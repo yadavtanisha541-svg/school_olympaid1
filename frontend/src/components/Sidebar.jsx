@@ -16,13 +16,12 @@ import {
   Clock,
   BarChart3,
   UserCheck,
-  UploadCloud,
-  CheckCircle2,
-  ShieldAlert
+  LogOut
 } from 'lucide-react';
+import { Badge } from './Badge';
 
 export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose }) => {
-  const { user, hasPermission } = useAuth();
+  const { user, logout, hasPermission } = useAuth();
 
   const superAdminNav = [
     { id: 'overview', label: 'Dashboard Overview', icon: LayoutDashboard },
@@ -65,6 +64,15 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose }) => {
   } else {
     navItems = studentNav;
   }
+
+  const getRoleBadgeVariant = (role) => {
+    switch (role) {
+      case 'superadmin': return 'purple';
+      case 'teacher': return 'primary';
+      case 'student': return 'success';
+      default: return 'default';
+    }
+  };
 
   return (
     <>
@@ -111,6 +119,38 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose }) => {
               </button>
             );
           })}
+        </div>
+
+        {/* User Profile Card placed at the very bottom */}
+        <div className="p-3 border-t border-slate-200 bg-slate-50/50">
+          <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white border border-slate-200/80 shadow-xs">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-9 h-9 shrink-0 rounded-xl bg-slate-100 border border-slate-200 text-slate-800 flex items-center justify-center font-bold text-sm shadow-inner">
+                {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <p className="text-xs font-bold text-slate-900 leading-tight truncate">
+                    {user?.full_name || 'User'}
+                  </p>
+                  <Badge variant={getRoleBadgeVariant(user?.role)} size="sm">
+                    {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'teacher' ? 'Teacher' : (user?.class_name || 'Student')}
+                  </Badge>
+                </div>
+                <p className="text-[11px] text-slate-500 font-mono mt-0.5 truncate">
+                  {user?.login_id}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={logout}
+              title="Log Out"
+              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors shrink-0"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </aside>
     </>
