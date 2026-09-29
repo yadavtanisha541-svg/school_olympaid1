@@ -112,19 +112,6 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose }) => {
             );
           })}
         </div>
-
-        {/* Footer info card */}
-        <div className="p-3 border-t border-slate-100 bg-slate-50/50">
-          <div className="p-3 bg-white rounded-xl border border-slate-200/80 shadow-2xs">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <p className="text-[11px] font-semibold text-slate-700">Exam Engine Live</p>
-            </div>
-            <p className="text-[10px] text-slate-500 mt-1">
-              Secure Proctoring & Timers Active
-            </p>
-          </div>
-        </div>
       </aside>
     </>
   );
