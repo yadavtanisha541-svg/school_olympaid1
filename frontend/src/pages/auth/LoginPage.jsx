@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Eye, EyeOff, Lock, User, Shield, GraduationCap, BookOpen, AlertCircle, ArrowRight, Award } from 'lucide-react';
+import { Eye, EyeOff, Lock, User, AlertCircle, ArrowRight, Award } from 'lucide-react';
 import { Button } from '../../components/Button';
 
 export const LoginPage = ({ onNavigateVerify }) => {
@@ -33,12 +33,6 @@ export const LoginPage = ({ onNavigateVerify }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleQuickFill = (id, pass) => {
-    setLoginId(id);
-    setPassword(pass);
-    setError('');
   };
 
   return (
@@ -139,41 +133,6 @@ export const LoginPage = ({ onNavigateVerify }) => {
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
           </form>
-
-          {/* Quick Demo Access Bar */}
-          <div className="mt-6 pt-5 border-t border-slate-100">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 text-center mb-3">
-              One-Click Demo Role Access
-            </p>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickFill('ADMIN001', 'Admin@123')}
-                className="flex flex-col items-center justify-center p-2 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-800 transition-colors"
-              >
-                <Shield className="w-4 h-4 text-purple-600 mb-1" />
-                <span className="text-[10px] font-bold">Super Admin</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickFill('TCH101', 'Teacher@123')}
-                className="flex flex-col items-center justify-center p-2 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 transition-colors"
-              >
-                <GraduationCap className="w-4 h-4 text-indigo-600 mb-1" />
-                <span className="text-[10px] font-bold">Teacher</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickFill('STU1001', 'Student@123')}
-                className="flex flex-col items-center justify-center p-2 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition-colors"
-              >
-                <BookOpen className="w-4 h-4 text-emerald-600 mb-1" />
-                <span className="text-[10px] font-bold">Student</span>
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Public Certificate Verification Link */}
