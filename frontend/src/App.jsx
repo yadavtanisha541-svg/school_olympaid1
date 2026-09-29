@@ -157,8 +157,9 @@ export const App = () => {
         case 'overview':
           return <SuperAdminOverview onNavigateTab={setCurrentTab} />;
         case 'teachers':
+          return <UserManagement mode="teachers" />;
         case 'students':
-          return <UserManagement initialTab={currentTab} />;
+          return <UserManagement mode="students" />;
         case 'academic':
           return <AcademicStructure />;
         case 'question_bank':
@@ -190,7 +191,7 @@ export const App = () => {
         case 'exams':
           return <ExamManagementPage />;
         case 'students':
-          return <UserManagement initialTab="students" />;
+          return <UserManagement mode="students" />;
         case 'results':
           return <ExamResultsPage />;
         case 'leaderboard':

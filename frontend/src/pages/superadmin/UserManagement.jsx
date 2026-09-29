@@ -20,14 +20,14 @@ import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
 import { Modal } from '../../components/Modal';
 
-export const UserManagement = () => {
-  const [activeTab, setActiveTab] = useState('teachers'); // 'teachers' | 'students'
+export const UserManagement = ({ mode = 'teachers' }) => {
   const [teachers, setTeachers] = useState([]);
   const [students, setStudents] = useState([]);
   const [classes, setClasses] = useState([]);
   const [allPermissions, setAllPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [selectedClassFilter, setSelectedClassFilter] = useState('');
 
   // Modals
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -40,7 +40,7 @@ export const UserManagement = () => {
 
   // Form State
   const [formData, setFormData] = useState({
-    role: 'teacher',
+    role: mode === 'teachers' ? 'teacher' : 'student',
     full_name: '',
     login_id: '',
     password: '',
@@ -56,20 +56,26 @@ export const UserManagement = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
 
+  const isTeacherView = mode === 'teachers';
+
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [tRes, sRes, cRes, pRes] = await Promise.all([
-        apiClient.get('/users/teachers', { search }),
-        apiClient.get('/users/students', { search }),
-        apiClient.get('/academic/classes'),
-        apiClient.get('/permissions')
-      ]);
-
-      if (tRes.success) setTeachers(tRes.data || []);
-      if (sRes.success) setStudents(sRes.data || []);
-      if (cRes.success) setClasses(cRes.data || []);
-      if (pRes.success) setAllPermissions(pRes.data || []);
+      if (isTeacherView) {
+        const [tRes, pRes] = await Promise.all([
+          apiClient.get('/users/teachers', { search }),
+          apiClient.get('/permissions')
+        ]);
+        if (tRes.success) setTeachers(tRes.data || []);
+        if (pRes.success) setAllPermissions(pRes.data || []);
+      } else {
+        const [sRes, cRes] = await Promise.all([
+          apiClient.get('/users/students', { search, class_id: selectedClassFilter }),
+          apiClient.get('/academic/classes')
+        ]);
+        if (sRes.success) setStudents(sRes.data || []);
+        if (cRes.success) setClasses(cRes.data || []);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -79,9 +85,10 @@ export const UserManagement = () => {
 
   useEffect(() => {
     fetchData();
-  }, [search]);
+  }, [mode, search, selectedClassFilter]);
 
-  const handleOpenCreate = (role) => {
+  const handleOpenCreate = () => {
+    const role = isTeacherView ? 'teacher' : 'student';
     setFormData({
       role,
       full_name: '',
@@ -102,7 +109,10 @@ export const UserManagement = () => {
     try {
       const res = await apiClient.post('/users', formData);
       if (res.success) {
-        setFeedback({ type: 'success', message: `${formData.role === 'teacher' ? 'Teacher' : 'Student'} created successfully! Login ID: ${res.data.login_id}` });
+        setFeedback({
+          type: 'success',
+          message: `${formData.role === 'teacher' ? 'Teacher' : 'Student'} created successfully! Login ID: ${res.data.login_id}`
+        });
         setShowCreateModal(false);
         fetchData();
       }
@@ -209,35 +219,37 @@ export const UserManagement = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header & Tabs */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black tracking-tight text-slate-900">
-            User & Role Management
+          <h2 className="text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2.5">
+            {isTeacherView ? (
+              <>
+                <GraduationCap className="w-7 h-7 text-brand-600" />
+                <span>Teacher Management</span>
+              </>
+            ) : (
+              <>
+                <Users className="w-7 h-7 text-emerald-600" />
+                <span>Student Management</span>
+              </>
+            )}
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Create teachers, students, generate credentials, configure role-based permissions and reset passwords.
+            {isTeacherView
+              ? 'Create faculty accounts, configure permissions, generate credentials, and monitor question authoring.'
+              : 'Create student candidates, assign academic classes, monitor performance, and manage candidate credentials.'}
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={GraduationCap}
-            onClick={() => handleOpenCreate('teacher')}
-          >
-            Add Teacher
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            icon={Users}
-            onClick={() => handleOpenCreate('student')}
-          >
-            Add Student
-          </Button>
-        </div>
+        <Button
+          variant={isTeacherView ? 'primary' : 'success'}
+          size="sm"
+          icon={isTeacherView ? GraduationCap : Users}
+          onClick={handleOpenCreate}
+        >
+          {isTeacherView ? 'Add New Teacher' : 'Add New Student'}
+        </Button>
       </div>
 
       {feedback.message && (
@@ -247,34 +259,25 @@ export const UserManagement = () => {
         </div>
       )}
 
-      {/* Tab Switcher & Search Bar */}
+      {/* Filter & Search Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <button
-            type="button"
-            onClick={() => setActiveTab('teachers')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === 'teachers'
-                ? 'bg-brand-600 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <GraduationCap className="w-4 h-4" />
-            <span>Teachers ({teachers.length})</span>
-          </button>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          {!isTeacherView && (
+            <select
+              value={selectedClassFilter}
+              onChange={(e) => setSelectedClassFilter(e.target.value)}
+              className="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-brand-500"
+            >
+              <option value="">All Classes</option>
+              {classes.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          )}
 
-          <button
-            type="button"
-            onClick={() => setActiveTab('students')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === 'students'
-                ? 'bg-brand-600 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            <span>Students ({students.length})</span>
-          </button>
+          <span className="text-xs font-bold text-slate-500">
+            Total: {isTeacherView ? teachers.length : students.length} {isTeacherView ? 'Teachers' : 'Students'}
+          </span>
         </div>
 
         {/* Search */}
@@ -284,7 +287,7 @@ export const UserManagement = () => {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, ID or email..."
+            placeholder={`Search ${isTeacherView ? 'teachers' : 'students'} by name, ID or email...`}
             className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
@@ -292,7 +295,7 @@ export const UserManagement = () => {
 
       {/* Main Table */}
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-        {activeTab === 'teachers' ? (
+        {isTeacherView ? (
           /* TEACHERS TABLE */
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
@@ -301,7 +304,7 @@ export const UserManagement = () => {
                   <th className="py-3.5 px-4">Teacher Name & ID</th>
                   <th className="py-3.5 px-4">Contact</th>
                   <th className="py-3.5 px-4">Permissions</th>
-                  <th className="py-3.5 px-4">Questions</th>
+                  <th className="py-3.5 px-4">Questions Authored</th>
                   <th className="py-3.5 px-4">Status</th>
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
@@ -310,7 +313,7 @@ export const UserManagement = () => {
                 {teachers.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="py-8 text-center text-slate-400">
-                      No teachers found. Click "Add Teacher" to create faculty accounts.
+                      No teachers found. Click "Add New Teacher" to create faculty accounts.
                     </td>
                   </tr>
                 ) : (
@@ -401,7 +404,7 @@ export const UserManagement = () => {
                 {students.length === 0 ? (
                   <tr>
                     <td colSpan="7" className="py-8 text-center text-slate-400">
-                      No students found. Click "Add Student" to create candidate profiles.
+                      No students found. Click "Add New Student" to create candidate profiles.
                     </td>
                   </tr>
                 ) : (
@@ -412,7 +415,7 @@ export const UserManagement = () => {
                         <p className="text-[11px] font-mono font-bold text-emerald-600">{s.login_id}</p>
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-semibold">
+                        <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-bold border border-slate-200">
                           {s.class_name || 'Unassigned'}
                         </span>
                       </td>
@@ -423,7 +426,7 @@ export const UserManagement = () => {
                       <td className="py-3.5 px-4 font-bold text-slate-800">
                         {s.attempts_count} exams
                       </td>
-                      <td className="py-3.5 px-4 font-bold text-brand-600">
+                      <td className="py-3.5 px-4 font-bold text-brand-600 font-mono">
                         {s.avg_score ? `${parseFloat(s.avg_score).toFixed(1)}%` : '-'}
                       </td>
                       <td className="py-3.5 px-4">
@@ -487,7 +490,7 @@ export const UserManagement = () => {
               Cancel
             </Button>
             <Button variant="primary" loading={actionLoading} onClick={handleCreateSubmit}>
-              Create User
+              Create {formData.role === 'teacher' ? 'Teacher' : 'Student'}
             </Button>
           </div>
         }
@@ -502,7 +505,7 @@ export const UserManagement = () => {
               required
               value={formData.full_name}
               onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-              placeholder="e.g. Dr. Rajesh Sharma"
+              placeholder={isTeacherView ? 'e.g. Dr. Rajesh Sharma' : 'e.g. Aarav Mehta'}
               className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500"
             />
           </div>
@@ -534,7 +537,7 @@ export const UserManagement = () => {
             </div>
           </div>
 
-          {formData.role === 'student' && (
+          {!isTeacherView && (
             <div>
               <label className="block font-bold text-slate-700 uppercase tracking-wider mb-1">
                 Academic Class
@@ -561,7 +564,7 @@ export const UserManagement = () => {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="teacher@olympiadhub.com"
+                placeholder={isTeacherView ? 'teacher@olympiadhub.com' : 'student@email.com'}
                 className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500"
               />
             </div>
@@ -585,7 +588,7 @@ export const UserManagement = () => {
       <Modal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
-        title="Edit User Profile"
+        title={`Edit ${selectedUser?.role === 'teacher' ? 'Teacher' : 'Student'} Profile`}
         maxWidth="max-w-md"
         footer={
           <div className="flex items-center justify-end gap-3 w-full">
@@ -605,6 +608,23 @@ export const UserManagement = () => {
               className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500"
             />
           </div>
+
+          {!isTeacherView && (
+            <div>
+              <label className="block font-bold text-slate-700 uppercase tracking-wider mb-1">Academic Class</label>
+              <select
+                value={formData.class_id}
+                onChange={(e) => setFormData({ ...formData, class_id: e.target.value })}
+                className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500"
+              >
+                <option value="">Select Academic Class</option>
+                {classes.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div>
             <label className="block font-bold text-slate-700 uppercase tracking-wider mb-1">Email</label>
             <input
