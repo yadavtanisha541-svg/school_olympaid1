@@ -50,13 +50,26 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
 
   const metrics = data?.metrics || {};
 
-  // Formatted current date like "Monday, 23 Sep 2026"
-  const formattedDate = new Intl.DateTimeFormat('en-GB', {
-    weekday: 'long',
-    day: 'numeric',
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedDateStr = currentTime.toLocaleDateString('en-US', {
+    weekday: 'short',
     month: 'short',
+    day: 'numeric',
     year: 'numeric'
-  }).format(new Date());
+  });
+
+  const formattedTimeStr = currentTime.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  }).toLowerCase();
 
   // Recent Submissions (live fallback to sample items if empty)
   const candidateSubmissions = (data?.recent_results && data.recent_results.length > 0)
@@ -87,68 +100,81 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
 
   return (
     <div className="space-y-6 pb-12 font-sans">
-      {/* 1. Greeting Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 flex items-center gap-2">
-            Good Morning, Super Admin <span className="inline-block animate-bounce">👋</span>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Here's what's happening with your Olympiad platform today.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {/* Calendar Date Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200/80 rounded-2xl shadow-xs text-xs font-semibold text-slate-700">
-            <Calendar className="w-4 h-4 text-indigo-500" />
-            <span>{formattedDate}</span>
+      {/* 1. Warm Greeting & Quick Actions Header Banner matching exact target */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Left Warm Cream Greeting Card (8 Cols) */}
+        <div className="lg:col-span-8 bg-gradient-to-r from-[#faf6ee] via-[#f7f3eb] to-[#fbf8f2] border border-[#e8dfd1] rounded-3xl p-5 sm:p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            {/* Potted plant / aesthetic leaf illustration badge */}
+            <div className="w-14 h-14 rounded-2xl bg-white border border-[#e8dfd1] shadow-2xs flex items-center justify-center text-2xl shrink-0">
+              🪴
+            </div>
+            <div>
+              <p className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-stone-400">
+                GOOD MORNING, SUPER ADMIN
+              </p>
+              <h1 className="text-lg sm:text-xl font-black text-stone-900 tracking-tight mt-0.5 leading-snug">
+                Here's what's happening at <span className="text-[#a66e38]">OlympiadHub</span> today
+              </h1>
+              <p className="text-xs text-stone-500 mt-0.5">
+                Track examinations, manage questions and keep everything running smoothly.
+              </p>
+            </div>
           </div>
 
-          {/* Quick Actions Dropdown */}
-          <div className="relative">
+          {/* Right Live Date & Time inside card */}
+          <div className="text-left sm:text-right shrink-0 border-t sm:border-t-0 border-[#e8dfd1]/60 pt-2 sm:pt-0">
+            <p className="text-xs font-bold text-stone-800 font-sans">
+              {formattedDateStr}
+            </p>
+            <p className="text-xs font-mono font-bold text-[#a66e38] mt-0.5">
+              {formattedTimeStr}
+            </p>
+          </div>
+        </div>
+
+        {/* Right Quick Actions Card (4 Cols) */}
+        <div className="lg:col-span-4 bg-white rounded-3xl border border-[#e8dfd1] p-4 shadow-2xs flex flex-col justify-between">
+          <h3 className="text-xs font-bold text-stone-800 mb-2.5">
+            Quick Actions
+          </h3>
+
+          <div className="grid grid-cols-2 gap-2.5">
             <button
               type="button"
-              onClick={() => setShowQuickActions(!showQuickActions)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-2xl text-xs font-bold shadow-sm shadow-indigo-500/25 transition-all active:scale-95 cursor-pointer"
+              onClick={() => onNavigateTab('students')}
+              className="px-3 py-2 rounded-2xl bg-[#faf7f2] hover:bg-[#f2ece0] border border-[#e8dfd1] text-stone-800 text-xs font-semibold flex items-center gap-2 transition-all shadow-2xs active:scale-95 cursor-pointer text-left"
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Quick Actions</span>
-              <ChevronDown className="w-3.5 h-3.5" />
+              <Users className="w-3.5 h-3.5 text-[#a66e38] shrink-0" />
+              <span className="truncate">Add Student</span>
             </button>
 
-            {showQuickActions && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <button
-                  type="button"
-                  onClick={() => { setShowQuickActions(false); onNavigateTab('exams'); }}
-                  className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2"
-                >
-                  <Plus className="w-3.5 h-3.5" /> Create Exam
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setShowQuickActions(false); onNavigateTab('question_bank'); }}
-                  className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2"
-                >
-                  <HelpCircle className="w-3.5 h-3.5" /> Question Bank
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setShowQuickActions(false); onNavigateTab('students'); }}
-                  className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2"
-                >
-                  <Users className="w-3.5 h-3.5" /> Add Student
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setShowQuickActions(false); onNavigateTab('teachers'); }}
-                  className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2"
-                >
-                  <GraduationCap className="w-3.5 h-3.5" /> Add Teacher
-                </button>
-              </div>
-            )}
+            <button
+              type="button"
+              onClick={() => onNavigateTab('exams')}
+              className="px-3 py-2 rounded-2xl bg-[#faf7f2] hover:bg-[#f2ece0] border border-[#e8dfd1] text-stone-800 text-xs font-semibold flex items-center gap-2 transition-all shadow-2xs active:scale-95 cursor-pointer text-left"
+            >
+              <Calendar className="w-3.5 h-3.5 text-[#a66e38] shrink-0" />
+              <span className="truncate">Create Exam</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onNavigateTab('question_bank')}
+              className="px-3 py-2 rounded-2xl bg-[#faf7f2] hover:bg-[#f2ece0] border border-[#e8dfd1] text-stone-800 text-xs font-semibold flex items-center gap-2 transition-all shadow-2xs active:scale-95 cursor-pointer text-left"
+            >
+              <Clock className="w-3.5 h-3.5 text-[#a66e38] shrink-0" />
+              <span className="truncate">Question Bank</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onNavigateTab('results')}
+              className="px-3 py-2 rounded-2xl bg-[#faf7f2] hover:bg-[#f2ece0] border border-[#e8dfd1] text-stone-800 text-xs font-semibold flex items-center gap-2 transition-all shadow-2xs active:scale-95 cursor-pointer text-left"
+            >
+              <FileText className="w-3.5 h-3.5 text-[#a66e38] shrink-0" />
+              <span className="truncate">Reports</span>
+            </button>
           </div>
         </div>
       </div>
