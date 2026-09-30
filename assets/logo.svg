@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0F2744" />
+      <stop offset="50%" stop-color="#1E3A8A" />
+      <stop offset="100%" stop-color="#0D9488" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14B8A6" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="goldStar" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+    <filter id="subtleShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F2744" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Logo Mark Group -->
+  <g transform="translate(10, 10)" filter="url(#subtleShadow)">
+    <!-- Geometric Academic Shield Base -->
+    <path d="M40 4 L74 22 V52 C74 68 40 78 40 78 C40 78 6 68 6 52 V22 Z" fill="#0F2744" />
+    
+    <!-- Dynamic Upward Achievement Vector / Ascent Wing -->
+    <path d="M40 12 L66 26 V48 C66 60 40 68 40 68 Z" fill="url(#brandGrad)" />
+    
+    <!-- Stylized Knowledge Diamond / Mortarboard Angle -->
+    <polygon points="40,14 62,27 40,40 18,27" fill="#FFFFFF" opacity="0.95" />
+    
+    <!-- Central Achievement Star & Geometric Orbit -->
+    <circle cx="40" cy="27" r="5" fill="url(#goldStar)" />
+    <path d="M22 46 C28 54 52 54 58 46" fill="none" stroke="url(#accentGrad)" stroke-width="3" stroke-linecap="round" />
+    <circle cx="58" cy="46" r="2.5" fill="#14B8A6" />
+  </g>
+
+  <!-- Typography Wordmark -->
+  <g transform="translate(100, 22)">
+    <!-- Main Brand Name -->
+    <text x="0" y="38" font-family="'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="36" font-weight="800" fill="#0F2744" letter-spacing="-0.5px">
+      Olympiad<tspan fill="#0D9488">Hub</tspan>
+    </text>
+    
+    <!-- Small geometric dot accent above the b -->
+    <circle cx="218" cy="12" r="3.5" fill="#14B8A6" />
+
+    <!-- Tagline -->
+    <text x="2" y="58" font-family="'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9.5" font-weight="700" fill="#64748B" letter-spacing="2.8px">
+      LEARN • PRACTICE • COMPETE • ACHIEVE
+    </text>
+  </g>
+</svg>

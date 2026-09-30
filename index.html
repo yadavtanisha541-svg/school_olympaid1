@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OlympiadHub — Learn. Practice. Compete. Achieve.</title>
+  <meta name="description" content="OlympiadHub is the premier modern Olympiad examination platform for Mathematics, Science, English, Cyber, and Logical Reasoning across Classes Nursery to 10." />
+  <meta name="keywords" content="Olympiad examination, Math Olympiad, Science Olympiad, Cyber Olympiad, Mock tests, Sample papers, Student rankings, Certificate of achievement" />
+  
+  <!-- Open Graph Meta -->
+  <meta property="og:title" content="OlympiadHub — Premier Olympiad Examination Platform" />
+  <meta property="og:description" content="Prepare, practice, and compete in prestigious online Olympiad examinations." />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              900: '#0F2744',
+              800: '#1E3A8A',
+              700: '#2563EB',
+            },
+            teal: {
+              800: '#0D9488',
+              700: '#0F766E',
+              600: '#14B8A6',
+              500: '#2DD4BF',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            serif: ['Georgia', 'Cambria', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased flex flex-col min-h-screen">
+
+  <!-- ================= TOP NOTIFICATION / ROLE SWITCH BAR ================= -->
+  <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center space-x-2">
+        <span class="px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 font-bold uppercase tracking-wider text-[10px]">
+          2026-2027 Registration Open
+        </span>
+        <span class="hidden sm:inline text-slate-400">International Olympiad schedule announced • Free diagnostic mock test enabled!</span>
+      </div>
+
+      <!-- Quick Role Switcher for Pair Testing -->
+      <div class="flex items-center space-x-2">
+        <span class="text-slate-400 text-[11px] font-semibold">Switch Portal Demo:</span>
+        <div class="inline-flex rounded-lg bg-slate-800 p-0.5 text-[11px]">
+          <button onclick="window.OlympiadApp.switchUserRole('student')" class="px-2 py-1 rounded text-white hover:bg-slate-700 font-medium">Student</button>
+          <button onclick="window.OlympiadApp.switchUserRole('parent')" class="px-2 py-1 rounded text-slate-300 hover:bg-slate-700 font-medium">Parent</button>
+          <button onclick="window.OlympiadApp.switchUserRole('school')" class="px-2 py-1 rounded text-slate-300 hover:bg-slate-700 font-medium">School</button>
+          <button onclick="window.OlympiadApp.switchUserRole('admin')" class="px-2 py-1 rounded text-teal-400 hover:bg-slate-700 font-bold">Admin</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= STICKY HEADER NAVBAR ================= -->
+  <header id="main-navbar" class="header-glass sticky top-0 z-40 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logo -->
+        <a href="#" onclick="window.OlympiadApp.showView('home-view')" class="flex items-center space-x-3 shrink-0">
+          <img src="assets/logo.svg" alt="OlympiadHub Logo" class="h-11 sm:h-12 w-auto" />
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden lg:flex items-center space-x-6 text-sm font-semibold text-slate-700">
+          <a href="#home" onclick="window.OlympiadApp.showView('home-view')" class="hover:text-blue-900 transition">Home</a>
+          <a href="#olympiads" onclick="window.OlympiadApp.showView('olympiads-view')" class="hover:text-blue-900 transition">Olympiads</a>
+          <a href="#classes" onclick="window.OlympiadApp.showView('classes-view')" class="hover:text-blue-900 transition">Classes</a>
+          <a href="#syllabus" onclick="window.OlympiadApp.showView('syllabus-view')" class="hover:text-blue-900 transition">Syllabus</a>
+          <a href="#sample-papers" onclick="window.OlympiadApp.showView('sample-papers-view')" class="hover:text-blue-900 transition">Sample Papers</a>
+          <a href="#leaderboard" onclick="window.OlympiadApp.showView('leaderboard-view')" class="hover:text-blue-900 transition">Results & Ranks</a>
+          <a href="#about" onclick="window.OlympiadApp.showView('about-view')" class="hover:text-blue-900 transition">About</a>
+          <a href="#contact" onclick="window.OlympiadApp.showView('contact-view')" class="hover:text-blue-900 transition">Contact</a>
+        </nav>
+
+        <!-- Right Action Controls -->
+        <div class="flex items-center space-x-3">
+          <div id="header-user-badge" class="hidden sm:block"></div>
+
+          <button onclick="window.OlympiadApp.openRegisterModal()" class="hidden sm:inline-flex px-4 py-2 rounded-xl btn-primary text-white font-bold text-xs sm:text-sm shadow">
+            Register Student
+          </button>
+
+          <!-- Mobile Hamburger Toggle -->
+          <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="lg:hidden p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Navigation -->
+    <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-5 space-y-2 shadow-lg">
+      <a href="#" onclick="window.OlympiadApp.showView('home-view'); document.getElementById('mobile-menu').classList.add('hidden')" class="block py-2 text-sm font-bold text-slate-800">Home</a>
+      <a href="#" onclick="window.OlympiadApp.showView('olympiads-view'); document.getElementById('mobile-menu').classList.add('hidden')" class="block py-2 text-sm font-semibold text-slate-700">Olympiads</a>
+      <a href="#" onclick="window.OlympiadApp.showView('classes-view'); document.getElementById('mobile-menu').classList.add('hidden')" class="block py-2 text-sm font-semibold text-slate-700">Classes</a>
+      <a href="#" onclick="window.OlympiadApp.showView('syllabus-view'); document.getElementById('mobile-menu').classList.add('hidden')" class="block py-2 text-sm font-semibold text-slate-700">Syllabus</a>
+      <a href="#" onclick="window.OlympiadApp.showView('sample-papers-view'); document.getElementById('mobile-menu').classList.add('hidden')" class="block py-2 text-sm font-semibold text-slate-700">Sample Papers</a>
+      <a href="#" onclick="window.OlympiadApp.showView('leaderboard-view'); document.getElementById('mobile-menu').classList.add('hidden')" class="block py-2 text-sm font-semibold text-slate-700">Results & Ranks</a>
+      <div class="pt-3 border-t border-slate-100 flex flex-col space-y-2">
+        <button onclick="window.OlympiadApp.showStudentPortal(); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full py-2.5 rounded-lg btn-teal text-white font-bold text-xs">Student Portal</button>
+        <button onclick="window.OlympiadApp.showAdminPortal(); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full py-2.5 rounded-lg bg-slate-800 text-white font-bold text-xs">Admin Panel</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT WRAPPER ================= -->
+  <main class="flex-1">
+
+    <!-- ================= 1. HOME VIEW ================= -->
+    <div id="home-view" class="app-view space-y-20 pb-20">
+      
+      <!-- HERO SECTION -->
+      <section class="relative pt-12 pb-16 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <!-- Left Hero Text (7 Cols) -->
+            <div class="lg:col-span-7 space-y-6">
+              <div class="hero-badge inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold text-teal-800">
+                <span class="w-2 h-2 rounded-full bg-teal-600 animate-pulse"></span>
+                <span>The Premier Academic Excellence Platform</span>
+              </div>
+
+              <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
+                Challenge Your Knowledge. <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-900 via-blue-800 to-teal-700">
+                  Discover Your Potential.
+                </span>
+              </h1>
+
+              <p class="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed">
+                Prepare, practice and participate in exciting Olympiad examinations designed to develop knowledge, logic and problem-solving skills across Mathematics, Science, English, Cyber, and Cognitive Reasoning.
+              </p>
+
+              <div class="flex flex-wrap items-center gap-4 pt-2">
+                <button onclick="window.OlympiadApp.showView('olympiads-view')" class="px-6 py-3.5 rounded-xl btn-primary text-white font-bold text-sm shadow-lg flex items-center space-x-2">
+                  <span>Explore Olympiads</span>
+                  <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+
+                <button onclick="window.OlympiadApp.startQuickMock('IMO')" class="px-6 py-3.5 rounded-xl btn-teal text-white font-bold text-sm shadow-lg flex items-center space-x-2">
+                  <i data-lucide="play-circle" class="w-4 h-4"></i>
+                  <span>Start Free Mock Test</span>
+                </button>
+              </div>
+
+              <!-- Trust Metrics Badge -->
+              <div class="pt-6 border-t border-slate-200 grid grid-cols-3 gap-4 text-left">
+                <div>
+                  <div class="text-xl sm:text-2xl font-black text-slate-900">250,000+</div>
+                  <div class="text-xs text-slate-500 font-medium">Enrolled Scholars</div>
+                </div>
+                <div>
+                  <div class="text-xl sm:text-2xl font-black text-slate-900">1,850+</div>
+                  <div class="text-xs text-slate-500 font-medium">Partner Schools</div>
+                </div>
+                <div>
+                  <div class="text-xl sm:text-2xl font-black text-emerald-600">100%</div>
+                  <div class="text-xs text-slate-500 font-medium">Verified Certificates</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Hero Visual / Interactive Card (5 Cols) -->
+            <div class="lg:col-span-5 relative">
+              <div class="relative bg-white rounded-3xl p-7 border border-slate-200 shadow-2xl space-y-6">
+                
+                <!-- Card Header -->
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-900 text-white flex items-center justify-center font-bold">
+                      <i data-lucide="award" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                      <div class="text-sm font-bold text-slate-900">Live Mock Challenge</div>
+                      <div class="text-xs text-teal-800 font-medium">Class 5 Mathematics Sample</div>
+                    </div>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">Active</span>
+                </div>
+
+                <!-- Live Question Preview Box -->
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div class="flex justify-between text-xs text-slate-500 font-bold">
+                    <span>Q12. Mental Arithmetic</span>
+                    <span class="text-blue-900">Time Left: 29:45</span>
+                  </div>
+                  <div class="text-sm font-bold text-slate-800">
+                    What is the product of 25 × 4 + 350 ÷ 7 - 15?
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="p-2 rounded-lg bg-white border font-medium">A. 125</div>
+                    <div class="p-2 rounded-lg bg-emerald-50 border border-emerald-500 text-emerald-950 font-bold flex justify-between">
+                      <span>B. 135</span>
+                      <span>✓</span>
+                    </div>
+                    <div class="p-2 rounded-lg bg-white border font-medium">C. 145</div>
+                    <div class="p-2 rounded-lg bg-white border font-medium">D. 115</div>
+                  </div>
+                </div>
+
+                <!-- Instant Action CTA in Card -->
+                <div class="space-y-2">
+                  <button onclick="window.OlympiadApp.startQuickMock('IMO')" class="w-full py-3 rounded-xl btn-primary text-white font-bold text-xs sm:text-sm text-center shadow">
+                    Experience Full Online Exam Engine →
+                  </button>
+                  <p class="text-[11px] text-center text-slate-400">Includes timer, question palette, formulas & instant topic-wise analytics.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- UPCOMING EXAM SECTION -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-3">
+          <div>
+            <span class="text-xs font-bold text-teal-800 uppercase tracking-widest block mb-1">Official Calendar</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Upcoming Olympiad Examinations</h2>
+          </div>
+          <button onclick="window.OlympiadApp.showView('olympiads-view')" class="text-xs font-bold text-blue-900 hover:text-blue-700 flex items-center space-x-1">
+            <span>View All Olympiads</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div id="upcoming-exams-list" class="space-y-4">
+          <!-- Upcoming exam cards injected via app.js -->
+        </div>
+      </section>
+
+      <!-- OLYMPIAD CATEGORIES -->
+      <section class="bg-white py-16 border-y border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center max-w-2xl mx-auto mb-12 space-y-2">
+            <span class="text-xs font-bold text-teal-800 uppercase tracking-widest">Academic Disciplines</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Olympiad Examination Categories</h2>
+            <p class="text-xs sm:text-sm text-slate-500">Comprehensive curriculum aligned with national and international academic standards.</p>
+          </div>
+
+          <div id="public-olympiads-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Olympiad category cards injected via app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- HOW IT WORKS (4 STEPS) -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-14 space-y-2">
+          <span class="text-xs font-bold text-teal-800 uppercase tracking-widest">Simple Seamless Journey</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">How OlympiadHub Works</h2>
+          <p class="text-xs sm:text-sm text-slate-500">Four straightforward steps from registration to verified achievement.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-900 flex items-center justify-center font-black text-lg mb-4">1</div>
+            <h3 class="text-base font-bold text-slate-900 mb-1">Choose Olympiad</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">Select from Mathematics, Science, English, Cyber or Reasoning for your class grade.</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative">
+            <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-800 flex items-center justify-center font-black text-lg mb-4">2</div>
+            <h3 class="text-base font-bold text-slate-900 mb-1">Register Online</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">Enroll in minutes as an individual student or through your school coordinator.</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-700 flex items-center justify-center font-black text-lg mb-4">3</div>
+            <h3 class="text-base font-bold text-slate-900 mb-1">Prepare & Practice</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">Access official sample papers, previous year question banks and timed mock tests.</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-black text-lg mb-4">4</div>
+            <h3 class="text-base font-bold text-slate-900 mb-1">Take Exam & Achieve</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">Appear in the proctored exam, view instant diagnostics, and download verified certificates.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- WHY OLYMPIADHUB (8 FEATURE CARDS) -->
+      <section class="bg-white py-16 border-y border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center max-w-2xl mx-auto mb-12 space-y-2">
+            <span class="text-xs font-bold text-teal-800 uppercase tracking-widest">Why Choose Us</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Engineered for Academic Excellence</h2>
+            <p class="text-xs sm:text-sm text-slate-500">Every feature is designed to sharpen intellectual capability and test readiness.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+              <i data-lucide="book-open" class="w-6 h-6 text-blue-900"></i>
+              <h4 class="text-sm font-bold text-slate-900">Structured Learning</h4>
+              <p class="text-xs text-slate-500">Topic-by-topic curriculum structured specifically for each standard.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+              <i data-lucide="monitor" class="w-6 h-6 text-teal-800"></i>
+              <h4 class="text-sm font-bold text-slate-900">Online Examination</h4>
+              <p class="text-xs text-slate-500">Seamless proctored testing interface with real-time timers and auto-save.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+              <i data-lucide="check-square" class="w-6 h-6 text-indigo-600"></i>
+              <h4 class="text-sm font-bold text-slate-900">Practice Tests</h4>
+              <p class="text-xs text-slate-500">Extensive mock papers and previous 5 years official exam papers.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+              <i data-lucide="zap" class="w-6 h-6 text-amber-500"></i>
+              <h4 class="text-sm font-bold text-slate-900">Instant Results</h4>
+              <p class="text-xs text-slate-500">Immediate score calculation, accuracy percentages, and answer keys.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+              <i data-lucide="pie-chart" class="w-6 h-6 text-rose-600"></i>
+              <h4 class="text-sm font-bold text-slate-900">Performance Analysis</h4>
+              <p class="text-xs text-slate-500">Topic-level diagnostic breakdown showing strengths and improvement areas.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+              <i data-lucide="award" class="w-6 h-6 text-amber-600"></i>
+              <h4 class="text-sm font-bold text-slate-900">Certificates</h4>
+              <p class="text-xs text-slate-500">Authentic printable certificates with cryptographic hash verification.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+              <i data-lucide="trophy" class="w-6 h-6 text-emerald-600"></i>
+              <h4 class="text-sm font-bold text-slate-900">National Rankings</h4>
+              <p class="text-xs text-slate-500">Benchmark your child against students across National, State and School levels.</p>
+            </div>
+
+            <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+              <i data-lucide="shield-check" class="w-6 h-6 text-cyan-600"></i>
+              <h4 class="text-sm font-bold text-slate-900">Secure Examination</h4>
+              <p class="text-xs text-slate-500">Anti-tab switch detection, randomized questions and strict integrity checks.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LIVE STATS COUNTER -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-gradient-to-r from-blue-900 via-blue-950 to-slate-900 rounded-3xl p-8 sm:p-12 text-white shadow-xl">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+            <div>
+              <div id="stat-counter-students" class="text-3xl sm:text-5xl font-black text-teal-300">250,000+</div>
+              <div class="text-xs sm:text-sm text-slate-300 font-semibold mt-1">Students Participated</div>
+            </div>
+            <div>
+              <div id="stat-counter-olympiads" class="text-3xl sm:text-5xl font-black text-teal-300">45+</div>
+              <div class="text-xs sm:text-sm text-slate-300 font-semibold mt-1">Olympiads Conducted</div>
+            </div>
+            <div>
+              <div id="stat-counter-questions" class="text-3xl sm:text-5xl font-black text-teal-300">120,000+</div>
+              <div class="text-xs sm:text-sm text-slate-300 font-semibold mt-1">Practice Questions</div>
+            </div>
+            <div>
+              <div id="stat-counter-schools" class="text-3xl sm:text-5xl font-black text-teal-300">1,850+</div>
+              <div class="text-xs sm:text-sm text-slate-300 font-semibold mt-1">Schools Connected</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TESTIMONIALS & FAQ -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+        
+        <!-- Testimonials -->
+        <div>
+          <div class="text-center max-w-2xl mx-auto mb-10 space-y-2">
+            <span class="text-xs font-bold text-teal-800 uppercase tracking-widest">Scholars & Educators</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">What Parents & Teachers Say</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+              <div class="flex text-amber-400 text-sm">★★★★★</div>
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed italic">
+                “OlympiadHub’s mock test engine gave my son Advik the exact confidence he needed. The topic-wise analysis pinpointed where he lost time in Geometry.”
+              </p>
+              <div class="flex items-center space-x-3 pt-2 border-t border-slate-100">
+                <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-xs">VS</div>
+                <div>
+                  <div class="text-xs font-bold text-slate-900">Vikram Sharma</div>
+                  <div class="text-[11px] text-slate-400">Parent of Class 5 Student (Mumbai)</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+              <div class="flex text-amber-400 text-sm">★★★★★</div>
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed italic">
+                “As a school coordinator, the bulk CSV student upload saved our administration weeks of manual effort. The automatic certificates are pristine.”
+              </p>
+              <div class="flex items-center space-x-3 pt-2 border-t border-slate-100">
+                <div class="w-9 h-9 rounded-full bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">MR</div>
+                <div>
+                  <div class="text-xs font-bold text-slate-900">Dr. Meenakshi Rao</div>
+                  <div class="text-[11px] text-slate-400">Academic Coordinator, Cambridge High</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+              <div class="flex text-amber-400 text-sm">★★★★★</div>
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed italic">
+                “The question palette, timer countdown, and step-by-step solutions make OlympiadHub by far the best online examination platform.”
+              </p>
+              <div class="flex items-center space-x-3 pt-2 border-t border-slate-100">
+                <div class="w-9 h-9 rounded-full bg-purple-100 text-purple-800 flex items-center justify-center font-bold text-xs">AP</div>
+                <div>
+                  <div class="text-xs font-bold text-slate-900">Aarav Patel</div>
+                  <div class="text-[11px] text-slate-400">National Rank #1 Medalist</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ Accordion -->
+        <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm max-w-4xl mx-auto">
+          <h3 class="text-xl font-bold text-slate-900 mb-6 text-center">Frequently Asked Questions</h3>
+          
+          <div class="space-y-4 text-xs sm:text-sm">
+            <details class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 group" open>
+              <summary class="font-bold text-slate-900 cursor-pointer flex justify-between items-center">
+                <span>What is OlympiadHub?</span>
+                <span class="text-slate-400 font-normal group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <p class="text-slate-600 mt-2 leading-relaxed">
+                OlympiadHub is a premier online examination and preparation platform hosting competitive Olympiads across Mathematics, Science, English, Cyber, and Logical Reasoning for students from Nursery to Class 10.
+              </p>
+            </details>
+
+            <details class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 group">
+              <summary class="font-bold text-slate-900 cursor-pointer flex justify-between items-center">
+                <span>Who is eligible to participate?</span>
+                <span class="text-slate-400 font-normal group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <p class="text-slate-600 mt-2 leading-relaxed">
+                Students from any recognized school curriculum across Nursery, Kindergarten, and Classes 1 through 10 are eligible. Individual students as well as institutional school batches can participate.
+              </p>
+            </details>
+
+            <details class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 group">
+              <summary class="font-bold text-slate-900 cursor-pointer flex justify-between items-center">
+                <span>How does the online proctored exam work?</span>
+                <span class="text-slate-400 font-normal group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <p class="text-slate-600 mt-2 leading-relaxed">
+                Exams are conducted through our secure examination engine with an interactive question palette, live countdown timer, auto-saving of answers, and security monitoring against tab switching.
+              </p>
+            </details>
+
+            <details class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 group">
+              <summary class="font-bold text-slate-900 cursor-pointer flex justify-between items-center">
+                <span>How can I download my verified certificate?</span>
+                <span class="text-slate-400 font-normal group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <p class="text-slate-600 mt-2 leading-relaxed">
+                Immediately after exam evaluation, certificates are generated with unique Certificate IDs, score verification QR stamps, and can be downloaded or printed in PDF format from the student dashboard.
+              </p>
+            </details>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- ================= 2. OLYMPIADS DEDICATED VIEW ================= -->
+    <div id="olympiads-view" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <div class="border-b border-slate-200 pb-5">
+        <span class="text-xs font-bold text-teal-800 uppercase tracking-widest block">Official Portfolio</span>
+        <h1 class="text-3xl font-extrabold text-slate-900 mt-1">All Olympiad Examinations (2026-2027)</h1>
+        <p class="text-sm text-slate-500 mt-1">Explore complete syllabi, exam patterns, schedules, and register for certified examinations.</p>
+      </div>
+
+      <div id="olympiads-page-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Reusable from DB -->
+      </div>
+    </div>
+
+    <!-- ================= 3. CLASSES VIEW ================= -->
+    <div id="classes-view" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <div class="border-b border-slate-200 pb-5">
+        <span class="text-xs font-bold text-teal-800 uppercase tracking-widest block">Grade Directory</span>
+        <h1 class="text-3xl font-extrabold text-slate-900 mt-1">Class-Wise Olympiad Programs</h1>
+        <p class="text-sm text-slate-500 mt-1">Tailored curriculum and mock question sets for every standard from Nursery to Class 10.</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div onclick="window.OlympiadApp.selectedClassFilter='nursery'; window.OlympiadApp.showView('sample-papers-view')" class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-blue-900 cursor-pointer transition">
+          <span class="text-xs font-bold text-teal-800">Early Years</span>
+          <h3 class="text-lg font-bold text-slate-900 mt-1">Nursery</h3>
+          <p class="text-xs text-slate-400 mt-1">Age 3-4 • JSTO Foundation</p>
+        </div>
+        <div onclick="window.OlympiadApp.selectedClassFilter='kg'; window.OlympiadApp.showView('sample-papers-view')" class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-blue-900 cursor-pointer transition">
+          <span class="text-xs font-bold text-teal-800">Early Years</span>
+          <h3 class="text-lg font-bold text-slate-900 mt-1">Kindergarten (KG)</h3>
+          <p class="text-xs text-slate-400 mt-1">Age 4-5 • Shapes & Quantities</p>
+        </div>
+        <div onclick="window.OlympiadApp.selectedClassFilter='1'; window.OlympiadApp.showView('sample-papers-view')" class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-blue-900 cursor-pointer transition">
+          <span class="text-xs font-bold text-blue-900">Primary</span>
+          <h3 class="text-lg font-bold text-slate-900 mt-1">Class 1</h3>
+          <p class="text-xs text-slate-400 mt-1">Math, Science, English, GK</p>
+        </div>
+        <div onclick="window.OlympiadApp.selectedClassFilter='2'; window.OlympiadApp.showView('sample-papers-view')" class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-blue-900 cursor-pointer transition">
+          <span class="text-xs font-bold text-blue-900">Primary</span>
+          <h3 class="text-lg font-bold text-slate-900 mt-1">Class 2</h3>
+          <p class="text-xs text-slate-400 mt-1">Math, Science, English, GK</p>
+        </div>
+        <div onclick="window.OlympiadApp.selectedClassFilter='3'; window.OlympiadApp.showView('sample-papers-view')" class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-blue-900 cursor-pointer transition">
+          <span class="text-xs font-bold text-blue-900">Primary</span>
+          <h3 class="text-lg font-bold text-slate-900 mt-1">Class 3</h3>
+          <p class="text-xs text-slate-400 mt-1">Math, Science, English, Cyber</p>
+        </div>
+        <div onclick="window.OlympiadApp.selectedClassFilter='4'; window.OlympiadApp.showView('sample-papers-view')" class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-blue-900 cursor-pointer transition">
+          <span class="text-xs font-bold text-blue-900">Primary</span>
+          <h3 class="text-lg font-bold text-slate-900 mt-1">Class 4</h3>
+          <p class="text-xs text-slate-400 mt-1">Math, Science, English, Cyber</p>
+        </div>
+        <div onclick="window.OlympiadApp.selectedClassFilter='5'; window.OlympiadApp.showView('sample-papers-view')" class="p-5 bg-blue-50/60 rounded-2xl border-2 border-blue-900 shadow-sm cursor-pointer transition">
+          <span class="text-xs font-bold text-blue-900">Featured</span>
+          <h3 class="text-lg font-bold text-slate-900 mt-1">Class 5</h3>
+          <p class="text-xs text-slate-500 mt-1">Full 6 Olympiad Disciplines</p>
+        </div>
+        <div onclick="window.OlympiadApp.selectedClassFilter='6'; window.OlympiadApp.showView('sample-papers-view')" class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-blue-900 cursor-pointer transition">
+          <span class="text-xs font-bold text-blue-900">Middle School</span>
+          <h3 class="text-lg font-bold text-slate-900 mt-1">Class 6</h3>
+          <p class="text-xs text-slate-400 mt-1">Advanced Problem Solving</p>
+        </div>
+        <div onclick="window.OlympiadApp.selectedClassFilter='7'; window.OlympiadApp.showView('sample-papers-view')" class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-blue-900 cursor-pointer transition">
+          <span class="text-xs font-bold text-blue-900">Middle School</span>
+          <h3 class="text-lg font-bold text-slate-900 mt-1">Class 7</h3>
+          <p class="text-xs text-slate-400 mt-1">Advanced Problem Solving</p>
+        </div>
+        <div onclick="window.OlympiadApp.selectedClassFilter='8'; window.OlympiadApp.showView('sample-papers-view')" class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-blue-900 cursor-pointer transition">
+          <span class="text-xs font-bold text-blue-900">Middle School</span>
+          <h3 class="text-lg font-bold text-slate-900 mt-1">Class 8</h3>
+          <p class="text-xs text-slate-400 mt-1">High School Prep & Coding</p>
+        </div>
+        <div onclick="window.OlympiadApp.selectedClassFilter='9'; window.OlympiadApp.showView('sample-papers-view')" class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-blue-900 cursor-pointer transition">
+          <span class="text-xs font-bold text-indigo-900">Secondary</span>
+          <h3 class="text-lg font-bold text-slate-900 mt-1">Class 9</h3>
+          <p class="text-xs text-slate-400 mt-1">Championship Level</p>
+        </div>
+        <div onclick="window.OlympiadApp.selectedClassFilter='10'; window.OlympiadApp.showView('sample-papers-view')" class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-blue-900 cursor-pointer transition">
+          <span class="text-xs font-bold text-indigo-900">Secondary</span>
+          <h3 class="text-lg font-bold text-slate-900 mt-1">Class 10</h3>
+          <p class="text-xs text-slate-400 mt-1">National Scholarship Tier</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 4. SYLLABUS VIEW ================= -->
+    <div id="syllabus-view" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <div class="border-b border-slate-200 pb-5">
+        <span class="text-xs font-bold text-teal-800 uppercase tracking-widest block">Curriculum Breakdown</span>
+        <h1 class="text-3xl font-extrabold text-slate-900 mt-1">Class 5 Mathematics Syllabus & Topics</h1>
+        <p class="text-sm text-slate-500 mt-1">Comprehensive syllabus weightage, topic descriptions, and direct practice triggers.</p>
+      </div>
+
+      <div id="syllabus-topics-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Syllabus injected via app.js -->
+      </div>
+    </div>
+
+    <!-- ================= 5. SAMPLE PAPERS & PREVIOUS PAPERS VIEW ================= -->
+    <div id="sample-papers-view" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+      <div>
+        <div class="border-b border-slate-200 pb-5 mb-6">
+          <span class="text-xs font-bold text-teal-800 uppercase tracking-widest block">Official Archive</span>
+          <h1 class="text-3xl font-extrabold text-slate-900 mt-1">Official Sample Papers & Practice Sets</h1>
+          <p class="text-sm text-slate-500 mt-1">Download official question papers with verified step-by-step answer keys or practice online.</p>
+        </div>
+
+        <div id="sample-papers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Sample papers injected via app.js -->
+        </div>
+      </div>
+
+      <div>
+        <div class="border-b border-slate-200 pb-5 mb-6">
+          <span class="text-xs font-bold text-purple-800 uppercase tracking-widest block">Past Championships</span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Previous Year Question Papers</h2>
+          <p class="text-sm text-slate-500 mt-1">Solve authentic past championship papers to evaluate readiness against historical national averages.</p>
+        </div>
+
+        <div id="previous-papers-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Previous papers injected via app.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 6. LEADERBOARDS & RESULTS SEARCH VIEW ================= -->
+    <div id="leaderboard-view" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-slate-200 pb-5 gap-4">
+        <div>
+          <span class="text-xs font-bold text-amber-600 uppercase tracking-widest block">National Honor Roll</span>
+          <h1 class="text-3xl font-extrabold text-slate-900 mt-1">Olympiad Championship Leaderboard</h1>
+          <p class="text-sm text-slate-500 mt-1">Recognizing top rankers across National, State, and School percentiles.</p>
+        </div>
+
+        <div class="relative min-w-[260px]">
+          <input type="text" oninput="window.OlympiadApp.filterLeaderboard(this.value)" placeholder="Search by student, city or school..." class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-blue-600 font-medium" />
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+        </div>
+      </div>
+
+      <!-- Leaderboard Table -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+              <tr>
+                <th class="p-3.5">National Rank</th>
+                <th class="p-3.5">Scholar Name</th>
+                <th class="p-3.5">Grade</th>
+                <th class="p-3.5">Score</th>
+                <th class="p-3.5">Percentile</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-tbody" class="divide-y divide-slate-100">
+              <!-- Leaderboard rows injected via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 7. ABOUT VIEW ================= -->
+    <div id="about-view" class="app-view hidden max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <div class="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-sm space-y-6">
+        <span class="text-xs font-bold text-teal-800 uppercase tracking-widest block">Our Mission</span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900">Democratizing Academic Excellence Worldwide</h1>
+        <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+          OlympiadHub was established with a singular vision: to nurture young analytical minds through transparent, rigorous, and inspiring academic competitions. By leveraging modern proctored assessment technology, we provide every student — from nursery learners to high school scholars — an equal platform to test their abilities, identify strengths, and earn globally recognized credentials.
+        </p>
+      </div>
+    </div>
+
+    <!-- ================= 8. CONTACT VIEW ================= -->
+    <div id="contact-view" class="app-view hidden max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <div class="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-sm space-y-6">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Contact Olympiad Examination Board</h1>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs sm:text-sm text-slate-600">
+          <div>
+            <strong class="text-slate-900 block mb-1">Academic Secretariat & Support:</strong>
+            <p>support@olympiadhub.org</p>
+            <p class="mt-1">+1 (800) 458-OLYMPIAD</p>
+          </div>
+          <div>
+            <strong class="text-slate-900 block mb-1">Institutional Inquiries:</strong>
+            <p>schools@olympiadhub.org</p>
+            <p class="mt-1">Mon - Sat: 9:00 AM - 6:00 PM EST</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 9. ACTIVE EXAM VIEW (ONLINE MCQ ENGINE) ================= -->
+    <div id="exam-active-view" class="app-view hidden min-h-screen bg-slate-100">
+      <!-- Full Proctored Exam Engine dynamically injected by exam-engine.js -->
+    </div>
+
+    <!-- ================= 10. RESULT & ANALYTICS VIEW ================= -->
+    <div id="result-view" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div id="result-dashboard-container">
+        <!-- Result analytics injected by analytics.js -->
+      </div>
+    </div>
+
+    <!-- ================= 11. STUDENT PORTAL VIEW ================= -->
+    <div id="student-portal-view" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div id="student-portal-content">
+        <!-- Rendered by portals.js -->
+      </div>
+    </div>
+
+    <!-- ================= 12. PARENT PORTAL VIEW ================= -->
+    <div id="parent-portal-view" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div id="parent-portal-content">
+        <!-- Rendered by portals.js -->
+      </div>
+    </div>
+
+    <!-- ================= 13. SCHOOL PORTAL VIEW ================= -->
+    <div id="school-portal-view" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div id="school-portal-content">
+        <!-- Rendered by portals.js -->
+      </div>
+    </div>
+
+    <!-- ================= 14. ADMIN PANEL VIEW ================= -->
+    <div id="admin-portal-view" class="app-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div id="admin-panel-content">
+        <!-- Rendered by admin.js -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-white border-t border-slate-200 mt-20 pt-16 pb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+        
+        <!-- Col 1: Brand -->
+        <div class="lg:col-span-2 space-y-4">
+          <img src="assets/logo.svg" alt="OlympiadHub Logo" class="h-10 w-auto" />
+          <p class="text-xs text-slate-500 leading-relaxed max-w-sm">
+            OlympiadHub is an academic Olympiad examination and certification ecosystem empowering scholars to excel in Mathematics, Science, English, Cyber, and Cognitive Aptitude.
+          </p>
+          <div class="text-xs text-slate-400">
+            Tagline: <strong>Learn. Practice. Compete. Achieve.</strong>
+          </div>
+        </div>
+
+        <!-- Col 2: Olympiads -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Olympiads</h4>
+          <ul class="space-y-2 text-xs text-slate-600">
+            <li><a href="#" onclick="window.OlympiadApp.showView('olympiads-view')" class="hover:text-blue-900">Mathematics (IMO)</a></li>
+            <li><a href="#" onclick="window.OlympiadApp.showView('olympiads-view')" class="hover:text-blue-900">Science (NSO)</a></li>
+            <li><a href="#" onclick="window.OlympiadApp.showView('olympiads-view')" class="hover:text-blue-900">English (IEO)</a></li>
+            <li><a href="#" onclick="window.OlympiadApp.showView('olympiads-view')" class="hover:text-blue-900">Cyber & AI (NCO)</a></li>
+            <li><a href="#" onclick="window.OlympiadApp.showView('olympiads-view')" class="hover:text-blue-900">Reasoning (LRAO)</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Quick Links -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Resources</h4>
+          <ul class="space-y-2 text-xs text-slate-600">
+            <li><a href="#" onclick="window.OlympiadApp.showView('sample-papers-view')" class="hover:text-blue-900">Sample Papers</a></li>
+            <li><a href="#" onclick="window.OlympiadApp.showView('sample-papers-view')" class="hover:text-blue-900">Previous Papers</a></li>
+            <li><a href="#" onclick="window.OlympiadApp.startQuickMock('IMO')" class="hover:text-blue-900">Free Mock Test</a></li>
+            <li><a href="#" onclick="window.OlympiadApp.showView('leaderboard-view')" class="hover:text-blue-900">National Leaderboards</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Portals -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Portals</h4>
+          <ul class="space-y-2 text-xs text-slate-600">
+            <li><a href="#" onclick="window.OlympiadApp.showStudentPortal()" class="hover:text-blue-900">Student Dashboard</a></li>
+            <li><a href="#" onclick="window.OlympiadApp.showParentPortal()" class="hover:text-blue-900">Parent Monitoring</a></li>
+            <li><a href="#" onclick="window.OlympiadApp.showSchoolPortal()" class="hover:text-blue-900">School Coordinator Portal</a></li>
+            <li><a href="#" onclick="window.OlympiadApp.showAdminPortal()" class="hover:text-blue-900 font-bold text-teal-800">Admin Control Hub</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="border-t border-slate-100 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+        <div>© 2026 OlympiadHub International Council. All rights reserved.</div>
+        <div class="flex space-x-4">
+          <a href="#" class="hover:text-slate-600">Privacy Policy</a>
+          <a href="#" class="hover:text-slate-600">Terms & Conditions</a>
+          <a href="#" class="hover:text-slate-600">Refund Policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= TOAST NOTIFICATION CONTAINER ================= -->
+  <div id="app-toaster" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 max-w-sm pointer-events-none"></div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. Registration Modal -->
+  <div id="auth-register-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5 border border-slate-200">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-xl font-bold text-slate-900">Student Registration</h3>
+          <p class="text-xs text-slate-500">Create your OlympiadHub candidate account</p>
+        </div>
+        <button onclick="window.OlympiadApp.closeRegisterModal()" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+
+      <form onsubmit="window.OlympiadApp.handleStudentRegisterSubmit(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Student Full Name</label>
+          <input type="text" id="reg-student-name" required placeholder="e.g. Advik Sharma" class="w-full p-2.5 rounded-lg border border-slate-300 font-medium" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Class / Standard</label>
+            <select id="reg-student-class" class="w-full p-2.5 rounded-lg border border-slate-300 font-medium bg-white">
+              <option value="nursery">Nursery</option>
+              <option value="kg">KG</option>
+              <option value="1">Class 1</option>
+              <option value="2">Class 2</option>
+              <option value="3">Class 3</option>
+              <option value="4">Class 4</option>
+              <option value="5" selected>Class 5</option>
+              <option value="6">Class 6</option>
+              <option value="7">Class 7</option>
+              <option value="8">Class 8</option>
+              <option value="9">Class 9</option>
+              <option value="10">Class 10</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">School Name</label>
+            <input type="text" id="reg-student-school" placeholder="e.g. St. Xavier High" class="w-full p-2.5 rounded-lg border border-slate-300 font-medium" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Email Address</label>
+          <input type="email" id="reg-student-email" required placeholder="student@example.com" class="w-full p-2.5 rounded-lg border border-slate-300 font-medium" />
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl btn-primary text-white font-bold text-xs sm:text-sm shadow mt-2">
+          Create Account & Generate Student ID
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Exam Submit Confirmation Modal -->
+  <div id="exam-confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 border border-slate-200">
+      <div class="flex items-center space-x-3 text-amber-600">
+        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+        <h3 class="text-base font-bold text-slate-900">Confirm Exam Submission</h3>
+      </div>
+
+      <div class="bg-slate-50 p-3.5 rounded-xl text-xs space-y-1.5 text-slate-700">
+        <div class="flex justify-between"><span>Total Questions:</span> <strong id="confirm-total-q" class="text-slate-900">0</strong></div>
+        <div class="flex justify-between"><span>Answered Questions:</span> <strong id="confirm-answered-q" class="text-emerald-700">0</strong></div>
+        <div class="flex justify-between"><span>Unanswered Questions:</span> <strong id="confirm-unanswered-q" class="text-red-700">0</strong></div>
+        <div class="flex justify-between"><span>Marked for Review:</span> <strong id="confirm-review-q" class="text-purple-700">0</strong></div>
+      </div>
+
+      <p class="text-xs text-slate-500">
+        Are you sure you want to end and submit your examination? Once submitted, your answers cannot be modified.
+      </p>
+
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <button onclick="window.examEngine.closeSubmitConfirmModal()" class="py-2.5 rounded-xl border border-slate-300 font-semibold text-xs text-slate-700 hover:bg-slate-50">
+          Continue Exam
+        </button>
+        <button onclick="window.examEngine.submitExam(false)" class="py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow">
+          Yes, Submit Now
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Solutions Review Modal -->
+  <div id="solutions-review-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-200">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Step-by-Step Question Solutions</h3>
+          <p class="text-xs text-slate-500">Official explanations and accuracy review</p>
+        </div>
+        <button onclick="window.OlympiadAnalytics.closeSolutionsModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+      </div>
+      <div id="solutions-review-content" class="p-6 overflow-y-auto space-y-4 flex-1"></div>
+      <div class="p-4 border-t border-slate-100 flex justify-end">
+        <button onclick="window.OlympiadAnalytics.closeSolutionsModal()" class="px-5 py-2 rounded-xl btn-primary text-white font-bold text-xs">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Certificate View & Download Modal -->
+  <div id="certificate-modal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative">
+      <div class="flex items-center justify-between no-print">
+        <div class="flex items-center space-x-2">
+          <span class="px-2.5 py-1 rounded bg-amber-100 text-amber-800 text-xs font-bold uppercase">Official Academic Credential</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="window.OlympiadCertificate.printCertificate()" class="px-4 py-2 rounded-xl btn-primary text-white font-bold text-xs flex items-center space-x-1.5 shadow">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Print / Save as PDF</span>
+          </button>
+          <button onclick="window.OlympiadCertificate.closeCertificateModal()" class="p-2 text-slate-400 hover:text-slate-600 text-lg">✕</button>
+        </div>
+      </div>
+
+      <div id="certificate-render-zone">
+        <!-- Rendered by certificate.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Olympiad Detail Modal -->
+  <div id="olympiad-detail-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl relative border border-slate-200">
+      <button onclick="window.OlympiadApp.closeOlympiadDetailModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600">✕</button>
+      <div id="olympiad-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- 6. Payment Checkout Modal -->
+  <div id="checkout-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative border border-slate-200">
+      <button onclick="window.OlympiadPortals.closeCheckoutModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600">✕</button>
+      <div id="checkout-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- 7. Admin Add Question Modal -->
+  <div id="admin-question-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full shadow-2xl border border-slate-200">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <h3 class="text-base font-bold text-slate-900">Add New Olympiad Question</h3>
+        <button onclick="window.OlympiadAdmin.closeAddQuestionModal()" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+
+      <form onsubmit="window.OlympiadAdmin.saveNewQuestion(event)" class="space-y-3 text-xs">
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Subject</label>
+            <select id="q-form-subject" class="w-full p-2 border rounded-lg bg-white">
+              <option value="math">Mathematics</option>
+              <option value="science">Science</option>
+              <option value="english">English</option>
+              <option value="cyber">Cyber</option>
+              <option value="reasoning">Reasoning</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Class</label>
+            <select id="q-form-class" class="w-full p-2 border rounded-lg bg-white">
+              <option value="5">Class 5</option>
+              <option value="6">Class 6</option>
+              <option value="7">Class 7</option>
+              <option value="8">Class 8</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Difficulty</label>
+            <select id="q-form-diff" class="w-full p-2 border rounded-lg bg-white">
+              <option value="Easy">Easy</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Question Statement</label>
+          <textarea id="q-form-text" rows="2" required placeholder="Enter the question problem statement..." class="w-full p-2 border rounded-lg"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" id="q-form-optA" required placeholder="Option A" class="p-2 border rounded-lg" />
+          <input type="text" id="q-form-optB" required placeholder="Option B" class="p-2 border rounded-lg" />
+          <input type="text" id="q-form-optC" placeholder="Option C" class="p-2 border rounded-lg" />
+          <input type="text" id="q-form-optD" placeholder="Option D" class="p-2 border rounded-lg" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Correct Answer</label>
+            <select id="q-form-correct" class="w-full p-2 border rounded-lg bg-white">
+              <option value="A">Option A</option>
+              <option value="B">Option B</option>
+              <option value="C">Option C</option>
+              <option value="D">Option D</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Explanation</label>
+            <input type="text" id="q-form-exp" placeholder="Step-by-step logic..." class="w-full p-2 border rounded-lg" />
+          </div>
+        </div>
+
+        <div class="pt-3 flex justify-end space-x-2">
+          <button type="button" onclick="window.OlympiadAdmin.closeAddQuestionModal()" class="px-4 py-2 border rounded-lg font-semibold">Cancel</button>
+          <button type="submit" class="px-4 py-2 btn-primary text-white rounded-lg font-bold">Save Question</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Core Scripts -->
+  <script src="js/db.js"></script>
+  <script src="js/exam-engine.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/certificate.js"></script>
+  <script src="js/portals.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,16 +1,13 @@
 @echo off
-title OlympiadHub - Online Examination Platform
+title OlympiadHub - Online Olympiad Examination Platform
 echo ===================================================
-echo Starting OlympiadHub Full-Stack Examination System
+echo Starting OlympiadHub Examination System
 echo ===================================================
 
-set PATH=C:\Users\HP\.gemini\antigravity\scratch\nodejs;C:\xampp\php;%PATH%
+echo Opening OlympiadHub in your default web browser...
+start "" "%~dp0index.html"
 
-echo 1. Starting PHP REST API Server on http://127.0.0.1:8000...
-start /B "OlympiadHub API" "C:\xampp\php\php.exe" -S 127.0.0.1:8000 -t "%~dp0backend\public"
-
-echo 2. Starting React Vite Frontend on http://127.0.0.1:3000...
-cd /d "%~dp0frontend"
-npm run dev
-
+echo OlympiadHub is now running!
+echo URL: file:///%~dp0index.html
+echo.
 pause
