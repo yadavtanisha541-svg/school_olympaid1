@@ -430,13 +430,13 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
   return (
     <div className="space-y-6 pb-16 font-sans max-w-7xl mx-auto">
       {/* 1. Seamless Balanced Header Banner */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2">
-        <div className="flex items-center gap-3.5 min-w-0">
-          <div className="w-13 h-13 rounded-2xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-2xs">
-            <Video className="w-6.5 h-6.5 text-[#80497D]" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="w-14 h-14 rounded-2xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-xs">
+            <Video className="w-7 h-7 text-[#80497D]" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#422240] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight">
               Online Classes &amp; Course Packages Studio
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
@@ -445,7 +445,7 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0 flex-wrap">
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
           <Button
             variant="secondary"
             size="md"

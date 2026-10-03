@@ -133,8 +133,8 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
         {/* Total Students (Light Purple) */}
         <div className="bg-white rounded-2xl border border-[#eee6f8] p-5 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
           <div className="flex items-center gap-3.5">
-            <div className="w-13 h-13 rounded-2xl bg-[#faf5ff] text-[#7c3aed] flex items-center justify-center border border-[#e9d5ff] shrink-0">
-              <Users className="w-6.5 h-6.5" />
+            <div className="w-14 h-14 rounded-2xl bg-[#faf5ff] text-[#7c3aed] flex items-center justify-center border border-[#e9d5ff] shrink-0">
+              <Users className="w-7 h-7" />
             </div>
             <div>
               <p className="text-xs sm:text-sm font-bold text-slate-500">Total Students</p>
@@ -155,8 +155,8 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
         {/* Registered Schools (Light Green) */}
         <div className="bg-white rounded-2xl border border-[#eee6f8] p-5 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
           <div className="flex items-center gap-3.5">
-            <div className="w-13 h-13 rounded-2xl bg-[#ecfdf5] text-[#059669] flex items-center justify-center border border-[#a7f3d0] shrink-0">
-              <Building2 className="w-6.5 h-6.5" />
+            <div className="w-14 h-14 rounded-2xl bg-[#ecfdf5] text-[#059669] flex items-center justify-center border border-[#a7f3d0] shrink-0">
+              <Building2 className="w-7 h-7" />
             </div>
             <div>
               <p className="text-xs sm:text-sm font-bold text-slate-500">Registered Schools</p>
@@ -177,8 +177,8 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
         {/* Total Exams (Light Purple) */}
         <div className="bg-white rounded-2xl border border-[#eee6f8] p-5 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
           <div className="flex items-center gap-3.5">
-            <div className="w-13 h-13 rounded-2xl bg-[#faf5ff] text-[#9333ea] flex items-center justify-center border border-[#e9d5ff] shrink-0">
-              <FileSpreadsheet className="w-6.5 h-6.5" />
+            <div className="w-14 h-14 rounded-2xl bg-[#faf5ff] text-[#9333ea] flex items-center justify-center border border-[#e9d5ff] shrink-0">
+              <FileSpreadsheet className="w-7 h-7" />
             </div>
             <div>
               <p className="text-xs sm:text-sm font-bold text-slate-500">Total Exams</p>
@@ -199,8 +199,8 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
         {/* Questions in Bank (Light Green) */}
         <div className="bg-white rounded-2xl border border-[#eee6f8] p-5 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
           <div className="flex items-center gap-3.5">
-            <div className="w-13 h-13 rounded-2xl bg-[#ecfdf5] text-[#047857] flex items-center justify-center border border-[#a7f3d0] shrink-0">
-              <FileText className="w-6.5 h-6.5" />
+            <div className="w-14 h-14 rounded-2xl bg-[#ecfdf5] text-[#047857] flex items-center justify-center border border-[#a7f3d0] shrink-0">
+              <FileText className="w-7 h-7" />
             </div>
             <div>
               <p className="text-xs sm:text-sm font-bold text-slate-500">Questions in Bank</p>
