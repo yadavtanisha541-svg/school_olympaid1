@@ -170,32 +170,32 @@ export const SuperAdminPaymentManager = () => {
   return (
     <div className="space-y-6 pb-16 font-sans max-w-7xl mx-auto">
       
-      {/* 1. Header Banner */}
-      <div className="bg-gradient-to-r from-[#faf6fa] via-white to-[#fdf7f5] border border-[#ebd7eb] rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-5">
+      {/* 1. Seamless Background Header (No Outer Box) */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 py-2">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-[#80497D] text-white flex items-center justify-center font-bold shadow-md shadow-[#80497D]/20">
-            <CreditCard className="w-7 h-7" />
+          <div className="w-13 h-13 rounded-2xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-2xs">
+            <CreditCard className="w-6.5 h-6.5 text-[#80497D]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-[#f4eaf4] text-[#80497D] border border-[#ebd7eb]">
+              <span className="px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase bg-[#f4eaf4] text-[#80497D] border border-[#ebd7eb]">
                 Finance &amp; Transactions
               </span>
               <span className="text-xs text-slate-400 font-semibold">• MySQL Gateway</span>
             </div>
-            <h1 className="text-2xl font-black text-[#422240] tracking-tight mt-0.5">
+            <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight mt-1">
               Payment Gateway, QR Code &amp; Student Orders
             </h1>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
               Customize official bank account details, UPI ID, and QR code, and review all student payments with UTR codes.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap shrink-0">
           <Button
             variant="secondary"
-            size="sm"
+            size="md"
             icon={RefreshCw}
             onClick={() => {
               fetchBankSettings();
@@ -207,7 +207,7 @@ export const SuperAdminPaymentManager = () => {
           </Button>
           <Button
             variant="primary"
-            size="sm"
+            size="md"
             icon={Building}
             onClick={() => setActiveTab('settings')}
           >
