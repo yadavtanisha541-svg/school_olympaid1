@@ -177,16 +177,10 @@ export const SuperAdminPaymentManager = () => {
             <CreditCard className="w-6.5 h-6.5 text-[#80497D]" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase bg-[#f4eaf4] text-[#80497D] border border-[#ebd7eb]">
-                Finance &amp; Transactions
-              </span>
-              <span className="text-xs text-slate-400 font-semibold">• MySQL Gateway</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight mt-1">
+            <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight">
               Payment Gateway, QR Code &amp; Student Orders
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
               Customize official bank account details, UPI ID, and QR code, and review all student payments with UTR codes.
             </p>
           </div>
