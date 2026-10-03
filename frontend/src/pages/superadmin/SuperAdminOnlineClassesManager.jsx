@@ -430,16 +430,16 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
   return (
     <div className="space-y-6 pb-16 font-sans max-w-7xl mx-auto">
       {/* 1. Seamless Balanced Header Banner */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-1">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2">
         <div className="flex items-center gap-3.5 min-w-0">
-          <div className="w-12 h-12 rounded-xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-2xs">
-            <Video className="w-6 h-6 text-[#80497D]" />
+          <div className="w-13 h-13 rounded-2xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-2xs">
+            <Video className="w-6.5 h-6.5 text-[#80497D]" />
           </div>
-          <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#422240] tracking-tight truncate">
+          <div>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#422240] tracking-tight">
               Online Classes &amp; Course Packages Studio
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5 truncate">
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
               Create, customize, price, and manage interactive concept batches, self-paced recorded packages, and video lectures.
             </p>
           </div>
@@ -474,42 +474,72 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
       </div>
 
       {feedback.message && (
-        <div className={`p-4 rounded-2xl border text-xs flex items-center justify-between shadow-xs ${
+        <div className={`p-4 rounded-2xl border text-sm flex items-center justify-between shadow-xs ${
           feedback.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'
         }`}>
-          <span>{feedback.message}</span>
-          <button onClick={() => setFeedback({ type: '', message: '' })} className="font-bold ml-4">✕</button>
+          <div className="flex items-center gap-2.5">
+            {feedback.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-600" /> : <AlertCircle className="w-5 h-5 text-rose-600" />}
+            <span className="font-bold">{feedback.message}</span>
+          </div>
+          <button onClick={() => setFeedback({ type: '', message: '' })} className="font-bold ml-4 text-slate-400 hover:text-slate-700">✕</button>
         </div>
       )}
 
-      {/* 2. Top Stats Counter */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-        <div className="bg-white p-4.5 rounded-2xl border border-[#ebd7eb] shadow-2xs">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Packages</p>
-          <h3 className="text-2xl font-black text-[#80497D] mt-1 font-mono">{packages.length}</h3>
-          <p className="text-[10px] text-slate-400 mt-0.5">Self-paced &amp; bundles</p>
+      {/* 2. Rich Top Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Active Packages */}
+        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
+            <Layers className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Packages</p>
+            <h3 className="text-2xl font-black text-[#80497D] mt-0.5 font-mono">{packages.length}</h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Self-paced &amp; bundles</p>
+          </div>
         </div>
-        <div className="bg-white p-4.5 rounded-2xl border border-[#ebd7eb] shadow-2xs">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Live Batches</p>
-          <h3 className="text-2xl font-black text-[#C35B3F] mt-1 font-mono">{batches.length}</h3>
-          <p className="text-[10px] text-slate-400 mt-0.5">Interactive sessions</p>
+
+        {/* Live Batches */}
+        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-orange-50 text-[#C35B3F] flex items-center justify-center border border-orange-100 shrink-0">
+            <Calendar className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Batches</p>
+            <h3 className="text-2xl font-black text-[#C35B3F] mt-0.5 font-mono">{batches.length}</h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Interactive sessions</p>
+          </div>
         </div>
-        <div className="bg-white p-4.5 rounded-2xl border border-[#ebd7eb] shadow-2xs">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Video Lectures</p>
-          <h3 className="text-2xl font-black text-emerald-600 mt-1 font-mono">{lectures.length}</h3>
-          <p className="text-[10px] text-slate-400 mt-0.5">Chapter-wise topics</p>
+
+        {/* Video Lectures */}
+        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
+            <Video className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Video Lectures</p>
+            <h3 className="text-2xl font-black text-emerald-600 mt-0.5 font-mono">{lectures.length}</h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Chapter-wise topics</p>
+          </div>
         </div>
-        <div className="bg-white p-4.5 rounded-2xl border border-[#ebd7eb] shadow-2xs">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Enrollments</p>
-          <h3 className="text-2xl font-black text-slate-900 mt-1 font-mono">
-            {packages.reduce((acc, p) => acc + (p.enrolled_students || 0), 0) + 120}
-          </h3>
-          <p className="text-[10px] text-slate-400 mt-0.5">Students enrolled</p>
+
+        {/* Total Enrollments */}
+        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
+            <Users className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Enrollments</p>
+            <h3 className="text-2xl font-black text-slate-900 mt-0.5 font-mono">
+              {packages.reduce((acc, p) => acc + (p.enrolled_students || 0), 0) + 120}
+            </h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Students enrolled</p>
+          </div>
         </div>
       </div>
 
       {/* 3. Sub-Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#ebd7eb] pb-3 overflow-x-auto">
+      <div className="flex items-center gap-2.5 border-b border-[#ebd7eb] pb-3 overflow-x-auto">
         {[
           { id: 'packages', label: 'Course Packages & Bundles', icon: Layers, count: packages.length },
           { id: 'hero_banner', label: 'Featured Hero Banner', icon: Sparkles },
@@ -524,17 +554,17 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
+              className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
                 isActive
-                  ? 'bg-[#80497D] text-white shadow-md shadow-[#80497D]/20 font-extrabold'
-                  : 'bg-white text-slate-600 hover:bg-[#faf6fa] border border-[#ebd7eb]'
+                  ? 'bg-[#80497D] text-white shadow-md shadow-[#80497D]/20'
+                  : 'bg-white text-slate-600 border border-[#ebd7eb] hover:bg-[#faf6fa] hover:text-[#80497D]'
               }`}
             >
               <Icon className="w-4 h-4" />
               <span>{tab.label}</span>
               {tab.count !== undefined && (
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                  isActive ? 'bg-white/20 text-white' : 'bg-[#f4eaf4] text-[#80497D]'
                 }`}>
                   {tab.count}
                 </span>
