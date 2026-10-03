@@ -79,7 +79,7 @@ export const DetailedSolutionsPage = ({ attemptId, onBack }) => {
               {/* 4 MCQ Options */}
               <div className="space-y-2.5">
                 {['A', 'B', 'C', 'D'].map((opt) => {
-                  const text = item[`option_${opt.toLowerCase()}`];
+                  const text = item ? item[`option_${(opt || '').toString().toLowerCase()}`] : '';
                   const isUserPick = userSelected === opt;
                   const isThisCorrect = correctOpt === opt;
 

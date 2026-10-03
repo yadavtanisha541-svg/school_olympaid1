@@ -367,9 +367,15 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
                 <h1 className="text-sm font-bold text-slate-900 truncate max-w-xs sm:max-w-md">
                   {sessionData?.exam?.title}
                 </h1>
-                <p className="text-[11px] text-slate-500 font-mono">
-                  Code: {sessionData?.exam?.exam_code}
-                </p>
+                <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+                  <span>Code: {sessionData?.exam?.exam_code}</span>
+                  {sessionData?.exam?.author_name && (
+                    <>
+                      <span>•</span>
+                      <span className="text-[#7c3aed] font-bold">Faculty: {sessionData.exam.author_name}</span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -465,7 +471,7 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
                 {/* 4 MCQ OPTIONS */}
                 <div className="space-y-3 pt-2">
                   {['A', 'B', 'C', 'D'].map((optKey) => {
-                    const optText = currentQuestion[`option_${optKey.toLowerCase()}`];
+                    const optText = currentQuestion ? currentQuestion[`option_${(optKey || '').toString().toLowerCase()}`] : '';
                     const active = isSelected(optKey);
 
                     return (

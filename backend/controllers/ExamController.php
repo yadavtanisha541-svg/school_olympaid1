@@ -21,26 +21,31 @@ class ExamController {
         if ($user['role'] === 'student') {
             // Student view: show exams available to this student
             $sql = "
-                SELECT e.*, ac.name as class_name, s.name as subject_name,
+                SELECT e.*, ac.name as class_name, s.name as subject_name, u.full_name as author_name,
                        (SELECT COUNT(*) FROM exam_attempts ea WHERE ea.exam_id = e.id AND ea.student_id = ? AND ea.status = 'submitted') as user_attempt_count,
                        (SELECT ea.id FROM exam_attempts ea WHERE ea.exam_id = e.id AND ea.student_id = ? AND ea.status = 'in_progress' ORDER BY ea.id DESC LIMIT 1) as active_attempt_id,
                        (SELECT ea.score FROM exam_attempts ea WHERE ea.exam_id = e.id AND ea.student_id = ? AND ea.status = 'submitted' ORDER BY ea.score DESC LIMIT 1) as best_score
                 FROM exams e
                 LEFT JOIN academic_classes ac ON e.class_id = ac.id
                 LEFT JOIN subjects s ON e.subject_id = s.id
+                LEFT JOIN users u ON e.created_by = u.id
                 WHERE e.status = 'published'
             ";
             $params = [$user['id'], $user['id'], $user['id']];
 
-            // Filter access
-            if ($user['class_id']) {
+            // Strict Class Matching for Student
+            if (!empty($user['class_id'])) {
                 $sql .= " AND (
-                    e.id IN (SELECT exam_id FROM exam_assignments WHERE target_type = 'all' OR (target_type = 'class' AND target_id = ?) OR (target_type = 'individual' AND target_id = ?))
-                    OR e.class_id = ? OR e.class_id IS NULL
+                    e.class_id = ?
+                    OR (e.class_id IS NULL AND e.id IN (SELECT exam_id FROM exam_assignments WHERE target_type = 'all' OR (target_type = 'class' AND target_id = ?)))
+                    OR e.id IN (SELECT exam_id FROM exam_assignments WHERE target_type = 'individual' AND target_id = ?)
                 )";
                 $params[] = $user['class_id'];
-                $params[] = $user['id'];
                 $params[] = $user['class_id'];
+                $params[] = $user['id'];
+            } else {
+                $sql .= " AND (e.class_id IS NULL OR e.id IN (SELECT exam_id FROM exam_assignments WHERE target_type = 'individual' AND target_id = ?))";
+                $params[] = $user['id'];
             }
 
             if ($examType !== '') {
@@ -74,6 +79,12 @@ class ExamController {
                 WHERE 1=1
             ";
             $params = [];
+
+            // If teacher, only show exams created by this teacher
+            if ($user['role'] === 'teacher') {
+                $sql .= " AND e.created_by = ?";
+                $params[] = $user['id'];
+            }
 
             if ($classId) {
                 $sql .= " AND e.class_id = ?";
@@ -207,7 +218,7 @@ class ExamController {
         $stmt->execute([
             trim($input['title']),
             $examCode,
-            in_array($input['exam_type'] ?? '', ['free_trial', 'practice', 'mock', 'paid']) ? $input['exam_type'] : 'practice',
+            in_array($input['exam_type'] ?? '', ['free_trial', 'practice', 'mock']) ? $input['exam_type'] : 'practice',
             trim($input['description'] ?? ''),
             trim($input['instructions'] ?? 'Read all questions carefully. Choose the single best answer for each question.'),
             !empty($input['class_id']) ? (int)$input['class_id'] : null,
@@ -266,6 +277,15 @@ class ExamController {
         $input = Validator::getJsonInput();
         $db = Database::getConnection();
 
+        // If teacher, verify exam ownership
+        if ($user['role'] === 'teacher') {
+            $chk = $db->prepare("SELECT id FROM exams WHERE id = ? AND created_by = ?");
+            $chk->execute([$id, $user['id']]);
+            if (!$chk->fetch()) {
+                Response::forbidden('You can only modify exams created by you.');
+            }
+        }
+
         $questionIds = $input['question_ids'] ?? null;
         $totalQuestions = $questionIds ? count($questionIds) : 0;
         $totalMarks = 0.00;
@@ -290,7 +310,7 @@ class ExamController {
 
         $stmt->execute([
             trim($input['title']),
-            in_array($input['exam_type'] ?? '', ['free_trial', 'practice', 'mock', 'paid']) ? $input['exam_type'] : 'practice',
+            in_array($input['exam_type'] ?? '', ['free_trial', 'practice', 'mock']) ? $input['exam_type'] : 'practice',
             trim($input['description'] ?? ''),
             trim($input['instructions'] ?? ''),
             !empty($input['class_id']) ? (int)$input['class_id'] : null,
@@ -344,6 +364,16 @@ class ExamController {
         }
 
         $db = Database::getConnection();
+
+        // If teacher, verify exam ownership
+        if ($user['role'] === 'teacher') {
+            $chk = $db->prepare("SELECT id FROM exams WHERE id = ? AND created_by = ?");
+            $chk->execute([$id, $user['id']]);
+            if (!$chk->fetch()) {
+                Response::forbidden('You can only delete exams created by you.');
+            }
+        }
+
         $stmt = $db->prepare("DELETE FROM exams WHERE id = ?");
         $stmt->execute([$id]);
 

@@ -15,7 +15,12 @@ class ExamEngineController {
         $db = Database::getConnection();
 
         // 1. Fetch Exam
-        $stmt = $db->prepare("SELECT * FROM exams WHERE id = ?");
+        $stmt = $db->prepare("
+            SELECT e.*, u.full_name as author_name
+            FROM exams e
+            LEFT JOIN users u ON e.created_by = u.id
+            WHERE e.id = ?
+        ");
         $stmt->execute([$examId]);
         $exam = $stmt->fetch();
 
@@ -23,8 +28,14 @@ class ExamEngineController {
             Response::notFound('Exam not found.');
         }
 
-        if ($exam['status'] !== 'published' && $user['role'] === 'student') {
-            Response::error('This exam is currently not available.', 403);
+        if ($user['role'] === 'student') {
+            if ($exam['status'] !== 'published') {
+                Response::error('This exam is currently not available.', 403);
+            }
+            // Strict Class Match Verification
+            if (!empty($exam['class_id']) && !empty($user['class_id']) && (int)$exam['class_id'] !== (int)$user['class_id']) {
+                Response::error('This examination is restricted to students of another class.', 403);
+            }
         }
 
         // Check start/end dates
@@ -362,6 +373,7 @@ class ExamEngineController {
                 'id' => $exam['id'],
                 'title' => $exam['title'],
                 'exam_code' => $exam['exam_code'],
+                'author_name' => $exam['author_name'] ?? 'Faculty Member',
                 'duration_minutes' => $exam['duration_minutes'],
                 'instructions' => $exam['instructions'],
                 'negative_marking' => (bool)$exam['negative_marking'],
@@ -550,11 +562,569 @@ class ExamEngineController {
             ");
             $stmtC->execute([$examId, $classId]);
             $cRankings = $stmtC->fetchAll(PDO::FETCH_COLUMN);
-
             $updCRank = $db->prepare("UPDATE exam_attempts SET rank_class = ? WHERE id = ?");
             foreach ($cRankings as $idx => $attId) {
                 $updCRank->execute([$idx + 1, $attId]);
             }
         }
+    }
+
+    public function submitGeneratedTest(): void {
+        $db = Database::getConnection();
+        $data = json_decode(file_get_contents('php://input'), true) ?? [];
+
+        // 1. Resolve Student accurately without throwing 401 exit
+        $user = Auth::getOptionalUser();
+
+        if (!$user && !empty($data['student_id'])) {
+            $uStmt = $db->prepare("SELECT u.*, ac.name as class_name FROM users u LEFT JOIN academic_classes ac ON u.class_id = ac.id WHERE u.id = ? LIMIT 1");
+            $uStmt->execute([(int)$data['student_id']]);
+            $user = $uStmt->fetch();
+        }
+
+        if (!$user && !empty($data['student_login_id'])) {
+            $uStmt = $db->prepare("SELECT u.*, ac.name as class_name FROM users u LEFT JOIN academic_classes ac ON u.class_id = ac.id WHERE u.login_id = ? LIMIT 1");
+            $uStmt->execute([trim($data['student_login_id'])]);
+            $user = $uStmt->fetch();
+        }
+
+        if (!$user && !empty($data['student_email'])) {
+            $uStmt = $db->prepare("SELECT u.*, ac.name as class_name FROM users u LEFT JOIN academic_classes ac ON u.class_id = ac.id WHERE u.email = ? LIMIT 1");
+            $uStmt->execute([trim($data['student_email'])]);
+            $user = $uStmt->fetch();
+        }
+
+        if (!$user && !empty($data['student_name'])) {
+            $uStmt = $db->prepare("SELECT u.*, ac.name as class_name FROM users u LEFT JOIN academic_classes ac ON u.class_id = ac.id WHERE u.full_name LIKE ? AND u.role = 'student' ORDER BY u.id DESC LIMIT 1");
+            $uStmt->execute(["%" . trim($data['student_name']) . "%"]);
+            $user = $uStmt->fetch();
+        }
+
+        if (!$user) {
+            $stdStmt = $db->query("SELECT u.*, ac.name as class_name FROM users u LEFT JOIN academic_classes ac ON u.class_id = ac.id WHERE u.role = 'student' ORDER BY u.id DESC LIMIT 1");
+            $user = $stdStmt->fetch();
+            if (!$user) {
+                $stdStmt = $db->query("SELECT u.*, ac.name as class_name FROM users u LEFT JOIN academic_classes ac ON u.class_id = ac.id ORDER BY u.id ASC LIMIT 1");
+                $user = $stdStmt->fetch();
+            }
+        }
+
+        // If school_name or city passed in payload, ensure student profile has it
+        if ($user && !empty($data['student_school']) && (empty($user['school_name']) || $user['school_name'] === 'Delhi Public School' || $user['school_name'] === 'Independent Candidate')) {
+            $updSchool = $db->prepare("UPDATE users SET school_name = ? WHERE id = ?");
+            $updSchool->execute([trim($data['student_school']), $user['id']]);
+        }
+
+        $studentId = (int)($user['id'] ?? 1);
+        $subjectKey = strtolower(trim($data['subject'] ?? 'math'));
+        $gradeName = trim($data['grade'] ?? ($data['class'] ?? ($user['class_name'] ?? ($user['class'] ?? 'Class 6'))));
+        $level = trim($data['level'] ?? 'Level 1');
+        $difficulty = trim($data['difficulty'] ?? 'Foundation');
+        $totalQuestions = (int)($data['totalQuestions'] ?? 10);
+        $durationMinutes = (int)($data['durationMinutes'] ?? 15);
+        $timeSpentSeconds = max(1, (int)($data['timeSpentSeconds'] ?? 30));
+        $score = (float)($data['score'] ?? 0);
+        $totalMarks = (float)($data['totalMarks'] ?? $totalQuestions);
+        $percentage = ($totalMarks > 0) ? round(($score / $totalMarks) * 100, 2) : 0.00;
+        $correctCount = (int)($data['correctCount'] ?? 0);
+        $wrongCount = (int)($data['wrongCount'] ?? 0);
+        $unansweredCount = (int)($data['unansweredCount'] ?? max(0, $totalQuestions - ($correctCount + $wrongCount)));
+        $passed = ($percentage >= 40.0) ? 1 : 0;
+        $questions = is_array($data['questions'] ?? null) ? $data['questions'] : [];
+        $existingExamId = isset($data['exam_id']) ? (int)$data['exam_id'] : null;
+
+        // 2. Resolve Subject ID
+        $subMap = [
+            'math' => ['Mathematics', 'IMO', 'Maths'],
+            'english' => ['English', 'IEO'],
+            'science' => ['Science', 'ISO', 'NSO'],
+            'cyber' => ['Cyber', 'ICO', 'ICSO', 'Computer'],
+            'gk' => ['General Knowledge', 'IGKO', 'GK'],
+            'reasoning' => ['Reasoning', 'Logical Reasoning', 'LRO', 'ISSO']
+        ];
+        $searchTerms = $subMap[$subjectKey] ?? [$subjectKey];
+        $subjectId = null;
+        foreach ($searchTerms as $term) {
+            $sStmt = $db->prepare("SELECT id FROM subjects WHERE name LIKE ? OR code LIKE ? LIMIT 1");
+            $sStmt->execute(["%$term%", "%$term%"]);
+            $subjectId = $sStmt->fetchColumn();
+            if ($subjectId) break;
+        }
+        if (!$subjectId) {
+            $subjectId = $db->query("SELECT id FROM subjects ORDER BY id ASC LIMIT 1")->fetchColumn() ?: 1;
+        }
+
+        // 3. Resolve Class ID
+        preg_match('/\d+/', $gradeName, $classMatches);
+        $classNum = !empty($classMatches[0]) ? $classMatches[0] : '6';
+        $cStmt = $db->prepare("SELECT id FROM academic_classes WHERE name LIKE ? OR code LIKE ? LIMIT 1");
+        $cStmt->execute(["%Class $classNum%", "%CLASS-$classNum%"]);
+        $classId = $cStmt->fetchColumn();
+        if (!$classId) {
+            $classId = !empty($user['class_id']) ? (int)$user['class_id'] : ($db->query("SELECT id FROM academic_classes ORDER BY id ASC LIMIT 1")->fetchColumn() ?: 1);
+        }
+
+        // 3. Create or Reuse Exam Record
+        if ($existingExamId && $existingExamId > 0) {
+            $examId = $existingExamId;
+            $chk = $db->prepare("SELECT title FROM exams WHERE id = ?");
+            $chk->execute([$examId]);
+            $examTitle = $chk->fetchColumn() ?: "Olympiad Test Generator Pro - $gradeName";
+        } else {
+            $subjectTitle = ucfirst($subjectKey);
+            if ($subjectKey === 'math') $subjectTitle = 'Mathematics';
+            if ($subjectKey === 'reasoning') $subjectTitle = 'Reasoning';
+            $examTitle = "$subjectTitle - $gradeName ($level $difficulty)";
+            $examCode = 'GEN-' . strtoupper(substr($subjectKey, 0, 3)) . '-' . strtoupper(substr(uniqid(), -5));
+
+            $insExam = $db->prepare("
+                INSERT INTO exams (
+                    title, exam_code, exam_type, subject_id, class_id, duration_minutes,
+                    total_questions, total_marks, passing_percentage, randomize_questions, shuffle_options,
+                    negative_marking, default_negative_marks, attempt_limit, result_visibility,
+                    solution_visibility, certificate_eligibility, min_certificate_percentage,
+                    status, created_by, created_at
+                ) VALUES (
+                    ?, ?, 'generated', ?, ?, ?,
+                    ?, ?, 40.00, 0, 0,
+                    0, 0.00, 10, 'immediate',
+                    'always', 1, 50.00,
+                    'published', 1, NOW()
+                )
+            ");
+            $insExam->execute([
+                $examTitle,
+                $examCode,
+                $subjectId,
+                $classId,
+                $durationMinutes,
+                $totalQuestions,
+                $totalMarks
+            ]);
+            $examId = (int)$db->lastInsertId();
+        }
+
+        // 4. Save Questions & Question links
+        $letters = ['A', 'B', 'C', 'D'];
+        $createdQIds = [];
+
+        foreach ($questions as $idx => $qData) {
+            $qText = trim($qData['q'] ?? ('Question ' . ($idx + 1)));
+            $opts = $qData['options'] ?? ['Option A', 'Option B', 'Option C', 'Option D'];
+            $optA = $opts[0] ?? 'A';
+            $optB = $opts[1] ?? 'B';
+            $optC = $opts[2] ?? 'C';
+            $optD = $opts[3] ?? 'D';
+            
+            $correctIdx = isset($qData['correct']) ? (int)$qData['correct'] : 0;
+            $correctLetter = $letters[$correctIdx] ?? 'A';
+            $explanation = $qData['explanation'] ?? '';
+
+            // Check if question exists
+            $chkQ = $db->prepare("SELECT id FROM questions WHERE question_text = ? AND subject_id = ? LIMIT 1");
+            $chkQ->execute([$qText, $subjectId]);
+            $existingQId = $chkQ->fetchColumn();
+
+            if ($existingQId) {
+                $qId = (int)$existingQId;
+            } else {
+                $insQ = $db->prepare("
+                    INSERT INTO questions (
+                        subject_id, class_id, question_text, option_a, option_b, option_c, option_d,
+                        correct_option, explanation, difficulty, marks, negative_marks, status, created_by, created_at
+                    ) VALUES (
+                        ?, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, 1.00, 0.00, 'active', 1, NOW()
+                    )
+                ");
+                $insQ->execute([
+                    $subjectId,
+                    $classId,
+                    $qText,
+                    $optA,
+                    $optB,
+                    $optC,
+                    $optD,
+                    $correctLetter,
+                    $explanation,
+                    strtolower($difficulty)
+                ]);
+                $qId = (int)$db->lastInsertId();
+            }
+
+            $createdQIds[] = [
+                'qId' => $qId,
+                'qData' => $qData,
+                'correctLetter' => $correctLetter
+            ];
+
+            // Link in exam_questions safely
+            $chkEQ = $db->prepare("SELECT id FROM exam_questions WHERE exam_id = ? AND question_id = ? LIMIT 1");
+            $chkEQ->execute([$examId, $qId]);
+            if (!$chkEQ->fetchColumn()) {
+                $insEQ = $db->prepare("INSERT INTO exam_questions (exam_id, question_id, question_order) VALUES (?, ?, ?)");
+                $insEQ->execute([$examId, $qId, $idx + 1]);
+            }
+        }
+
+        // 5. Create attempt record in `exam_attempts`
+        $submittedAt = date('Y-m-d H:i:s');
+        $startTime = date('Y-m-d H:i:s', time() - $timeSpentSeconds);
+        $expectedEndTime = date('Y-m-d H:i:s', time() + ($durationMinutes * 60));
+
+        $insAttempt = $db->prepare("
+            INSERT INTO exam_attempts (
+                exam_id, student_id, start_time, expected_end_time, submitted_at,
+                status, time_spent_seconds, total_questions, answered_count,
+                correct_count, wrong_count, unanswered_count, score, percentage, passed, ip_address
+            ) VALUES (
+                ?, ?, ?, ?, ?,
+                'submitted', ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?
+            )
+        ");
+        $insAttempt->execute([
+            $examId,
+            $studentId,
+            $startTime,
+            $expectedEndTime,
+            $submittedAt,
+            $timeSpentSeconds,
+            $totalQuestions,
+            $correctCount + $wrongCount,
+            $correctCount,
+            $wrongCount,
+            $unansweredCount,
+            $score,
+            $percentage,
+            $passed,
+            $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1'
+        ]);
+        $attemptId = (int)$db->lastInsertId();
+
+        // 6. Record student answers
+        $insAnswer = $db->prepare("
+            INSERT INTO student_answers (
+                attempt_id, question_id, selected_option, is_correct, is_marked_for_review,
+                marks_awarded, time_spent_seconds
+            ) VALUES (?, ?, ?, ?, 0, ?, 1)
+        ");
+
+        foreach ($createdQIds as $item) {
+            $qId = $item['qId'];
+            $qData = $item['qData'];
+            $correctLetter = $item['correctLetter'];
+
+            $userSelectedIdx = $qData['userSelected'] ?? null;
+            $userSelectedLetter = ($userSelectedIdx !== null && isset($letters[$userSelectedIdx])) ? $letters[$userSelectedIdx] : null;
+            
+            $isCorrect = ($userSelectedLetter !== null && $userSelectedLetter === $correctLetter) ? 1 : 0;
+            $marksAwarded = $isCorrect ? 1.00 : 0.00;
+
+            $insAnswer->execute([
+                $attemptId,
+                $qId,
+                $userSelectedLetter,
+                $isCorrect,
+                $marksAwarded
+            ]);
+        }
+
+        // 7. Calculate Ranks
+        $this->calculateRanks($examId, (int)$classId);
+
+        // 8. Generate Certificate if passed
+        $cert = null;
+        if ($percentage >= 50.0) {
+            $cert = CertificateGenerator::generateCertificateForAttempt($attemptId);
+        }
+
+        // 9. Activity Log
+        Logger::log("Student Completed Generated Test: $examTitle [Score: $score/$totalQuestions, $percentage%]", 'TestGenerator', [
+            'attempt_id' => $attemptId,
+            'exam_id' => $examId,
+            'student_name' => $user['full_name'] ?? 'Student',
+            'score' => $score,
+            'percentage' => $percentage
+        ], $studentId, 'student');
+
+        Response::success([
+            'attempt_id' => $attemptId,
+            'exam_id' => $examId,
+            'exam_title' => $examTitle,
+            'student_name' => $user['full_name'] ?? 'Student',
+            'score' => $score,
+            'total_questions' => $totalQuestions,
+            'percentage' => $percentage,
+            'passed' => (bool)$passed,
+            'certificate_number' => $cert['certificate_number'] ?? null,
+            'synced' => true
+        ], 'Test submission saved. Details are now visible in Super Admin & Teacher Admin portals.');
+    }
+
+    public function getGeneratorAdminPapers(): void {
+        $db = Database::getConnection();
+        $classFilter = trim($_GET['class'] ?? '');
+        $subjectFilter = trim($_GET['subject'] ?? '');
+        $categoryFilter = trim($_GET['paper_category'] ?? '');
+        $yearFilter = trim($_GET['exam_year'] ?? '');
+
+        $sql = "
+            SELECT e.*, ac.name as class_name, s.name as subject_name, s.code as subject_code
+            FROM exams e
+            LEFT JOIN academic_classes ac ON e.class_id = ac.id
+            LEFT JOIN subjects s ON e.subject_id = s.id
+            WHERE (e.exam_type IN ('generated', 'practice', 'sample_paper', 'previous_year') OR e.paper_category IS NOT NULL)
+        ";
+        $params = [];
+
+        if ($categoryFilter !== '' && $categoryFilter !== 'all') {
+            if ($categoryFilter === 'sample_paper' || $categoryFilter === 'sample') {
+                $sql .= " AND (e.paper_category = 'sample_paper' OR e.exam_type = 'sample_paper' OR e.title LIKE '%Sample Paper%')";
+            } elseif ($categoryFilter === 'previous_year' || $categoryFilter === 'past_paper' || $categoryFilter === 'previous') {
+                $sql .= " AND (e.paper_category = 'previous_year' OR e.exam_type = 'previous_year' OR e.title LIKE '%Previous Year%' OR e.title LIKE '%Past Paper%')";
+            } elseif ($categoryFilter === 'generator') {
+                $sql .= " AND (e.paper_category = 'generator' OR e.exam_type = 'generated' OR (e.paper_category IS NULL AND e.title NOT LIKE '%Sample%' AND e.title NOT LIKE '%Previous%'))";
+            } else {
+                $sql .= " AND e.paper_category = ?";
+                $params[] = $categoryFilter;
+            }
+        }
+
+        if ($yearFilter !== '' && $yearFilter !== 'all') {
+            $sql .= " AND (e.exam_year = ? OR e.title LIKE ?)";
+            $params[] = $yearFilter;
+            $params[] = "%$yearFilter%";
+        }
+
+        if ($classFilter !== '' && $classFilter !== 'All') {
+            preg_match('/\d+/', $classFilter, $matches);
+            if (!empty($matches[0])) {
+                $classNum = $matches[0];
+                $sql .= " AND (ac.name LIKE ? OR ac.name LIKE ? OR ac.code LIKE ? OR e.title LIKE ?)";
+                $params[] = "%Class $classNum%";
+                $params[] = "%Grade $classNum%";
+                $params[] = "%CLASS-$classNum%";
+                $params[] = "%Class $classNum%";
+            } else {
+                $sql .= " AND (ac.name LIKE ? OR ac.code LIKE ? OR e.title LIKE ?)";
+                $params[] = "%$classFilter%";
+                $params[] = "%$classFilter%";
+                $params[] = "%$classFilter%";
+            }
+        }
+
+        if ($subjectFilter !== '' && $subjectFilter !== 'All') {
+            $subMap = [
+                'math' => 'IMO',
+                'science' => 'ISO',
+                'cyber' => 'ICSO',
+                'english' => 'IEO',
+                'gk' => 'IGKO',
+                'reasoning' => 'ISSO'
+            ];
+            $subCode = $subMap[strtolower($subjectFilter)] ?? $subjectFilter;
+            $sql .= " AND (s.code LIKE ? OR s.name LIKE ? OR e.title LIKE ? OR e.exam_code LIKE ?)";
+            $params[] = "%$subCode%";
+            $params[] = "%$subjectFilter%";
+            $params[] = "%$subjectFilter%";
+            $params[] = "%$subCode%";
+        }
+
+        $sql .= " ORDER BY e.id DESC";
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $papers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fetch questions for each paper
+        foreach ($papers as &$p) {
+            $qStmt = $db->prepare("
+                SELECT q.*, eq.question_order
+                FROM exam_questions eq
+                JOIN questions q ON eq.question_id = q.id
+                WHERE eq.exam_id = ?
+                ORDER BY eq.question_order ASC
+            ");
+            $qStmt->execute([$p['id']]);
+            $rawQs = $qStmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            $formattedQs = [];
+            foreach ($rawQs as $rq) {
+                $correctLetter = strtoupper(trim($rq['correct_option'] ?? 'A'));
+                $correctIdx = 0;
+                if ($correctLetter === 'B') $correctIdx = 1;
+                elseif ($correctLetter === 'C') $correctIdx = 2;
+                elseif ($correctLetter === 'D') $correctIdx = 3;
+
+                $formattedQs[] = [
+                    'id' => (int)$rq['id'],
+                    'q' => $rq['question_text'],
+                    'options' => [
+                        $rq['option_a'],
+                        $rq['option_b'],
+                        $rq['option_c'],
+                        $rq['option_d']
+                    ],
+                    'correct' => $correctIdx,
+                    'explanation' => $rq['explanation'] ?? '',
+                    'marks' => (float)($rq['marks'] ?? 1.0)
+                ];
+            }
+            $p['questions'] = $formattedQs;
+        }
+
+        Response::success($papers, 'Exam papers retrieved successfully.');
+    }
+
+    public function createGeneratorAdminPaper(): void {
+        $db = Database::getConnection();
+        $data = json_decode(file_get_contents('php://input'), true) ?? [];
+
+        $title = trim($data['title'] ?? '');
+        $subjectKey = trim($data['subject'] ?? 'math');
+        $className = trim($data['class'] ?? 'Class 6');
+        $paperCategory = trim($data['paper_category'] ?? 'generator');
+        $examYear = trim($data['exam_year'] ?? '2024');
+        $durationMinutes = (int)($data['duration_minutes'] ?? 15);
+        $totalQuestions = (int)($data['total_questions'] ?? 10);
+        $totalMarks = (float)($data['total_marks'] ?? $totalQuestions);
+        $difficulty = trim($data['difficulty'] ?? 'Standard');
+        $questions = is_array($data['questions'] ?? null) ? $data['questions'] : [];
+
+        if (empty($title)) {
+            if ($paperCategory === 'previous_year') {
+                $title = "$className " . strtoupper($subjectKey) . " Previous Year Question Paper ($examYear)";
+            } elseif ($paperCategory === 'sample_paper') {
+                $title = "$className " . strtoupper($subjectKey) . " Official Free Sample Paper";
+            } else {
+                $title = "Olympiad Intelligent Test Generator Pro - $className (" . strtoupper($subjectKey) . ")";
+            }
+        }
+
+        // 1. Resolve Subject
+        $subMap = [
+            'math' => ['IMO', 'Mathematics'],
+            'science' => ['ISO', 'Science', 'NSO'],
+            'cyber' => ['ICSO', 'Cyber', 'Computers', 'ICO'],
+            'english' => ['IEO', 'English'],
+            'gk' => ['IGKO', 'General Knowledge', 'GK'],
+            'reasoning' => ['ISSO', 'Reasoning', 'Social Studies', 'LRO']
+        ];
+        $searchTerms = $subMap[strtolower($subjectKey)] ?? [$subjectKey];
+        $subjectId = null;
+        foreach ($searchTerms as $term) {
+            $sStmt = $db->prepare("SELECT id FROM subjects WHERE code LIKE ? OR name LIKE ? LIMIT 1");
+            $sStmt->execute(["%$term%", "%$term%"]);
+            $subjectId = $sStmt->fetchColumn();
+            if ($subjectId) break;
+        }
+        if (!$subjectId) {
+            $subjectId = $db->query("SELECT id FROM subjects ORDER BY id ASC LIMIT 1")->fetchColumn() ?: 1;
+        }
+
+        // 2. Resolve Exact Class
+        preg_match('/\d+/', $className, $classMatches);
+        $classNum = !empty($classMatches[0]) ? $classMatches[0] : '6';
+        $cStmt = $db->prepare("SELECT id FROM academic_classes WHERE name LIKE ? OR name LIKE ? OR code LIKE ? LIMIT 1");
+        $cStmt->execute(["%Class $classNum%", "%$className%", "%CLASS-$classNum%"]);
+        $classId = $cStmt->fetchColumn();
+        if (!$classId) {
+            $classId = $db->query("SELECT id FROM academic_classes ORDER BY id ASC LIMIT 1")->fetchColumn() ?: 1;
+        }
+
+        // 3. Create Exam
+        $typePrefix = ($paperCategory === 'previous_year') ? 'PYP' : (($paperCategory === 'sample_paper') ? 'SMP' : 'TGP');
+        $examCode = $typePrefix . '-' . strtoupper(substr($subjectKey, 0, 3)) . '-' . strtoupper(substr(uniqid(), -5));
+        $examType = ($paperCategory === 'previous_year') ? 'previous_year' : (($paperCategory === 'sample_paper') ? 'sample_paper' : 'generated');
+
+        $insExam = $db->prepare("
+            INSERT INTO exams (
+                title, exam_code, exam_type, exam_year, paper_category, subject_id, class_id, duration_minutes,
+                total_questions, total_marks, passing_percentage, randomize_questions, shuffle_options,
+                negative_marking, default_negative_marks, attempt_limit, result_visibility,
+                solution_visibility, certificate_eligibility, min_certificate_percentage,
+                status, created_by, created_at
+            ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, 40.00, 0, 0,
+                0, 0.00, 10, 'immediate',
+                'always', 1, 50.00,
+                'published', 1, NOW()
+            )
+        ");
+        $insExam->execute([
+            $title,
+            $examCode,
+            $examType,
+            $examYear,
+            $paperCategory,
+            $subjectId,
+            $classId,
+            $durationMinutes,
+            count($questions) > 0 ? count($questions) : $totalQuestions,
+            $totalMarks
+        ]);
+        $examId = (int)$db->lastInsertId();
+
+        // 4. Save Questions
+        $letters = ['A', 'B', 'C', 'D'];
+        foreach ($questions as $idx => $q) {
+            $qText = trim($q['q'] ?? '');
+            if (empty($qText)) continue;
+            $opts = $q['options'] ?? ['Option A', 'Option B', 'Option C', 'Option D'];
+            $optA = $opts[0] ?? 'Option A';
+            $optB = $opts[1] ?? 'Option B';
+            $optC = $opts[2] ?? 'Option C';
+            $optD = $opts[3] ?? 'Option D';
+            $corrIdx = isset($q['correct']) ? (int)$q['correct'] : 0;
+            $corrLetter = $letters[$corrIdx] ?? 'A';
+            $explanation = trim($q['explanation'] ?? '');
+            $qMarks = (float)($q['marks'] ?? 1.0);
+
+            $insQ = $db->prepare("
+                INSERT INTO questions (
+                    subject_id, class_id, question_text, option_a, option_b, option_c, option_d,
+                    correct_option, explanation, difficulty, marks, negative_marks, status, created_by, created_at
+                ) VALUES (
+                    ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, 0.00, 'active', 1, NOW()
+                )
+            ");
+            $insQ->execute([
+                $subjectId,
+                $classId,
+                $qText,
+                $optA,
+                $optB,
+                $optC,
+                $optD,
+                $corrLetter,
+                $explanation,
+                strtolower($difficulty),
+                $qMarks
+            ]);
+            $qId = (int)$db->lastInsertId();
+
+            $insEQ = $db->prepare("INSERT INTO exam_questions (exam_id, question_id, question_order) VALUES (?, ?, ?)");
+            $insEQ->execute([$examId, $qId, $idx + 1]);
+        }
+
+        Response::success([
+            'id' => $examId,
+            'title' => $title,
+            'exam_code' => $examCode,
+            'paper_category' => $paperCategory,
+            'exam_year' => $examYear,
+            'class_name' => $className,
+            'subject_id' => $subjectId,
+            'total_questions' => count($questions)
+        ], 'Exam paper created and published successfully by Super Admin.');
+    }
+
+    public function deleteGeneratorAdminPaper(int $examId): void {
+        $db = Database::getConnection();
+        $del = $db->prepare("DELETE FROM exams WHERE id = ?");
+        $del->execute([$examId]);
+        Response::success(['id' => $examId], 'Exam paper deleted successfully.');
     }
 }

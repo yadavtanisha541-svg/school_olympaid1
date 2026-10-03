@@ -1,0 +1,304 @@
+{
+    "hero_banner": {
+        "badge": "FEATURED",
+        "title": "Reasoning Online Classes for IMO, ISO(NSO) & IEO",
+        "subtitle": "Get expert guidance and improve your problem-solving skills.",
+        "button_text": "ENROLL NOW \u2192",
+        "button_action": "packages",
+        "is_active": true
+    },
+    "packages": [
+        {
+            "id": "oc_pkg_1",
+            "title": "Olympiads Self-Paced Recorded Concept Classes - Class 6",
+            "class_name": "Class 6",
+            "subject": "All Olympiads",
+            "subject_code": "ALL",
+            "package_type": "self_paced",
+            "price": 2499,
+            "original_price": 3499,
+            "badge_text": "Bestseller",
+            "header_color": "#d49b28",
+            "status": "active",
+            "features": [
+                "Watch, rewind, pause, replay and revise anytime at your own pace",
+                "Structured series of Recorded Concept classes.",
+                "Chapter-wise Presentation Videos for self-paced study",
+                "Chapter-wise Assignments for additional practice",
+                "Chapter-wise Quiz for quick revision",
+                "Previous Year Papers (2024 & 2025) for practice and pattern understanding",
+                "Reasoning Skill Development Program (RSDP) with Reasoning Recorded Concept classes.",
+                "Logical Reasoning Previous Year's Questions",
+                "Intelligent Olympiad Test Generator built for smart Olympiad preparation."
+            ],
+            "sections": [
+                {
+                    "title": "Recorded Classes",
+                    "color": "blue",
+                    "items": [
+                        "Total 25 Recorded Classes \u2013 Learn, Revisit & Revise Anytime",
+                        "Recorded classes covering the entire syllabus - Chapter-wise",
+                        "2 Previous Year Papers (2024 & 2025)"
+                    ]
+                },
+                {
+                    "title": "Practice & Tests",
+                    "color": "purple",
+                    "items": [
+                        "Chapter-wise Presentation Videos for practice and reinforcement",
+                        "Chapter-wise Assignments for additional practice",
+                        "Chapter-wise Quizzes for quick revision",
+                        "2 Level-1 Previous Year Papers (2024 & 2025)"
+                    ]
+                },
+                {
+                    "title": "Intelligent Olympiad Test Generator",
+                    "color": "green",
+                    "items": [
+                        "A bigger, \"Intelligent\" question bank",
+                        "Smart Question Selection",
+                        "Generate upto 10 personalised tests"
+                    ]
+                }
+            ],
+            "special_offer_text": "Special Offer: 3499.00 \u2014 2499.00",
+            "enrolled_students": 1240,
+            "created_at": "2026-10-01 10:00:00"
+        },
+        {
+            "id": "oc_pkg_2",
+            "title": "Olympiads Online Concept Classes & Learners Package - Class 6",
+            "class_name": "Class 6",
+            "subject": "IMO & ISO Combo",
+            "subject_code": "COMBO",
+            "package_type": "learners_package",
+            "price": 4999,
+            "original_price": 6999,
+            "badge_text": "Complete Package",
+            "header_color": "#d49b28",
+            "status": "active",
+            "features": [
+                "One Package. Complete Preparation. Greater Confidence.",
+                "Rare and benefit with big discount and access. Package.",
+                "Solution course of IMO, ISO packages.",
+                "24 Online Concept classes of IMO, ISO",
+                "Online Assignments, Mid Term Assessments.",
+                "Recordings of all classes.",
+                "Chapter-wise Test Series.",
+                "Topic-Wise Explanatory Videos of IMO",
+                "Round 1 Previous Years Papers",
+                "Round 1 Mock Tests.",
+                "Interactive & Downloadable Previous Year Papers and Mock Tests."
+            ],
+            "sections": [
+                {
+                    "title": "Live & Recorded Concept Classes",
+                    "color": "blue",
+                    "items": [
+                        "24 Online Live Interactive Concept Classes",
+                        "HD Recordings available for all sessions 24\/7",
+                        "Topic-Wise Explanatory Videos for IMO & ISO"
+                    ]
+                },
+                {
+                    "title": "Assessments & Tests",
+                    "color": "purple",
+                    "items": [
+                        "Chapter-wise Test Series & Mid-Term Assessments",
+                        "Round 1 Previous Years Papers & Mock Tests",
+                        "Interactive & Downloadable Question Papers"
+                    ]
+                },
+                {
+                    "title": "Intelligent Olympiad Test Generator",
+                    "color": "green",
+                    "items": [
+                        "Intelligent Olympiad Test Generator designed specifically for Olympiad preparation",
+                        "Generate unlimited personalized chapter practice tests"
+                    ]
+                }
+            ],
+            "special_offer_text": "Special Offer: 6999.00 \u2014 4999.00",
+            "enrolled_students": 890,
+            "created_at": "2026-10-01 10:30:00"
+        },
+        {
+            "id": "oc_pkg_3",
+            "title": "IEO Recorded Concept Classes - Class 6",
+            "class_name": "Class 6",
+            "subject": "English (IEO)",
+            "subject_code": "IEO",
+            "package_type": "subject_concept",
+            "price": 2499,
+            "original_price": 3000,
+            "badge_text": "Special Offer",
+            "header_color": "#80497D",
+            "status": "active",
+            "features": [
+                "Total 25 Recorded Classes covering the entire syllabus",
+                "Grammar fluency, modal verbs, syntax & tenses",
+                "Chapter-wise Presentation Videos & Assignments",
+                "2 Level-1 Previous Year Papers (2024 & 2025)",
+                "Intelligent Olympiad Test Generator with smart question selection"
+            ],
+            "sections": [
+                {
+                    "title": "Recorded Classes",
+                    "color": "blue",
+                    "items": [
+                        "Total 25 Recorded Classes \u2013 Learn, Revisit & Revise Anytime",
+                        "Recorded classes covering the entire syllabus - Chapter-wise",
+                        "2 Previous Year Papers (2024 & 2025)"
+                    ]
+                },
+                {
+                    "title": "Practice & Tests",
+                    "color": "purple",
+                    "items": [
+                        "Chapter-wise Presentation Videos for practice and reinforcement",
+                        "Chapter-wise Assignments for additional practice",
+                        "Chapter-wise Quizzes for quick revision",
+                        "2 Level-1 Previous Year Papers (2024 & 2025)"
+                    ]
+                },
+                {
+                    "title": "Intelligent Olympiad Test Generator",
+                    "color": "green",
+                    "items": [
+                        "A bigger, \"Intelligent\" question bank",
+                        "Smart Question Selection",
+                        "Generate upto 10 personalised tests"
+                    ]
+                }
+            ],
+            "special_offer_text": "Special Offer: 3000.00 \u2014 2499.00",
+            "enrolled_students": 670,
+            "created_at": "2026-10-01 11:00:00"
+        },
+        {
+            "id": "oc_pkg_4",
+            "title": "ISO (NSO) Recorded Concept Classes - Class 6",
+            "class_name": "Class 6",
+            "subject": "Science (ISO\/NSO)",
+            "subject_code": "ISO",
+            "package_type": "subject_concept",
+            "price": 2499,
+            "original_price": 3000,
+            "badge_text": "Special Offer",
+            "header_color": "#059669",
+            "status": "active",
+            "features": [
+                "Total 27 Recorded Classes covering Physics, Chemistry & Biology",
+                "Chapter-wise Presentation Videos and conceptual experiments",
+                "Chapter-wise Assignments & Quizzes for quick revision",
+                "2 Level-1 Previous Year Papers (2024 & 2025)",
+                "Intelligent Olympiad Test Generator integration"
+            ],
+            "sections": [
+                {
+                    "title": "Recorded Classes",
+                    "color": "blue",
+                    "items": [
+                        "Total 27 Recorded Classes \u2013 Learn, Revisit & Revise Anytime",
+                        "Recorded classes covering the entire syllabus - Chapter-wise",
+                        "2 Previous Year Papers (2024 & 2025)"
+                    ]
+                },
+                {
+                    "title": "Practice & Tests",
+                    "color": "purple",
+                    "items": [
+                        "Chapter-wise Presentation Videos for practice and reinforcement",
+                        "Chapter-wise Assignments for additional practice",
+                        "Chapter-wise Quizzes for quick revision",
+                        "2 Level-1 Previous Year Papers (2024 & 2025)"
+                    ]
+                },
+                {
+                    "title": "Intelligent Olympiad Test Generator",
+                    "color": "green",
+                    "items": [
+                        "A bigger, \"Intelligent\" question bank",
+                        "Smart Question Selection",
+                        "Generate upto 10 personalised tests"
+                    ]
+                }
+            ],
+            "special_offer_text": "Special Offer: 3000.00 \u2014 2499.00",
+            "enrolled_students": 920,
+            "created_at": "2026-10-01 11:15:00"
+        }
+    ],
+    "batches": [
+        {
+            "id": "batch_1",
+            "name": "Reasoning Achievers Batch (Classes 3-6)",
+            "class_name": "Class 6",
+            "subject": "Logical Reasoning (ISSO)",
+            "faculty_name": "Mrs. Komal Rajput & Shalini Jaiswal",
+            "schedule": "Mon, Wed, Fri \u2022 5:00 PM - 6:30 PM",
+            "meeting_link": "https:\/\/meet.google.com\/oly-reas-live",
+            "max_capacity": 50,
+            "enrolled_count": 38,
+            "status": "active"
+        },
+        {
+            "id": "batch_2",
+            "name": "IMO Mathematics Champions Batch",
+            "class_name": "Class 6",
+            "subject": "Mathematics (IMO)",
+            "faculty_name": "Mr. Arvind Mehta",
+            "schedule": "Tue, Thu, Sat \u2022 6:00 PM - 7:30 PM",
+            "meeting_link": "https:\/\/meet.google.com\/oly-math-live",
+            "max_capacity": 45,
+            "enrolled_count": 42,
+            "status": "active"
+        }
+    ],
+    "lectures": [
+        {
+            "id": "lec_1",
+            "title": "Mastering English Grammar Rules",
+            "subject": "IEO (English)",
+            "class_name": "Class 6",
+            "category": "IEO PREPARATION",
+            "duration": "42 mins",
+            "video_url": "https:\/\/www.youtube.com\/embed\/dQw4w9WgXcQ",
+            "desc": "Master essential tenses, modal auxiliaries, subject-verb agreement, and error detection rules for IEO Achievers section.",
+            "status": "active"
+        },
+        {
+            "id": "lec_2",
+            "title": "All About MODAL Verbs & Syntax",
+            "subject": "IEO (English)",
+            "class_name": "Class 6",
+            "category": "IEO PREPARATION",
+            "duration": "38 mins",
+            "video_url": "https:\/\/www.youtube.com\/embed\/dQw4w9WgXcQ",
+            "desc": "Comprehensive visual breakdown of modal verbs with real Olympiad sentence applications.",
+            "status": "active"
+        },
+        {
+            "id": "lec_3",
+            "title": "Mastering Fractions: Simplified for IMO",
+            "subject": "IMO (Maths)",
+            "class_name": "Class 6",
+            "category": "IMO PREPARATION",
+            "duration": "45 mins",
+            "video_url": "https:\/\/www.youtube.com\/embed\/dQw4w9WgXcQ",
+            "desc": "Fraction operations, improper fractions, visual models, and speed shortcuts to solve IMO Section 2 fraction word problems.",
+            "status": "active"
+        },
+        {
+            "id": "lec_4",
+            "title": "Prepare for Class Olympiads (NSO Science)",
+            "subject": "ISO (Science)",
+            "class_name": "Class 6",
+            "category": "NSO PREPARATION",
+            "duration": "50 mins",
+            "video_url": "https:\/\/www.youtube.com\/embed\/dQw4w9WgXcQ",
+            "desc": "Physics forces, chemical reactions, environmental biology, and scientific methodology for National Science Olympiad.",
+            "status": "active"
+        }
+    ]
+}

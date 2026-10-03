@@ -63,10 +63,17 @@ class UserController {
         $status = trim($_GET['status'] ?? '');
 
         $sql = "
-            SELECT u.id, u.login_id, u.full_name, u.email, u.phone, u.class_id, u.status, u.created_at,
+            SELECT u.id, u.login_id, u.full_name, u.email, u.phone, u.class_id, u.status, u.avatar,
+                   u.school_name, u.school_address, u.school_board, u.school_code,
+                   u.father_name, u.mother_name, u.parent_name, u.parent_phone, u.parent_email,
+                   u.section, u.roll_number, u.academic_year, u.dob, u.gender,
+                   u.address, u.city, u.state, u.pincode, u.profile_data_json, u.created_at,
                    ac.name as class_name,
                    (SELECT COUNT(*) FROM exam_attempts ea WHERE ea.student_id = u.id AND ea.status = 'submitted') as attempts_count,
-                   (SELECT AVG(ea.percentage) FROM exam_attempts ea WHERE ea.student_id = u.id AND ea.status = 'submitted') as avg_score
+                   (SELECT AVG(ea.percentage) FROM exam_attempts ea WHERE ea.student_id = u.id AND ea.status = 'submitted') as avg_score,
+                   (SELECT COALESCE(SUM(ea.correct_count), 0) FROM exam_attempts ea WHERE ea.student_id = u.id AND ea.status = 'submitted') as total_correct,
+                   (SELECT COALESCE(SUM(ea.wrong_count), 0) FROM exam_attempts ea WHERE ea.student_id = u.id AND ea.status = 'submitted') as total_wrong,
+                   (SELECT COUNT(*) FROM certificates c WHERE c.student_id = u.id) as certificates_count
             FROM users u
             LEFT JOIN academic_classes ac ON u.class_id = ac.id
             WHERE u.role = 'student'
@@ -74,7 +81,8 @@ class UserController {
         $params = [];
 
         if ($search !== '') {
-            $sql .= " AND (u.full_name LIKE ? OR u.login_id LIKE ? OR u.email LIKE ?)";
+            $sql .= " AND (u.full_name LIKE ? OR u.login_id LIKE ? OR u.email LIKE ? OR u.school_name LIKE ?)";
+            $params[] = "%$search%";
             $params[] = "%$search%";
             $params[] = "%$search%";
             $params[] = "%$search%";
@@ -147,13 +155,47 @@ class UserController {
         $passwordHash = Auth::hashPassword($password);
         $email = trim($input['email'] ?? '');
         $phone = trim($input['phone'] ?? '');
+        $avatar = $input['avatar'] ?? null;
         $classId = ($role === 'student' && !empty($input['class_id'])) ? (int)$input['class_id'] : null;
         $status = in_array($input['status'] ?? 'active', ['active', 'inactive']) ? $input['status'] : 'active';
         $roleId = ($role === 'teacher') ? 2 : 3;
 
+        $schoolName = trim($input['school_name'] ?? '');
+        $schoolAddress = trim($input['school_address'] ?? '');
+        $schoolBoard = trim($input['school_board'] ?? '');
+        $schoolCode = trim($input['school_code'] ?? '');
+        $fatherName = trim($input['father_name'] ?? '');
+        $motherName = trim($input['mother_name'] ?? '');
+        $parentName = trim($input['parent_name'] ?? ($fatherName ?: $motherName));
+        $parentPhone = trim($input['parent_phone'] ?? '');
+        $parentEmail = trim($input['parent_email'] ?? '');
+        $section = trim($input['section'] ?? 'A');
+        $rollNumber = trim($input['roll_number'] ?? '');
+        $academicYear = trim($input['academic_year'] ?? '2026-2027');
+        $dob = !empty($input['dob']) ? trim($input['dob']) : null;
+        $gender = trim($input['gender'] ?? 'Male');
+        $address = trim($input['address'] ?? '');
+        $city = trim($input['city'] ?? ($input['school_city'] ?? ''));
+        $state = trim($input['state'] ?? ($input['school_state'] ?? ''));
+        $pincode = trim($input['pincode'] ?? ($input['school_pincode'] ?? ''));
+
         $stmt = $db->prepare("
-            INSERT INTO users (login_id, password_hash, full_name, email, phone, role, role_id, class_id, status, must_change_password, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
+            INSERT INTO users (
+                login_id, password_hash, full_name, email, phone, avatar, role, role_id, class_id, status,
+                school_name, school_address, school_board, school_code,
+                father_name, mother_name, parent_name, parent_phone, parent_email,
+                section, roll_number, academic_year, dob, gender,
+                address, city, state, pincode,
+                must_change_password, created_by
+            )
+            VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
+                ?, ?, ?, ?,
+                1, ?
+            )
         ");
         $stmt->execute([
             $loginId,
@@ -161,10 +203,29 @@ class UserController {
             $fullName,
             $email,
             $phone,
+            $avatar,
             $role,
             $roleId,
             $classId,
             $status,
+            $schoolName,
+            $schoolAddress,
+            $schoolBoard,
+            $schoolCode,
+            $fatherName,
+            $motherName,
+            $parentName,
+            $parentPhone,
+            $parentEmail,
+            $section,
+            $rollNumber,
+            $academicYear,
+            $dob,
+            $gender,
+            $address,
+            $city,
+            $state,
+            $pincode,
             $admin['id']
         ]);
 
@@ -186,6 +247,7 @@ class UserController {
             'login_id' => $loginId,
             'generated_password' => $password,
             'full_name' => $fullName,
+            'school_name' => $schoolName,
             'role' => $role
         ], ucfirst($role) . ' created successfully.', 201);
     }
@@ -200,24 +262,225 @@ class UserController {
         }
 
         $db = Database::getConnection();
+
+        // Check user existence by ID or login_id
+        $stmtCheck = $db->prepare("SELECT id, login_id FROM users WHERE id = ?");
+        $stmtCheck->execute([$id]);
+        $existingUser = $stmtCheck->fetch();
+
+        $loginId = trim($input['login_id'] ?? '');
+
+        if (!$existingUser && !empty($loginId)) {
+            $stmtCheck = $db->prepare("SELECT id, login_id FROM users WHERE login_id = ?");
+            $stmtCheck->execute([$loginId]);
+            $existingUser = $stmtCheck->fetch();
+            if ($existingUser) {
+                $id = (int)$existingUser['id'];
+            }
+        }
+
         $email = trim($input['email'] ?? '');
         $phone = trim($input['phone'] ?? '');
+        $avatar = $input['avatar'] ?? null;
         $classId = !empty($input['class_id']) ? (int)$input['class_id'] : null;
         $status = in_array($input['status'] ?? '', ['active', 'inactive']) ? $input['status'] : 'active';
+        $password = trim($input['password'] ?? '');
 
-        $stmt = $db->prepare("
-            UPDATE users SET full_name = ?, email = ?, phone = ?, class_id = ?, status = ?
-            WHERE id = ?
-        ");
-        $stmt->execute([$fullName, $email, $phone, $classId, $status, $id]);
+        $schoolName = isset($input['school_name']) ? trim($input['school_name']) : null;
+        $schoolAddress = isset($input['school_address']) ? trim($input['school_address']) : null;
+        $schoolBoard = isset($input['school_board']) ? trim($input['school_board']) : null;
+        $schoolCode = isset($input['school_code']) ? trim($input['school_code']) : null;
+        $fatherName = isset($input['father_name']) ? trim($input['father_name']) : null;
+        $motherName = isset($input['mother_name']) ? trim($input['mother_name']) : null;
+        $parentName = isset($input['parent_name']) ? trim($input['parent_name']) : ($fatherName ?: $motherName);
+        $parentPhone = isset($input['parent_phone']) ? trim($input['parent_phone']) : null;
+        $parentEmail = isset($input['parent_email']) ? trim($input['parent_email']) : null;
+        $section = isset($input['section']) ? trim($input['section']) : null;
+        $rollNumber = isset($input['roll_number']) ? trim($input['roll_number']) : null;
+        $academicYear = isset($input['academic_year']) ? trim($input['academic_year']) : null;
+        $dob = !empty($input['dob']) ? trim($input['dob']) : null;
+        $gender = isset($input['gender']) ? trim($input['gender']) : null;
+        $address = isset($input['address']) ? trim($input['address']) : null;
+        $city = isset($input['city']) ? trim($input['city']) : (isset($input['school_city']) ? trim($input['school_city']) : null);
+        $state = isset($input['state']) ? trim($input['state']) : (isset($input['school_state']) ? trim($input['school_state']) : null);
+        $pincode = isset($input['pincode']) ? trim($input['pincode']) : (isset($input['school_pincode']) ? trim($input['school_pincode']) : null);
+
+        if (!$existingUser) {
+            $role = trim($input['role'] ?? 'student');
+            $roleId = ($role === 'teacher') ? 2 : 3;
+            $pass = !empty($password) ? $password : 'Student@123';
+            $pHash = Auth::hashPassword($pass);
+            $ins = $db->prepare("
+                INSERT INTO users (
+                    login_id, password_hash, full_name, email, phone, avatar, role, role_id, class_id, status,
+                    school_name, school_address, father_name, mother_name, parent_name, parent_phone, parent_email,
+                    section, roll_number, academic_year, dob, gender, address, city, state, pincode,
+                    must_change_password, created_by
+                )
+                VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    0, ?
+                )
+            ");
+            $ins->execute([
+                $loginId ?: ('STU' . rand(1000, 9999)),
+                $pHash,
+                $fullName,
+                $email,
+                $phone,
+                $avatar,
+                $role,
+                $roleId,
+                $classId,
+                $status,
+                $schoolName ?: '',
+                $schoolAddress ?: '',
+                $fatherName ?: '',
+                $motherName ?: '',
+                $parentName ?: '',
+                $parentPhone ?: '',
+                $parentEmail ?: '',
+                $section ?: 'A',
+                $rollNumber ?: '',
+                $academicYear ?: '2026-2027',
+                $dob,
+                $gender ?: 'Male',
+                $address ?: '',
+                $city ?: '',
+                $state ?: '',
+                $pincode ?: '',
+                $admin['id']
+            ]);
+            $id = (int)$db->lastInsertId();
+            Response::success(['id' => $id, 'login_id' => $loginId, 'password' => $pass], 'Student created and details saved successfully.');
+            return;
+        }
+
+        if (!empty($loginId) && $loginId !== $existingUser['login_id']) {
+            $chk = $db->prepare("SELECT id FROM users WHERE login_id = ? AND id != ?");
+            $chk->execute([$loginId, $id]);
+            if ($chk->fetch()) {
+                Response::error("Login ID '$loginId' is already in use by another account.", 422);
+            }
+        } else {
+            $loginId = $existingUser['login_id'];
+        }
+
+        // Check optional password update
+        $password = trim($input['password'] ?? '');
+
+        // Dynamic update query building
+        $updateFields = [
+            "full_name = ?",
+            "email = ?",
+            "phone = ?",
+            "class_id = ?",
+            "status = ?",
+            "login_id = ?"
+        ];
+        $updateParams = [$fullName, $email, $phone, $classId, $status, $loginId];
+
+        if ($avatar !== null) {
+            $updateFields[] = "avatar = ?";
+            $updateParams[] = $avatar;
+        }
+        if (!empty($password)) {
+            if (strlen($password) < 6) {
+                Response::error('Password must be at least 6 characters.', 422);
+            }
+            $updateFields[] = "password_hash = ?";
+            $updateParams[] = Auth::hashPassword($password);
+        }
+        if ($schoolName !== null) {
+            $updateFields[] = "school_name = ?";
+            $updateParams[] = $schoolName;
+        }
+        if ($schoolAddress !== null) {
+            $updateFields[] = "school_address = ?";
+            $updateParams[] = $schoolAddress;
+        }
+        if ($schoolBoard !== null) {
+            $updateFields[] = "school_board = ?";
+            $updateParams[] = $schoolBoard;
+        }
+        if ($schoolCode !== null) {
+            $updateFields[] = "school_code = ?";
+            $updateParams[] = $schoolCode;
+        }
+        if ($fatherName !== null) {
+            $updateFields[] = "father_name = ?";
+            $updateParams[] = $fatherName;
+        }
+        if ($motherName !== null) {
+            $updateFields[] = "mother_name = ?";
+            $updateParams[] = $motherName;
+        }
+        if ($parentName !== null) {
+            $updateFields[] = "parent_name = ?";
+            $updateParams[] = $parentName;
+        }
+        if ($parentPhone !== null) {
+            $updateFields[] = "parent_phone = ?";
+            $updateParams[] = $parentPhone;
+        }
+        if ($parentEmail !== null) {
+            $updateFields[] = "parent_email = ?";
+            $updateParams[] = $parentEmail;
+        }
+        if ($section !== null) {
+            $updateFields[] = "section = ?";
+            $updateParams[] = $section;
+        }
+        if ($rollNumber !== null) {
+            $updateFields[] = "roll_number = ?";
+            $updateParams[] = $rollNumber;
+        }
+        if ($academicYear !== null) {
+            $updateFields[] = "academic_year = ?";
+            $updateParams[] = $academicYear;
+        }
+        if ($dob !== null) {
+            $updateFields[] = "dob = ?";
+            $updateParams[] = $dob;
+        }
+        if ($gender !== null) {
+            $updateFields[] = "gender = ?";
+            $updateParams[] = $gender;
+        }
+        if ($address !== null) {
+            $updateFields[] = "address = ?";
+            $updateParams[] = $address;
+        }
+        if ($city !== null) {
+            $updateFields[] = "city = ?";
+            $updateParams[] = $city;
+        }
+        if ($state !== null) {
+            $updateFields[] = "state = ?";
+            $updateParams[] = $state;
+        }
+        if ($pincode !== null) {
+            $updateFields[] = "pincode = ?";
+            $updateParams[] = $pincode;
+        }
+
+        $updateParams[] = $id;
+        $sql = "UPDATE users SET " . implode(", ", $updateFields) . " WHERE id = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute($updateParams);
 
         if (isset($input['permissions']) && is_array($input['permissions'])) {
             $this->saveUserPermissions($id, $input['permissions']);
         }
 
-        Logger::log('Updated User Details', 'User', ['user_id' => $id], $admin['id'], 'superadmin');
+        Logger::log('Updated User Details', 'User', ['user_id' => $id, 'login_id' => $loginId], $admin['id'], 'superadmin');
 
-        Response::success(null, 'User updated successfully.');
+        Response::success([
+            'id' => $id,
+            'login_id' => $loginId
+        ], 'User updated successfully.');
     }
 
     public function resetPassword(int $id): void {
@@ -225,6 +488,10 @@ class UserController {
         $input = Validator::getJsonInput();
 
         $newPassword = trim($input['new_password'] ?? 'ChangeMe@123');
+        if (empty($newPassword)) {
+            Response::error('New password is required.', 422);
+        }
+
         if (strlen($newPassword) < 6) {
             Response::error('Password must be at least 6 characters.', 422);
         }
@@ -232,7 +499,7 @@ class UserController {
         $db = Database::getConnection();
         $hash = Auth::hashPassword($newPassword);
 
-        $stmt = $db->prepare("UPDATE users SET password_hash = ?, must_change_password = 1 WHERE id = ?");
+        $stmt = $db->prepare("UPDATE users SET password_hash = ?, must_change_password = 0 WHERE id = ?");
         $stmt->execute([$hash, $id]);
 
         Logger::log('Reset User Password', 'User', ['user_id' => $id], $admin['id'], 'superadmin');
@@ -265,7 +532,7 @@ class UserController {
         $admin = Auth::requireRole(['superadmin']);
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT id, role FROM users WHERE id = ?");
+        $stmt = $db->prepare("SELECT id, role, full_name, email, login_id FROM users WHERE id = ?");
         $stmt->execute([$id]);
         $user = $stmt->fetch();
 
@@ -277,12 +544,100 @@ class UserController {
             Response::error('Superadmin accounts cannot be deleted.', 403);
         }
 
-        $del = $db->prepare("DELETE FROM users WHERE id = ?");
-        $del->execute([$id]);
+        $db->beginTransaction();
+        try {
+            // 1. Delete user sessions & permissions
+            $db->prepare("DELETE FROM login_sessions WHERE user_id = ?")->execute([$id]);
+            $db->prepare("DELETE FROM user_permissions WHERE user_id = ?")->execute([$id]);
+            $db->prepare("DELETE FROM exam_security_events WHERE student_id = ?")->execute([$id]);
+            $db->prepare("DELETE FROM certificates WHERE student_id = ?")->execute([$id]);
 
-        Logger::log('Deleted User', 'User', ['user_id' => $id, 'role' => $user['role']], $admin['id'], 'superadmin');
+            // 2. Delete student answers and exam attempts
+            $db->prepare("
+                DELETE sa FROM student_answers sa
+                JOIN exam_attempts ea ON sa.attempt_id = ea.id
+                WHERE ea.student_id = ?
+            ")->execute([$id]);
+            $db->prepare("DELETE FROM exam_attempts WHERE student_id = ?")->execute([$id]);
 
-        Response::success(null, 'User deleted successfully.');
+            // 3. Delete activity logs
+            $db->prepare("DELETE FROM activity_logs WHERE user_id = ?")->execute([$id]);
+
+            // 4. Reassign questions or exams if user is a teacher
+            $db->prepare("UPDATE exams SET created_by = ? WHERE created_by = ?")->execute([$admin['id'], $id]);
+            $db->prepare("UPDATE questions SET created_by = ? WHERE created_by = ?")->execute([$admin['id'], $id]);
+
+            // 5. Delete from student/school registrations if exists
+            $db->prepare("DELETE FROM student_registrations WHERE user_id = ?")->execute([$id]);
+            $db->prepare("DELETE FROM school_registrations WHERE user_id = ?")->execute([$id]);
+
+            // 6. Delete user
+            $del = $db->prepare("DELETE FROM users WHERE id = ?");
+            $del->execute([$id]);
+
+            $db->commit();
+
+            Logger::log('Deleted User', 'User', ['user_id' => $id, 'role' => $user['role'], 'name' => $user['full_name']], $admin['id'], 'superadmin');
+
+            Response::success(null, 'User deleted successfully.');
+        } catch (\Exception $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            Response::error('Failed to delete user: ' . $e->getMessage(), 500);
+        }
+    }
+
+    public function bulkDeleteUsers(): void {
+        $admin = Auth::requireRole(['superadmin']);
+        $body = Validator::getJsonInput();
+        $ids = $body['ids'] ?? [];
+
+        if (empty($ids) || !is_array($ids)) {
+            Response::error('No user IDs provided for deletion.', 422);
+        }
+
+        $db = Database::getConnection();
+        $deletedCount = 0;
+
+        foreach ($ids as $id) {
+            $userId = (int)$id;
+            if ($userId <= 1) continue; // Do not delete superadmin
+
+            try {
+                $db->beginTransaction();
+
+                $db->prepare("DELETE FROM login_sessions WHERE user_id = ?")->execute([$userId]);
+                $db->prepare("DELETE FROM user_permissions WHERE user_id = ?")->execute([$userId]);
+                $db->prepare("DELETE FROM exam_security_events WHERE student_id = ?")->execute([$userId]);
+                $db->prepare("DELETE FROM certificates WHERE student_id = ?")->execute([$userId]);
+
+                $db->prepare("
+                    DELETE sa FROM student_answers sa
+                    JOIN exam_attempts ea ON sa.attempt_id = ea.id
+                    WHERE ea.student_id = ?
+                ")->execute([$userId]);
+                $db->prepare("DELETE FROM exam_attempts WHERE student_id = ?")->execute([$userId]);
+                $db->prepare("DELETE FROM activity_logs WHERE user_id = ?")->execute([$userId]);
+                $db->prepare("DELETE FROM student_registrations WHERE user_id = ?")->execute([$userId]);
+                $db->prepare("DELETE FROM school_registrations WHERE user_id = ?")->execute([$userId]);
+
+                $db->prepare("UPDATE exams SET created_by = ? WHERE created_by = ?")->execute([$admin['id'], $userId]);
+                $db->prepare("UPDATE questions SET created_by = ? WHERE created_by = ?")->execute([$admin['id'], $userId]);
+
+                $del = $db->prepare("DELETE FROM users WHERE id = ? AND role != 'superadmin'");
+                $del->execute([$userId]);
+
+                $db->commit();
+                $deletedCount++;
+            } catch (\Exception $e) {
+                if ($db->inTransaction()) {
+                    $db->rollBack();
+                }
+            }
+        }
+
+        Response::success(['deleted_count' => $deletedCount], "$deletedCount users deleted successfully.");
     }
 
     public function getPermissionsList(): void {

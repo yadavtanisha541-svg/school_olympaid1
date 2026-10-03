@@ -6,7 +6,7 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
-      const saved = localStorage.getItem('olympiadhub_user');
+      const saved = sessionStorage.getItem('olympiadhub_user');
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
@@ -27,10 +27,12 @@ export const AuthProvider = ({ children }) => {
         const res = await apiClient.get('/auth/me');
         if (res.success && res.data) {
           setUser(res.data);
-          localStorage.setItem('olympiadhub_user', JSON.stringify(res.data));
+          sessionStorage.setItem('olympiadhub_user', JSON.stringify(res.data));
+          localStorage.removeItem('olympiadhub_user'); // cleanup legacy
         }
       } catch (err) {
         apiClient.setToken(null);
+        sessionStorage.removeItem('olympiadhub_user');
         localStorage.removeItem('olympiadhub_user');
         setUser(null);
       } finally {
@@ -50,7 +52,8 @@ export const AuthProvider = ({ children }) => {
     if (res.success && res.data) {
       apiClient.setToken(res.data.token);
       setUser(res.data.user);
-      localStorage.setItem('olympiadhub_user', JSON.stringify(res.data.user));
+      sessionStorage.setItem('olympiadhub_user', JSON.stringify(res.data.user));
+      localStorage.removeItem('olympiadhub_user'); // cleanup legacy
       return res.data.user;
     }
     throw new Error(res.message || 'Login failed');
@@ -60,10 +63,14 @@ export const AuthProvider = ({ children }) => {
     try {
       await apiClient.post('/auth/logout');
     } catch (e) {
-      // Ignore logout errors
+      // Ignore network errors on logout
     } finally {
       apiClient.setToken(null);
+      sessionStorage.removeItem('olympiadhub_user');
+      sessionStorage.removeItem('olympiadhub_token');
       localStorage.removeItem('olympiadhub_user');
+      localStorage.removeItem('olympiadhub_token');
+      sessionStorage.clear();
       setUser(null);
     }
   };
@@ -81,6 +88,19 @@ export const AuthProvider = ({ children }) => {
     return user?.role === role;
   };
 
+  const updateUser = (updater) => {
+    setUser((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : { ...prev, ...updater };
+      if (next) {
+        sessionStorage.setItem('olympiadhub_user', JSON.stringify(next));
+      } else {
+        sessionStorage.removeItem('olympiadhub_user');
+      }
+      localStorage.removeItem('olympiadhub_user');
+      return next;
+    });
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -90,7 +110,8 @@ export const AuthProvider = ({ children }) => {
         logout,
         hasPermission,
         isRole,
-        setUser
+        setUser,
+        updateUser
       }}
     >
       {children}

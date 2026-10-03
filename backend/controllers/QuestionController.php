@@ -56,6 +56,11 @@ class QuestionController {
             $where[] = "q.status = ?";
             $params[] = $status;
         }
+        if ($user['role'] === 'teacher') {
+            $where[] = "q.created_by = ?";
+            $params[] = $user['id'];
+        }
+
         if ($search !== '') {
             $where[] = "(q.question_text LIKE ? OR q.explanation LIKE ?)";
             $params[] = "%$search%";
@@ -187,6 +192,16 @@ class QuestionController {
         }
 
         $db = Database::getConnection();
+
+        // If teacher, verify question ownership
+        if ($user['role'] === 'teacher') {
+            $chk = $db->prepare("SELECT id FROM questions WHERE id = ? AND created_by = ?");
+            $chk->execute([$id, $user['id']]);
+            if (!$chk->fetch()) {
+                Response::forbidden('You can only modify questions created by you.');
+            }
+        }
+
         $stmt = $db->prepare("
             UPDATE questions SET
                 class_id = ?, subject_id = ?, chapter_id = ?, topic_id = ?,
@@ -227,6 +242,16 @@ class QuestionController {
         }
 
         $db = Database::getConnection();
+
+        // If teacher, verify question ownership
+        if ($user['role'] === 'teacher') {
+            $chk = $db->prepare("SELECT id FROM questions WHERE id = ? AND created_by = ?");
+            $chk->execute([$id, $user['id']]);
+            if (!$chk->fetch()) {
+                Response::forbidden('You can only delete questions created by you.');
+            }
+        }
+
         $stmt = $db->prepare("DELETE FROM questions WHERE id = ?");
         $stmt->execute([$id]);
 

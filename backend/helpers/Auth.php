@@ -28,6 +28,35 @@ class Auth {
         return null;
     }
 
+    public static function getOptionalUser(): ?array {
+        if (self::$currentUser !== null) {
+            return self::$currentUser;
+        }
+
+        $token = self::getBearerToken();
+        if (!$token) {
+            return null;
+        }
+
+        $db = Database::getConnection();
+        $stmt = $db->prepare("
+            SELECT s.id as session_id, s.expires_at, s.is_active,
+                   u.id, u.login_id, u.full_name, u.email, u.phone, u.role, u.role_id, u.class_id, u.status, u.must_change_password, u.avatar,
+                   ac.name as class_name
+            FROM login_sessions s
+            JOIN users u ON s.user_id = u.id
+            LEFT JOIN academic_classes ac ON u.class_id = ac.id
+            WHERE s.session_token = ? AND s.is_active = 1
+        ");
+        $stmt->execute([$token]);
+        $user = $stmt->fetch();
+        if ($user && $user['status'] === 'active') {
+            self::$currentUser = $user;
+            return $user;
+        }
+        return null;
+    }
+
     public static function authenticate(): array {
         if (self::$currentUser !== null) {
             return self::$currentUser;

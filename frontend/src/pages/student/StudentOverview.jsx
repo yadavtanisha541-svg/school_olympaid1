@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 import {
   BookOpen,
@@ -10,182 +11,904 @@ import {
   ArrowRight,
   Sparkles,
   Zap,
-  Play
+  Play,
+  HelpCircle,
+  BarChart3,
+  Calendar,
+  FileText,
+  Target,
+  Download,
+  Flame,
+  Check,
+  ChevronRight,
+  ShieldCheck,
+  Eye,
+  AlertCircle,
+  Lightbulb,
+  Puzzle,
+  Globe,
+  Languages,
+  Rocket,
+  Layers,
+  FileSpreadsheet,
+  Atom,
+  Calculator,
+  Laptop,
+  Brain,
+  Search,
+  RotateCcw,
+  X,
+  Filter,
+  Users,
+  ExternalLink,
+  FileCheck2,
+  Building2
 } from 'lucide-react';
-import { StatCard } from '../../components/StatCard';
-import { Badge } from '../../components/Badge';
-import { Button } from '../../components/Button';
 
 export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult }) => {
+  const { user } = useAuth();
   const [data, setData] = useState(null);
+  const [availableExams, setAvailableExams] = useState([]);
+  const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState(() => new Date());
+
+  // Update clock once every minute to prevent constant re-renders
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+    return () => clearInterval(timer);
+  }, []);
 
   const fetchDashboard = async () => {
     try {
       setLoading(true);
-      const res = await apiClient.get('/analytics/student');
-      if (res.success && res.data) {
-        setData(res.data);
+      const [dashRes, examsRes, certRes] = await Promise.all([
+        apiClient.get('/analytics/student').catch(() => ({ success: false })),
+        apiClient.get('/exams/available').catch(() => ({ success: false })),
+        apiClient.get('/certificates/my').catch(() => ({ success: false }))
+      ]);
+
+      if (dashRes.success && dashRes.data) {
+        setData(dashRes.data);
+      }
+      if (examsRes.success && examsRes.data) {
+        setAvailableExams(examsRes.data);
+      }
+      if (certRes.success && certRes.data) {
+        setCertificates(certRes.data);
       }
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching student dashboard:', err);
     } finally {
       setLoading(false);
     }
   };
 
+  // Real-time All Students Test Results & Live Percentages State
+  const [allStudentResults, setAllStudentResults] = useState([]);
+  const [resultsLoading, setResultsLoading] = useState(false);
+  const [resultsTab, setResultsTab] = useState('all_stream'); // 'all_stream' | 'weekly_leaderboard' | 'my_tests'
+  const [selectedClassFilter, setSelectedClassFilter] = useState('ALL');
+  const [selectedSubjectFilter, setSelectedSubjectFilter] = useState('ALL');
+  const [resultSearchQuery, setResultSearchQuery] = useState('');
+
+  const fetchResultsStream = async (showLoading = false) => {
+    try {
+      if (showLoading) setResultsLoading(true);
+      const res = await apiClient.get('/results', {
+        scope: 'all'
+      });
+      if (res.success && Array.isArray(res.data)) {
+        setAllStudentResults(res.data);
+      }
+    } catch (e) {
+      console.error('Error fetching student results stream:', e);
+    } finally {
+      if (showLoading) setResultsLoading(false);
+    }
+  };
+
+  // Weekly Leaderboard State (Connected to real Admin high scores & percentages)
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [leaderboardClass, setLeaderboardClass] = useState('ALL');
+  const [leaderboardSubject, setLeaderboardSubject] = useState('ALL');
+  const [sortField, setSortField] = useState('percentage');
+  const [sortAsc, setSortAsc] = useState(false);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+
+  const fetchWeeklyLeaderboard = async (cls, subj) => {
+    try {
+      setLeaderboardLoading(true);
+      const res = await apiClient.get('/leaderboard', {
+        class_name: cls === 'ALL' ? '' : cls,
+        subject: subj === 'ALL' ? '' : subj,
+        limit: 20
+      });
+      if (res.success && Array.isArray(res.data)) {
+        setLeaderboardData(res.data);
+      }
+    } catch (e) {
+      console.error('Error fetching weekly leaderboard:', e);
+    } finally {
+      setLeaderboardLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchDashboard();
-  }, []);
+    fetchResultsStream(true);
+
+    const handleExamSubmitted = () => {
+      fetchDashboard();
+      fetchResultsStream(false);
+      fetchWeeklyLeaderboard(leaderboardClass, leaderboardSubject);
+    };
+
+    window.addEventListener('exam-submitted', handleExamSubmitted);
+    window.addEventListener('olympiad-exam-submitted', handleExamSubmitted);
+
+    // Silent background refresh without table flicker/collapse
+    const pollInterval = setInterval(() => {
+      fetchResultsStream(false);
+    }, 10000);
+
+    return () => {
+      clearInterval(pollInterval);
+      window.removeEventListener('exam-submitted', handleExamSubmitted);
+      window.removeEventListener('olympiad-exam-submitted', handleExamSubmitted);
+    };
+  }, [leaderboardClass, leaderboardSubject]);
+
+  useEffect(() => {
+    fetchWeeklyLeaderboard(leaderboardClass, leaderboardSubject);
+  }, [leaderboardClass, leaderboardSubject]);
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortAsc(!sortAsc);
+    } else {
+      setSortField(field);
+      setSortAsc(field === 'name' || field === 'school');
+    }
+  };
+
+  const sortedLeaderboard = useMemo(() => {
+    const list = [...leaderboardData];
+    list.sort((a, b) => {
+      let valA = a[sortField];
+      let valB = b[sortField];
+      if (sortField === 'percentage') {
+        valA = parseFloat(a.percentage_num || a.percentage || 0);
+        valB = parseFloat(b.percentage_num || b.percentage || 0);
+      }
+      if (valA < valB) return sortAsc ? -1 : 1;
+      if (valA > valB) return sortAsc ? 1 : -1;
+      return 0;
+    });
+    return list;
+  }, [leaderboardData, sortField, sortAsc]);
+
+  // Filtered Student Results Stream
+  const filteredStudentResults = useMemo(() => {
+    return allStudentResults.filter((r) => {
+      // 1. Class filter
+      if (selectedClassFilter !== 'ALL') {
+        const targetClass = selectedClassFilter.toLowerCase();
+        const rClass = (r.class_name || '').toLowerCase();
+        const rExam = (r.exam_title || '').toLowerCase();
+        if (!rClass.includes(targetClass) && !rExam.includes(targetClass)) {
+          return false;
+        }
+      }
+
+      // 2. Subject filter
+      if (selectedSubjectFilter !== 'ALL') {
+        const targetSub = selectedSubjectFilter.toLowerCase();
+        const rSub = (r.subject_name || '').toLowerCase();
+        const rCode = (r.subject_code || '').toLowerCase();
+        const rExam = (r.exam_title || '').toLowerCase();
+        if (!rSub.includes(targetSub) && !rCode.includes(targetSub) && !rExam.includes(targetSub)) {
+          return false;
+        }
+      }
+
+      // 3. Search query
+      if (resultSearchQuery.trim()) {
+        const q = resultSearchQuery.toLowerCase();
+        const matchName = (r.student_name || '').toLowerCase().includes(q);
+        const matchLogin = (r.student_login_id || '').toLowerCase().includes(q);
+        const matchExam = (r.exam_title || '').toLowerCase().includes(q);
+        const matchSchool = (r.school_name || '').toLowerCase().includes(q);
+        if (!matchName && !matchLogin && !matchExam && !matchSchool) return false;
+      }
+
+      return true;
+    });
+  }, [allStudentResults, selectedClassFilter, selectedSubjectFilter, resultSearchQuery]);
+
+  const myTestResults = useMemo(() => {
+    if (!user) return [];
+    return allStudentResults.filter(r => r.student_id === user.id || (r.student_login_id && r.student_login_id === user.login_id));
+  }, [allStudentResults, user]);
+
+  // Time of day greeting
+  const hour = currentTime.getHours();
+  const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
+
+  const studentName = user?.full_name || 'Sandeep';
+
+  const formattedDateStr = currentTime.toLocaleDateString('en-US', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
 
   if (loading) {
-    return <div className="p-8 text-center text-slate-400">Loading candidate portal...</div>;
+    return (
+      <div className="p-12 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-3">
+        <div className="w-8 h-8 border-3 border-[#3b82f6] border-t-transparent rounded-full animate-spin" />
+        <span>Loading student learning portal...</span>
+      </div>
+    );
   }
 
   const metrics = data?.metrics || {};
+  const recentAttempts = data?.recent_attempts || [];
+  const subjectProgress = data?.subject_progress || [];
+
+  // Calculate real totals across student's answers
+  const totalAnswered = subjectProgress.reduce((acc, curr) => acc + parseInt(curr.total_answered || 0), 0);
+  const totalCorrect = subjectProgress.reduce((acc, curr) => acc + parseInt(curr.correct_count || 0), 0);
+  const overallAccuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : (parseFloat(metrics.avg_score || 0) || 80);
 
   return (
-    <div className="space-y-8">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-brand-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl">
-        <div className="relative z-10 max-w-2xl">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-500/20 border border-brand-400/30 text-brand-300 text-xs font-bold mb-3">
-            <Sparkles className="w-3.5 h-3.5" />
-            National Assessment Ready
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
-            Welcome to Your Olympiad Examination Dashboard
+    <div className="space-y-6 pb-14 font-sans w-full max-w-full overflow-x-hidden">
+      
+      {/* ========================================================================= */}
+      {/* 1. HERO GREETING BANNER (Exact Design with Stacked Books & Cup)           */}
+      {/* ========================================================================= */}
+      <div className="bg-gradient-to-r from-[#faf6fa] via-white to-[#fdf7f5] border border-[#ebd7eb] rounded-3xl p-5 sm:p-6 md:p-7 shadow-xs relative overflow-hidden">
+        {/* Soft Decorative Glow Circles */}
+        <div className="absolute top-0 right-1/4 w-48 h-48 bg-[#ebd7eb]/40 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-10 w-40 h-40 bg-[#f6d6cc]/40 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+          {/* Left Content */}
+          <div className="space-y-3 max-w-2xl">
+            <div className="flex items-start gap-3.5">
+              {/* Waving Hand Circular Badge */}
+              <div className="w-11 h-11 rounded-2xl bg-white/90 border border-[#ebd7eb] shadow-2xs flex items-center justify-center text-2xl shrink-0 mt-0.5">
+                👋
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-semibold text-slate-500">
+                  Welcome Back,
+                </p>
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
+                  {greeting}, <span className="text-[#80497D] capitalize">{studentName}</span>!
+                </h1>
+              </div>
+            </div>
+
+            <p className="text-xs sm:text-sm text-slate-600 font-medium pl-0.5">
+              Keep learning, keep growing. Your next big achievement is near!
+            </p>
+
+            {/* Bottom Row: Date Pill */}
+            <div className="pt-1 flex items-center flex-wrap gap-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#f4eaf4] border border-[#ebd7eb] rounded-xl text-xs font-bold text-[#80497D] shadow-2xs">
+                <Calendar className="w-3.5 h-3.5 text-[#80497D]" />
+                <span>Today: {formattedDateStr}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Content: Vector Illustration of Stacked Books with Tea Cup & Plant + Scholar Star Badge */}
+          <div className="shrink-0 flex items-center justify-center md:justify-end gap-4">
+            {/* Scholar Star Tier Badge Card */}
+            <div className="hidden lg:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 border border-[#f6d6cc] shadow-2xs">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#C35B3F] to-[#b04c31] text-white flex items-center justify-center shadow-2xs">
+                <Trophy className="w-5 h-5 fill-amber-100 text-[#fdf7f5]" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[11px] font-black uppercase tracking-wider text-[#422240]">
+                  Scholar Star
+                </span>
+                <span className="text-[9px] text-[#C35B3F] font-semibold">Active Tier</span>
+              </div>
+            </div>
+
+            {/* Flat Vector Stacked Books & Cheerful Cup SVG Illustration */}
+            <div className="relative w-36 h-28 sm:w-44 sm:h-32 shrink-0">
+              <svg viewBox="0 0 200 160" className="w-full h-full drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Small Potted Plant (Left) */}
+                <ellipse cx="42" cy="142" rx="20" ry="6" fill="#cbd5e1" opacity="0.4" />
+                {/* Pot */}
+                <path d="M 32 120 L 52 120 L 49 142 L 35 142 Z" fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="2" />
+                {/* Leaves */}
+                <path d="M 42 120 C 30 105, 22 108, 25 95 C 38 95, 42 110, 42 120 Z" fill="#2dd4bf" />
+                <path d="M 42 120 C 46 100, 60 90, 62 80 C 68 95, 54 112, 42 120 Z" fill="#10b981" />
+                <path d="M 42 115 C 34 85, 48 70, 52 65 C 56 80, 50 102, 42 115 Z" fill="#059669" />
+
+                {/* Ground Shadow under Books */}
+                <ellipse cx="120" cy="148" rx="60" ry="8" fill="#cbd5e1" opacity="0.45" />
+
+                {/* Bottom Book (Green) */}
+                <rect x="68" y="122" width="105" height="22" rx="5" fill="#059669" />
+                <rect x="74" y="124" width="97" height="18" rx="3" fill="#ffffff" />
+                <path d="M 68 122 Q 65 133 68 144 L 75 144 Q 72 133 75 122 Z" fill="#047857" />
+                <line x1="78" y1="129" x2="165" y2="129" stroke="#e2e8f0" strokeWidth="1.5" />
+                <line x1="78" y1="134" x2="165" y2="134" stroke="#e2e8f0" strokeWidth="1.5" />
+                <line x1="78" y1="139" x2="165" y2="139" stroke="#e2e8f0" strokeWidth="1.5" />
+
+                {/* Middle Book (Orange / Yellow) */}
+                <rect x="72" y="98" width="98" height="22" rx="5" fill="#f59e0b" />
+                <rect x="78" y="100" width="90" height="18" rx="3" fill="#ffffff" />
+                <path d="M 72 98 Q 69 109 72 120 L 79 120 Q 76 109 79 98 Z" fill="#d97706" />
+                <line x1="82" y1="105" x2="162" y2="105" stroke="#e2e8f0" strokeWidth="1.5" />
+                <line x1="82" y1="110" x2="162" y2="110" stroke="#e2e8f0" strokeWidth="1.5" />
+                <line x1="82" y1="115" x2="162" y2="115" stroke="#e2e8f0" strokeWidth="1.5" />
+
+                {/* Top Book (Blue) */}
+                <rect x="76" y="74" width="92" height="22" rx="5" fill="#2563eb" />
+                <rect x="82" y="76" width="84" height="18" rx="3" fill="#ffffff" />
+                <path d="M 76 74 Q 73 85 76 96 L 83 96 Q 80 85 83 74 Z" fill="#1d4ed8" />
+                <line x1="86" y1="81" x2="160" y2="81" stroke="#e2e8f0" strokeWidth="1.5" />
+                <line x1="86" y1="86" x2="160" y2="86" stroke="#e2e8f0" strokeWidth="1.5" />
+                <line x1="86" y1="91" x2="160" y2="91" stroke="#e2e8f0" strokeWidth="1.5" />
+
+                {/* Yellow Coffee/Tea Cup on Top */}
+                <path d="M 108 52 C 108 68, 138 68, 138 52 L 138 50 L 108 50 Z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2" />
+                {/* Cup Rim */}
+                <ellipse cx="123" cy="50" rx="15" ry="4" fill="#fde68a" stroke="#f59e0b" strokeWidth="1.5" />
+                <ellipse cx="123" cy="50" rx="12" ry="2.5" fill="#d97706" opacity="0.6" />
+                {/* Cup Handle */}
+                <path d="M 137 54 C 146 54, 146 64, 136 65" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" />
+                {/* Heart Symbol on Cup */}
+                <path d="M 123 58 C 121 55, 117 56, 117 59 C 117 63, 123 66, 123 66 C 123 66, 129 63, 129 59 C 129 56, 125 55, 123 58 Z" fill="#ffffff" />
+
+                {/* Steam & Sparkles */}
+                <circle cx="95" cy="45" r="2.5" fill="#fde047" />
+                <circle cx="152" cy="42" r="3" fill="#fde047" />
+                <path d="M 112 36 Q 110 30 114 24" stroke="#fde047" strokeWidth="2" strokeLinecap="round" />
+                <path d="M 124 33 Q 126 26 123 20" stroke="#fde047" strokeWidth="2" strokeLinecap="round" />
+                <path d="M 134 38 Q 138 31 135 25" stroke="#fde047" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. SECTION: OLYMPIAD SUBJECTS (6 Modern Pastel Cards Grid)                 */}
+      {/* ========================================================================= */}
+      <div className="space-y-3.5 pt-2">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-[#2563eb]" />
+              <span>Olympiad Subjects</span>
+            </h2>
+          </div>
+        </div>
+
+        {/* 6 Simple Square Subject Cards matching sidebar */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3.5 sm:gap-4 w-full">
+          {[
+            {
+              key: 'content_icso',
+              title: 'ICSO (Cyber)',
+              subtitle: 'Cyber & Computer',
+              icon: Laptop,
+              iconColor: 'text-sky-600',
+              iconBg: 'bg-sky-50 border-sky-200'
+            },
+            {
+              key: 'content_iso',
+              title: 'ISO (NSO)',
+              subtitle: 'Science & Discovery',
+              icon: Rocket,
+              iconColor: 'text-emerald-600',
+              iconBg: 'bg-emerald-50 border-emerald-200'
+            },
+            {
+              key: 'content_imo',
+              title: 'IMO (Maths)',
+              subtitle: 'Mathematics & Logic',
+              icon: Calculator,
+              iconColor: 'text-blue-600',
+              iconBg: 'bg-blue-50 border-blue-200'
+            },
+            {
+              key: 'content_ieo',
+              title: 'IEO (English)',
+              subtitle: 'English & Grammar',
+              icon: BookOpen,
+              iconColor: 'text-purple-600',
+              iconBg: 'bg-purple-50 border-purple-200'
+            },
+            {
+              key: 'content_igko',
+              title: 'IGKO (GK)',
+              subtitle: 'General Knowledge',
+              icon: Globe,
+              iconColor: 'text-amber-600',
+              iconBg: 'bg-amber-50 border-amber-200'
+            },
+            {
+              key: 'content_isso',
+              title: 'ISSO (Reasoning)',
+              subtitle: 'Logical Reasoning',
+              icon: Brain,
+              iconColor: 'text-rose-600',
+              iconBg: 'bg-rose-50 border-rose-200'
+            }
+          ].map((sub) => (
+            <div
+              key={sub.key}
+              onClick={() => onNavigateTab(sub.key)}
+              className="bg-white rounded-2xl border border-slate-200 hover:border-[#2563eb] p-4 sm:p-5 shadow-2xs hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center aspect-square group hover:-translate-y-1"
+            >
+              {/* Square Icon Container */}
+              <div className={`w-12 h-12 rounded-xl border ${sub.iconBg} ${sub.iconColor} flex items-center justify-center shadow-2xs group-hover:scale-110 transition-transform shrink-0`}>
+                <sub.icon className="w-6 h-6" />
+              </div>
+
+              {/* Subject Title & Subtitle */}
+              <div className="space-y-0.5 my-auto">
+                <h3 className="font-black text-slate-900 text-xs sm:text-sm tracking-tight group-hover:text-[#2563eb] transition-colors leading-tight">
+                  {sub.title}
+                </h3>
+                <p className="text-[10px] text-slate-400 font-medium truncate">
+                  {sub.subtitle}
+                </p>
+              </div>
+
+              {/* Bottom Simple Indicator */}
+              <div className="w-full pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400 group-hover:text-[#2563eb] transition-colors">
+                <span>0% Done</span>
+                <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 3. SECTION: TWO FEATURED BANNERS (Matches exact brand colors)               */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
+        
+        {/* Left Banner: Reasoning Online Classes */}
+        <div className="bg-[#faf6fa] rounded-3xl border border-[#ebd7eb] p-5 sm:p-6 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            {/* Open Book with Bulb Vector Illustration */}
+            <div className="w-14 h-14 rounded-2xl bg-white border border-[#ebd7eb] flex items-center justify-center shadow-xs shrink-0 text-[#80497D]">
+              <div className="relative">
+                <BookOpen className="w-7 h-7 text-[#80497D]" />
+                <Lightbulb className="w-4 h-4 text-[#e7b84b] fill-[#e7b84b] absolute -top-1.5 -right-1.5" />
+              </div>
+            </div>
+
+            <div className="min-w-0 space-y-1">
+              <span className="inline-block px-2.5 py-0.5 rounded-md bg-[#f4eaf4] text-[#80497D] text-[9px] font-black uppercase tracking-wider">
+                FEATURED
+              </span>
+              <h3 className="text-xs sm:text-sm font-black text-slate-900 leading-snug">
+                Reasoning Online Classes for IMO, ISO(NSO) &amp; IEO
+              </h3>
+              <p className="text-[11px] text-slate-500 font-medium">
+                Get expert guidance and improve your problem-solving skills.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => onNavigateTab('my_classes')}
+            className="px-5 sm:px-6 py-2.5 sm:py-3 bg-[#80497D] hover:bg-[#683965] text-white rounded-full text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1.5"
+          >
+            <span>ENROLL NOW</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Right Banner: Olympiad Intelligent Test Generator Pro */}
+        <div className="bg-[#fdf7f5] rounded-3xl border border-[#f6d6cc] p-5 sm:p-6 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            {/* Target & Checklist Illustration */}
+            <div className="w-14 h-14 rounded-2xl bg-white border border-[#f6d6cc] flex items-center justify-center shadow-xs shrink-0 text-[#C35B3F]">
+              <div className="relative">
+                <FileSpreadsheet className="w-7 h-7 text-[#C35B3F]" />
+                <Target className="w-4 h-4 text-[#dc2626] absolute -top-1.5 -right-1.5" />
+              </div>
+            </div>
+
+            <div className="min-w-0 space-y-1">
+              <span className="inline-block px-2.5 py-0.5 rounded-md bg-[#fbeee9] text-[#C35B3F] text-[9px] font-black uppercase tracking-wider">
+                PRO TOOL
+              </span>
+              <h3 className="text-xs sm:text-sm font-black text-slate-900 leading-snug">
+                Olympiad Intelligent Test Generator Pro
+              </h3>
+              <p className="text-[11px] text-slate-500 font-medium">
+                Create your own Olympiad tests in seconds.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => onNavigateTab('test_generator')}
+            className="px-5 sm:px-6 py-2.5 sm:py-3 bg-[#C35B3F] hover:bg-[#b04c31] text-white rounded-full text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1.5"
+          >
+            <span>TRY NOW</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 4. SECTION: FREE SAMPLE PAPERS & PREVIOUS YEAR PAPERS                       */}
+      {/* ========================================================================= */}
+      <div className="pt-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          
+          {/* Card 1: Spotlight: IGKO Quiz */}
+          <div className="bg-[#faf6fa] rounded-2xl border border-[#ebd7eb] p-4 sm:p-5 shadow-2xs hover:shadow-md transition-all flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-11 h-11 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center shrink-0 shadow-2xs">
+                <FileText className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                  Spotlight: IGKO Quiz
+                </h4>
+                <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
+                  Test your knowledge with latest questions.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onNavigateTab('free_quizzes')}
+              className="px-4 py-1.5 bg-[#80497D] hover:bg-[#683965] text-white rounded-full text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1"
+            >
+              <span>Open</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+
+          {/* Card 2: Free Sample Papers */}
+          <div className="bg-[#fdf7f5] rounded-2xl border border-[#f6d6cc] p-4 sm:p-5 shadow-2xs hover:shadow-md transition-all flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-11 h-11 rounded-xl bg-[#fbeee9] text-[#C35B3F] flex items-center justify-center shrink-0 shadow-2xs">
+                <FileSpreadsheet className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                  Free Sample Papers
+                </h4>
+                <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
+                  Download and practice sample papers.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onNavigateTab('free_sample_papers')}
+              className="px-4 py-1.5 bg-[#C35B3F] hover:bg-[#b04c31] text-white rounded-full text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1"
+            >
+              <span>Open</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+
+          {/* Card 3: Free Previous Year Papers */}
+          <div className="bg-[#faf6fa] rounded-2xl border border-[#ebd7eb] p-4 sm:p-5 shadow-2xs hover:shadow-md transition-all flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-11 h-11 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center shrink-0 shadow-2xs">
+                <Award className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                  Free Previous Year Papers
+                </h4>
+                <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
+                  Get past year papers with solutions.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onNavigateTab('free_past_papers')}
+              className="px-4 py-1.5 bg-[#80497D] hover:bg-[#683965] text-white rounded-full text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1"
+            >
+              <span>Open</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 5. SECTION: SKILL DEVELOPMENT PROGRAMS                                    */}
+      {/* ========================================================================= */}
+      <div className="space-y-3 pt-2">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
+            <Rocket className="w-5 h-5 text-[#f43f5e]" />
+            <span>Skill Development Programs</span>
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
-            Test your competitive skills across Mathematics, Science, General Knowledge and Computer Logic. Instant evaluation, rankings and verifiable certificates.
-          </p>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Button
-              variant="primary"
-              size="md"
-              icon={Play}
-              onClick={() => onNavigateTab('available_exams')}
-              className="bg-brand-500 hover:bg-brand-400 text-white font-bold shadow-lg shadow-brand-500/30"
-            >
-              Take Available Olympiads
-            </Button>
-            <Button
-              variant="secondary"
-              size="md"
-              icon={Clock}
-              onClick={() => onNavigateTab('exam_history')}
-              className="bg-white/10 hover:bg-white/20 text-white border-white/20"
-            >
-              My Exam History
-            </Button>
-          </div>
+
+          <button
+            type="button"
+            onClick={() => onNavigateTab && onNavigateTab('prog_rsdp')}
+            className="text-xs font-bold text-[#2563eb] hover:text-[#1d4ed8] hover:underline flex items-center gap-1 transition-colors cursor-pointer"
+          >
+            <span>View All Programs</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
         </div>
-      </div>
 
-      {/* 4 Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <StatCard
-          title="Available Olympiads"
-          value={metrics.available_exams || 0}
-          subtitle="Ready to attempt"
-          icon={BookOpen}
-          color="brand"
-        />
-        <StatCard
-          title="Exams Attempted"
-          value={metrics.total_attempts || 0}
-          subtitle={`${metrics.total_passed || 0} exams qualified`}
-          icon={CheckCircle2}
-          color="emerald"
-        />
-        <StatCard
-          title="Average Score"
-          value={`${metrics.avg_score || 0}%`}
-          subtitle={`Best score: ${metrics.best_score || 0}%`}
-          icon={TrendingUp}
-          color="purple"
-        />
-        <StatCard
-          title="Merit Certificates"
-          value={metrics.certificates_count || 0}
-          subtitle={metrics.best_rank ? `Best Rank: #${metrics.best_rank}` : 'Earn credentials'}
-          icon={Award}
-          color="amber"
-        />
-      </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 w-full">
+          {[
+            {
+              id: 'prog_rsdp',
+              title: 'Reasoning Skill Development',
+              subtitle: 'Build a strong foundation with essential skills.',
+              gradient: 'from-[#fb7185] via-[#f43f5e] to-[#e11d48]',
+              icon: Brain
+            },
+            {
+              id: 'prog_gksdp',
+              title: 'GK Skill Development',
+              subtitle: 'Improve your general knowledge and current affairs.',
+              gradient: 'from-[#60a5fa] via-[#3b82f6] to-[#2563eb]',
+              icon: Globe
+            },
+            {
+              id: 'prog_msdp',
+              title: 'Maths Skill Development',
+              subtitle: 'Sharpen your math skills with practice and theory.',
+              gradient: 'from-[#a78bfa] via-[#8b5cf6] to-[#7c3aed]',
+              isMath: true
+            },
+            {
+              id: 'prog_esdp',
+              title: 'English Skill Development',
+              subtitle: 'Enhance your communication and language skills.',
+              gradient: 'from-[#a3e635] via-[#84cc16] to-[#65a30d]',
+              isLang: true
+            },
+            {
+              id: 'prog_ssdp',
+              title: 'Science Skill Development',
+              subtitle: 'Explore science concepts with easy learning.',
+              gradient: 'from-[#22d3ee] via-[#06b6d4] to-[#0891b2]',
+              icon: Rocket
+            }
+          ].map((prog) => {
+            const Icon = prog.icon;
+            return (
+              <div
+                key={prog.id}
+                onClick={() => onNavigateTab(prog.id)}
+                className={`rounded-3xl p-5 flex flex-col justify-between text-white shadow-xs hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1 min-h-[210px] relative overflow-hidden bg-gradient-to-b ${prog.gradient} cursor-pointer group`}
+              >
+                {/* Frosted subtle geometric glow */}
+                <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none" />
 
-      {/* Two Column: Recent Submissions & Subject Proficiency */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Attempts */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-slate-900">Recent Exam Results</h3>
-            <Button variant="ghost" size="xs" onClick={() => onNavigateTab('exam_history')}>
-              View History
-            </Button>
-          </div>
+                <div className="space-y-2.5 relative z-10">
+                  {/* Top Frosted Circular Icon Container */}
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                    {prog.isMath ? (
+                      <span className="font-black text-sm text-white font-mono leading-none">
+                        x²
+                      </span>
+                    ) : prog.isLang ? (
+                      <span className="font-black text-xs text-white leading-none">
+                        文A
+                      </span>
+                    ) : (
+                      <Icon className="w-5 h-5 text-white" />
+                    )}
+                  </div>
 
-          <div className="space-y-3">
-            {(data?.recent_attempts || []).length === 0 ? (
-              <div className="py-8 text-center text-slate-400 text-xs">
-                No past attempts yet. Take an Olympiad to see your score analysis!
-              </div>
-            ) : (
-              (data?.recent_attempts || []).map((att) => (
-                <div key={att.id} className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-bold text-slate-900">{att.exam_title}</p>
-                    <p className="text-[11px] text-slate-500 font-mono mt-0.5">{att.submitted_at}</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-black text-brand-600 font-mono">{parseFloat(att.percentage).toFixed(1)}%</span>
-                    <Badge variant={att.passed ? 'success' : 'danger'} size="sm">
-                      {att.passed ? 'PASSED' : 'FAILED'}
-                    </Badge>
-                    <Button variant="secondary" size="xs" onClick={() => onViewResult(att.id)}>
-                      Scorecard
-                    </Button>
+                    <h3 className="font-black text-sm text-white leading-snug">
+                      {prog.title}
+                    </h3>
+                    <p className="text-[11px] text-white/90 font-medium leading-relaxed mt-1">
+                      {prog.subtitle}
+                    </p>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+
+                <div className="pt-3 border-t border-white/20 mt-auto relative z-10">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onNavigateTab(prog.id);
+                    }}
+                    className="w-full py-2 px-3 bg-white/25 hover:bg-white/35 text-white rounded-full text-xs font-bold transition-all backdrop-blur-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-2xs"
+                  >
+                    <span>Start Learning</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 6. SECTION: LIVE STUDENT TEST RESULTS, SCORES & LEADERBOARD               */}
+      {/* ========================================================================= */}
+      <div className="pt-2 space-y-4">
+        {/* Section Header (Flat on background, no box) */}
+        <div className="space-y-0.5">
+          <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-[#80497D]" />
+            <span>Live Student Exam Results &amp; Percentages</span>
+          </h2>
+          <p className="text-[11px] text-slate-500 font-medium">
+            Real-time student performance feed, test scores, and subject-wise percentages.
+          </p>
         </div>
 
-        {/* Subject Progress */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-slate-900">Subject Accuracy Progress</h3>
-            <TrendingUp className="w-4 h-4 text-slate-400" />
-          </div>
+        {/* LIVE STUDENTS RESULTS TABLE */}
+        <div className="space-y-3">
 
-          <div className="space-y-4">
-            {(data?.subject_progress || []).length === 0 ? (
-              <div className="py-8 text-center text-slate-400 text-xs">
-                Subject progress will appear after your first examination attempt.
-              </div>
-            ) : (
-              (data?.subject_progress || []).map((sub, idx) => (
-                <div key={idx} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-slate-800">{sub.subject_name}</span>
-                    <span className="font-bold text-slate-900">{sub.accuracy || 0}% Accuracy ({sub.correct_count}/{sub.total_answered})</span>
-                  </div>
-                  <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all"
-                      style={{
-                        width: `${Math.min(100, Math.max(5, sub.accuracy || 0))}%`,
-                        backgroundColor: sub.color || '#4F46E5'
-                      }}
-                    />
-                  </div>
-                </div>
-              ))
-            )}
+            {/* Results Table */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 border-b border-slate-200/80 text-slate-500 text-[10px] uppercase font-bold tracking-wider">
+                    <tr>
+                      <th className="py-3 px-3 w-10 text-center">#</th>
+                      <th className="py-3 px-4">Student</th>
+                      <th className="py-3 px-3">Class</th>
+                      <th className="py-3 px-4">Test Title &amp; Subject</th>
+                      <th className="py-3 px-4">School</th>
+                      <th className="py-3 px-4">Percentage</th>
+                      <th className="py-3 px-4 text-right">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium">
+                    {resultsLoading ? (
+                      <tr>
+                        <td colSpan={7} className="py-10 text-center text-slate-400">
+                          <div className="flex items-center justify-center gap-2">
+                            <RotateCcw className="w-4 h-4 animate-spin text-indigo-600" />
+                            <span>Loading live student exam results...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : filteredStudentResults.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="py-10 text-center text-slate-400">
+                          No student test results match your filter criteria.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredStudentResults.map((r, idx) => {
+                        const pct = parseFloat(r.percentage || 0).toFixed(1);
+                        const isPassed = Number(r.passed) === 1 || parseFloat(pct) >= 50;
+                        const isMyRecord = user && (r.student_id === user.id || r.student_login_id === user.login_id);
+
+                        return (
+                          <tr
+                            key={r.id || idx}
+                            className={`hover:bg-slate-50/80 transition-colors ${
+                              isMyRecord ? 'bg-indigo-50/30 font-semibold' : ''
+                            }`}
+                          >
+                            <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-400 text-xs">
+                              {idx + 1}
+                            </td>
+
+                            <td className="py-3.5 px-4">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-xl bg-[#80497D] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
+                                  {r.student_name ? r.student_name.charAt(0).toUpperCase() : 'S'}
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-1.5">
+                                    <p className="font-bold text-slate-900 truncate">
+                                      {r.student_name || 'Student'}
+                                    </p>
+                                    {isMyRecord && (
+                                      <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-[#f4eaf4] text-[#80497D]">
+                                        YOU
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-[10px] font-mono text-slate-400 truncate uppercase">
+                                    {r.student_login_id || 'ID'}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td className="py-3.5 px-3 whitespace-nowrap">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#f4eaf4] text-[#80497D] border border-[#ebd7eb]">
+                                {r.class_name || 'Class 6'}
+                              </span>
+                            </td>
+
+                            <td className="py-3.5 px-4">
+                              <p className="font-bold text-slate-900 line-clamp-1">
+                                {r.exam_title || 'Olympiad Test Paper'}
+                              </p>
+                              <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium mt-0.5">
+                                {r.subject_name ? (
+                                  <span className="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">
+                                    {r.subject_name}
+                                  </span>
+                                ) : (
+                                  <span className="text-purple-700 font-bold bg-purple-50 px-1.5 py-0.2 rounded border border-purple-100">
+                                    Olympiad
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+
+                            <td className="py-3.5 px-4 font-semibold text-slate-700 whitespace-nowrap">
+                              <div className="flex items-center gap-1.5">
+                                <Building2 className="w-3.5 h-3.5 text-[#80497D] shrink-0" />
+                                <span className="font-bold text-slate-800 truncate max-w-[220px]" title={r.school_name || 'Independent Candidate'}>
+                                  {r.school_name || 'Independent Candidate'}
+                                </span>
+                              </div>
+                            </td>
+
+                            <td className="py-3.5 px-4 whitespace-nowrap">
+                              <span
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-black font-mono ${
+                                  parseFloat(pct) >= 80
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                    : parseFloat(pct) >= 50
+                                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                                    : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                }`}
+                              >
+                                {pct}%
+                              </span>
+                            </td>
+
+                            <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                              <span
+                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                                  isPassed
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                    : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                }`}
+                              >
+                                <span className={`w-1.5 h-1.5 rounded-full ${isPassed ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                                <span>{isPassed ? 'Passed' : 'Completed'}</span>
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 };
+

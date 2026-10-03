@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { OlympiadHubLogo } from './OlympiadHubLogo';
 import {
   LayoutDashboard,
   Users,
   GraduationCap,
+  Building2,
+  ShoppingBag,
   Layers,
   HelpCircle,
   FileSpreadsheet,
@@ -14,27 +17,85 @@ import {
   Settings,
   BookOpen,
   Clock,
-  BarChart3,
   UserCheck,
-  ArrowRight,
-  Sparkles
+  LogOut,
+  Globe,
+  ChevronDown,
+  ChevronUp,
+  Laptop,
+  Rocket,
+  Calculator,
+  Brain,
+  BarChart3,
+  TrendingUp,
+  Bookmark,
+  User,
+  CreditCard,
+  Wallet,
+  FileText,
+  Gamepad2,
+  Send,
+  Calendar,
+  Info,
+  Atom,
+  Sparkles,
+  Video
 } from 'lucide-react';
 
-export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose }) => {
-  const { user, hasPermission } = useAuth();
+export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic }) => {
+  const { user, logout, hasPermission } = useAuth();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
+
+  // Close user menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Student Accordion state
+  const [studentAccordions, setStudentAccordions] = useState({
+    content: true,
+    programs: true,
+    performance: false,
+    account: false,
+    info: false,
+    freeZone: false
+  });
+
+  const toggleStudentAccordion = (sectionKey) => {
+    setStudentAccordions(prev => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey]
+    }));
+  };
 
   const superAdminNav = [
     { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'teachers', label: 'Teacher Management', icon: GraduationCap },
+    { id: 'payment_bank_manager', label: 'Payment, QR & Orders', icon: CreditCard },
+    { id: 'online_classes_manager', label: 'Online Classes Studio', icon: Video },
+    { id: 'skill_programs_manager', label: 'Skill Programs Studio', icon: Rocket },
+    { id: 'superadmin_packages', label: 'Package Sales & Manager', icon: ShoppingBag },
+    { id: 'schools', label: 'School Registrations', icon: Building2 },
+    { id: 'coordinators', label: 'Coordinator Applicants', icon: UserCheck },
+    { id: 'workbook_orders', label: 'Workbook Orders', icon: ShoppingBag },
     { id: 'students', label: 'Student Management', icon: Users },
-    { id: 'academic', label: 'Classes & Subjects', icon: Layers },
-    { id: 'question_bank', label: 'Question Bank', icon: HelpCircle },
-    { id: 'exams', label: 'Exam Management', icon: FileSpreadsheet },
+    { id: 'academic', label: 'Disciplines & Subjects', icon: Layers },
+    { id: 'subject_content', label: 'Subject & Class Content', icon: BookOpen },
+    { id: 'revision_vault', label: 'Revision Vault & Bookmarks', icon: Bookmark },
+    { id: 'free_quizzes_manager', label: 'FREE Quizzes Manager', icon: HelpCircle },
+    { id: 'faqs_key_info', label: 'FAQs & Key Info Manager', icon: HelpCircle },
+    { id: 'test_generator_manager', label: 'Sample & Past Papers', icon: Sparkles },
     { id: 'results', label: 'Exam Results & Reports', icon: FileCheck2 },
     { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy },
     { id: 'certificates', label: 'Certificates Manager', icon: Award },
     { id: 'activity_logs', label: 'Audit Activity Logs', icon: Activity },
-    { id: 'settings', label: 'System Settings', icon: Settings },
+    { id: 'settings', label: 'System Settings', icon: Settings }
   ];
 
   const teacherNav = [
@@ -43,137 +104,593 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose }) => {
     { id: 'exams', label: 'Exam Management', icon: FileSpreadsheet, perm: 'manage_exams' },
     { id: 'students', label: 'Student Management', icon: Users, perm: 'view_students' },
     { id: 'results', label: 'Exam Results & Reports', icon: FileCheck2, perm: 'view_results' },
-    { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy, perm: 'view_leaderboards' },
+    { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy, perm: 'view_leaderboards' }
   ];
-
-  const studentNav = [
-    { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'available_exams', label: 'Available Olympiads', icon: BookOpen },
-    { id: 'exam_history', label: 'My Exam History', icon: Clock },
-    { id: 'performance', label: 'Performance Analytics', icon: BarChart3 },
-    { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy },
-    { id: 'certificates', label: 'Certificates Manager', icon: Award },
-    { id: 'profile', label: 'My Profile & Security', icon: UserCheck },
-  ];
-
-  let navItems = [];
-  if (user?.role === 'superadmin') {
-    navItems = superAdminNav;
-  } else if (user?.role === 'teacher') {
-    navItems = teacherNav.filter(item => !item.perm || hasPermission(item.perm));
-  } else {
-    navItems = studentNav;
-  }
 
   return (
     <>
       {/* Mobile Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-40 bg-[#321630]/60 backdrop-blur-xs lg:hidden"
           onClick={onClose}
         />
       )}
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-white border-r border-slate-100 flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-white/95 backdrop-blur-md border-r border-[#ebd7eb] flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Brand Header */}
-        <div className="h-20 px-6 flex items-center gap-3 border-b border-slate-100/80">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-            <Trophy className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <span className="text-lg font-black tracking-tight text-slate-900">
-              Olympiad<span className="text-indigo-600">Hub</span>
-            </span>
-            <p className="text-[10px] font-semibold text-slate-400 tracking-wide mt-0.5">
-              Learn • Compete • Grow
-            </p>
-          </div>
+        <div className="h-20 px-5 flex items-center justify-between border-b border-[#ebd7eb] shrink-0 bg-[#fff9f2]">
+          <OlympiadHubLogo size="sm" showTagline={false} />
         </div>
 
         {/* Navigation items */}
-        <div className="flex-1 py-4 px-3 space-y-1 overflow-y-auto custom-scrollbar">
-          {/* Top Dashboard Item */}
-          {navItems.length > 0 && (
+        <div className="flex-1 py-3 px-3 space-y-1 overflow-y-auto custom-scrollbar">
+          {/* Public Portal Switcher */}
+          {onGoToPublic && (
             <button
               type="button"
               onClick={() => {
-                onSelectTab('overview');
+                onGoToPublic();
                 if (onClose) onClose();
               }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 mb-3 ${
-                currentTab === 'overview'
-                  ? 'bg-indigo-50/90 text-indigo-700 border border-indigo-100 shadow-xs'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-              }`}
+              className="w-full flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#C35B3F] bg-[#faf4e0] hover:bg-[#faebd7] border border-[#e7b84b]/40 mb-2 cursor-pointer shadow-2xs transition-colors"
             >
-              <LayoutDashboard className={`w-4 h-4 ${currentTab === 'overview' ? 'text-indigo-600' : 'text-slate-400'}`} />
-              <span>Dashboard</span>
+              <Globe className="w-4 h-4 text-[#C35B3F]" />
+              <span>🌐 View Public Website</span>
             </button>
           )}
 
-          <div className="px-3 pt-2 pb-1.5">
-            <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-              {user?.role === 'superadmin' ? 'ADMINISTRATION' : user?.role === 'teacher' ? 'FACULTY PORTAL' : 'STUDENT PORTAL'}
-            </p>
-          </div>
+          {/* Top Dashboard Button */}
+          <button
+            type="button"
+            onClick={() => {
+              onSelectTab('overview');
+              if (onClose) onClose();
+            }}
+            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
+              currentTab === 'overview'
+                ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                : 'text-slate-700 hover:bg-[#faf6fa] hover:text-[#80497D] font-semibold'
+            }`}
+          >
+            <LayoutDashboard className={`w-4 h-4 ${currentTab === 'overview' ? 'text-[#80497D]' : 'text-slate-400'}`} />
+            <span>Dashboard</span>
+          </button>
 
-          {navItems.filter(i => i.id !== 'overview').map((item) => {
-            const Icon = item.icon;
-            const isActive = currentTab === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => {
-                  onSelectTab(item.id);
-                  if (onClose) onClose();
-                }}
-                className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-150 ${
-                  isActive
-                    ? 'bg-indigo-50/90 text-indigo-700 font-bold border border-indigo-100 shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
-              >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-600' : 'text-slate-400'}`} />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-
-          {/* Bottom Promotional Card */}
-          <div className="pt-6 pb-2 px-1">
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 border border-indigo-100/80 p-4">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1 max-w-[120px]">
-                  <p className="text-xs font-black text-slate-800 leading-tight">
-                    Build Better Future Through Olympiads
-                  </p>
-                </div>
-                {/* Visual Icon Illustration */}
-                <div className="w-12 h-12 rounded-xl bg-white/80 border border-indigo-100 flex items-center justify-center text-amber-500 shadow-xs">
-                  <Trophy className="w-6 h-6 text-amber-500 fill-amber-400/20" />
-                </div>
+          {/* ========================================================================= */}
+          {/* 1. SUPERADMIN NAV                                                         */}
+          {/* ========================================================================= */}
+          {user?.role === 'superadmin' && (
+            <div className="space-y-1 pt-2">
+              <div className="px-3 pb-1">
+                <p className="text-[9px] font-extrabold uppercase tracking-widest text-[#80497D]">
+                  ADMINISTRATION
+                </p>
               </div>
-              <div className="mt-3 flex items-center justify-between">
+
+              {superAdminNav.filter(i => i.id !== 'overview').map((item) => {
+                const Icon = item.icon;
+                const isActive = currentTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      onSelectTab(item.id);
+                      if (onClose) onClose();
+                    }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
+                      isActive
+                        ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                        : 'text-slate-700 font-semibold hover:bg-[#faf6fa] hover:text-[#80497D]'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-[#80497D]' : 'text-slate-400'}`} />
+                    <span className="truncate">{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* 2. TEACHER NAV                                                            */}
+          {/* ========================================================================= */}
+          {user?.role === 'teacher' && (
+            <div className="space-y-1 pt-2">
+              <div className="px-3 pb-1">
+                <p className="text-[9px] font-extrabold uppercase tracking-widest text-[#80497D]">
+                  FACULTY PORTAL
+                </p>
+              </div>
+
+              {teacherNav.filter(item => !item.perm || hasPermission(item.perm)).filter(i => i.id !== 'overview').map((item) => {
+                const Icon = item.icon;
+                const isActive = currentTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      onSelectTab(item.id);
+                      if (onClose) onClose();
+                    }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
+                      isActive
+                        ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                        : 'text-slate-700 font-semibold hover:bg-[#faf6fa] hover:text-[#80497D]'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-[#80497D]' : 'text-slate-400'}`} />
+                    <span className="truncate">{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* 3. STUDENT PORTAL (CLEAN FLAT ACCORDION WITH NO OUTER BOX BORDERS)        */}
+          {/* ========================================================================= */}
+          {(!user || user?.role === 'student') && (
+            <div className="space-y-3 pt-2">
+              {/* SECTION A: OLYMPIADS */}
+              <div className="space-y-1">
+                <p className="px-3 text-[9px] font-black uppercase tracking-widest text-[#80497D]">
+                  OLYMPIADS
+                </p>
+
+                {/* My Content Accordion Header */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => toggleStudentAccordion('content')}
+                    className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <BookOpen className="w-4 h-4 text-[#80497D]" />
+                      <span>My Content</span>
+                    </div>
+                    {studentAccordions.content ? (
+                      <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                    )}
+                  </button>
+
+                  {/* Clean Sub-items */}
+                  {studentAccordions.content && (
+                    <div className="pl-7 pr-2 py-0.5 space-y-0.5">
+                      {[
+                        { id: 'content_icso', label: 'ICSO (Cyber)', icon: Laptop },
+                        { id: 'content_iso', label: 'ISO (NSO)', icon: Rocket },
+                        { id: 'content_imo', label: 'IMO (Maths)', icon: Calculator },
+                        { id: 'content_ieo', label: 'IEO (English)', icon: BookOpen },
+                        { id: 'content_igko', label: 'IGKO (GK)', icon: Globe },
+                        { id: 'content_isso', label: 'ISSO (Reasoning)', icon: Brain }
+                      ].map((sub) => {
+                        const SubIcon = sub.icon;
+                        const isSubActive = currentTab === sub.id;
+                        return (
+                          <button
+                            key={sub.id}
+                            type="button"
+                            onClick={() => {
+                              onSelectTab(sub.id);
+                              if (onClose) onClose();
+                            }}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                              isSubActive
+                                ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                                : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
+                            }`}
+                          >
+                            <SubIcon className={`w-3.5 h-3.5 ${isSubActive ? 'text-[#80497D]' : 'text-slate-400'}`} />
+                            <span>{sub.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* My Classes */}
                 <button
                   type="button"
-                  onClick={() => onSelectTab(user?.role === 'student' ? 'available_exams' : 'exams')}
-                  className="w-7 h-7 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center shadow-sm shadow-indigo-500/30 transition-transform active:scale-95"
+                  onClick={() => {
+                    onSelectTab('my_classes');
+                    if (onClose) onClose();
+                  }}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs transition-all cursor-pointer ${
+                    currentTab === 'my_classes'
+                      ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                      : 'text-slate-700 font-semibold hover:bg-[#faf6fa] hover:text-[#80497D]'
+                  }`}
                 >
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <Users className="w-4 h-4 text-slate-400" />
+                  <span>My Classes</span>
                 </button>
-                <span className="text-[10px] font-bold text-indigo-600 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" /> Explore
+              </div>
+
+              {/* SECTION B: MY PERFORMANCE */}
+              <div className="space-y-1 pt-1 border-t border-[#ebd7eb]/40">
+                {/* My Performance Accordion Header */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => toggleStudentAccordion('performance')}
+                    className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <BarChart3 className="w-4 h-4 text-[#C35B3F]" />
+                      <span>My Performance</span>
+                    </div>
+                    {studentAccordions.performance ? (
+                      <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                    )}
+                  </button>
+
+                  {/* Clean Sub-items */}
+                  {studentAccordions.performance && (
+                    <div className="pl-7 pr-2 py-0.5 space-y-0.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSelectTab('performance');
+                          if (onClose) onClose();
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                          currentTab === 'performance'
+                            ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                            : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
+                        }`}
+                      >
+                        <BarChart3 className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Statistics &amp; Reports</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSelectTab('performance');
+                          if (onClose) onClose();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium cursor-pointer"
+                      >
+                        <TrendingUp className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Analysis</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* My Revision */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSelectTab('my_revision');
+                    if (onClose) onClose();
+                  }}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs transition-all cursor-pointer ${
+                    currentTab === 'my_revision'
+                      ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                      : 'text-slate-700 font-semibold hover:bg-[#faf6fa] hover:text-[#80497D]'
+                  }`}
+                >
+                  <Bookmark className="w-4 h-4 text-slate-400" />
+                  <span>My Revision</span>
+                </button>
+              </div>
+
+              {/* SECTION C: MY ACCOUNT */}
+              <div className="space-y-1 pt-2 border-t border-[#ebd7eb]/40">
+                <p className="px-3 text-[9px] font-black uppercase tracking-widest text-[#80497D]">
+                  MY ACCOUNT
+                </p>
+
+                {/* Account Accordion Header */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => toggleStudentAccordion('account')}
+                    className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <User className="w-4 h-4 text-[#e7b84b]" />
+                      <span>My Account</span>
+                    </div>
+                    {studentAccordions.account ? (
+                      <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                    )}
+                  </button>
+
+                  {/* Clean Sub-items */}
+                  {studentAccordions.account && (
+                    <div className="pl-7 pr-2 py-0.5 space-y-0.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSelectTab('profile');
+                          if (onClose) onClose();
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                          currentTab === 'profile'
+                            ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                            : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
+                        }`}
+                      >
+                        <User className="w-3.5 h-3.5 text-slate-400" />
+                        <span>My Profile</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSelectTab('my_orders');
+                          if (onClose) onClose();
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                          currentTab === 'my_orders'
+                            ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                            : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
+                        }`}
+                      >
+                        <CreditCard className="w-3.5 h-3.5 text-slate-400" />
+                        <span>My Orders</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSelectTab('my_wallet');
+                          if (onClose) onClose();
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                          currentTab === 'my_wallet'
+                            ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                            : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
+                        }`}
+                      >
+                        <Wallet className="w-3.5 h-3.5 text-slate-400" />
+                        <span>My Wallet</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* SECTION D: OTHERS & INFORMATION */}
+              <div className="space-y-1 pt-2 border-t border-[#ebd7eb]/40">
+                <p className="px-3 text-[9px] font-black uppercase tracking-widest text-[#80497D]">
+                  INFO &amp; EXTRAS
+                </p>
+
+                {/* Info Accordion Header */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => toggleStudentAccordion('info')}
+                    className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Info className="w-4 h-4 text-[#80497D]" />
+                      <span>Info</span>
+                    </div>
+                    {studentAccordions.info ? (
+                      <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                    )}
+                  </button>
+
+                  {/* Info Sub-items */}
+                  {studentAccordions.info && (
+                    <div className="pl-7 pr-2 py-0.5 space-y-0.5">
+                      {[
+                        { id: 'info_datesheet', label: 'Date Sheet', icon: Calendar },
+                        { id: 'info_awards', label: 'Awards', icon: Trophy },
+                        { id: 'info_icso', label: 'ICSO', icon: Laptop },
+                        { id: 'info_nso', label: 'NSO', icon: Rocket },
+                        { id: 'info_imo', label: 'IMO', icon: Calculator },
+                        { id: 'info_ieo', label: 'IEO', icon: BookOpen }
+                      ].map((sub) => {
+                        const SubIcon = sub.icon;
+                        const isSubActive = currentTab === sub.id;
+                        return (
+                          <button
+                            key={sub.id}
+                            type="button"
+                            onClick={() => {
+                              onSelectTab(sub.id);
+                              if (onClose) onClose();
+                            }}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                              isSubActive
+                                ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                                : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
+                            }`}
+                          >
+                            <SubIcon className={`w-3.5 h-3.5 ${isSubActive ? 'text-[#80497D]' : 'text-slate-400'}`} />
+                            <span>{sub.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Free Zone Accordion Header */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => toggleStudentAccordion('freeZone')}
+                    className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Send className="w-4 h-4 text-[#C35B3F]" />
+                      <span>Free Zone</span>
+                    </div>
+                    {studentAccordions.freeZone ? (
+                      <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                    )}
+                  </button>
+
+                  {/* Clean Sub-items */}
+                  {studentAccordions.freeZone && (
+                    <div className="pl-7 pr-2 py-0.5 space-y-0.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSelectTab('free_sample_papers');
+                          if (onClose) onClose();
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                          currentTab === 'free_sample_papers'
+                            ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                            : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
+                        }`}
+                      >
+                        <FileText className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Sample Papers &amp; OMR</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSelectTab('free_past_papers');
+                          if (onClose) onClose();
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                          currentTab === 'free_past_papers'
+                            ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                            : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
+                        }`}
+                      >
+                        <FileSpreadsheet className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Previous Year Papers</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* FREE Quizzes */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSelectTab('free_quizzes');
+                    if (onClose) onClose();
+                  }}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs transition-all cursor-pointer ${
+                    currentTab === 'free_quizzes'
+                      ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                      : 'text-slate-700 font-semibold hover:bg-[#faf6fa] hover:text-[#80497D]'
+                  }`}
+                >
+                  <HelpCircle className="w-4 h-4 text-slate-400" />
+                  <span>FREE Quizzes</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom User Profile Card & Interactive Menu */}
+        <div className="p-3 border-t border-[#ebd7eb] bg-[#fff9f2] shrink-0 relative" ref={userMenuRef}>
+          {/* Popover Options Menu */}
+          {isUserMenuOpen && (
+            <div className="absolute bottom-full left-3 right-3 mb-2 bg-white rounded-2xl border border-[#ebd7eb] shadow-2xl p-2 space-y-1 z-50 animate-in fade-in zoom-in-95 duration-150">
+              <div className="px-3 py-2 border-b border-[#f4eaf4]">
+                <p className="text-xs font-black text-[#4e2a4a] truncate">
+                  {user?.name || user?.email || 'Candidate'}
+                </p>
+                <p className="text-[11px] text-slate-500 truncate">
+                  {user?.email || ''}
+                </p>
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#faf4e0] text-[#80497D] capitalize">
+                    {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'teacher' ? 'Faculty' : 'Candidate'}
+                  </span>
+                  {user?.class && (
+                    <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#f4eaf4] text-[#80497D]">
+                      {user.class}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Profile Option */}
+              <button
+                type="button"
+                onClick={() => {
+                  onSelectTab('profile');
+                  setIsUserMenuOpen(false);
+                  if (onClose) onClose();
+                }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  currentTab === 'profile'
+                    ? 'bg-[#f4eaf4] text-[#80497D]'
+                    : 'text-slate-700 hover:bg-[#faf6fa] hover:text-[#80497D]'
+                }`}
+              >
+                <User className="w-4 h-4 text-[#80497D]" />
+                <span>My Profile</span>
+              </button>
+
+              {/* Logout Option */}
+              <button
+                type="button"
+                onClick={async () => {
+                  setIsUserMenuOpen(false);
+                  await logout();
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 hover:text-red-700 transition-all cursor-pointer"
+              >
+                <LogOut className="w-4 h-4 text-red-500" />
+                <span>Logout / Sign Out</span>
+              </button>
+            </div>
+          )}
+
+          {/* User Profile Card Button */}
+          <button
+            type="button"
+            onClick={() => setIsUserMenuOpen(prev => !prev)}
+            className={`w-full flex items-center justify-between p-2 rounded-xl bg-white border transition-all cursor-pointer text-left ${
+              isUserMenuOpen
+                ? 'border-[#80497D] ring-2 ring-[#80497D]/20 shadow-sm'
+                : 'border-[#ebd7eb] hover:border-[#80497D]/40 shadow-2xs hover:bg-[#faf6fa]'
+            }`}
+            title="Click to open Profile & Logout menu"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-full bg-[#f4eaf4] text-[#80497D] font-black text-xs flex items-center justify-center border border-[#ebd7eb] shrink-0">
+                {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-[#4e2a4a] truncate">
+                  {user?.name || user?.email || 'Candidate'}
+                </p>
+                <span className="inline-block px-1.5 py-0.2 rounded text-[9px] font-bold bg-[#faf4e0] text-[#80497D] capitalize">
+                  {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'teacher' ? 'Faculty' : 'Candidate'}
                 </span>
               </div>
             </div>
-          </div>
+
+            <div className="p-1 rounded-lg text-slate-400 hover:text-[#80497D] transition-colors shrink-0">
+              {isUserMenuOpen ? (
+                <ChevronDown className="w-4 h-4 text-[#80497D]" />
+              ) : (
+                <ChevronUp className="w-4 h-4 text-slate-400" />
+              )}
+            </div>
+          </button>
         </div>
       </aside>
     </>

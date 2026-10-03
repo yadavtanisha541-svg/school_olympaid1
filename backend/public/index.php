@@ -76,6 +76,15 @@ try {
     if ($uri === '/api/auth/login' && $method === 'POST') {
         (new App\Controllers\AuthController())->login();
     }
+    if ($uri === '/api/auth/register-student' && $method === 'POST') {
+        (new App\Controllers\AuthController())->registerStudent();
+    }
+    if (($uri === '/api/auth/register-school' || $uri === '/api/auth/register-teacher') && $method === 'POST') {
+        (new App\Controllers\AuthController())->registerSchool();
+    }
+    if (($uri === '/api/coordinator/inquire' || $uri === '/api/auth/coordinator-inquiry') && $method === 'POST') {
+        (new App\Controllers\AuthController())->submitCoordinatorInquiry();
+    }
     if ($uri === '/api/auth/me' && $method === 'GET') {
         (new App\Controllers\AuthController())->me();
     }
@@ -89,12 +98,58 @@ try {
         (new App\Controllers\AuthController())->changePassword();
     }
 
+    // Workbook Orders & Free Trials (Public & Auto-save)
+    if ($uri === '/api/workbooks/order' && $method === 'POST') {
+        (new App\Controllers\PublicActionsController())->saveWorkbookOrder();
+    }
+    if ($uri === '/api/workbooks/orders' && $method === 'GET') {
+        (new App\Controllers\PublicActionsController())->getWorkbookOrders();
+    }
+    if (preg_match('#^/api/workbooks/orders/(\d+)$#', $uri, $m) && $method === 'DELETE') {
+        (new App\Controllers\PublicActionsController())->deleteWorkbookOrder((int)$m[1]);
+    }
+    if (preg_match('#^/api/workbooks/orders/(\d+)/status$#', $uri, $m) && ($method === 'PUT' || $method === 'POST')) {
+        (new App\Controllers\PublicActionsController())->updateWorkbookOrderStatus((int)$m[1]);
+    }
+
+    // School Registrations Management
+    if ($uri === '/api/schools/registrations' && $method === 'GET') {
+        (new App\Controllers\PublicActionsController())->getSchoolRegistrations();
+    }
+    if (preg_match('#^/api/schools/registrations/(\d+)$#', $uri, $m) && $method === 'DELETE') {
+        (new App\Controllers\PublicActionsController())->deleteSchoolRegistration((int)$m[1]);
+    }
+    if (preg_match('#^/api/schools/registrations/(\d+)/status$#', $uri, $m) && ($method === 'PUT' || $method === 'POST')) {
+        (new App\Controllers\PublicActionsController())->updateSchoolRegistrationStatus((int)$m[1]);
+    }
+
+    // Coordinator Inquiries Management
+    if (($uri === '/api/coordinator/inquiries' || $uri === '/api/coordinators/inquiries') && $method === 'GET') {
+        (new App\Controllers\PublicActionsController())->getCoordinatorInquiries();
+    }
+    if (preg_match('#^/api/coordinator/inquiries/(\d+)$#', $uri, $m) && $method === 'DELETE') {
+        (new App\Controllers\PublicActionsController())->deleteCoordinatorInquiry((int)$m[1]);
+    }
+    if (preg_match('#^/api/coordinator/inquiries/(\d+)/status$#', $uri, $m) && ($method === 'PUT' || $method === 'POST')) {
+        (new App\Controllers\PublicActionsController())->updateCoordinatorInquiryStatus((int)$m[1]);
+    }
+
+    if ($uri === '/api/free-trial/submit' && $method === 'POST') {
+        (new App\Controllers\PublicActionsController())->saveFreeTrialAttempt();
+    }
+    if ($uri === '/api/free-trial/attempts' && $method === 'GET') {
+        (new App\Controllers\PublicActionsController())->getFreeTrialAttempts();
+    }
+
     // 2. User Routes
     if ($uri === '/api/users/teachers' && $method === 'GET') {
         (new App\Controllers\UserController())->getTeachers();
     }
     if ($uri === '/api/users/students' && $method === 'GET') {
         (new App\Controllers\UserController())->getStudents();
+    }
+    if ($uri === '/api/users/bulk-delete' && $method === 'POST') {
+        (new App\Controllers\UserController())->bulkDeleteUsers();
     }
     if ($uri === '/api/users' && $method === 'POST') {
         (new App\Controllers\UserController())->createUser();
@@ -123,7 +178,13 @@ try {
         }
     }
 
-    // 3. Academic Structure Routes
+    // 3. Academic Structure & Public Directory Routes
+    if ($uri === '/api/public/disciplines' && $method === 'GET') {
+        (new App\Controllers\AcademicController())->getPublicDisciplines();
+    }
+    if ($uri === '/api/public/classes' && $method === 'GET') {
+        (new App\Controllers\AcademicController())->getPublicClasses();
+    }
     if ($uri === '/api/academic/classes') {
         if ($method === 'GET') {
             (new App\Controllers\AcademicController())->getClasses();
@@ -173,6 +234,13 @@ try {
             (new App\Controllers\AcademicController())->createTopic();
         }
     }
+    if ($uri === '/api/academic/subject-class-content') {
+        if ($method === 'GET') {
+            (new App\Controllers\AcademicController())->getSubjectClassContent();
+        } elseif ($method === 'POST' || $method === 'PUT') {
+            (new App\Controllers\AcademicController())->saveSubjectClassContent();
+        }
+    }
 
     // 4. Question Bank Routes
     if ($uri === '/api/questions') {
@@ -199,7 +267,7 @@ try {
     }
 
     // 5. Exam Routes
-    if ($uri === '/api/exams') {
+    if (($uri === '/api/exams' || $uri === '/api/exams/available')) {
         if ($method === 'GET') {
             (new App\Controllers\ExamController())->getExams();
         } elseif ($method === 'POST') {
@@ -229,8 +297,23 @@ try {
     if ($uri === '/api/exam-engine/submit' && $method === 'POST') {
         (new App\Controllers\ExamEngineController())->submitExam();
     }
+    if (($uri === '/api/test-generator/submit' || $uri === '/api/exam-engine/submit-generated') && $method === 'POST') {
+        (new App\Controllers\ExamEngineController())->submitGeneratedTest();
+    }
+    if ($uri === '/api/test-generator/admin-papers' && $method === 'GET') {
+        (new App\Controllers\ExamEngineController())->getGeneratorAdminPapers();
+    }
+    if ($uri === '/api/test-generator/admin-papers' && $method === 'POST') {
+        (new App\Controllers\ExamEngineController())->createGeneratorAdminPaper();
+    }
+    if (preg_match('#^/api/test-generator/admin-papers/(\d+)$#', $uri, $m) && $method === 'DELETE') {
+        (new App\Controllers\ExamEngineController())->deleteGeneratorAdminPaper((int)$m[1]);
+    }
 
     // 7. Results & Solutions
+    if ($uri === '/api/results' && $method === 'GET') {
+        (new App\Controllers\ResultController())->getResults();
+    }
     if (preg_match('#^/api/results/(\d+)$#', $uri, $m) && $method === 'GET') {
         (new App\Controllers\ResultController())->getResult((int)$m[1]);
     }
@@ -247,7 +330,7 @@ try {
     }
 
     // 9. Certificates
-    if ($uri === '/api/certificates' && $method === 'GET') {
+    if (($uri === '/api/certificates' || $uri === '/api/certificates/my') && $method === 'GET') {
         (new App\Controllers\CertificateController())->getCertificates();
     }
     if (preg_match('#^/api/certificates/(\d+)$#', $uri, $m) && $method === 'GET') {
@@ -267,17 +350,132 @@ try {
     if ($uri === '/api/analytics/student' && $method === 'GET') {
         (new App\Controllers\AnalyticsController())->getStudentDashboard();
     }
-    if ($uri === '/api/analytics/logs' && $method === 'GET') {
-        (new App\Controllers\AnalyticsController())->getActivityLogs();
+    if ($uri === '/api/analytics/logs') {
+        if ($method === 'GET') {
+            (new App\Controllers\AnalyticsController())->getActivityLogs();
+        } elseif ($method === 'DELETE') {
+            (new App\Controllers\AnalyticsController())->clearActivityLogs();
+        }
     }
 
-    // 11. System Settings
+    // 11. Study Packages & Student Purchases
+    if ($uri === '/api/packages' && $method === 'GET') {
+        (new App\Controllers\PackageController())->getPackages();
+    }
+    if ($uri === '/api/packages/create' && $method === 'POST') {
+        (new App\Controllers\PackageController())->createPackage();
+    }
+    if (preg_match('#^/api/packages/(\d+)$#', $uri, $m)) {
+        if ($method === 'PUT' || $method === 'POST') {
+            (new App\Controllers\PackageController())->updatePackage((int)$m[1]);
+        } elseif ($method === 'DELETE') {
+            (new App\Controllers\PackageController())->deletePackage((int)$m[1]);
+        }
+    }
+    if ($uri === '/api/packages/purchase' && $method === 'POST') {
+        (new App\Controllers\PackageController())->purchasePackage();
+    }
+    if ($uri === '/api/packages/admin-orders' && $method === 'GET') {
+        (new App\Controllers\PackageController())->getAdminPurchases();
+    }
+    if ($uri === '/api/packages/my-orders' && $method === 'GET') {
+        (new App\Controllers\PackageController())->getMyPurchases();
+    }
+
+    // 11b. Online Classes Studio & Catalog API
+    if ($uri === '/api/online-classes' && $method === 'GET') {
+        (new App\Controllers\OnlineClassesController())->getOnlineClasses();
+    }
+    if ($uri === '/api/online-classes' && $method === 'POST') {
+        (new App\Controllers\OnlineClassesController())->createPackage();
+    }
+    if ($uri === '/api/online-classes/hero' && $method === 'POST') {
+        (new App\Controllers\OnlineClassesController())->saveHeroBanner();
+    }
+    if (preg_match('#^/api/online-classes/([^/]+)$#', $uri, $m)) {
+        if ($method === 'PUT' || $method === 'POST') {
+            (new App\Controllers\OnlineClassesController())->updatePackage($m[1]);
+        } elseif ($method === 'DELETE') {
+            (new App\Controllers\OnlineClassesController())->deletePackage($m[1]);
+        }
+    }
+    if ($uri === '/api/online-classes/batches' && $method === 'POST') {
+        (new App\Controllers\OnlineClassesController())->createBatch();
+    }
+    if (preg_match('#^/api/online-classes/batches/([^/]+)$#', $uri, $m) && $method === 'DELETE') {
+        (new App\Controllers\OnlineClassesController())->deleteBatch($m[1]);
+    }
+    if ($uri === '/api/online-classes/lectures' && $method === 'POST') {
+        (new App\Controllers\OnlineClassesController())->createLecture();
+    }
+    if (preg_match('#^/api/online-classes/lectures/([^/]+)$#', $uri, $m) && $method === 'DELETE') {
+        (new App\Controllers\OnlineClassesController())->deleteLecture($m[1]);
+    }
+
+    // 11c. Payment & Bank Details & Checkout API
+    if ($uri === '/api/payment/bank-settings') {
+        if ($method === 'GET') {
+            (new App\Controllers\PaymentController())->getBankSettings();
+        } elseif ($method === 'POST' || $method === 'PUT') {
+            (new App\Controllers\PaymentController())->saveBankSettings();
+        }
+    }
+    if ($uri === '/api/payment/checkout' && $method === 'POST') {
+        (new App\Controllers\PaymentController())->processCheckout();
+    }
+    if ($uri === '/api/payment/orders' && $method === 'GET') {
+        (new App\Controllers\PaymentController())->getOrders();
+    }
+    if (preg_match('#^/api/payment/orders/(\d+)/status$#', $uri, $m) && ($method === 'PUT' || $method === 'POST')) {
+        (new App\Controllers\PaymentController())->updateOrderStatus((int)$m[1]);
+    }
+    if (preg_match('#^/api/payment/orders/(\d+)$#', $uri, $m) && $method === 'DELETE') {
+        (new App\Controllers\PaymentController())->deleteOrder((int)$m[1]);
+    }
+
+    // 12. System Settings
     if ($uri === '/api/settings') {
         if ($method === 'GET') {
             (new App\Controllers\SettingsController())->getSettings();
         } elseif ($method === 'POST' || $method === 'PUT') {
             (new App\Controllers\SettingsController())->updateSettings();
         }
+    }
+
+    // 13. Revision Vault & Bookmarked Questions API
+    if ($uri === '/api/revision-vault' && $method === 'GET') {
+        (new App\Controllers\RevisionVaultController())->getRevisionItems();
+    }
+    if ($uri === '/api/revision-vault' && $method === 'POST') {
+        (new App\Controllers\RevisionVaultController())->createRevisionItem();
+    }
+    if (preg_match('#^/api/revision-vault/(\d+)$#', $uri, $m)) {
+        if ($method === 'PUT' || $method === 'POST') {
+            (new App\Controllers\RevisionVaultController())->updateRevisionItem((int)$m[1]);
+        } elseif ($method === 'DELETE') {
+            (new App\Controllers\RevisionVaultController())->deleteRevisionItem((int)$m[1]);
+        }
+    }
+    if ($uri === '/api/revision-vault/seed' && $method === 'POST') {
+        (new App\Controllers\RevisionVaultController())->resetSeedItems();
+    }
+
+    // 14. FREE Quizzes & Fun-Zone API
+    if ($uri === '/api/free-quizzes' && $method === 'GET') {
+        (new App\Controllers\FreeQuizController())->getQuizzes();
+    }
+    if ($uri === '/api/free-quizzes' && $method === 'POST') {
+        (new App\Controllers\FreeQuizController())->createQuiz();
+    }
+    if (preg_match('#^/api/free-quizzes/(\d+)$#', $uri, $m)) {
+        if ($method === 'PUT' || $method === 'POST') {
+            (new App\Controllers\FreeQuizController())->updateQuiz((int)$m[1]);
+        } elseif ($method === 'DELETE') {
+            (new App\Controllers\FreeQuizController())->deleteQuiz((int)$m[1]);
+        }
+    }
+    if ($uri === '/api/free-quizzes/seed' && $method === 'POST') {
+        (new App\Controllers\FreeQuizController())->resetSeedQuizzes();
     }
 
     Response::notFound("Endpoint not found: $method $uri");

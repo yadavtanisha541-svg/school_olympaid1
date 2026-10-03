@@ -4,33 +4,50 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased min-h-screen;
+    @apply bg-[#fff9f2] text-[#4e2a4a] font-sans antialiased min-h-screen selection:bg-[#deb8de] selection:text-[#321630];
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 }
 
-/* Custom modern scrollbar */
+/* Custom luxury scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #fff9f2;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #deb8de;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #a868a7;
 }
 
 /* Exam interface utility classes */
 .exam-option-active {
-  @apply border-brand-600 bg-brand-50/70 ring-2 ring-brand-500/20 text-brand-900 font-medium;
+  @apply border-[#6d3a68] bg-[#f4ebf4] ring-2 ring-[#6d3a68]/25 text-[#4e2a4a] font-medium;
+}
+
+/* Theme Pill Badges */
+.theme-pill-header {
+  @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#f4ebf4] text-[#6d3a68] font-extrabold text-xs tracking-tight border border-[#edd6ed];
+}
+
+.theme-pill-coral {
+  @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#fbeae5] text-[#a74a32] font-extrabold text-xs tracking-tight border border-[#f7d7cc];
+}
+
+.theme-pill-gold {
+  @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#faf4e0] text-[#906223] font-extrabold text-xs tracking-tight border border-[#f5e7bf];
+}
+
+.theme-pill-lavender {
+  @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#f3f0fb] text-[#594774] font-extrabold text-xs tracking-tight border border-[#e8e2f7];
 }
 
 @keyframes pulse-subtle {
@@ -41,3 +58,17 @@
 .animate-pulse-subtle {
   animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* Subtle gradient animations */
+.gradient-plum-coral {
+  background: linear-gradient(135deg, #6d3a68 0%, #a868a7 50%, #d9775b 100%);
+}
+
+.gradient-coral-gold {
+  background: linear-gradient(135deg, #d9775b 0%, #e7b84b 100%);
+}
+
+.gradient-warm-surface {
+  background: linear-gradient(180deg, #ffffff 0%, #fff9f2 100%);
+}
+

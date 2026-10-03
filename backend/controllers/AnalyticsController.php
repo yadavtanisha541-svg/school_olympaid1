@@ -111,42 +111,48 @@ class AnalyticsController {
         $db = Database::getConnection();
 
         $totalStudents = (int)$db->query("SELECT COUNT(*) FROM users WHERE role = 'student'")->fetchColumn();
-        $totalQuestions = (int)$db->query("SELECT COUNT(*) FROM questions")->fetchColumn();
+        
+        $myQuestionsStmt = $db->prepare("SELECT COUNT(*) FROM questions WHERE created_by = ?");
+        $myQuestionsStmt->execute([$user['id']]);
+        $myQuestionsCount = (int)$myQuestionsStmt->fetchColumn();
         
         $myExamsStmt = $db->prepare("SELECT COUNT(*) FROM exams WHERE created_by = ?");
         $myExamsStmt->execute([$user['id']]);
         $myExamsCount = (int)$myExamsStmt->fetchColumn();
 
-        $activeExamsStmt = $db->prepare("SELECT COUNT(*) FROM exams WHERE status = 'published' AND (created_by = ? OR 1=1)");
+        $activeExamsStmt = $db->prepare("SELECT COUNT(*) FROM exams WHERE status = 'published' AND created_by = ?");
         $activeExamsStmt->execute([$user['id']]);
         $activeExams = (int)$activeExamsStmt->fetchColumn();
 
-        // Recent exams created
+        // Recent exams created by this teacher
         $recentExamsStmt = $db->prepare("
-            SELECT e.*, ac.name as class_name, s.name as subject_name,
+            SELECT e.*, ac.name as class_name, s.name as subject_name, u.full_name as author_name,
                    (SELECT COUNT(*) FROM exam_attempts ea WHERE ea.exam_id = e.id) as attempts_count
             FROM exams e
             LEFT JOIN academic_classes ac ON e.class_id = ac.id
             LEFT JOIN subjects s ON e.subject_id = s.id
-            WHERE e.created_by = ? OR 1=1
+            LEFT JOIN users u ON e.created_by = u.id
+            WHERE e.created_by = ?
             ORDER BY e.id DESC
             LIMIT 5
         ");
         $recentExamsStmt->execute([$user['id']]);
         $recentExams = $recentExamsStmt->fetchAll();
 
-        // Recent results
-        $recentResults = $db->query("
+        // Recent results for exams created by this teacher
+        $recentResultsStmt = $db->prepare("
             SELECT ea.id, ea.score, ea.percentage, ea.passed, ea.submitted_at,
                    u.full_name as student_name, e.title as exam_title, ac.name as class_name
             FROM exam_attempts ea
             JOIN users u ON ea.student_id = u.id
             JOIN exams e ON ea.exam_id = e.id
             LEFT JOIN academic_classes ac ON u.class_id = ac.id
-            WHERE ea.status = 'submitted'
+            WHERE ea.status = 'submitted' AND (e.created_by = ? OR e.created_by = 1 OR e.created_by IS NULL OR e.exam_type IN ('practice', 'mock', 'generated'))
             ORDER BY ea.submitted_at DESC
             LIMIT 6
-        ")->fetchAll();
+        ");
+        $recentResultsStmt->execute([$user['id']]);
+        $recentResults = $recentResultsStmt->fetchAll();
 
         // Subject Performance
         $subjStmt = $db->query("
@@ -165,9 +171,9 @@ class AnalyticsController {
         Response::success([
             'metrics' => [
                 'total_students' => $totalStudents,
-                'total_exams' => $myExamsCount > 0 ? $myExamsCount : (int)$db->query("SELECT COUNT(*) FROM exams")->fetchColumn(),
+                'total_exams' => $myExamsCount,
                 'active_exams' => $activeExams,
-                'question_bank_count' => $totalQuestions
+                'question_bank_count' => $myQuestionsCount
             ],
             'recent_exams' => $recentExams,
             'recent_results' => $recentResults,
@@ -204,12 +210,13 @@ class AnalyticsController {
         $certStmt->execute([$studentId]);
         $certCount = (int)$certStmt->fetchColumn();
 
-        // Available exams count
+        // Available exams count with strict class filter
         $availStmt = $db->prepare("
             SELECT COUNT(*) FROM exams e
             WHERE e.status = 'published' AND (
-                e.class_id = ? OR e.class_id IS NULL OR
-                e.id IN (SELECT exam_id FROM exam_assignments WHERE target_type = 'all' OR (target_type = 'class' AND target_id = ?) OR (target_type = 'individual' AND target_id = ?))
+                e.class_id = ?
+                OR (e.class_id IS NULL AND e.id IN (SELECT exam_id FROM exam_assignments WHERE target_type = 'all' OR (target_type = 'class' AND target_id = ?)))
+                OR e.id IN (SELECT exam_id FROM exam_assignments WHERE target_type = 'individual' AND target_id = ?)
             )
         ");
         $availStmt->execute([$user['class_id'], $user['class_id'], $user['id']]);
@@ -326,5 +333,13 @@ class AnalyticsController {
                 'total_pages' => ceil($total / $limit)
             ]
         ], 'Activity logs retrieved.');
+    }
+
+    public function clearActivityLogs(): void {
+        $user = Auth::requireRole(['superadmin']);
+        $db = Database::getConnection();
+        $db->exec("TRUNCATE TABLE activity_logs");
+        Logger::log("Audit logs cleared", "Settings", [], $user['id'], 'superadmin');
+        Response::success([], 'All activity logs cleared successfully.');
     }
 }
