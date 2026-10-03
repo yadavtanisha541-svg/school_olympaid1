@@ -99,122 +99,122 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
   return (
     <div className="space-y-6 pb-12 font-sans">
       {/* 1. Brand Greeting Banner with Exact Brand Palette & Live Time */}
-      <div className="bg-gradient-to-r from-[#faf6fa] via-white to-[#fdf7f5] border border-[#ebd7eb] rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5 min-w-0">
-          <div className="w-11 h-11 rounded-xl bg-white border border-[#ebd7eb] shadow-xs flex items-center justify-center text-[#80497D] shrink-0">
-            <Trophy className="w-5 h-5 text-[#80497D] fill-[#f4eaf4]" />
+      <div className="bg-gradient-to-r from-[#faf6fa] via-white to-[#fdf7f5] border border-[#ebd7eb] rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-white border border-[#ebd7eb] shadow-xs flex items-center justify-center text-[#80497D] shrink-0">
+            <Trophy className="w-7 h-7 text-[#80497D] fill-[#f4eaf4]" />
           </div>
           <div className="min-w-0">
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#f4eaf4] text-[#80497D] font-extrabold text-[9px] tracking-wider uppercase border border-[#ebd7eb]">
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.8 rounded-lg bg-[#f4eaf4] text-[#80497D] font-extrabold text-xs tracking-wider uppercase border border-[#ebd7eb]">
               Welcome Back
             </span>
-            <h1 className="text-base sm:text-lg font-black text-[#422240] tracking-tight mt-0.5 leading-snug truncate">
+            <h1 className="text-lg sm:text-2xl font-black text-[#422240] tracking-tight mt-1 leading-snug truncate">
               OlympiadHub Performance &amp; Analytics
             </h1>
-            <p className="text-[11px] text-slate-500 font-medium truncate">
+            <p className="text-xs sm:text-sm text-slate-600 font-medium truncate mt-0.5">
               Monitor candidates, academic metrics, and live examination activities.
             </p>
           </div>
         </div>
 
         <div className="text-left sm:text-right shrink-0">
-          <p className="text-xs sm:text-sm font-bold text-[#80497D] flex items-center gap-1.5 sm:justify-end">
-            <Calendar className="w-3.5 h-3.5 text-[#80497D]" />
+          <p className="text-sm sm:text-base font-bold text-[#80497D] flex items-center gap-1.5 sm:justify-end">
+            <Calendar className="w-4 h-4 text-[#80497D]" />
             <span>{formattedDateStr}</span>
           </p>
-          <p className="text-xs sm:text-sm font-mono font-black text-[#80497D] mt-0.5">
+          <p className="text-sm sm:text-lg font-mono font-black text-[#80497D] mt-0.5">
             {formattedTimeStr}
           </p>
         </div>
       </div>
 
       {/* 2. Top Metric Cards (Row 1: 4 Light Purple & Light Green Cards) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Total Students (Light Purple) */}
-        <div className="bg-white rounded-2xl border border-[#eee6f8] p-4 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-[#faf5ff] text-[#7c3aed] flex items-center justify-center border border-[#e9d5ff]">
-              <Users className="w-5 h-5" />
+        <div className="bg-white rounded-2xl border border-[#eee6f8] p-5 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
+          <div className="flex items-center gap-3.5">
+            <div className="w-13 h-13 rounded-2xl bg-[#faf5ff] text-[#7c3aed] flex items-center justify-center border border-[#e9d5ff] shrink-0">
+              <Users className="w-6.5 h-6.5" />
             </div>
             <div>
-              <p className="text-xs font-bold text-slate-400">Total Students</p>
-              <h3 className="text-xl font-black text-[#2e1065] leading-tight mt-0.5 font-mono">
+              <p className="text-xs sm:text-sm font-bold text-slate-500">Total Students</p>
+              <h3 className="text-2xl sm:text-3xl font-black text-[#2e1065] leading-tight mt-0.5 font-mono">
                 {metrics.total_students ?? 2}
               </h3>
-              <p className="text-[11px] text-slate-400 mt-0.5">Enrolled candidates</p>
+              <p className="text-xs text-slate-400 mt-0.5">Enrolled candidates</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <svg className="w-12 h-6 text-[#c084fc] stroke-current fill-none" viewBox="0 0 50 20">
+            <svg className="w-14 h-7 text-[#c084fc] stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 15 Q 15 5 25 10 T 50 3" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-[11px] font-extrabold text-[#7c3aed] mt-1 bg-[#faf5ff] px-1.5 py-0.5 rounded border border-[#e9d5ff]">↑ 12%</span>
+            <span className="text-xs font-black text-[#7c3aed] mt-1 bg-[#faf5ff] px-2 py-0.5 rounded border border-[#e9d5ff]">↑ 12%</span>
           </div>
         </div>
 
         {/* Registered Schools (Light Green) */}
-        <div className="bg-white rounded-2xl border border-[#eee6f8] p-4 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-[#ecfdf5] text-[#059669] flex items-center justify-center border border-[#a7f3d0]">
-              <Building2 className="w-5 h-5" />
+        <div className="bg-white rounded-2xl border border-[#eee6f8] p-5 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
+          <div className="flex items-center gap-3.5">
+            <div className="w-13 h-13 rounded-2xl bg-[#ecfdf5] text-[#059669] flex items-center justify-center border border-[#a7f3d0] shrink-0">
+              <Building2 className="w-6.5 h-6.5" />
             </div>
             <div>
-              <p className="text-xs font-bold text-slate-400">Registered Schools</p>
-              <h3 className="text-xl font-black text-[#064e3b] leading-tight mt-0.5 font-mono">
+              <p className="text-xs sm:text-sm font-bold text-slate-500">Registered Schools</p>
+              <h3 className="text-2xl sm:text-3xl font-black text-[#064e3b] leading-tight mt-0.5 font-mono">
                 {metrics.total_schools ?? 12}
               </h3>
-              <p className="text-[11px] text-slate-400 mt-0.5">Partner Institutions</p>
+              <p className="text-xs text-slate-400 mt-0.5">Partner Institutions</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <svg className="w-12 h-6 text-[#34d399] stroke-current fill-none" viewBox="0 0 50 20">
+            <svg className="w-14 h-7 text-[#34d399] stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 18 Q 12 12 25 8 T 50 2" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-[11px] font-extrabold text-[#059669] mt-1 bg-[#ecfdf5] px-1.5 py-0.5 rounded border border-[#a7f3d0]">↑ 18%</span>
+            <span className="text-xs font-black text-[#059669] mt-1 bg-[#ecfdf5] px-2 py-0.5 rounded border border-[#a7f3d0]">↑ 18%</span>
           </div>
         </div>
 
         {/* Total Exams (Light Purple) */}
-        <div className="bg-white rounded-2xl border border-[#eee6f8] p-4 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-[#faf5ff] text-[#9333ea] flex items-center justify-center border border-[#e9d5ff]">
-              <FileSpreadsheet className="w-5 h-5" />
+        <div className="bg-white rounded-2xl border border-[#eee6f8] p-5 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
+          <div className="flex items-center gap-3.5">
+            <div className="w-13 h-13 rounded-2xl bg-[#faf5ff] text-[#9333ea] flex items-center justify-center border border-[#e9d5ff] shrink-0">
+              <FileSpreadsheet className="w-6.5 h-6.5" />
             </div>
             <div>
-              <p className="text-xs font-bold text-slate-400">Total Exams</p>
-              <h3 className="text-xl font-black text-[#2e1065] leading-tight mt-0.5 font-mono">
+              <p className="text-xs sm:text-sm font-bold text-slate-500">Total Exams</p>
+              <h3 className="text-2xl sm:text-3xl font-black text-[#2e1065] leading-tight mt-0.5 font-mono">
                 {metrics.total_exams ?? 2}
               </h3>
-              <p className="text-[11px] text-slate-400 mt-0.5">Live Olympiads</p>
+              <p className="text-xs text-slate-400 mt-0.5">Live Olympiads</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <svg className="w-12 h-6 text-[#a855f7] stroke-current fill-none" viewBox="0 0 50 20">
+            <svg className="w-14 h-7 text-[#a855f7] stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 16 Q 15 14 30 6 T 50 2" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-[11px] font-extrabold text-[#9333ea] mt-1 bg-[#faf5ff] px-1.5 py-0.5 rounded border border-[#e9d5ff]">↑ 50%</span>
+            <span className="text-xs font-black text-[#9333ea] mt-1 bg-[#faf5ff] px-2 py-0.5 rounded border border-[#e9d5ff]">↑ 50%</span>
           </div>
         </div>
 
         {/* Questions in Bank (Light Green) */}
-        <div className="bg-white rounded-2xl border border-[#eee6f8] p-4 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-[#ecfdf5] text-[#047857] flex items-center justify-center border border-[#a7f3d0]">
-              <FileText className="w-5 h-5" />
+        <div className="bg-white rounded-2xl border border-[#eee6f8] p-5 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
+          <div className="flex items-center gap-3.5">
+            <div className="w-13 h-13 rounded-2xl bg-[#ecfdf5] text-[#047857] flex items-center justify-center border border-[#a7f3d0] shrink-0">
+              <FileText className="w-6.5 h-6.5" />
             </div>
             <div>
-              <p className="text-xs font-bold text-slate-400">Questions in Bank</p>
-              <h3 className="text-xl font-black text-[#064e3b] leading-tight mt-0.5 font-mono">
+              <p className="text-xs sm:text-sm font-bold text-slate-500">Questions in Bank</p>
+              <h3 className="text-2xl sm:text-3xl font-black text-[#064e3b] leading-tight mt-0.5 font-mono">
                 {metrics.total_questions ?? 3}
               </h3>
-              <p className="text-[11px] text-slate-400 mt-0.5">Across all subjects</p>
+              <p className="text-xs text-slate-400 mt-0.5">Across all subjects</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <svg className="w-12 h-6 text-[#6ee7b7] stroke-current fill-none" viewBox="0 0 50 20">
+            <svg className="w-14 h-7 text-[#6ee7b7] stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 18 Q 15 10 30 12 T 50 4" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-[11px] font-extrabold text-[#047857] mt-1 bg-[#ecfdf5] px-1.5 py-0.5 rounded border border-[#a7f3d0]">↑ 33%</span>
+            <span className="text-xs font-black text-[#047857] mt-1 bg-[#ecfdf5] px-2 py-0.5 rounded border border-[#a7f3d0]">↑ 33%</span>
           </div>
         </div>
       </div>
@@ -225,10 +225,10 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
         <div className="lg:col-span-7 bg-white rounded-3xl border border-[#eee6f8] p-6 shadow-card flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="theme-pill-header">
+              <span className="theme-pill-header text-xs sm:text-sm">
                 Participation YoY Growth
               </span>
-              <div className="flex items-center gap-3 text-xs font-bold text-slate-500">
+              <div className="flex items-center gap-3 text-xs sm:text-sm font-bold text-slate-500">
                 <span className="flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded-full bg-[#a855f7]" /> This Period (Purple)
                 </span>
@@ -272,7 +272,7 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
               </svg>
             </div>
 
-            <div className="flex justify-between text-[11px] font-bold text-slate-400 mt-3 px-1 font-mono">
+            <div className="flex justify-between text-xs font-bold text-slate-500 mt-3 px-1 font-mono">
               <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
             </div>
           </div>
@@ -282,13 +282,13 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
         <div className="lg:col-span-5 bg-white rounded-3xl border border-[#eee6f8] p-6 shadow-card flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="theme-pill-header">
+              <span className="theme-pill-header text-xs sm:text-sm">
                 Subject Accuracy
               </span>
               <button
                 type="button"
                 onClick={() => onNavigateTab('results')}
-                className="text-xs font-bold text-[#7c3aed] hover:underline cursor-pointer"
+                className="text-xs sm:text-sm font-bold text-[#7c3aed] hover:underline cursor-pointer"
               >
                 Details →
               </button>
@@ -303,11 +303,11 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
                 { name: 'General Knowledge', accuracy: 76, color: '#34d399' }
               ].map((sub, i) => (
                 <div key={i}>
-                  <div className="flex justify-between text-xs font-bold mb-1">
+                  <div className="flex justify-between text-xs sm:text-sm font-bold mb-1.5">
                     <span className="text-[#2e1065]">{sub.name}</span>
-                    <span className="font-mono text-slate-700">{sub.accuracy}%</span>
+                    <span className="font-mono text-slate-800 font-black">{sub.accuracy}%</span>
                   </div>
-                  <div className="h-3 rounded-full bg-slate-100 overflow-hidden p-0.5">
+                  <div className="h-3.5 rounded-full bg-slate-100 overflow-hidden p-0.5">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{ width: `${sub.accuracy}%`, backgroundColor: sub.color }}
@@ -318,9 +318,9 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+          <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm font-semibold text-slate-600">
             <span>Overall Platform Accuracy</span>
-            <span className="font-black text-[#065f46] font-mono text-sm">{metrics.avg_score ?? 85}%</span>
+            <span className="font-black text-[#065f46] font-mono text-base">{metrics.avg_score ?? 85}%</span>
           </div>
         </div>
       </div>
