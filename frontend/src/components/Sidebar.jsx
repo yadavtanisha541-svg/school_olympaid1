@@ -80,7 +80,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
     { id: 'payment_bank_manager', label: 'Payment, QR & Orders', icon: CreditCard },
     { id: 'online_classes_manager', label: 'Online Classes Studio', icon: Video },
     { id: 'skill_programs_manager', label: 'Skill Programs Studio', icon: Rocket },
-    { id: 'superadmin_packages', label: 'Package Sales & Manager', icon: ShoppingBag },
+    { id: 'superadmin_packages', label: 'Subject Model Tests & Packages', icon: BookOpen },
     { id: 'schools', label: 'School Registrations', icon: Building2 },
     { id: 'coordinators', label: 'Coordinator Applicants', icon: UserCheck },
     { id: 'workbook_orders', label: 'Workbook Orders', icon: ShoppingBag },
@@ -119,7 +119,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-white/95 backdrop-blur-md border-r border-[#ebd7eb] flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-40 w-72 bg-white/95 backdrop-blur-md border-r border-[#ebd7eb] flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -129,7 +129,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
         </div>
 
         {/* Navigation items */}
-        <div className="flex-1 py-3 px-3 space-y-1 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 py-3 px-3.5 space-y-1.5 overflow-y-auto custom-scrollbar">
           {/* Public Portal Switcher */}
           {onGoToPublic && (
             <button
@@ -138,9 +138,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                 onGoToPublic();
                 if (onClose) onClose();
               }}
-              className="w-full flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#C35B3F] bg-[#faf4e0] hover:bg-[#faebd7] border border-[#e7b84b]/40 mb-2 cursor-pointer shadow-2xs transition-colors"
+              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-[#C35B3F] bg-[#faf4e0] hover:bg-[#faebd7] border border-[#e7b84b]/40 mb-2 cursor-pointer shadow-2xs transition-colors"
             >
-              <Globe className="w-4 h-4 text-[#C35B3F]" />
+              <Globe className="w-4.5 h-4.5 text-[#C35B3F] shrink-0" />
               <span>🌐 View Public Website</span>
             </button>
           )}
@@ -152,13 +152,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
               onSelectTab('overview');
               if (onClose) onClose();
             }}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
+            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all duration-150 cursor-pointer ${
               currentTab === 'overview'
-                ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                ? 'bg-[#f4eaf4] text-[#80497D] font-bold shadow-2xs'
                 : 'text-slate-700 hover:bg-[#faf6fa] hover:text-[#80497D] font-semibold'
             }`}
           >
-            <LayoutDashboard className={`w-4 h-4 ${currentTab === 'overview' ? 'text-[#80497D]' : 'text-slate-400'}`} />
+            <LayoutDashboard className={`w-4.5 h-4.5 shrink-0 ${currentTab === 'overview' ? 'text-[#80497D]' : 'text-slate-400'}`} />
             <span>Dashboard</span>
           </button>
 
@@ -166,9 +166,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           {/* 1. SUPERADMIN NAV                                                         */}
           {/* ========================================================================= */}
           {user?.role === 'superadmin' && (
-            <div className="space-y-1 pt-2">
+            <div className="space-y-1 pt-2.5">
               <div className="px-3 pb-1">
-                <p className="text-[9px] font-extrabold uppercase tracking-widest text-[#80497D]">
+                <p className="text-[11px] font-black uppercase tracking-wider text-[#80497D]">
                   ADMINISTRATION
                 </p>
               </div>
@@ -184,13 +184,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                       onSelectTab(item.id);
                       if (onClose) onClose();
                     }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] sm:text-sm transition-all duration-150 cursor-pointer text-left ${
                       isActive
-                        ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                        ? 'bg-[#f4eaf4] text-[#80497D] font-bold shadow-2xs'
                         : 'text-slate-700 font-semibold hover:bg-[#faf6fa] hover:text-[#80497D]'
                     }`}
                   >
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-[#80497D]' : 'text-slate-400'}`} />
+                    <Icon className={`w-4.5 h-4.5 shrink-0 ${isActive ? 'text-[#80497D]' : 'text-slate-400'}`} />
                     <span className="truncate">{item.label}</span>
                   </button>
                 );
@@ -202,9 +202,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           {/* 2. TEACHER NAV                                                            */}
           {/* ========================================================================= */}
           {user?.role === 'teacher' && (
-            <div className="space-y-1 pt-2">
+            <div className="space-y-1 pt-2.5">
               <div className="px-3 pb-1">
-                <p className="text-[9px] font-extrabold uppercase tracking-widest text-[#80497D]">
+                <p className="text-[11px] font-black uppercase tracking-wider text-[#80497D]">
                   FACULTY PORTAL
                 </p>
               </div>
@@ -220,13 +220,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                       onSelectTab(item.id);
                       if (onClose) onClose();
                     }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] sm:text-sm transition-all duration-150 cursor-pointer text-left ${
                       isActive
-                        ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                        ? 'bg-[#f4eaf4] text-[#80497D] font-bold shadow-2xs'
                         : 'text-slate-700 font-semibold hover:bg-[#faf6fa] hover:text-[#80497D]'
                     }`}
                   >
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-[#80497D]' : 'text-slate-400'}`} />
+                    <Icon className={`w-4.5 h-4.5 shrink-0 ${isActive ? 'text-[#80497D]' : 'text-slate-400'}`} />
                     <span className="truncate">{item.label}</span>
                   </button>
                 );
@@ -241,7 +241,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
             <div className="space-y-3 pt-2">
               {/* SECTION A: OLYMPIADS */}
               <div className="space-y-1">
-                <p className="px-3 text-[9px] font-black uppercase tracking-widest text-[#80497D]">
+                <p className="px-3 text-[11px] font-black uppercase tracking-wider text-[#80497D]">
                   OLYMPIADS
                 </p>
 
@@ -250,16 +250,16 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   <button
                     type="button"
                     onClick={() => toggleStudentAccordion('content')}
-                    className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <BookOpen className="w-4 h-4 text-[#80497D]" />
+                      <BookOpen className="w-4.5 h-4.5 text-[#80497D] shrink-0" />
                       <span>My Content</span>
                     </div>
                     {studentAccordions.content ? (
-                      <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                      <ChevronUp className="w-4 h-4 text-slate-400" />
                     ) : (
-                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
                     )}
                   </button>
 
@@ -284,13 +284,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                               onSelectTab(sub.id);
                               if (onClose) onClose();
                             }}
-                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all cursor-pointer ${
                               isSubActive
                                 ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
                                 : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
                             }`}
                           >
-                            <SubIcon className={`w-3.5 h-3.5 ${isSubActive ? 'text-[#80497D]' : 'text-slate-400'}`} />
+                            <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-[#80497D]' : 'text-slate-400'}`} />
                             <span>{sub.label}</span>
                           </button>
                         );
@@ -306,13 +306,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     onSelectTab('my_classes');
                     if (onClose) onClose();
                   }}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs transition-all cursor-pointer ${
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all cursor-pointer ${
                     currentTab === 'my_classes'
                       ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
                       : 'text-slate-700 font-semibold hover:bg-[#faf6fa] hover:text-[#80497D]'
                   }`}
                 >
-                  <Users className="w-4 h-4 text-slate-400" />
+                  <Users className="w-4.5 h-4.5 text-slate-400 shrink-0" />
                   <span>My Classes</span>
                 </button>
               </div>
@@ -324,16 +324,16 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   <button
                     type="button"
                     onClick={() => toggleStudentAccordion('performance')}
-                    className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <BarChart3 className="w-4 h-4 text-[#C35B3F]" />
+                      <BarChart3 className="w-4.5 h-4.5 text-[#C35B3F] shrink-0" />
                       <span>My Performance</span>
                     </div>
                     {studentAccordions.performance ? (
-                      <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                      <ChevronUp className="w-4 h-4 text-slate-400" />
                     ) : (
-                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
                     )}
                   </button>
 
@@ -346,13 +346,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('performance');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all cursor-pointer ${
                           currentTab === 'performance'
                             ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
                             : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
                         }`}
                       >
-                        <BarChart3 className="w-3.5 h-3.5 text-slate-400" />
+                        <BarChart3 className="w-4 h-4 text-slate-400 shrink-0" />
                         <span>Statistics &amp; Reports</span>
                       </button>
                       <button
@@ -361,9 +361,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('performance');
                           if (onClose) onClose();
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium cursor-pointer"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium cursor-pointer"
                       >
-                        <TrendingUp className="w-3.5 h-3.5 text-slate-400" />
+                        <TrendingUp className="w-4 h-4 text-slate-400 shrink-0" />
                         <span>Analysis</span>
                       </button>
                     </div>
@@ -377,20 +377,20 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     onSelectTab('my_revision');
                     if (onClose) onClose();
                   }}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs transition-all cursor-pointer ${
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all cursor-pointer ${
                     currentTab === 'my_revision'
                       ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
                       : 'text-slate-700 font-semibold hover:bg-[#faf6fa] hover:text-[#80497D]'
                   }`}
                 >
-                  <Bookmark className="w-4 h-4 text-slate-400" />
+                  <Bookmark className="w-4.5 h-4.5 text-slate-400 shrink-0" />
                   <span>My Revision</span>
                 </button>
               </div>
 
               {/* SECTION C: MY ACCOUNT */}
               <div className="space-y-1 pt-2 border-t border-[#ebd7eb]/40">
-                <p className="px-3 text-[9px] font-black uppercase tracking-widest text-[#80497D]">
+                <p className="px-3 text-[11px] font-black uppercase tracking-wider text-[#80497D]">
                   MY ACCOUNT
                 </p>
 
@@ -399,16 +399,16 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   <button
                     type="button"
                     onClick={() => toggleStudentAccordion('account')}
-                    className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <User className="w-4 h-4 text-[#e7b84b]" />
+                      <User className="w-4.5 h-4.5 text-[#e7b84b] shrink-0" />
                       <span>My Account</span>
                     </div>
                     {studentAccordions.account ? (
-                      <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                      <ChevronUp className="w-4 h-4 text-slate-400" />
                     ) : (
-                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
                     )}
                   </button>
 
@@ -421,13 +421,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('profile');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all cursor-pointer ${
                           currentTab === 'profile'
                             ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
                             : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
                         }`}
                       >
-                        <User className="w-3.5 h-3.5 text-slate-400" />
+                        <User className="w-4 h-4 text-slate-400 shrink-0" />
                         <span>My Profile</span>
                       </button>
                       <button
@@ -436,13 +436,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('my_orders');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all cursor-pointer ${
                           currentTab === 'my_orders'
                             ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
                             : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
                         }`}
                       >
-                        <CreditCard className="w-3.5 h-3.5 text-slate-400" />
+                        <CreditCard className="w-4 h-4 text-slate-400 shrink-0" />
                         <span>My Orders</span>
                       </button>
                       <button
@@ -451,13 +451,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('my_wallet');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all cursor-pointer ${
                           currentTab === 'my_wallet'
                             ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
                             : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
                         }`}
                       >
-                        <Wallet className="w-3.5 h-3.5 text-slate-400" />
+                        <Wallet className="w-4 h-4 text-slate-400 shrink-0" />
                         <span>My Wallet</span>
                       </button>
                     </div>
@@ -467,7 +467,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
               {/* SECTION D: OTHERS & INFORMATION */}
               <div className="space-y-1 pt-2 border-t border-[#ebd7eb]/40">
-                <p className="px-3 text-[9px] font-black uppercase tracking-widest text-[#80497D]">
+                <p className="px-3 text-[11px] font-black uppercase tracking-wider text-[#80497D]">
                   INFO &amp; EXTRAS
                 </p>
 
@@ -476,16 +476,16 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   <button
                     type="button"
                     onClick={() => toggleStudentAccordion('info')}
-                    className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <Info className="w-4 h-4 text-[#80497D]" />
+                      <Info className="w-4.5 h-4.5 text-[#80497D] shrink-0" />
                       <span>Info</span>
                     </div>
                     {studentAccordions.info ? (
-                      <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                      <ChevronUp className="w-4 h-4 text-slate-400" />
                     ) : (
-                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
                     )}
                   </button>
 
@@ -510,13 +510,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                               onSelectTab(sub.id);
                               if (onClose) onClose();
                             }}
-                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all cursor-pointer ${
                               isSubActive
                                 ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
                                 : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
                             }`}
                           >
-                            <SubIcon className={`w-3.5 h-3.5 ${isSubActive ? 'text-[#80497D]' : 'text-slate-400'}`} />
+                            <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-[#80497D]' : 'text-slate-400'}`} />
                             <span>{sub.label}</span>
                           </button>
                         );
@@ -530,16 +530,16 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   <button
                     type="button"
                     onClick={() => toggleStudentAccordion('freeZone')}
-                    className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <Send className="w-4 h-4 text-[#C35B3F]" />
+                      <Send className="w-4.5 h-4.5 text-[#C35B3F] shrink-0" />
                       <span>Free Zone</span>
                     </div>
                     {studentAccordions.freeZone ? (
-                      <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                      <ChevronUp className="w-4 h-4 text-slate-400" />
                     ) : (
-                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
                     )}
                   </button>
 
@@ -552,13 +552,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('free_sample_papers');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all cursor-pointer ${
                           currentTab === 'free_sample_papers'
                             ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
                             : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
                         }`}
                       >
-                        <FileText className="w-3.5 h-3.5 text-slate-400" />
+                        <FileText className="w-4 h-4 text-slate-400 shrink-0" />
                         <span>Sample Papers &amp; OMR</span>
                       </button>
                       <button
@@ -567,13 +567,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('free_past_papers');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all cursor-pointer ${
                           currentTab === 'free_past_papers'
                             ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
                             : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
                         }`}
                       >
-                        <FileSpreadsheet className="w-3.5 h-3.5 text-slate-400" />
+                        <FileSpreadsheet className="w-4 h-4 text-slate-400 shrink-0" />
                         <span>Previous Year Papers</span>
                       </button>
                     </div>
@@ -587,13 +587,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     onSelectTab('free_quizzes');
                     if (onClose) onClose();
                   }}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs transition-all cursor-pointer ${
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all cursor-pointer ${
                     currentTab === 'free_quizzes'
                       ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
                       : 'text-slate-700 font-semibold hover:bg-[#faf6fa] hover:text-[#80497D]'
                   }`}
                 >
-                  <HelpCircle className="w-4 h-4 text-slate-400" />
+                  <HelpCircle className="w-4.5 h-4.5 text-slate-400 shrink-0" />
                   <span>FREE Quizzes</span>
                 </button>
               </div>
@@ -607,18 +607,18 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           {isUserMenuOpen && (
             <div className="absolute bottom-full left-3 right-3 mb-2 bg-white rounded-2xl border border-[#ebd7eb] shadow-2xl p-2 space-y-1 z-50 animate-in fade-in zoom-in-95 duration-150">
               <div className="px-3 py-2 border-b border-[#f4eaf4]">
-                <p className="text-xs font-black text-[#4e2a4a] truncate">
+                <p className="text-sm font-black text-[#4e2a4a] truncate">
                   {user?.name || user?.email || 'Candidate'}
                 </p>
-                <p className="text-[11px] text-slate-500 truncate">
+                <p className="text-xs text-slate-500 truncate">
                   {user?.email || ''}
                 </p>
                 <div className="flex items-center gap-1.5 mt-1.5">
-                  <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#faf4e0] text-[#80497D] capitalize">
+                  <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-[#faf4e0] text-[#80497D] capitalize">
                     {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'teacher' ? 'Faculty' : 'Candidate'}
                   </span>
                   {user?.class && (
-                    <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#f4eaf4] text-[#80497D]">
+                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-[#f4eaf4] text-[#80497D]">
                       {user.class}
                     </span>
                   )}
@@ -633,13 +633,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   setIsUserMenuOpen(false);
                   if (onClose) onClose();
                 }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                   currentTab === 'profile'
                     ? 'bg-[#f4eaf4] text-[#80497D]'
                     : 'text-slate-700 hover:bg-[#faf6fa] hover:text-[#80497D]'
                 }`}
               >
-                <User className="w-4 h-4 text-[#80497D]" />
+                <User className="w-4.5 h-4.5 text-[#80497D]" />
                 <span>My Profile</span>
               </button>
 
@@ -650,9 +650,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   setIsUserMenuOpen(false);
                   await logout();
                 }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 hover:text-red-700 transition-all cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 hover:text-red-700 transition-all cursor-pointer"
               >
-                <LogOut className="w-4 h-4 text-red-500" />
+                <LogOut className="w-4.5 h-4.5 text-red-500" />
                 <span>Logout / Sign Out</span>
               </button>
             </div>
@@ -662,7 +662,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           <button
             type="button"
             onClick={() => setIsUserMenuOpen(prev => !prev)}
-            className={`w-full flex items-center justify-between p-2 rounded-xl bg-white border transition-all cursor-pointer text-left ${
+            className={`w-full flex items-center justify-between p-2.5 rounded-xl bg-white border transition-all cursor-pointer text-left ${
               isUserMenuOpen
                 ? 'border-[#80497D] ring-2 ring-[#80497D]/20 shadow-sm'
                 : 'border-[#ebd7eb] hover:border-[#80497D]/40 shadow-2xs hover:bg-[#faf6fa]'
@@ -670,14 +670,14 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
             title="Click to open Profile & Logout menu"
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-[#f4eaf4] text-[#80497D] font-black text-xs flex items-center justify-center border border-[#ebd7eb] shrink-0">
+              <div className="w-9 h-9 rounded-full bg-[#f4eaf4] text-[#80497D] font-black text-sm flex items-center justify-center border border-[#ebd7eb] shrink-0">
                 {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold text-[#4e2a4a] truncate">
+                <p className="text-sm font-bold text-[#4e2a4a] truncate">
                   {user?.name || user?.email || 'Candidate'}
                 </p>
-                <span className="inline-block px-1.5 py-0.2 rounded text-[9px] font-bold bg-[#faf4e0] text-[#80497D] capitalize">
+                <span className="inline-block px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#faf4e0] text-[#80497D] capitalize">
                   {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'teacher' ? 'Faculty' : 'Candidate'}
                 </span>
               </div>
@@ -685,9 +685,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
             <div className="p-1 rounded-lg text-slate-400 hover:text-[#80497D] transition-colors shrink-0">
               {isUserMenuOpen ? (
-                <ChevronDown className="w-4 h-4 text-[#80497D]" />
+                <ChevronDown className="w-4.5 h-4.5 text-[#80497D]" />
               ) : (
-                <ChevronUp className="w-4 h-4 text-slate-400" />
+                <ChevronUp className="w-4.5 h-4.5 text-slate-400" />
               )}
             </div>
           </button>

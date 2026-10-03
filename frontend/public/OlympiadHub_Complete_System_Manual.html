@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OlympiadHub - Complete Features & Master System Documentation (All Portals)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap');
+
+    :root {
+      --primary: #4e2a4a;
+      --primary-dark: #3b1d38;
+      --primary-light: #6d3a68;
+      --accent: #d99b26;
+      --olive: #859900;
+      --blue: #2980b9;
+      --green: #00b074;
+      --red: #d63031;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--slate-800);
+      background-color: #f1f5f9;
+      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 20px auto;
+      background: #ffffff;
+      padding: 45px;
+      border-radius: 16px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.06);
+    }
+
+    /* Print Sticky Bar */
+    .print-bar {
+      position: sticky;
+      top: 0;
+      background: #4e2a4a;
+      color: white;
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .print-btn {
+      background: #00b074;
+      color: white;
+      border: none;
+      padding: 10px 22px;
+      font-weight: 800;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,176,116,0.3);
+      transition: all 0.2s;
+    }
+    .print-btn:hover {
+      background: #009260;
+      transform: translateY(-1px);
+    }
+
+    /* Cover Header */
+    .doc-header {
+      border-bottom: 3px solid var(--primary);
+      padding-bottom: 24px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .brand-title {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+    .brand-subtitle {
+      font-size: 13.5px;
+      color: var(--slate-600);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .badge-top {
+      background: #faf5fa;
+      border: 1.5px solid #ebd7eb;
+      color: #6d3a68;
+      padding: 6px 14px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Chapter Headers */
+    .chapter-banner {
+      background: linear-gradient(135deg, #4e2a4a 0%, #6d3a68 100%);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 900;
+      margin: 32px 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 3px 10px rgba(78,42,74,0.15);
+    }
+    .chapter-number {
+      background: #d99b26;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .sub-section-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #6d3a68;
+      border-left: 4px solid #d99b26;
+      padding-left: 10px;
+      margin: 20px 0 10px 0;
+    }
+
+    /* Grid & Cards */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: #fafafa;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.2s;
+    }
+    .card:hover {
+      border-color: #cbd5e1;
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--slate-900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .card-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: #edd6ed;
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .card-desc {
+      font-size: 11.5px;
+      color: var(--slate-600);
+      line-height: 1.55;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px 0;
+      font-size: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    th {
+      background: #f8fafc;
+      color: #1e293b;
+      font-weight: 800;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    tr:nth-child(even) {
+      background-color: #fafbfc;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+    .pill-olive { background: #ecfccb; color: #4d7c0f; }
+    .pill-blue { background: #e0f2fe; color: #0369a1; }
+    .pill-purple { background: #f3e8ff; color: #6b21a8; }
+    .pill-green { background: #d1fae5; color: #065f46; }
+    .pill-amber { background: #fef3c7; color: #92400e; }
+
+    .highlight-box {
+      background: linear-gradient(135deg, #faf5fa 0%, #f3e8f3 100%);
+      border: 1.5px solid #ebd7eb;
+      border-radius: 12px;
+      padding: 18px;
+      margin: 18px 0;
+    }
+
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--slate-500);
+      font-weight: 600;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+      .print-bar {
+        display: none;
+      }
+      .container {
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Print Bar -->
+  <div class="print-bar">
+    <div>
+      <strong style="font-size: 15px;">OlympiadHub™ Complete Master System &amp; Features Guide</strong>
+      <span style="font-size: 11.5px; opacity: 0.9; margin-left: 10px;">(Student Portal, Super Admin Studio, School Portal, Exam Engine)</span>
+    </div>
+    <button class="print-btn" onclick="window.print()">
+      🖨️ Download Full PDF / Print
+    </button>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="doc-header">
+      <div>
+        <div class="brand-title">OlympiadHub™ Master Feature Specification Manual</div>
+        <div class="brand-subtitle">Complete Documentation of All System Modules, Student Tools &amp; Super Admin Capabilities</div>
+      </div>
+      <div class="badge-top">
+        Academic Session 2026-27 • Release 4.0
+      </div>
+    </div>
+
+    <!-- Executive Overview -->
+    <div class="highlight-box">
+      <div style="font-weight: 900; font-size: 13.5px; color: #4e2a4a; margin-bottom: 6px;">
+        🌟 Platform Ecosystem Overview
+      </div>
+      <p style="font-size: 12px; color: #475569; line-height: 1.6;">
+        <strong>OlympiadHub</strong> एक संपूर्ण डिजिटल ओलंपियाड परीक्षा एवं लर्निंग प्लेटफॉर्म है जो <strong>कक्षा 1 से 12</strong> तक के विद्यार्थियों, अभिभावकों, विद्यालयों एवं सुपर एडमिनिस्ट्रेटर को एक आधुनिक, सुरक्षित और हाई-स्पीड एग्जामिनेशन इकोसिस्टम प्रदान करता है। इसमें 6 प्रमुख ओलंपियाड्स (<strong>IMO, ISO, ICSO, IEO, IGKO, ISSO</strong>) के लिए कंप्यूटर-बेस्ड टेस्ट्स, चैप्टर-वाइज पैकेज, लाइव स्कोरकार्ड, कटऑफ एनालिसिस, सुपर एडमिन टेस्ट स्टूडियो और ई-कॉमर्स पेमेंट सिस्टम एकीकृत हैं।
+      </p>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- CHAPTER 1: STUDENT DASHBOARD & LEARNING PORTAL                             -->
+    <!-- ========================================================================= -->
+    <div class="chapter-banner">
+      <span class="chapter-number">1</span>
+      <span>Student Dashboard &amp; Learning Portal (विद्यार्थी पोर्टल के सभी फीचर्स)</span>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">1</span>
+          Subject Mock Test Series Covers
+        </div>
+        <div class="card-desc">
+          प्रत्येक विषय (IMO, IGKO, ISO आदि) का समर्पित <strong>Series Cover Banner</strong> (उदा. <em>Class 6 - All India IMO Mock Test Series</em>) जिसमें <strong>Mock Test 1, Mock Test 2, Mock Test 3</strong> आदि के कार्ड्स व्यवस्थित रहते हैं।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">2</span>
+          Interactive Mock Test Cards
+        </div>
+        <div class="card-desc">
+          कार्ड पर Olive-Green हेडर, <strong>Status</strong> (<span class="pill pill-amber">Unattempted</span> / <span class="pill pill-green">Completed</span>), <strong>Last Score</strong> (<span class="pill pill-olive">none</span> या <span class="pill pill-olive">15 / 60</span>) और <strong>[Open]</strong> बटन उपलब्ध है।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">3</span>
+          Test Instructions &amp; Synopsis Modal
+        </div>
+        <div class="card-desc">
+          टेस्ट शुरू करने से पहले 2-कॉलम गाइड: बाईं तरफ परीक्षा के दिशा-निर्देश (MCQ पैटर्न, समय नियम) और दाईं तरफ टेस्ट सिनॉप्सिस (अवधि, कुल प्रश्न, कुल अंक) के साथ <strong>Start Test</strong> और <strong>Download PDF</strong> का विकल्प।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">4</span>
+          Printable Question Paper &amp; Solution PDF
+        </div>
+        <div class="card-desc">
+          टर्म्स एंड कंडीशंस स्वीकार करके विद्यार्थी बिना उत्तर वाला <strong>क्वेश्चन पेपर PDF</strong> या मास्टर उत्तर कुंजी व व्याख्या सहित <strong>सॉल्यूशन PDF</strong> एक क्लिक में प्रिंट व डाउनलोड कर सकते हैं।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">5</span>
+          Live Computer-Based Exam Screen
+        </div>
+        <div class="card-desc">
+          • <strong>Top Bar:</strong> विषय कोड बैज + पेपर टाइटल + <strong>⏱ Time Left: MM:SS</strong> ऑटो-काउंटडाउन टाइमर + <strong>End Test</strong> बटन।<br>
+          • <strong>Sections Bar:</strong> अलग-अलग अनुभागों (General Awareness, Achievers आदि) के बीच त्वरित स्विचिंग।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">6</span>
+          Question Area &amp; Colored Options
+        </div>
+        <div class="card-desc">
+          • प्रश्न संख्या व मार्क्स डिस्प्ले (उदा. <em>Q No: 1/50 • Marks: 1</em>)<br>
+          • 4 कलर्ड ऑप्शन बॉक्सेस: <strong>[A] Pink</strong>, <strong>[B] Orange</strong>, <strong>[C] Cyan</strong>, <strong>[D] Purple</strong><br>
+          • नीचे डायरेक्ट <strong>Radio Selector (A, B, C, D)</strong> और दाईं तरफ <strong>Next &gt;</strong> बटन।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">7</span>
+          1..50 Question Palette with Color Status
+        </div>
+        <div class="card-desc">
+          सभी प्रश्नों का त्वरित ग्रिड जिसमें स्थिति अनुसार रंग बदलते हैं:<br>
+          • 🟢 <strong>Answered</strong> (हरा)<br>
+          • 🟠 <strong>Skipped</strong> (नारंगी)<br>
+          • 🟣 <strong>Flagged</strong> (बैंगनी)<br>
+          • ⚪ <strong>Non-Visited</strong> (ग्रे)
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">8</span>
+          Scorecard &amp; Benchmark Analysis Bar
+        </div>
+        <div class="card-desc">
+          परीक्षा समाप्त होते ही सिंगल हॉरिजॉन्टल बार में रिजल्ट:<br>
+          1. <strong>Time Taken:</strong> (उदा. <code>0:10 | 60.0 Min</code>)<br>
+          2. <strong>Marks Obtained:</strong> (उदा. <code>15 / 60</code>)<br>
+          3. <strong>Last Year Cutoff Marks:</strong> (उदा. <code>42 / 60</code>)<br>
+          4. <strong>2x2 Filter Radios:</strong> <em>All, Correct, Wrong, Unattempted</em>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">9</span>
+          Detailed Question-by-Question Solutions
+        </div>
+        <div class="card-desc">
+          प्रत्येक प्रश्न के नीचे सही उत्तर हरे रंग में <strong>✓ Correct Answer</strong>, विद्यार्थी द्वारा दिया गलत उत्तर लाल रंग में <strong>✗ Your Answer</strong> और नीचे नीले बॉर्डर वाला <strong>Detailed Explanation Box</strong> दिखाई देता है।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">10</span>
+          Previous Year Solved Papers (PYQ)
+        </div>
+        <div class="card-desc">
+          पिछले 5 से 10 वर्षों के ओरिजिनल ओलंपियाड पेपर्स संपूर्ण हल व मास्टर कीज़ के साथ डिजिटल अभ्यास के लिए उपलब्ध हैं।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">11</span>
+          Custom Adaptive Test Generator Pro
+        </div>
+        <div class="card-desc">
+          छात्र अपनी पसंद के विषय, विशिष्ट चैप्टर्स, प्रश्नों की संख्या और समय का चयन करके स्वतः नया प्रैक्टिस टेस्ट जनरेट कर सकते हैं।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">12</span>
+          Daily 5-Minute Free Sprints &amp; Vault
+        </div>
+        <div class="card-desc">
+          रोजाना 5 मिनट के त्वरित स्पीड टेस्ट्स, फॉर्मूला शीट्स, माइंड मैप्स और रिवीजन चीटशीट्स का संग्रह।
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ========================================================================= -->
+    <!-- CHAPTER 2: SUPER ADMIN MANAGEMENT STUDIO                                  -->
+    <!-- ========================================================================= -->
+    <div class="chapter-banner">
+      <span class="chapter-number">2</span>
+      <span>Super Admin Management Console (सुपर एडमिन पैनल के सभी फीचर्स)</span>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">⚡</span>
+          Full-Page Model Test Authoring Studio
+        </div>
+        <div class="card-desc">
+          सुपर एडमिन के लिए डेडिकेटेड फुल-पेज स्टूडियो जिसमें पेपर का नाम, क्लास, विषय, अवधि, कुल अंक और कट-ऑफ मार्क्स आसानी से सेट कर सकते हैं।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">📋</span>
+          Smart Bulk Question Importer
+        </div>
+        <div class="card-desc">
+          Word या PDF से दर्जनों प्रश्न एक साथ कॉपी-पेस्ट करें। सिस्टम स्वतः प्रश्न, ऑप्शन्स (A, B, C, D), सही उत्तर, मार्क्स और व्याख्या को अलग-अलग पहचान कर सेव कर लेता है।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">🏆</span>
+          Subject Series Covers &amp; + Add Test
+        </div>
+        <div class="card-desc">
+          प्रत्येक विषय के Series Cover में <strong>+ Add Mock Test to [Subject]</strong> बटन पर क्लिक करके 1-क्लिक में <code>Mock Test 2</code>, <code>Mock Test 3</code>, <code>Mock Test 4</code> जोड़ सकते हैं।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">🎯</span>
+          Cutoff Marks Configurator
+        </div>
+        <div class="card-desc">
+          प्रत्येक टेस्ट के लिए राष्ट्रीय कट-ऑफ अंक (उदा. 42 मार्क्स) निर्धारित करें जो छात्र के रिजल्ट स्कोरकार्ड बॉक्स 3 में स्वतः प्रदर्शित होता है।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">✏️</span>
+          Live Edit &amp; Immediate Delete
+        </div>
+        <div class="card-desc">
+          किसी भी टेस्ट पर <strong>[Edit]</strong> दबाकर प्रश्न, ऑप्शन्स या मार्क्स बदलें और <strong>[Delete]</strong> दबाकर बिना किसी रुकावट के टेस्ट हटाएँ। बदलाव सीधे स्टूडेंट पैनल पर लाइव होते हैं।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">📦</span>
+          Study Package &amp; Bundle Builder
+        </div>
+        <div class="card-desc">
+          नए स्टडी पैकेज बनाएं, कीमत (उदा. ₹1499), मूल कीमत (₹1999), हेडर का रंग, पॉइंट्स और फीचर्स कस्टमाइज करें।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">💳</span>
+          Student Purchases &amp; Orders Ledger
+        </div>
+        <div class="card-desc">
+          छात्रों द्वारा खरीदे गए पैकेजेस, ट्रांजैक्शन आईडी, क्लास, विषय और रेवेन्यू का संपूर्ण रियल-टाइम बहीखाता।
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">🏫</span>
+          School &amp; Student User Directory
+        </div>
+        <div class="card-desc">
+          रजिस्टर्ड स्कूलों और छात्रों के खातों की निगरानी, एक्टिवेशन, पासवर्ड रीसेट और एक्सेस कंट्रोल मैनेजमेंट।
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- CHAPTER 3: SUPPORTED OLYMPIAD SUBJECTS MATRIX                             -->
+    <!-- ========================================================================= -->
+    <div class="chapter-banner">
+      <span class="chapter-number">3</span>
+      <span>Olympiad Subjects &amp; Syllabus Coverage (सभी 6 विषय)</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Olympiad Name</th>
+          <th>Classes</th>
+          <th>Key Syllabus &amp; Sections Included</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="pill pill-purple">IMO</span></td>
+          <td><strong>International Mathematics Olympiad</strong></td>
+          <td>Class 1 to 12</td>
+          <td>Logical Reasoning, Mathematical Reasoning, Everyday Math, Achievers Section (HOTS)</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-green">ISO / NSO</span></td>
+          <td><strong>International Science Olympiad</strong></td>
+          <td>Class 1 to 12</td>
+          <td>Physics, Chemistry, Biology, Environmental Science, Scientific HOTS Section</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-blue">ICSO</span></td>
+          <td><strong>International Cyber &amp; AI Olympiad</strong></td>
+          <td>Class 1 to 12</td>
+          <td>Computer Fundamentals, Cyber Security, AI &amp; Python Logic, IT Achievers</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-amber">IEO</span></td>
+          <td><strong>International English Olympiad</strong></td>
+          <td>Class 1 to 12</td>
+          <td>Word &amp; Structure Knowledge, Reading Comprehension, Spoken Expression, HOTS</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-olive">IGKO</span></td>
+          <td><strong>General Knowledge Olympiad</strong></td>
+          <td>Class 1 to 12</td>
+          <td>General Awareness, Current Affairs Digest, India &amp; World, Life Skills Section</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-purple">ISSO</span></td>
+          <td><strong>Social Studies &amp; Reasoning Olympiad</strong></td>
+          <td>Class 1 to 12</td>
+          <td>History, Civics, Geography, Verbal &amp; Non-Verbal Analytical Reasoning</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ========================================================================= -->
+    <!-- CHAPTER 4: TECHNICAL ARCHITECTURE & DEPLOYMENT CAPABILITIES               -->
+    <!-- ========================================================================= -->
+    <div class="chapter-banner">
+      <span class="chapter-number">4</span>
+      <span>Technical Specifications &amp; Performance Architecture</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Module</th>
+          <th>Technology</th>
+          <th>Capability Highlights</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Frontend</strong></td>
+          <td>React 18 + Vite 5 + Tailwind CSS</td>
+          <td>100% रिस्पॉन्सिव, मोबाइल/टैबलेट/डेस्कटॉप फ्रेंडली, सब-सेकंड लोडिंग स्पीड।</td>
+        </tr>
+        <tr>
+          <td><strong>Persistence Engine</strong></td>
+          <td>Dual Mode (Client MockEngine + PHP REST API)</td>
+          <td>Vercel, cPanel, Cloudflare या बिना डेटाबेस सर्वर के भी 100% फुल-स्टैक वर्क करता है।</td>
+        </tr>
+        <tr>
+          <td><strong>PDF Generation</strong></td>
+          <td>HTML5 Native Print Engine</td>
+          <td>बिना किसी बाहरी थर्ड-पार्टी लाइब्रेरी के हाई-डेफिनिशन प्रिंटेबल क्वेश्चन पेपर व सॉल्यूशन PDF जनरेशन।</td>
+        </tr>
+        <tr>
+          <td><strong>Security &amp; Storage</strong></td>
+          <td>LocalStorage Sync + Session Guard</td>
+          <td>छात्रों के टेस्ट अटेम्प्ट्स, स्कोर और प्रोग्रेस को सुरक्षित रूप से लोकल व क्लाउड में स्टोर रखता है।</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div>
+        <strong>OlympiadHub™</strong> • All-in-One Examination Ecosystem
+      </div>
+      <div>
+        Generated on: <strong>October 2026</strong> • Official Documentation
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

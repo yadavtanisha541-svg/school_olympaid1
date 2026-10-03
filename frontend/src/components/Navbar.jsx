@@ -451,7 +451,7 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-[#faf6fa]/95 backdrop-blur-md border-b border-[#ebd7eb] h-20 flex items-center px-4 sm:px-6 lg:px-8 lg:pl-64 w-full">
+    <header className="sticky top-0 z-30 bg-[#faf6fa]/95 backdrop-blur-md border-b border-[#ebd7eb] h-20 flex items-center px-4 sm:px-6 lg:px-8 lg:pl-72 w-full">
       <div className="w-full flex items-center justify-between gap-4 max-w-7xl mx-auto">
         {/* Left: Mobile Toggle & Global Search Bar */}
         <div className="flex items-center gap-3 flex-1 max-w-xl">

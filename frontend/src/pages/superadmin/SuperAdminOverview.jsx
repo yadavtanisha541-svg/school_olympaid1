@@ -99,136 +99,32 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
   return (
     <div className="space-y-6 pb-12 font-sans">
       {/* 1. Brand Greeting Banner with Exact Brand Palette & Live Time */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Left Greeting Card */}
-        <div className="lg:col-span-8 bg-gradient-to-r from-[#faf6fa] via-white to-[#fdf7f5] border border-[#ebd7eb] rounded-2xl p-4 sm:p-4.5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5 min-w-0">
-            <div className="w-11 h-11 rounded-xl bg-white border border-[#ebd7eb] shadow-xs flex items-center justify-center text-[#80497D] shrink-0">
-              <Trophy className="w-5 h-5 text-[#80497D] fill-[#f4eaf4]" />
-            </div>
-            <div className="min-w-0">
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#f4eaf4] text-[#80497D] font-extrabold text-[9px] tracking-wider uppercase border border-[#ebd7eb]">
-                Welcome Back
-              </span>
-              <h1 className="text-base sm:text-lg font-black text-[#422240] tracking-tight mt-0.5 leading-snug truncate">
-                OlympiadHub Performance &amp; Analytics
-              </h1>
-              <p className="text-[11px] text-slate-500 font-medium truncate">
-                Monitor candidates, academic metrics, and live examination activities.
-              </p>
-            </div>
+      <div className="bg-gradient-to-r from-[#faf6fa] via-white to-[#fdf7f5] border border-[#ebd7eb] rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <div className="w-11 h-11 rounded-xl bg-white border border-[#ebd7eb] shadow-xs flex items-center justify-center text-[#80497D] shrink-0">
+            <Trophy className="w-5 h-5 text-[#80497D] fill-[#f4eaf4]" />
           </div>
-
-          <div className="text-left sm:text-right shrink-0">
-            <p className="text-xs sm:text-sm font-bold text-[#80497D] flex items-center gap-1.5 sm:justify-end">
-              <Calendar className="w-3.5 h-3.5 text-[#80497D]" />
-              <span>{formattedDateStr}</span>
-            </p>
-            <p className="text-xs sm:text-sm font-mono font-black text-[#80497D] mt-0.5">
-              {formattedTimeStr}
+          <div className="min-w-0">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#f4eaf4] text-[#80497D] font-extrabold text-[9px] tracking-wider uppercase border border-[#ebd7eb]">
+              Welcome Back
+            </span>
+            <h1 className="text-base sm:text-lg font-black text-[#422240] tracking-tight mt-0.5 leading-snug truncate">
+              OlympiadHub Performance &amp; Analytics
+            </h1>
+            <p className="text-[11px] text-slate-500 font-medium truncate">
+              Monitor candidates, academic metrics, and live examination activities.
             </p>
           </div>
         </div>
 
-        {/* Right Quick Actions Card */}
-        <div className="lg:col-span-4 bg-white rounded-2xl border border-[#ebd7eb] p-3.5 sm:p-4 shadow-2xs flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#80497D] bg-[#f4eaf4] px-2.5 py-1 rounded-lg border border-[#ebd7eb]">
-              Quick Shortcuts
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
-            <button
-              type="button"
-              onClick={() => onNavigateTab('schools')}
-              className="px-2 py-1.5 rounded-xl bg-[#faf6fa] hover:bg-[#f4eaf4] border border-[#ebd7eb] text-[#80497D] text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
-            >
-              <Building2 className="w-3.5 h-3.5 text-[#80497D] shrink-0" />
-              <span className="truncate">Schools</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onNavigateTab('coordinators')}
-              className="px-2 py-1.5 rounded-xl bg-[#faf6fa] hover:bg-[#f4eaf4] border border-[#ebd7eb] text-[#80497D] text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
-            >
-              <UserCheck className="w-3.5 h-3.5 text-[#80497D] shrink-0" />
-              <span className="truncate">Coordinators</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onNavigateTab('workbook_orders')}
-              className="px-2 py-1.5 rounded-xl bg-[#fdf7f5] hover:bg-[#fbeee9] border border-[#f6d6cc] text-[#C35B3F] text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
-            >
-              <ShoppingBag className="w-3.5 h-3.5 text-[#C35B3F] shrink-0" />
-              <span className="truncate">Workbooks</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onNavigateTab('students')}
-              className="px-2 py-1.5 rounded-xl bg-[#faf6fa] hover:bg-[#f4eaf4] border border-[#ebd7eb] text-[#80497D] text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
-            >
-              <Users className="w-3.5 h-3.5 text-[#80497D] shrink-0" />
-              <span className="truncate">Students</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onNavigateTab('skill_programs_manager')}
-              className="px-2 py-1.5 rounded-xl bg-[#faf6fa] hover:bg-[#f4eaf4] border border-[#ebd7eb] text-[#80497D] text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
-            >
-              <Rocket className="w-3.5 h-3.5 text-[#80497D] shrink-0" />
-              <span className="truncate">Skill Studio</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onNavigateTab('test_generator_manager')}
-              className="px-2 py-1.5 rounded-xl bg-[#fdf7f5] hover:bg-[#fbeee9] border border-[#f6d6cc] text-[#C35B3F] text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-[#C35B3F] shrink-0" />
-              <span className="truncate">Papers Center</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onNavigateTab('superadmin_packages')}
-              className="px-2 py-1.5 rounded-xl bg-[#faf6fa] hover:bg-[#f4eaf4] border border-[#ebd7eb] text-[#80497D] text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
-            >
-              <ShoppingBag className="w-3.5 h-3.5 text-[#80497D] shrink-0" />
-              <span className="truncate">Packages</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onNavigateTab('results')}
-              className="px-2 py-1.5 rounded-xl bg-[#fdf7f5] hover:bg-[#fbeee9] border border-[#f6d6cc] text-[#C35B3F] text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
-            >
-              <FileText className="w-3.5 h-3.5 text-[#C35B3F] shrink-0" />
-              <span className="truncate">Results</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onNavigateTab('revision_vault')}
-              className="px-2 py-1.5 rounded-xl bg-[#faf6fa] hover:bg-[#f4eaf4] border border-[#ebd7eb] text-[#80497D] text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
-            >
-              <Bookmark className="w-3.5 h-3.5 text-[#80497D] shrink-0" />
-              <span className="truncate">Revision Vault</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onNavigateTab('free_quizzes_manager')}
-              className="px-2 py-1.5 rounded-xl bg-[#faf6fa] hover:bg-[#f4eaf4] border border-[#ebd7eb] text-[#80497D] text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
-            >
-              <HelpCircle className="w-3.5 h-3.5 text-[#80497D] shrink-0" />
-              <span className="truncate">Free Quizzes</span>
-            </button>
-          </div>
+        <div className="text-left sm:text-right shrink-0">
+          <p className="text-xs sm:text-sm font-bold text-[#80497D] flex items-center gap-1.5 sm:justify-end">
+            <Calendar className="w-3.5 h-3.5 text-[#80497D]" />
+            <span>{formattedDateStr}</span>
+          </p>
+          <p className="text-xs sm:text-sm font-mono font-black text-[#80497D] mt-0.5">
+            {formattedTimeStr}
+          </p>
         </div>
       </div>
 

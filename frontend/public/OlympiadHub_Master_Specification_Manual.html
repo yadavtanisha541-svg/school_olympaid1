@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OlympiadHub - Master Platform Specifications & Architecture Manual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #80497D;
+      --primary-dark: #582b55;
+      --primary-light: #f4eaf4;
+      --accent: #C35B3F;
+      --accent-light: #fdf2ef;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --bg-light: #f8fafc;
+      --border-color: #e2e8f0;
+      --card-bg: #ffffff;
+      --success: #16a34a;
+      --warning: #d97706;
+      --info: #2563eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text-main);
+      background-color: #f1f5f9;
+      line-height: 1.65;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Floating Action Bar for Print / PDF */
+    .action-header {
+      position: sticky;
+      top: 0;
+      z-index: 9999;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--primary-light);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(128, 73, 125, 0.08);
+    }
+
+    .brand-tag {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 18px;
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .btn-print {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #ffffff;
+      border: none;
+      padding: 10px 22px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(128, 73, 125, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .btn-print:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(128, 73, 125, 0.35);
+    }
+
+    .document-container {
+      max-width: 1050px;
+      margin: 32px auto;
+      background: #ffffff;
+      padding: 56px 64px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border-color);
+    }
+
+    /* Header Banner */
+    .doc-hero {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 32px;
+      margin-bottom: 40px;
+    }
+
+    .doc-badge {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      border: 1px solid #ebd7eb;
+    }
+
+    .doc-hero h1 {
+      font-size: 32px;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1.25;
+      margin-bottom: 10px;
+    }
+
+    .doc-hero p {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 800px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+      background: var(--bg-light);
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .meta-item h4 {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .meta-item p {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* Section Styling */
+    .section-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-top: 48px;
+      margin-bottom: 18px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--primary-light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title .section-num {
+      background: var(--primary);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 6px;
+    }
+
+    .sub-section-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-top: 24px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #334155;
+    }
+
+    /* Cards Grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin: 16px 0 24px;
+    }
+
+    .feature-card {
+      background: #fafafc;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px;
+      transition: all 0.2s;
+    }
+
+    .feature-card.highlight {
+      background: #fcf8fb;
+      border-color: #ebd7eb;
+    }
+
+    .feature-card h3 {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .feature-card ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .feature-card ul li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 6px;
+      font-size: 12.5px;
+      color: #475569;
+    }
+
+    .feature-card ul li::before {
+      content: "•";
+      position: absolute;
+      left: 4px;
+      color: var(--accent);
+      font-size: 16px;
+      line-height: 1;
+      top: -1px;
+    }
+
+    /* Tables */
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 28px;
+      font-size: 12.5px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .spec-table th {
+      background: #f8fafc;
+      color: #0f172a;
+      font-weight: 700;
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 2px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+    }
+
+    .spec-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      color: #334155;
+      vertical-align: top;
+    }
+
+    .spec-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .spec-table tr:hover {
+      background-color: #fafbfc;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-primary { background: var(--primary-light); color: var(--primary-dark); }
+    .badge-accent { background: var(--accent-light); color: var(--accent); }
+    .badge-success { background: #dcfce7; color: var(--success); }
+    .badge-info { background: #dbeafe; color: var(--info); }
+    .badge-warning { background: #fef3c7; color: var(--warning); }
+
+    /* Code Blocks */
+    pre, code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+    }
+
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 14px 18px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 12px 0 20px;
+      line-height: 1.5;
+    }
+
+    .highlight-box {
+      border-left: 4px solid var(--primary);
+      background: var(--primary-light);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 13px;
+    }
+
+    .highlight-box.warning {
+      border-left-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    /* Print CSS */
+    @media print {
+      body {
+        background: #ffffff;
+        font-size: 11pt;
+      }
+
+      .action-header {
+        display: none !important;
+      }
+
+      .document-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        border: none;
+      }
+
+      .section-title {
+        margin-top: 24pt;
+        page-break-after: avoid;
+      }
+
+      .feature-card, .spec-table, .highlight-box {
+        page-break-inside: avoid;
+      }
+
+      pre {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Print Action Bar -->
+  <div class="action-header">
+    <div class="brand-tag">
+      <div class="brand-logo">Ω</div>
+      <div>
+        <div class="brand-title">OlympiadHub Master System Specification</div>
+        <div class="brand-subtitle">Official Complete Feature Manual &amp; Enterprise Architecture Documentation</div>
+      </div>
+    </div>
+    <div>
+      <button class="btn-print" onclick="window.print()">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+          <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+        </svg>
+        Save as PDF / Print Manual
+      </button>
+    </div>
+  </div>
+
+  <!-- Document Container -->
+  <div class="document-container">
+
+    <!-- Hero / Title -->
+    <div class="doc-hero">
+      <span class="doc-badge">Enterprise Edition 2.0 • Complete Master Document</span>
+      <h1>OlympiadHub Platform &amp; Ecosystem Specifications</h1>
+      <p>A comprehensive technical and functional manual covering the Public Web Portal, Student Dashboard, Super Admin Studio, School Management, Online Exam Engine, Sub-Domain Code Architecture, AI Camera Proctoring, and Granular Role-Based Access Control (RBAC).</p>
+
+      <div class="meta-grid">
+        <div class="meta-item">
+          <h4>Platform Version</h4>
+          <p>v2.4.0 Production</p>
+        </div>
+        <div class="meta-item">
+          <h4>Target Audience</h4>
+          <p>Super Admins, Schools, Students</p>
+        </div>
+        <div class="meta-item">
+          <h4>Olympiad Subjects</h4>
+          <p>6 National/Global Disciplines</p>
+        </div>
+        <div class="meta-item">
+          <h4>Proctoring Engine</h4>
+          <p>AI WebRTC Camera &amp; Security</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 1: SUB-DOMAIN ARCHITECTURE & CODE ROUTING -->
+    <div class="section-title">
+      <span class="section-num">01</span>
+      Sub-Domain Multi-Tenant Architecture &amp; Code Routing
+    </div>
+
+    <p>OlympiadHub implements a dynamic, multi-tenant sub-domain routing architecture. It allows schools and institutions to have their dedicated branded portals (e.g., <code>dpsdelhi.olympiadhub.com</code>, <code>ryan.olympiadhub.com</code>) while running on a single codebase with shared infrastructure.</p>
+
+    <div class="feature-card highlight" style="margin: 16px 0 24px;">
+      <h3>💻 Sub-Domain Code Architecture &amp; Execution</h3>
+      <ul>
+        <li><strong>Context Provider Pattern:</strong> <code>TenantContext.Provider</code> wraps the application and supplies <code>schoolId</code>, <code>brandingConfig</code>, and <code>allowedExams</code>.</li>
+        <li><strong>Scoped API Requests:</strong> All outbound HTTP requests automatically inject <code>X-Tenant-Subdomain</code> header for tenant data isolation.</li>
+        <li><strong>White-Label Customization:</strong> Custom school logos on student dashboard headers, login screens, and PDF certificates.</li>
+        <li><strong>Dynamic Fallback:</strong> If no sub-domain is detected (e.g. <code>www.olympiadhub.com</code>), platform defaults to the main public marketplace.</li>
+      </ul>
+    </div>
+
+    <div class="sub-section-title">Sub-Domain Routing Logic &amp; Code Flow</div>
+    <pre><code>// Subdomain & Tenant Resolver Implementation (Code Reference)
+export const resolveTenantFromHost = (hostname) => {
+  const rootDomain = 'olympiadhub.com';
+  if (!hostname || hostname.includes('localhost') || hostname === rootDomain) {
+    return { isRoot: true, tenantSlug: null, schoolName: 'OlympiadHub Global' };
+  }
+  
+  const parts = hostname.split('.');
+  if (parts.length > 2 && parts[0] !== 'www') {
+    const tenantSlug = parts[0].toLowerCase();
+    return {
+      isRoot: false,
+      tenantSlug: tenantSlug,
+      apiUrl: `https://api.olympiadhub.com/v1/tenants/${tenantSlug}`,
+      portalType: 'INSTITUTIONAL_SUBDOMAIN'
+    };
+  }
+  return { isRoot: true, tenantSlug: null };
+};</code></pre>
+
+    <!-- SECTION 2: CAMERA PROCTORING & INTEGRITY SYSTEM -->
+    <div class="section-title">
+      <span class="section-num">02</span>
+      Live AI Web Camera Proctoring &amp; Exam Security
+    </div>
+
+    <p>To ensure 100% academic integrity and prevent cheating during online national/international Olympiads, OlympiadHub incorporates an AI WebRTC Camera Proctoring System with browser security enforcement.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card highlight">
+        <h3>📹 Live Web Camera Monitoring</h3>
+        <ul>
+          <li><strong>Pre-Exam WebCam Diagnostic:</strong> Forces students to grant browser camera/mic permissions before launching the test.</li>
+          <li><strong>Continuous Stream Capture:</strong> High-efficiency video feed preview rendered inside a non-intrusive floating HUD.</li>
+          <li><strong>Automated Periodic Snapshots:</strong> Encrypted webcam snapshots captured every 15-30 seconds and uploaded to cloud proctor storage.</li>
+          <li><strong>Live Supervisor Stream:</strong> Real-time multi-grid view for exam invigilators to supervise candidates simultaneously.</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h3>🛡️ AI Face Detection &amp; Anti-Cheating</h3>
+        <ul>
+          <li><strong>Face Absence Detection:</strong> Flags when candidate leaves the camera frame for &gt; 5 seconds.</li>
+          <li><strong>Multiple Face Detection:</strong> Alerts when secondary persons or unauthorized helpers are detected in the frame.</li>
+          <li><strong>Tab-Switch &amp; Blur Listener:</strong> Detects when a student switches tabs, minimizes window, or opens search engines.</li>
+          <li><strong>Full-Screen Lockout:</strong> Forces full-screen mode; prompts violation count if exited.</li>
+          <li><strong>Clipboard &amp; Shortcut Lockdown:</strong> Disables Right-Click, Copy, Paste, PrintScreen, Inspect Element, and DevTools shortcuts.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SECTION 3: ROLE-BASED ACCESS CONTROL (RBAC) & PERMISSIONS -->
+    <div class="section-title">
+      <span class="section-num">03</span>
+      Role-Based Access Control (RBAC) &amp; Permissions Matrix
+    </div>
+
+    <p>OlympiadHub utilizes a granular Role-Based Access Control (RBAC) hierarchy ensuring complete security, data segregation, and least-privilege access across all user classifications.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>👑 1. Super Administrator (Root Governance)</h3>
+        <ul>
+          <li>Full platform governance, global database access, and configuration management.</li>
+          <li>Creation of Mock Test Series, Subject Covers, Packages, and Question Banks.</li>
+          <li>Financial reports, package sales overview, and payout processing.</li>
+          <li>User role assignments and system audit logs.</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h3>👁️ 2. Exam Invigilator / AI Proctor</h3>
+        <ul>
+          <li>Live examination room supervisor access.</li>
+          <li>Real-time multi-candidate camera video stream monitoring.</li>
+          <li>Issue live warnings, pause suspect exams, or disqualify students for cheating.</li>
+          <li>Inspect real-time anomaly snapshots and tab-switch violation counts.</li>
+        </ul>
+      </div>
+
+      <div class="feature-card" style="grid-column: span 2;">
+        <h3>🎓 3. Candidate / Student</h3>
+        <ul>
+          <li>Access subject-wise mock tests, live exam runner, and test packages.</li>
+          <li>View personalized scorecards, question-level breakdown, and ranking.</li>
+          <li>Access Revision Vault, download formulas, and practice free daily quizzes.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sub-section-title">Granular Permissions Matrix Table</div>
+    <table class="spec-table">
+      <thead>
+        <tr>
+          <th style="width: 35%;">Module / Action</th>
+          <th style="width: 25%;">Super Administrator</th>
+          <th style="width: 20%;">Exam Invigilator / Proctor</th>
+          <th style="width: 20%;">Candidate / Student</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Create &amp; Edit Mock Tests &amp; Covers</strong></td>
+          <td><span class="badge badge-success">Full Access</span></td>
+          <td><span class="badge badge-accent">No</span></td>
+          <td><span class="badge badge-accent">No</span></td>
+        </tr>
+        <tr>
+          <td><strong>Set Pricing, Discounts &amp; Packages</strong></td>
+          <td><span class="badge badge-success">Full Access</span></td>
+          <td><span class="badge badge-accent">No</span></td>
+          <td><span class="badge badge-accent">No</span></td>
+        </tr>
+        <tr>
+          <td><strong>Live Camera Stream Supervision</strong></td>
+          <td><span class="badge badge-success">Platform-Wide</span></td>
+          <td><span class="badge badge-success">Assigned Room</span></td>
+          <td><span class="badge badge-accent">No</span></td>
+        </tr>
+        <tr>
+          <td><strong>Take Online Exam &amp; Auto-Submit</strong></td>
+          <td><span class="badge badge-info">Preview Mode</span></td>
+          <td><span class="badge badge-accent">No</span></td>
+          <td><span class="badge badge-success">Full Access</span></td>
+        </tr>
+        <tr>
+          <td><strong>View Analytics, Rankings &amp; Scorecards</strong></td>
+          <td><span class="badge badge-success">Platform-Wide</span></td>
+          <td><span class="badge badge-accent">No</span></td>
+          <td><span class="badge badge-info">Self Scorecard</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- SECTION 4: STUDENT DASHBOARD -->
+    <div class="section-title">
+      <span class="section-num">04</span>
+      Student Dashboard &amp; Learning Experience
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card highlight">
+        <h3>📚 Subject-Wise Mock Test Series</h3>
+        <ul>
+          <li><strong>6 Dedicated Subject Covers:</strong> Visually rich cards for IMO, ISO, ICSO, IEO, IGKO, and ISSO.</li>
+          <li><strong>Hierarchical Test Architecture:</strong> Clicking any subject opens all associated tests (Test 1, Test 2, Test 3...).</li>
+          <li><strong>Conditional Score &amp; Rank Display:</strong> Displays previous attempt marks and percentile if attempted; renders a clean start card for new papers.</li>
+          <li><strong>Integrated PDF &amp; OMR Downloads:</strong> 1-click download of official instruction manual and offline practice sheets.</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h3>⚡ Real-time Online Exam Engine</h3>
+        <ul>
+          <li><strong>Live Synchronized Timer:</strong> Countdown clock with auto-submit upon expiry.</li>
+          <li><strong>Interactive Question Palette:</strong> Visual indicators for Answered, Unvisited, Marked for Review, and Skipped questions.</li>
+          <li><strong>Rich LaTeX &amp; Diagram Rendering:</strong> Support for mathematical equations, scientific diagrams, and code snippets.</li>
+          <li><strong>Instant Result Generation:</strong> Automated scoring, percentile calculation, and All-India Rank (AIR) computation.</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h3>🛡️ Revision Vault &amp; Study Resources</h3>
+        <ul>
+          <li><strong>Personal Bookmarks:</strong> Save tricky questions with detailed step-by-step explanations for pre-exam revision.</li>
+          <li><strong>Formula &amp; Mind-Map Library:</strong> Downloadable quick-reference sheets for Number Theory, Geometry, Science laws, and Grammar rules.</li>
+          <li><strong>Daily Speed Drills:</strong> 5-minute timed micro-quizzes to improve mental speed and calculation accuracy.</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h3>🛒 Mock Test Package Store</h3>
+        <ul>
+          <li><strong>Tailored Subject Packs:</strong> Purchase single subject mastery packs or 6-in-1 combo Olympiad super packs.</li>
+          <li><strong>Validity &amp; Attempt Management:</strong> Instant activation upon successful payment with clear expiry tracking.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SECTION 5: SUPER ADMIN STUDIO -->
+    <div class="section-title">
+      <span class="section-num">05</span>
+      Super Admin Studio &amp; Command Center
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card highlight">
+        <h3>🎨 Mock Test Series &amp; Cover Studio</h3>
+        <ul>
+          <li><strong>Subject Cover Manager:</strong> Customize banners, badges, descriptions, and class mappings for all 6 Olympiads.</li>
+          <li><strong>Dynamic Test Addition:</strong> Add unlimited mock tests (Test 1 to 100) inside any subject series in real-time.</li>
+          <li><strong>Instructions &amp; Media Attachments:</strong> Upload downloadable PDF manuals, exam rules, and section guidelines per paper.</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h3>✍️ Advanced Paper Authoring Engine</h3>
+        <ul>
+          <li><strong>Multi-Format Questions:</strong> Standard MCQ, Multi-Select, Numerical Input, Matrix Match, and Assertion-Reasoning.</li>
+          <li><strong>Section Structure:</strong> Configure Section 1 (Logical Reasoning), Section 2 (Subject Knowledge), and Section 3 (Achievers HOTS).</li>
+          <li><strong>Custom Marking Rules:</strong> Set positive marks, negative marks, and sectional time limits per paper.</li>
+          <li><strong>Step-by-Step Solutions:</strong> Rich-text explanation builder with diagrams for post-exam student learning.</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h3>📦 Packages &amp; Pricing Management</h3>
+        <ul>
+          <li>Create subject test packages, bundle mock tests, and set promotional discounts.</li>
+          <li>Coupon &amp; voucher code engine with percentage/flat discount rules.</li>
+          <li>Manage test validity duration (30 days, 90 days, 1 Year).</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h3>👥 Candidate &amp; Institutional Governance</h3>
+        <ul>
+          <li>Complete registry of all registered students with filtering by class, school, and performance.</li>
+          <li>Reset student test attempts, generate password resets, and inspect live proctoring logs.</li>
+          <li>School tie-up requests approval and coordinator assignment.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SECTION 6: 6 OLYMPIAD DISCIPLINES -->
+    <div class="section-title">
+      <span class="section-num">06</span>
+      Academic Curriculums &amp; 6 Olympiad Disciplines
+    </div>
+
+    <table class="spec-table">
+      <thead>
+        <tr>
+          <th style="width: 15%;">Olympiad Code</th>
+          <th style="width: 25%;">Discipline Name</th>
+          <th style="width: 35%;">Core Syllabus Areas</th>
+          <th style="width: 25%;">Target Grades</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-primary">IMO</span></td>
+          <td><strong>International Mathematics Olympiad</strong></td>
+          <td>Number Sense, Computation, Fractions, Geometry, Mensuration, Algebra, Data Handling, Achievers HOTS</td>
+          <td>Class 1 to Class 12</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-accent">ISO</span></td>
+          <td><strong>International Science Olympiad</strong></td>
+          <td>Living Organisms, Matter &amp; Materials, Force &amp; Motion, Light &amp; Sound, Electricity, Environmental Science</td>
+          <td>Class 1 to Class 12</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-info">ICSO</span></td>
+          <td><strong>International Cyber &amp; Computer Olympiad</strong></td>
+          <td>Computer Hardware/Software, Windows OS, MS Office, Scratch/Python Coding, AI Basics, Internet &amp; Cyber Safety</td>
+          <td>Class 1 to Class 12</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-warning">IEO</span></td>
+          <td><strong>International English Olympiad</strong></td>
+          <td>Vocabulary, Synonyms/Antonyms, English Grammar, Sentence Structure, Reading Comprehension, Spoken Expression</td>
+          <td>Class 1 to Class 12</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-success">IGKO</span></td>
+          <td><strong>International General Knowledge Olympiad</strong></td>
+          <td>Current Affairs, India &amp; The World, Science &amp; Nature, Sports &amp; Games, Life Skills, Heritage &amp; Culture</td>
+          <td>Class 1 to Class 10</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-primary">ISSO</span></td>
+          <td><strong>International Social Studies Olympiad</strong></td>
+          <td>Ancient/Modern History, Physical &amp; Political Geography, Civics &amp; Governance, Indian Constitution &amp; Society</td>
+          <td>Class 3 to Class 10</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- SECTION 7: TECHNICAL ARCHITECTURE -->
+    <div class="section-title">
+      <span class="section-num">07</span>
+      System Architecture, Security &amp; Technology Stack
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>⚡ Frontend &amp; UI Architecture</h3>
+        <ul>
+          <li><strong>Framework:</strong> React 18 SPA with Vite tooling for sub-second page transitions.</li>
+          <li><strong>Design System:</strong> Tailwind CSS with custom Purple &amp; Ochre brand palette.</li>
+          <li><strong>Math Rendering:</strong> KaTeX &amp; MathJax integration for mathematical formulas.</li>
+          <li><strong>Responsiveness:</strong> Mobile-first layout optimized for tablets and low-bandwidth connections.</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h3>🔒 Security &amp; Infrastructure</h3>
+        <ul>
+          <li><strong>Encryption:</strong> TLS 1.3 in-transit encryption and AES-256 data storage.</li>
+          <li><strong>Authentication:</strong> Secure JWT with refresh token rotation and multi-device session invalidation.</li>
+          <li><strong>Anti-Tamper Exam Engine:</strong> Time synchronization with NTP server to prevent client-side clock tampering.</li>
+          <li><strong>Automated Backups:</strong> Daily automated snapshots with zero downtime restore capability.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Document Footer -->
+    <div style="margin-top: 48px; padding-top: 24px; border-top: 2px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted);">
+      <div>
+        <strong>OlympiadHub Global Technologies Inc.</strong> • Confidential &amp; Proprietary System Manual
+      </div>
+      <div>
+        Generated on October 03, 2026 • Verified Platform Release
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

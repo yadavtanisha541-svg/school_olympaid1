@@ -517,46 +517,41 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
           </div>
         </div>
 
-        {/* Modal: Exit / Submit Confirmation */}
+        {/* Modal: Exit / Submit Confirmation (Exact replica of user screenshot) */}
         {showExitConfirm && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
-            <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-slate-200 shadow-2xl space-y-4 text-center">
-              <AlertCircle className="w-12 h-12 text-amber-500 mx-auto" />
-              <h3 className="text-lg font-black text-slate-900">Are you ready to submit your exam?</h3>
-              <div className="p-3.5 bg-slate-50 rounded-2xl text-xs space-y-1.5 text-left border border-slate-200">
-                <div className="flex justify-between font-bold">
-                  <span className="text-slate-500">Attempted Questions:</span>
-                  <span className="text-emerald-700">{totalAnswered} / {totalQuestionsCount}</span>
-                </div>
-                <div className="flex justify-between font-bold">
-                  <span className="text-slate-500">Unanswered / Skipped:</span>
-                  <span className="text-rose-700">{totalUnanswered}</span>
-                </div>
-                <div className="flex justify-between font-bold">
-                  <span className="text-slate-500">Marked for Review:</span>
-                  <span className="text-amber-700">{totalFlagged}</span>
-                </div>
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+            <div className="bg-white rounded-2xl max-w-lg w-full p-6 border border-slate-200 shadow-2xl space-y-6 relative animate-in zoom-in-95">
+              <button
+                type="button"
+                onClick={() => setShowExitConfirm(false)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-sm font-bold cursor-pointer p-1"
+              >
+                ✕
+              </button>
+
+              <div className="pt-2">
+                <p className="text-sm sm:text-base font-medium text-slate-800 leading-relaxed">
+                  Do you want to end test? Please make sure all attempted questions are marked <strong className="text-emerald-600 font-bold">GREEN</strong>.
+                </p>
               </div>
-              <p className="text-xs text-slate-500">
-                Once submitted, your responses will be evaluated instantly and your performance scorecard will be generated.
-              </p>
-              <div className="flex items-center justify-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowExitConfirm(false)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 cursor-pointer"
-                >
-                  Continue Test
-                </button>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => {
                     setShowExitConfirm(false);
                     handleSubmitTest();
                   }}
-                  className="px-5 py-2.5 rounded-xl text-xs font-black text-white bg-[#00b074] hover:bg-[#009260] cursor-pointer shadow-md"
+                  className="px-5 py-2 rounded-lg bg-[#2980b9] hover:bg-[#2471a3] text-white text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
                 >
-                  Confirm &amp; Submit Now
+                  YES
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowExitConfirm(false)}
+                  className="px-5 py-2 rounded-lg bg-[#c0392b] hover:bg-[#a93226] text-white text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
+                >
+                  NO
                 </button>
               </div>
             </div>

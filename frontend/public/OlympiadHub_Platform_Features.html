@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OlympiadHub - Complete Platform Features & Specifications Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --primary: #4e2a4a;
+      --primary-light: #6d3a68;
+      --accent: #d99b26;
+      --olive: #859900;
+      --blue: #2980b9;
+      --green: #00b074;
+      --red: #d63031;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--slate-800);
+      background-color: #f8fafc;
+      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    /* Print Controls */
+    .print-bar {
+      position: sticky;
+      top: 0;
+      background: #4e2a4a;
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .print-btn {
+      background: #00b074;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .print-btn:hover {
+      background: #009260;
+    }
+
+    /* Cover / Header */
+    .header {
+      border-bottom: 3px solid var(--primary);
+      padding-bottom: 24px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .brand-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--slate-600);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .doc-badge {
+      background: #fdf2f8;
+      border: 1px solid #fbcfe8;
+      color: #9d174d;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Section Styling */
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary);
+      border-left: 4px solid var(--accent);
+      padding-left: 12px;
+      margin: 28px 0 14px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .section-desc {
+      font-size: 12px;
+      color: var(--slate-600);
+      margin-bottom: 16px;
+    }
+
+    /* Feature Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: var(--slate-50);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.2s;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--slate-900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .card-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: #edd6ed;
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .card-text {
+      font-size: 11.5px;
+      color: var(--slate-600);
+      line-height: 1.5;
+    }
+
+    /* Badges & Tables */
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+    .badge-primary { background: #edd6ed; color: var(--primary); }
+    .badge-green { background: #d1fae5; color: #065f46; }
+    .badge-blue { background: #e0f2fe; color: #0369a1; }
+    .badge-olive { background: #ecfccb; color: #4d7c0f; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 20px 0;
+      font-size: 11.5px;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    th {
+      background: #f1f5f9;
+      color: var(--slate-800);
+      font-weight: 800;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+
+    .highlight-box {
+      background: linear-gradient(135deg, #faf5fa 0%, #f3e8f3 100%);
+      border: 1px solid #e2c2e2;
+      border-radius: 12px;
+      padding: 18px;
+      margin: 20px 0;
+    }
+
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--slate-500);
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+      .print-bar {
+        display: none;
+      }
+      .container {
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Print & Download Bar -->
+  <div class="print-bar">
+    <div>
+      <strong>OlympiadHub Platform Specifications &amp; Feature Brochure</strong>
+      <span style="font-size: 11px; opacity: 0.85; margin-left: 10px;">Official System Documentation</span>
+    </div>
+    <button class="print-btn" onclick="window.print()">
+      🖨️ Save as PDF / Print
+    </button>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <div class="brand-title">OlympiadHub™ Learning &amp; Examination Ecosystem</div>
+        <div class="brand-subtitle">Complete Feature Catalog, Functional Modules &amp; Platform Architecture</div>
+      </div>
+      <div class="doc-badge">
+        Edition 2026-27 • Version 3.2
+      </div>
+    </div>
+
+    <!-- Executive Summary -->
+    <div class="highlight-box">
+      <div style="font-weight: 800; font-size: 13px; color: #4e2a4a; margin-bottom: 6px;">
+        🌟 Executive Summary
+      </div>
+      <p style="font-size: 12px; color: #475569; line-height: 1.5;">
+        <strong>OlympiadHub</strong> is an all-in-one digital Olympiad preparation, examination, and diagnostics ecosystem tailored for students from <strong>Class 1 to Class 12</strong>. It supports 6 core National and International Olympiads (<strong>IMO, ISO, ICSO, IEO, IGKO, ISSO</strong>) with live computer-based tests, comprehensive syllabus kits, downloadable PDF papers with master answer keys, detailed cutoff benchmarking, and automated administration tools for schools and super administrators.
+      </p>
+    </div>
+
+    <!-- MODULE 1: STUDENT DASHBOARD -->
+    <div class="section-title">1. Student Learning &amp; Examination Portal</div>
+    <div class="section-desc">Interactive student dashboard designed for self-paced mastery, daily testing, and competitive rank benchmarking.</div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">1</span>
+          Subject-wise Mock Test Series Covers
+        </div>
+        <div class="card-text">
+          Organized by Subject &amp; Class with dedicated series covers (e.g. <em>Class 6 - All India IMO Mock Test Series</em>) containing multiple full-length timed tests (Mock 1, 2, 3...) matching official Olympiad standards.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">2</span>
+          Live Examination Portal &amp; Countdown Timer
+        </div>
+        <div class="card-text">
+          High-performance online exam interface featuring automatic countdown timer (MM:SS), 1..50 question palette with status colors (Answered, Skipped, Flagged, Non-visited), section switcher, and anti-cheating controls.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">3</span>
+          Scorecard &amp; In-depth Solution Analysis
+        </div>
+        <div class="card-text">
+          Instant scorecards showcasing <strong>Time Taken</strong>, <strong>Marks Obtained</strong>, and <strong>Last Year Cutoff Marks</strong> benchmarks, coupled with 2x2 filter radios (All, Correct, Wrong, Unattempted) and detailed step-by-step explanations.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">4</span>
+          Previous Year Papers (PYQ) &amp; Solutions
+        </div>
+        <div class="card-text">
+          Authentic 5 to 10-year official past papers for IMO, ISO, ICSO, IEO, IGKO, and ISSO with verified answer keys, explanation notes, and printable question papers.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">5</span>
+          Official Printable PDF Question Papers
+        </div>
+        <div class="card-text">
+          One-click generation of printable/downloadable question papers and complete master answer sheets formatted for offline study and mock exam simulations at home.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">6</span>
+          Adaptive Test Generator Pro
+        </div>
+        <div class="card-text">
+          Allows students to customize practice tests by selecting subject, specific syllabus chapters, difficulty level (Easy, Medium, HOTS), question count, and test duration.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">7</span>
+          Daily 5-Minute Free Sprint Quizzes
+        </div>
+        <div class="card-text">
+          Bite-sized daily subject quizzes designed to build consistent revision habits with instant scoring, hints, and daily leaderboards.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">8</span>
+          Revision Vault (Formula Sheets &amp; Mind Maps)
+        </div>
+        <div class="card-text">
+          High-yield downloadable revision summaries, speed math formula sheets, science concept mind maps, and grammar rules for last-minute exam review.
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 2: SUBJECTS COVERED -->
+    <div class="section-title">2. Olympiad Subjects &amp; Competitions Supported</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Subject Code</th>
+          <th>Olympiad Name</th>
+          <th>Grades</th>
+          <th>Curriculum &amp; Sections Included</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-primary">IMO</span></td>
+          <td>International Mathematics Olympiad</td>
+          <td>Class 1 - 12</td>
+          <td>Logical Reasoning, Mathematical Reasoning, Everyday Math, Achievers Section (HOTS)</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-green">ISO / NSO</span></td>
+          <td>International Science Olympiad</td>
+          <td>Class 1 - 12</td>
+          <td>Physics, Chemistry, Biology, Environmental Science, Achievers Section</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-blue">ICSO</span></td>
+          <td>International Cyber &amp; AI Olympiad</td>
+          <td>Class 1 - 12</td>
+          <td>Computer &amp; IT Fundamentals, Hardware/Software, Cyber Safety, AI &amp; Logic</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-primary">IEO</span></td>
+          <td>International English Olympiad</td>
+          <td>Class 1 - 12</td>
+          <td>Word &amp; Structure Knowledge, Reading Comprehension, Spoken Expression, Achievers</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-olive">IGKO</span></td>
+          <td>International General Knowledge Olympiad</td>
+          <td>Class 1 - 12</td>
+          <td>General Awareness, Current Affairs, India &amp; World, Life Skills, Achievers Section</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-primary">ISSO</span></td>
+          <td>Social Studies &amp; Reasoning Olympiad</td>
+          <td>Class 1 - 12</td>
+          <td>History, Geography, Civics, Quantitative Aptitude &amp; Verbal/Non-Verbal Reasoning</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- MODULE 3: SUPER ADMIN STUDIO -->
+    <div class="section-title">3. Super Admin Management Studio</div>
+    <div class="section-desc">Comprehensive administrative control panel for curriculum authors, publishers, and platform administrators.</div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">⚡</span>
+          Full-Page Model Test Paper Studio
+        </div>
+        <div class="card-text">
+          Dedicated authoring suite to create, edit, and publish papers with custom sections, question points, timing, total marks, and target grade levels.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">📋</span>
+          Smart Bulk Question Importer
+        </div>
+        <div class="card-text">
+          Paste multi-question text blocks from Word/PDFs. The parser automatically structures question text, options (A, B, C, D), correct answers, marks, and explanations.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">🎯</span>
+          Cutoff Marks Configurator
+        </div>
+        <div class="card-text">
+          Set national benchmark cutoff marks for any mock test paper (e.g. 42 / 60) which dynamically populates on the student's post-exam scorecard.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">📦</span>
+          Study Package &amp; Bundle Builder
+        </div>
+        <div class="card-text">
+          Create paid and premium study packs, set pricing, original strike-through prices, promotional badge banners, and feature bullets with real-time cart integration.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">💳</span>
+          Live Orders &amp; Revenue Analytics
+        </div>
+        <div class="card-text">
+          Real-time payment ledger tracking student orders, purchased packages, payment gateway IDs, student details, and revenue breakdown by class and subject.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="card-icon">🏫</span>
+          School &amp; Student User Directory
+        </div>
+        <div class="card-text">
+          Manage registered institutions and students, activate/deactivate accounts, reset credentials, and review participation numbers across grades.
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 4: TECHNICAL SPECIFICATIONS -->
+    <div class="section-title">4. Technical Specifications &amp; Architecture</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Technology</th>
+          <th>Capability Highlights</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Frontend UI</strong></td>
+          <td>React 18 + Vite 5 + Tailwind CSS</td>
+          <td>Sub-second page rendering, ultra-responsive across Mobile, Tablet, and Desktop.</td>
+        </tr>
+        <tr>
+          <td><strong>Icons &amp; Assets</strong></td>
+          <td>Lucide React Icon Suite</td>
+          <td>Lightweight, scalable vector icons across all dashboards and portal screens.</td>
+        </tr>
+        <tr>
+          <td><strong>Backend API</strong></td>
+          <td>PHP 8.2 / RESTful Architecture</td>
+          <td>Modular controller endpoints for Auth, Exam Papers, Quizzes, Orders, and Packages.</td>
+        </tr>
+        <tr>
+          <td><strong>Dual Data Engine</strong></td>
+          <td>Client MockEngine + Server Database</td>
+          <td>Enables 100% full-stack functionality on static hosts (Vercel, GitHub Pages) and PHP/MySQL servers.</td>
+        </tr>
+        <tr>
+          <td><strong>PDF Engine</strong></td>
+          <td>HTML5 Print &amp; Dynamic Generator</td>
+          <td>Instant, clean, printable PDF rendering of question papers, answer keys, and report cards.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div>
+        <strong>OlympiadHub™</strong> • National Examination &amp; Prep System
+      </div>
+      <div>
+        Generated on: <strong>October 2026</strong> • Confidential &amp; Proprietary
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

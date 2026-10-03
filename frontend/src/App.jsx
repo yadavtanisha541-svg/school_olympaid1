@@ -313,7 +313,7 @@ export const App = () => {
   };
 
   // 1. LOGIN SCREEN VIEW
-  if (viewMode === 'login') {
+  if (viewMode === 'login' || (viewMode === 'dashboard' && !user)) {
     return (
       <LoginPage
         onNavigateVerify={() => {
@@ -816,7 +816,7 @@ export const App = () => {
         />
 
         {/* Main Content Viewport */}
-        <main className="flex-1 lg:pl-64 min-w-0 w-full overflow-x-hidden">
+        <main className="flex-1 lg:pl-72 min-w-0 w-full overflow-x-hidden">
           <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
             {renderDashboardContent()}
           </div>
