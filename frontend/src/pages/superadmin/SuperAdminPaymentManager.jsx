@@ -170,23 +170,23 @@ export const SuperAdminPaymentManager = () => {
   return (
     <div className="space-y-6 pb-16 font-sans max-w-7xl mx-auto">
       
-      {/* 1. Seamless Background Header (No Outer Box) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 py-2">
-        <div className="flex items-center gap-4">
-          <div className="w-13 h-13 rounded-2xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-2xs">
-            <CreditCard className="w-6.5 h-6.5 text-[#80497D]" />
+      {/* 1. Seamless Balanced Header Banner */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-1">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <div className="w-12 h-12 rounded-xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-2xs">
+            <CreditCard className="w-6 h-6 text-[#80497D]" />
           </div>
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#422240] tracking-tight truncate">
               Payment Gateway, QR Code &amp; Student Orders
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5 truncate">
               Customize official bank account details, UPI ID, and QR code, and review all student payments with UTR codes.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap shrink-0">
+        <div className="flex items-center gap-3 shrink-0">
           <Button
             variant="secondary"
             size="md"
@@ -211,49 +211,76 @@ export const SuperAdminPaymentManager = () => {
       </div>
 
       {feedback.message && (
-        <div className={`p-4 rounded-2xl border text-xs flex items-center justify-between shadow-xs ${
+        <div className={`p-4 rounded-2xl border text-sm flex items-center justify-between shadow-xs ${
           feedback.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'
         }`}>
-          <div className="flex items-center gap-2">
-            {feedback.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <AlertCircle className="w-4 h-4 text-rose-600" />}
+          <div className="flex items-center gap-2.5">
+            {feedback.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-600" /> : <AlertCircle className="w-5 h-5 text-rose-600" />}
             <span className="font-bold">{feedback.message}</span>
           </div>
           <button onClick={() => setFeedback({ type: '', message: '' })} className="font-bold ml-4 text-slate-400 hover:text-slate-700">✕</button>
         </div>
       )}
 
-      {/* 2. Top Stats Counter */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-        <div className="bg-white p-4.5 rounded-2xl border border-[#ebd7eb] shadow-2xs">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Revenue</p>
-          <h3 className="text-2xl font-black text-emerald-600 mt-1 font-mono">
-            ₹{Number(stats.total_revenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-          </h3>
-          <p className="text-[10px] text-slate-400 mt-0.5">Verified &amp; confirmed orders</p>
+      {/* 2. Rich Top Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Revenue */}
+        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
+            <DollarSign className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Revenue</p>
+            <h3 className="text-2xl font-black text-emerald-600 mt-0.5 font-mono">
+              ₹{Number(stats.total_revenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+            </h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Verified &amp; confirmed orders</p>
+          </div>
         </div>
-        <div className="bg-white p-4.5 rounded-2xl border border-[#ebd7eb] shadow-2xs">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Orders</p>
-          <h3 className="text-2xl font-black text-[#80497D] mt-1 font-mono">{orders.length}</h3>
-          <p className="text-[10px] text-slate-400 mt-0.5">All student checkouts</p>
+
+        {/* Total Orders */}
+        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
+            <CreditCard className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Orders</p>
+            <h3 className="text-2xl font-black text-[#80497D] mt-0.5 font-mono">{orders.length}</h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">All student checkouts</p>
+          </div>
         </div>
-        <div className="bg-white p-4.5 rounded-2xl border border-[#ebd7eb] shadow-2xs">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active UPI ID</p>
-          <h3 className="text-sm font-black text-slate-800 mt-2 font-mono truncate px-2">
-            {bankSettings.upi_id || 'Not set'}
-          </h3>
-          <p className="text-[10px] text-slate-400 mt-0.5">Live in checkout</p>
+
+        {/* Active UPI */}
+        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
+            <Eye className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active UPI ID</p>
+            <h3 className="text-sm font-black text-slate-800 mt-1 font-mono truncate">
+              {bankSettings.upi_id || 'Not set'}
+            </h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Live in checkout</p>
+          </div>
         </div>
-        <div className="bg-white p-4.5 rounded-2xl border border-[#ebd7eb] shadow-2xs">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Bank</p>
-          <h3 className="text-sm font-black text-slate-800 mt-2 truncate px-2">
-            {bankSettings.bank_name || 'Not set'}
-          </h3>
-          <p className="text-[10px] text-slate-400 mt-0.5">{bankSettings.account_number ? `A/C: ••••${bankSettings.account_number.slice(-4)}` : 'Bank Transfer'}</p>
+
+        {/* Active Bank */}
+        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 shrink-0">
+            <Building className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Bank</p>
+            <h3 className="text-sm font-black text-slate-800 mt-1 truncate">
+              {bankSettings.bank_name || 'Not set'}
+            </h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">{bankSettings.account_number ? `A/C: ••••${bankSettings.account_number.slice(-4)}` : 'Bank Transfer'}</p>
+          </div>
         </div>
       </div>
 
       {/* 3. Sub-Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#ebd7eb] pb-3 overflow-x-auto">
+      <div className="flex items-center gap-2.5 border-b border-[#ebd7eb] pb-3 overflow-x-auto">
         {[
           { id: 'orders', label: '📑 Student Orders & Payment Log', icon: DollarSign, count: orders.length },
           { id: 'settings', label: '💳 Bank, UPI & QR Customizer', icon: Building },
@@ -265,17 +292,16 @@ export const SuperAdminPaymentManager = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
+              className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
                 isActive
-                  ? 'bg-[#80497D] text-white shadow-md shadow-[#80497D]/20 font-extrabold'
-                  : 'bg-white text-slate-600 hover:bg-[#faf6fa] border border-[#ebd7eb]'
+                  ? 'bg-[#80497D] text-white shadow-md shadow-[#80497D]/20'
+                  : 'bg-white text-slate-600 border border-[#ebd7eb] hover:bg-[#faf6fa] hover:text-[#80497D]'
               }`}
             >
-              <Icon className="w-4 h-4" />
               <span>{tab.label}</span>
               {tab.count !== undefined && (
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                  isActive ? 'bg-white/20 text-white' : 'bg-[#f4eaf4] text-[#80497D]'
                 }`}>
                   {tab.count}
                 </span>
