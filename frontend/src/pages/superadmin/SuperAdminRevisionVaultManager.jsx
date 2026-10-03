@@ -229,34 +229,35 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
   return (
     <div className="space-y-6 font-sans pb-16">
       {/* Top Header Banner */}
-      <div className="bg-gradient-to-r from-[#6d3a68] to-[#8c4e8b] rounded-3xl p-6 sm:p-8 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/10 backdrop-blur-xs text-xs font-bold text-pink-200">
-            <Bookmark className="w-3.5 h-3.5" />
-            <span>Academic Curriculum Content Manager</span>
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-1">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <div className="w-12 h-12 rounded-xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-2xs">
+            <Bookmark className="w-6 h-6 text-[#80497D]" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-            Revision Vault &amp; Bookmarks Manager
-          </h1>
-          <p className="text-xs sm:text-sm text-pink-100 max-w-2xl">
-            Add, edit, and curate tricky questions, high-yield formulas, and AI-identified bookmarks for all classes (Class 1 to 12).
-          </p>
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#422240] tracking-tight truncate">
+              Revision Vault &amp; Bookmarks Manager
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5 truncate">
+              Add, edit, and curate tricky questions, high-yield formulas, and AI-identified bookmarks for all classes (Class 1 to 12).
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex items-center gap-3 shrink-0 flex-wrap">
           <button
             type="button"
             onClick={handleResetDefaults}
-            className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer backdrop-blur-xs border border-white/20 shadow-xs"
+            className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#faf6fa] text-slate-700 font-bold text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#ebd7eb] shadow-2xs"
             title="Reset Default Questions"
           >
-            <RotateCcw className="w-4 h-4" />
-            <span>Reset Seed Defaults</span>
+            <RotateCcw className="w-4 h-4 text-[#80497D]" />
+            <span>Reset Defaults</span>
           </button>
           <button
             type="button"
             onClick={handleOpenCreateModal}
-            className="px-5 py-2.5 rounded-xl bg-[#e7b84b] hover:bg-[#d4a236] text-[#321630] font-black text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer"
+            className="px-5 py-2.5 rounded-xl bg-[#80497D] hover:bg-[#6b3a69] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-[#80497D]/20 active:scale-95 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add Revision Question</span>

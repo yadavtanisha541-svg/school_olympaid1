@@ -511,43 +511,42 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
 
       {!showEditorModal ? (
         <>
-          {/* 1. Header Banner (Slim & Compact) */}
-          <div className="bg-gradient-to-r from-[#4e2a4a] via-[#6d3a68] to-[#8c4e8b] rounded-2xl p-4 sm:p-5 text-white shadow-xs relative overflow-hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 relative z-10">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#e7b84b]/20 border border-[#e7b84b]/40 text-[#e7b84b] text-[10px] font-bold uppercase tracking-wider mb-1">
-              <Zap className="w-3 h-3 text-[#e7b84b]" />
-              <span>Skill Development Programs Studio</span>
+          {/* 1. Header Banner */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-1">
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="w-12 h-12 rounded-xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-2xs">
+                <Zap className="w-6 h-6 text-[#80497D]" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#422240] tracking-tight truncate">
+                  Skill Development Curriculum &amp; Programs Manager
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5 truncate">
+                  Create, customize, and author full-page Skill Development Programs (RSDP, MSDP, SSDP, ESDP, GK-SDP, CSDP) with class-wise skills.
+                </p>
+              </div>
             </div>
-            <h1 className="text-lg sm:text-xl font-black tracking-tight leading-snug">
-              Skill Development Curriculum &amp; Programs Manager
-            </h1>
-            <p className="text-xs text-pink-100/90 mt-0.5 max-w-3xl">
-              Create, customize, and author full-page Skill Development Programs (RSDP, MSDP, SSDP, ESDP, GK-SDP, CSDP) with class-wise skills and pricing.
-            </p>
-          </div>
 
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={handleOpenNew}
-              className="px-4 py-2 rounded-xl text-xs font-black bg-[#e7b84b] text-[#321630] hover:bg-[#deb145] transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Create New Program</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleResetDefaults}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset Defaults</span>
-            </button>
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={handleResetDefaults}
+                className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#faf6fa] text-slate-700 font-bold text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#ebd7eb] shadow-2xs"
+                title="Reset Defaults"
+              >
+                <RotateCcw className="w-4 h-4 text-[#80497D]" />
+                <span>Reset Defaults</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleOpenNew}
+                className="px-5 py-2.5 rounded-xl bg-[#80497D] hover:bg-[#6b3a69] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-[#80497D]/20 active:scale-95 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Create New Program</span>
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
 
       {/* 2. Top Analytics KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
