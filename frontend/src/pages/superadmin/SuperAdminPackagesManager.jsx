@@ -1142,21 +1142,21 @@ Explanation: Sir Tim Berners-Lee invented the WWW at CERN in 1989.`}
         </div>
       )}
 
-      {/* Main Page Top Navigation & Action Bar */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Main Page Top Navigation & Action Bar (Seamless on background, no box) */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-1 pb-1">
         <div className="flex items-center gap-3.5 min-w-0">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#859900] to-[#5e6d00] text-white flex items-center justify-center shadow-xs shrink-0 font-black text-xl">
+          <div className="w-12 h-12 rounded-2xl bg-[#859900] text-white flex items-center justify-center shadow-xs shrink-0 font-black text-xl">
             <Trophy className="w-6 h-6" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#859900]/15 text-[#5e6d00]">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#859900]/15 text-[#5e6d00]">
                 SuperAdmin Studio
               </span>
               <span className="text-slate-300 font-bold text-xs">&bull;</span>
               <span className="text-xs text-slate-500 font-bold">100% Real-Time DB &amp; Live Sync</span>
             </div>
-            <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight leading-snug truncate mt-0.5">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug truncate mt-0.5">
               Subject Mock Test Covers &amp; Questions Studio
             </h1>
             <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
@@ -1177,8 +1177,8 @@ Explanation: Sir Tim Berners-Lee invented the WWW at CERN in 1989.`}
         </div>
       </div>
 
-      {/* Top Main Navigation Tabs */}
-      <div className="bg-white p-2 rounded-2xl border border-[#edd6ed] shadow-xs flex items-center gap-2.5 overflow-x-auto">
+      {/* Top Main Navigation Tabs (Seamless on background, no box) */}
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
         {[
           { id: 'exam_papers', label: '🌟 Subject Mock Test Series Covers & Tests', icon: Sparkles, count: examPapers.length },
           { id: 'packages', label: '📦 All-in-One Study Packages', icon: Package, count: packages.length },
@@ -1194,16 +1194,16 @@ Explanation: Sir Tim Berners-Lee invented the WWW at CERN in 1989.`}
                 setActiveTab(tab.id);
                 setSelectedSubjectCover(null);
               }}
-              className={`py-2.5 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap ${
+              className={`py-2 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap ${
                 isActive
                   ? 'bg-[#4e2a4a] text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-[#faf5fa] hover:text-[#4e2a4a]'
+                  : 'text-slate-600 hover:bg-slate-200/60 hover:text-[#4e2a4a]'
               }`}
             >
               <Icon className={`w-4 h-4 ${isActive ? 'text-[#e7b84b]' : 'text-slate-400'}`} />
               <span>{tab.label}</span>
               {tab.count !== undefined && (
-                <span className={`text-xs px-2 py-0.5 rounded-full font-black ${isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'}`}>
+                <span className={`text-xs px-2 py-0.5 rounded-full font-black ${isActive ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-700'}`}>
                   {tab.count}
                 </span>
               )}
@@ -1212,15 +1212,15 @@ Explanation: Sir Tim Berners-Lee invented the WWW at CERN in 1989.`}
         })}
       </div>
 
-      {/* Class & Filter Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+      {/* Class & Filter Controls (Seamless on background, no box) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="text-xs font-black text-slate-700">Class:</span>
             <select
               value={packageClassFilter}
               onChange={(e) => setPackageClassFilter(e.target.value)}
-              className="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-bold text-[#4e2a4a] bg-slate-50 cursor-pointer shadow-2xs"
+              className="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-bold text-[#4e2a4a] bg-white cursor-pointer shadow-2xs"
             >
               {CLASSES_LIST.map((cls) => (
                 <option key={cls} value={cls}>
@@ -1237,7 +1237,7 @@ Explanation: Sir Tim Berners-Lee invented the WWW at CERN in 1989.`}
               placeholder="Search tests or questions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#859900]"
+              className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#859900]"
             />
           </div>
         </div>
@@ -1246,7 +1246,7 @@ Explanation: Sir Tim Berners-Lee invented the WWW at CERN in 1989.`}
           <button
             type="button"
             onClick={() => setSelectedSubjectCover(null)}
-            className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs self-start sm:self-auto"
+            className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs border border-slate-200 self-start sm:self-auto"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>&larr; Back to All Subject Covers</span>
