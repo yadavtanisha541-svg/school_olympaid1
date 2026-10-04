@@ -57,6 +57,7 @@ import { SuperAdminOnlineClassesManager } from './pages/superadmin/SuperAdminOnl
 import { SuperAdminPaymentManager } from './pages/superadmin/SuperAdminPaymentManager';
 import { SuperAdminRevisionVaultManager } from './pages/superadmin/SuperAdminRevisionVaultManager';
 import { SuperAdminFreeQuizzesManager } from './pages/superadmin/SuperAdminFreeQuizzesManager';
+import { RolesAndPermissionsManager } from './pages/superadmin/RolesAndPermissionsManager';
 
 // Teacher Pages
 import { TeacherOverview } from './pages/teacher/TeacherOverview';
@@ -605,6 +606,11 @@ export const App = () => {
           return <UserManagement mode="teachers" />;
         case 'students':
           return <StudentManagement />;
+        case 'roles_permissions':
+        case 'role_permissions':
+        case 'roles':
+        case 'permissions':
+          return <RolesAndPermissionsManager onNavigateTab={setCurrentTab} />;
         case 'academic':
           return <AcademicStructure defaultTab="subjects" onNavigateTab={setCurrentTab} />;
         case 'subject_content':

@@ -40,7 +40,8 @@ import {
   Atom,
   Sparkles,
   Palette,
-  Video
+  Video,
+  ShieldCheck
 } from 'lucide-react';
 
 export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic }) => {
@@ -86,6 +87,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
     { id: 'coordinators', label: 'Coordinator Applicants', icon: UserCheck },
     { id: 'workbook_orders', label: 'Workbook Orders', icon: ShoppingBag },
     { id: 'students', label: 'Student Management', icon: Users },
+    { id: 'roles_permissions', label: 'Roles & Permissions', icon: ShieldCheck },
     { id: 'academic', label: 'Disciplines & Subjects', icon: Layers },
     { id: 'subject_content', label: 'Subject & Class Content', icon: BookOpen },
     { id: 'revision_vault', label: 'Revision Vault & Bookmarks', icon: Bookmark },
