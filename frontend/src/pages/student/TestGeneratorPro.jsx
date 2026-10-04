@@ -32,6 +32,7 @@ import {
   Download
 } from 'lucide-react';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
+import { DetailedSolutionsPage } from './DetailedSolutionsPage';
 
 const CHAPTERS_BY_SUBJECT = {
   reasoning: [
@@ -446,6 +447,39 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     const spentSecs = timeSpentSec % 60;
     const timeStr = `${spentMins}m ${spentSecs < 10 ? '0' : ''}${spentSecs}s`;
 
+    const solutionsFormatted = testQuestions.map((q, qIdx) => {
+      const uAns = userAnswers[qIdx];
+      const isCorrect = uAns === q.correct;
+      const optLetter = uAns !== undefined ? String.fromCharCode(65 + uAns) : null;
+      const correctLetter = String.fromCharCode(65 + (typeof q.correct === 'number' ? q.correct : 0));
+
+      return {
+        id: q.id || qIdx + 1,
+        question_text: q.q || q.question_text || `Question ${qIdx + 1}`,
+        q: q.q || q.question_text,
+        options: q.options,
+        option_a: q.options?.[0] || q.option_a || 'Option A',
+        option_b: q.options?.[1] || q.option_b || 'Option B',
+        option_c: q.options?.[2] || q.option_c || 'Option C',
+        option_d: q.options?.[3] || q.option_d || 'Option D',
+        selected_option: optLetter,
+        correct_option: correctLetter,
+        is_correct: isCorrect,
+        marks: q.marks || 1,
+        explanation: q.explanation || 'Refer to the official Olympiad step-by-step logic.'
+      };
+    });
+
+    const targetPaperForMeta = getMatchingPaper(selectedGrade, selectedSubject);
+    const metaFormatted = {
+      exam_title: targetPaperForMeta?.title || `${selectedGrade} ${subjectsMap[selectedSubject]?.name || selectedSubject} Practice Test`,
+      total_marks: totalQ,
+      score: correctCount,
+      cutoff_marks: Math.round(totalQ * 0.7),
+      time_taken_seconds: timeSpentSec,
+      duration_minutes: testDurationMinutes || 15
+    };
+
     const summary = {
       correctCount,
       totalQ,
@@ -454,7 +488,9 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       subjectName: selectedSubject.toUpperCase(),
       grade: selectedGrade,
       level: selectedLevel,
-      difficulty: selectedDifficulty
+      difficulty: selectedDifficulty,
+      solutions: solutionsFormatted,
+      attemptMeta: metaFormatted
     };
 
     setTestScore(correctCount);
@@ -543,9 +579,27 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   };
 
   // =========================================================================
-  // VIEW: FULL-SCREEN SCORECARD & TEST RESULT PAGE (Clean Full-Screen View)
+  // VIEW: DETAILED SOLUTIONS & PERFORMANCE REVIEW (Matching user screenshot)
   // =========================================================================
   if (isSubmitted && testResultSummary) {
+    return (
+      <DetailedSolutionsPage
+        initialSolutions={testResultSummary.solutions}
+        initialAttemptMeta={testResultSummary.attemptMeta}
+        onBack={() => {
+          setIsTestRunning(false);
+          setIsSubmitted(false);
+          if (onExitToDashboard) onExitToDashboard();
+        }}
+        onViewAnalysis={() => {
+          if (onNavigateTab) onNavigateTab('performance');
+        }}
+        onNavigateTab={onNavigateTab}
+      />
+    );
+  }
+
+  if (false && isSubmitted && testResultSummary) {
     const isGold = testResultSummary.pct >= 80;
     const isPass = testResultSummary.pct >= 40;
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
+import { DetailedSolutionsPage } from './DetailedSolutionsPage';
 import {
   FileText,
   Clock,
@@ -369,13 +370,14 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
     let earnedMarks = 0;
     let totalMarks = 0;
 
-    const detailedBreakdown = examQuestions.map((q, idx) => {
+    const detailedSolutions = examQuestions.map((q, idx) => {
       const chosen = selectedAnswers[idx];
       const qMarks = q.marks || 1;
       totalMarks += qMarks;
 
       const isCorrect = chosen !== undefined && chosen === q.correct;
-      const isUnanswered = chosen === undefined;
+      const optLetter = chosen !== undefined ? String.fromCharCode(65 + chosen) : null;
+      const correctLetter = String.fromCharCode(65 + (typeof q.correct === 'number' ? q.correct : 0));
 
       if (isCorrect) {
         correctCount += 1;
@@ -383,18 +385,19 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
       }
 
       return {
-        questionNumber: idx + 1,
-        questionText: q.q,
+        id: q.id || idx + 1,
+        question_text: q.q || q.question_text || `Question ${idx + 1}`,
+        q: q.q || q.question_text,
         options: q.options,
-        userAnswerIndex: chosen,
-        userAnswerText: chosen !== undefined ? q.options[chosen] : null,
-        correctAnswerIndex: q.correct,
-        correctAnswerText: q.options[q.correct],
-        isCorrect,
-        isUnanswered,
+        option_a: q.options?.[0] || q.option_a || 'Option A',
+        option_b: q.options?.[1] || q.option_b || 'Option B',
+        option_c: q.options?.[2] || q.option_c || 'Option C',
+        option_d: q.options?.[3] || q.option_d || 'Option D',
+        selected_option: optLetter,
+        correct_option: correctLetter,
+        is_correct: isCorrect,
         marks: qMarks,
-        marksEarned: isCorrect ? qMarks : 0,
-        explanation: q.explanation || 'Refer to the official Olympiad solution logic.'
+        explanation: q.explanation || 'Refer to the official Olympiad step-by-step logic.'
       };
     });
 
@@ -406,7 +409,7 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
 
     const resultSummary = {
       paperId: activePaper?.id || 'pyq',
-      paperTitle: activePaper?.title || 'Olympiad Exam Paper',
+      paperTitle: activePaper?.title || `${selectedClass} ${isPYQ ? 'Previous Year Paper' : 'Sample Paper'}`,
       paperMode: mode,
       grade: selectedClass,
       subjectKey: selectedSubjectKey,
@@ -423,7 +426,15 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
       timeSpentMinutes: timeSpentMin,
       timeSpentSeconds: timeSpentSec,
       passed: pct >= 40,
-      breakdown: detailedBreakdown
+      solutions: detailedSolutions,
+      attemptMeta: {
+        exam_title: activePaper?.title || `${selectedClass} ${isPYQ ? 'Previous Year Paper' : 'Sample Paper'}`,
+        total_marks: totalMarks || 60,
+        score: earnedMarks,
+        cutoff_marks: Math.round((totalMarks || 60) * 0.7),
+        time_taken_seconds: timeSpentSec,
+        duration_minutes: activePaper?.durationMinutes || 60
+      }
     };
 
     setTestResult(resultSummary);
@@ -802,15 +813,32 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
   // STEP 4: FULL-SCREEN SCORECARD & SOLUTION KEY (Stand-alone Full Page)
   // =========================================================================
   if (currentStep === 'result' && testResult) {
+    return (
+      <DetailedSolutionsPage
+        initialSolutions={testResult.solutions}
+        initialAttemptMeta={testResult.attemptMeta}
+        onBack={() => {
+          setCurrentStep('configure');
+          if (onExitToDashboard) onExitToDashboard();
+        }}
+        onViewAnalysis={() => {
+          if (onNavigateTab) onNavigateTab('performance');
+        }}
+        onNavigateTab={onNavigateTab}
+      />
+    );
+  }
+
+  if (false && currentStep === 'result_legacy' && testResult) {
     const isPass = testResult.percentage >= 40;
     const isGold = testResult.percentage >= 80;
 
-    const filteredQuestions = testResult.breakdown.filter((item) => {
+    const filteredQuestions = testResult.breakdown?.filter((item) => {
       if (reviewFilter === 'correct') return item.isCorrect;
       if (reviewFilter === 'wrong') return !item.isCorrect && !item.isUnanswered;
       if (reviewFilter === 'unattempted') return item.isUnanswered;
       return true;
-    });
+    }) || [];
 
     return (
       <div className="min-h-screen bg-slate-50 font-sans pb-24 animate-in fade-in duration-150">

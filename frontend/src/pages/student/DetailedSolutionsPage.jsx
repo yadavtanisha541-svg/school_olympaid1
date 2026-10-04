@@ -21,16 +21,26 @@ import { Badge } from '../../components/Badge';
 
 export const DetailedSolutionsPage = ({
   attemptId,
+  initialSolutions = null,
+  initialAttemptMeta = null,
   onBack,
   onViewAnalysis,
   onNavigateTab
 }) => {
-  const [solutions, setSolutions] = useState([]);
-  const [attemptMeta, setAttemptMeta] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [solutions, setSolutions] = useState(initialSolutions || []);
+  const [attemptMeta, setAttemptMeta] = useState(initialAttemptMeta || null);
+  const [loading, setLoading] = useState(initialSolutions ? false : true);
   const [filterType, setFilterType] = useState('all'); // 'all' | 'correct' | 'wrong' | 'unattempted'
 
   const fetchSolutions = async () => {
+    if (initialSolutions && initialSolutions.length > 0) {
+      setLoading(false);
+      return;
+    }
+    if (!attemptId) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const res = await apiClient.get(`/results/${attemptId}/solutions`);
@@ -55,8 +65,14 @@ export const DetailedSolutionsPage = ({
   };
 
   useEffect(() => {
-    fetchSolutions();
-  }, [attemptId]);
+    if (initialSolutions) {
+      setSolutions(initialSolutions);
+      if (initialAttemptMeta) setAttemptMeta(initialAttemptMeta);
+      setLoading(false);
+    } else {
+      fetchSolutions();
+    }
+  }, [attemptId, initialSolutions, initialAttemptMeta]);
 
   // Derived stats
   const totalQuestions = solutions.length || 2;

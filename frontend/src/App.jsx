@@ -277,9 +277,10 @@ export const App = () => {
         examId={activeExamId}
         onExamCompleted={(attemptId) => {
           setActiveExamId(null);
+          setActiveSolutionAttemptId(attemptId);
           setActiveResultAttemptId(attemptId);
           setViewMode('dashboard');
-          setCurrentTab('exam_result');
+          setCurrentTab('exam_solutions');
         }}
         onExit={() => {
           setActiveExamId(null);
@@ -541,20 +542,19 @@ export const App = () => {
       );
     }
 
-    // 1. Result & Solutions Drill-Down
+    // 1. Result & Solutions Drill-Down (Directly show Detailed Solutions & Performance Review)
     if (currentTab === 'exam_result' && activeResultAttemptId) {
       return (
-        <ExamResultView
+        <DetailedSolutionsPage
           attemptId={activeResultAttemptId}
           onBack={() => {
             setActiveResultAttemptId(null);
             setCurrentTab('overview');
           }}
-          onViewSolutions={(attId) => {
-            setActiveSolutionAttemptId(attId);
-            setCurrentTab('exam_solutions');
+          onViewAnalysis={() => {
+            setCurrentTab('performance');
           }}
-          onViewCertificate={(certId) => handleOpenCertificateById(certId)}
+          onNavigateTab={setCurrentTab}
         />
       );
     }
@@ -671,8 +671,9 @@ export const App = () => {
               onNavigateTab={setCurrentTab}
               onStartExam={(eId) => setActiveExamId(eId)}
               onViewResult={(attId) => {
+                setActiveSolutionAttemptId(attId);
                 setActiveResultAttemptId(attId);
-                setCurrentTab('exam_result');
+                setCurrentTab('exam_solutions');
               }}
             />
           );
@@ -703,8 +704,9 @@ export const App = () => {
           return (
             <ExamHistoryPage
               onViewResult={(attId) => {
+                setActiveSolutionAttemptId(attId);
                 setActiveResultAttemptId(attId);
-                setCurrentTab('exam_result');
+                setCurrentTab('exam_solutions');
               }}
               onViewSolutions={(attId) => {
                 setActiveSolutionAttemptId(attId);
@@ -718,8 +720,9 @@ export const App = () => {
             <StudentPerformancePage
               onNavigateTab={setCurrentTab}
               onViewResult={(attId) => {
+                setActiveSolutionAttemptId(attId);
                 setActiveResultAttemptId(attId);
-                setCurrentTab('exam_result');
+                setCurrentTab('exam_solutions');
               }}
             />
           );
@@ -782,8 +785,9 @@ export const App = () => {
               onNavigateTab={setCurrentTab}
               onStartExam={(eId) => setActiveExamId(eId)}
               onViewResult={(attId) => {
+                setActiveSolutionAttemptId(attId);
                 setActiveResultAttemptId(attId);
-                setCurrentTab('exam_result');
+                setCurrentTab('exam_solutions');
               }}
             />
           );
