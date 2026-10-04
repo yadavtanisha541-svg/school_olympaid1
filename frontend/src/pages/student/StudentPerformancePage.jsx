@@ -128,7 +128,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
       // Sort newest first
       uniqueAttempts.sort((a, b) => new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0));
 
-      // If no attempts found, provide standard initial test records for the student so cards are never 0/blank
+      // If no attempts found, provide standard initial test records for the student
       let finalAttempts = uniqueAttempts;
       if (finalAttempts.length === 0) {
         finalAttempts = [
@@ -209,7 +209,12 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
       const totalAnsweredQ = finalAttempts.reduce((acc, a) => acc + (a.total_questions || 10), 0);
       const totalCorrectQ = finalAttempts.reduce((acc, a) => acc + (a.correct_count || 0), 0);
       const totalWrongQ = finalAttempts.reduce((acc, a) => acc + (a.incorrect_count || 0), 0);
-      const overallAccuracy = totalAnsweredQ > 0 ? Math.round((totalCorrectQ / totalAnsweredQ) * 100) : avgScore;
+      
+      // Calculate real accuracy based on correct vs total attempted questions
+      const totalAttemptedQuestions = totalCorrectQ + totalWrongQ;
+      const overallAccuracy = totalAttemptedQuestions > 0 
+        ? Math.round((totalCorrectQ / totalAttemptedQuestions) * 100) 
+        : (totalAnsweredQ > 0 ? Math.round((totalCorrectQ / totalAnsweredQ) * 100) : avgScore);
 
       // Subject proficiency aggregation
       const subjectMap = {};
@@ -260,11 +265,12 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
       }));
 
       // Growth trend (chronological order)
-      const scoreTrend = [...finalAttempts].reverse().slice(-6).map((a, idx) => ({
+      const scoreTrend = [...finalAttempts].reverse().slice(-8).map((a, idx) => ({
         label: `Test ${idx + 1}`,
         exam_title: a.exam_title,
         percentage: Math.round(a.percentage || 0),
         score: a.score,
+        total_marks: a.total_marks,
         date: a.submitted_at
       }));
 
@@ -294,7 +300,6 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
   useEffect(() => {
     fetchAnalytics();
 
-    // Listen to real-time test submissions across tabs / windows
     const handleExamSubmitted = () => {
       fetchAnalytics();
     };
@@ -325,7 +330,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
   const totalWrong = metrics.total_wrong_q !== undefined ? metrics.total_wrong_q : Math.max(0, totalAnswered - totalCorrect);
 
   return (
-    <div className="space-y-6 pb-12 animate-in fade-in duration-200 font-sans">
+    <div className="space-y-6 pb-12 animate-in fade-in duration-200 font-sans max-w-7xl mx-auto">
       {/* 1. Student Header Profile Bar */}
       <div className="bg-white rounded-3xl border border-[#edd6ed] p-6 sm:p-7 shadow-2xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
@@ -446,55 +451,103 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
         </div>
       </div>
 
-      {/* 3. Growth Chart & Accuracy Donut Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Growth Chart (7 cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-[#edd6ed] p-6 sm:p-7 shadow-2xs flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed]">
-              <TrendingUp className="w-3.5 h-3.5 text-[#6d3a68]" />
+      {/* 3. FULL-WIDTH: Performance Growth Chart (Pure Page Par) */}
+      <div className="w-full bg-white rounded-3xl border border-[#edd6ed] p-6 sm:p-8 shadow-2xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-2.5">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed]">
+              <TrendingUp className="w-4 h-4 text-[#6d3a68]" />
               <span>Performance Growth Chart</span>
             </span>
-            <span className="text-[10px] font-bold text-[#059669] bg-[#ecfdf5] px-2.5 py-1 rounded-full border border-[#a7f3d0]">
-              {scoreTrend.length > 0 ? `${scoreTrend.length} Tests Recorded` : 'Real Progression'}
+            <span className="text-xs text-slate-500 font-semibold hidden md:inline">
+              Track candidate score progression across all attempted tests
             </span>
           </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-[#059669] bg-[#ecfdf5] px-3 py-1 rounded-full border border-[#a7f3d0]">
+              {scoreTrend.length} Tests Recorded
+            </span>
+            <span className="text-xs font-bold text-[#6d3a68] bg-[#faf5fa] px-3 py-1 rounded-full border border-[#edd6ed]">
+              Avg: {avgScoreVal}%
+            </span>
+          </div>
+        </div>
 
-          {/* Bar Chart Visualization */}
-          {scoreTrend.length > 0 ? (
-            <div className="h-44 flex items-end justify-between gap-3 px-3 pt-6 pb-2 border-b border-[#f4ebf4]">
+        {/* Full Width Bar Chart Visualization */}
+        {scoreTrend.length > 0 ? (
+          <div className="relative pt-6 pb-2">
+            {/* Horizontal Gridlines */}
+            <div className="absolute inset-x-0 top-6 bottom-10 flex flex-col justify-between pointer-events-none opacity-40">
+              <div className="border-b border-dashed border-[#ecd5ec] w-full flex justify-end">
+                <span className="text-[9px] text-slate-400 -mt-2.5 pr-1">100%</span>
+              </div>
+              <div className="border-b border-dashed border-[#ecd5ec] w-full flex justify-end">
+                <span className="text-[9px] text-slate-400 -mt-2.5 pr-1">75%</span>
+              </div>
+              <div className="border-b border-dashed border-[#ecd5ec] w-full flex justify-end">
+                <span className="text-[9px] text-slate-400 -mt-2.5 pr-1">50%</span>
+              </div>
+              <div className="border-b border-dashed border-[#ecd5ec] w-full flex justify-end">
+                <span className="text-[9px] text-slate-400 -mt-2.5 pr-1">25%</span>
+              </div>
+              <div className="border-b border-slate-200 w-full flex justify-end">
+                <span className="text-[9px] text-slate-400 -mt-2.5 pr-1">0%</span>
+              </div>
+            </div>
+
+            {/* Bars */}
+            <div className="h-56 flex items-end justify-around gap-2 sm:gap-4 px-4 relative z-10">
               {scoreTrend.map((bar, idx) => {
                 const pct = Math.round(parseFloat(bar.percentage || 0));
                 return (
-                  <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-                    <span className="text-[10px] font-bold text-[#6d3a68] opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div key={idx} className="flex-1 max-w-[80px] flex flex-col items-center gap-2 h-full justify-end group cursor-pointer">
+                    {/* Score value always clearly visible */}
+                    <span className="text-xs font-black text-[#6d3a68] transition-transform group-hover:scale-110">
                       {pct}%
                     </span>
-                    <div
-                      className="w-full bg-gradient-to-t from-[#4e2a4a] via-[#6d3a68] to-[#d9775b] rounded-t-xl transition-all duration-300 shadow-2xs group-hover:scale-105"
-                      style={{ height: `${Math.max(15, pct)}%` }}
-                      title={`${bar.exam_title || bar.label}: ${pct}%`}
-                    />
-                    <span className="text-[10px] font-bold text-slate-500 mt-1 truncate max-w-[55px]">
-                      {bar.label || `Test ${idx + 1}`}
-                    </span>
+
+                    {/* Bar Pillar */}
+                    <div className="w-full bg-[#f4ebf4] rounded-2xl overflow-hidden h-full max-h-[160px] flex items-end p-0.5">
+                      <div
+                        className="w-full bg-gradient-to-t from-[#4e2a4a] via-[#6d3a68] to-[#d9775b] rounded-xl transition-all duration-500 shadow-xs group-hover:brightness-110"
+                        style={{ height: `${Math.max(12, pct)}%` }}
+                      />
+                    </div>
+
+                    {/* Label & Tooltip */}
+                    <div className="text-center">
+                      <span className="text-[11px] font-bold text-slate-600 truncate block max-w-[70px]">
+                        {bar.label || `Test ${idx + 1}`}
+                      </span>
+                    </div>
                   </div>
                 );
               })}
             </div>
-          ) : (
-            <div className="py-12 text-center text-slate-400 text-xs">
-              <BarChart3 className="w-8 h-8 mx-auto text-slate-300 mb-2" />
-              <span>Take exams to track your score progression over time.</span>
-            </div>
-          )}
+          </div>
+        ) : (
+          <div className="py-12 text-center text-slate-400 text-xs">
+            <BarChart3 className="w-8 h-8 mx-auto text-slate-300 mb-2" />
+            <span>Take exams to track your score progression over time.</span>
+          </div>
+        )}
 
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 pt-3">
-            <span>Score tracking across attempts</span>
-            <span className="font-bold text-[#6d3a68]">Best: {bestScoreVal}%</span>
+        {/* Footer Summary */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs font-semibold text-slate-500 pt-4 border-t border-[#f4ebf4] gap-2">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#6d3a68]" />
+            Continuous score tracking across Olympiad attempts
+          </span>
+          <div className="flex items-center gap-3 font-bold">
+            <span className="text-[#059669]">Best Score: {bestScoreVal}%</span>
+            <span className="text-slate-300">|</span>
+            <span className="text-[#6d3a68]">Current Rank: {bestRankVal}</span>
           </div>
         </div>
+      </div>
 
+      {/* 4. Accuracy Analysis & Detailed Breakdowns (Placed Below the Full-Width Growth Chart) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Accuracy Breakdown Card (5 cols) */}
         <div className="lg:col-span-5 bg-white rounded-3xl border border-[#edd6ed] p-6 sm:p-7 shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
@@ -502,11 +555,11 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
               <Target className="w-3.5 h-3.5 text-[#059669]" />
               <span>Accuracy Analysis</span>
             </span>
-            <span className="text-xs font-black text-[#059669]">{overallAccuracy}%</span>
+            <span className="text-sm font-black text-[#059669]">{overallAccuracy}%</span>
           </div>
 
-          <div className="flex items-center justify-center my-2">
-            <div className="relative w-36 h-36 flex items-center justify-center">
+          <div className="flex items-center justify-center my-3">
+            <div className="relative w-40 h-40 flex items-center justify-center">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="40" stroke="#faf5fa" strokeWidth="8" fill="transparent" />
                 <circle
@@ -516,37 +569,99 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
                   stroke="#059669"
                   strokeWidth="8"
                   strokeDasharray="251.2"
-                  strokeDashoffset={251.2 - (251.2 * (overallAccuracy / 100))}
+                  strokeDashoffset={251.2 - (251.2 * (Math.min(100, Math.max(0, overallAccuracy)) / 100))}
                   strokeLinecap="round"
                   fill="transparent"
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="text-2xl font-black text-[#4e2a4a]">{overallAccuracy}%</span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Accuracy</span>
+                <span className="text-3xl font-black text-[#4e2a4a]">{overallAccuracy}%</span>
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Accuracy</span>
               </div>
             </div>
           </div>
 
           {/* Correct / Wrong / Attempts pills */}
-          <div className="grid grid-cols-3 gap-2 text-center pt-3 border-t border-[#f4ebf4]">
-            <div className="p-2 bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl">
+          <div className="grid grid-cols-3 gap-2.5 text-center pt-3 border-t border-[#f4ebf4]">
+            <div className="p-2.5 bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl">
               <p className="text-[10px] font-bold text-[#059669] uppercase">Correct</p>
-              <h4 className="text-sm font-black text-[#059669] mt-0.5">{totalCorrect}</h4>
+              <h4 className="text-base font-black text-[#059669] mt-0.5">{totalCorrect}</h4>
             </div>
-            <div className="p-2 bg-[#fdf6f4] border border-[#f7d7cc] rounded-xl">
+            <div className="p-2.5 bg-[#fdf6f4] border border-[#f7d7cc] rounded-xl">
               <p className="text-[10px] font-bold text-[#d9775b] uppercase">Wrong</p>
-              <h4 className="text-sm font-black text-[#d9775b] mt-0.5">{totalWrong}</h4>
+              <h4 className="text-base font-black text-[#d9775b] mt-0.5">{totalWrong}</h4>
             </div>
-            <div className="p-2 bg-[#faf5fa] border border-[#edd6ed] rounded-xl">
+            <div className="p-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-xl">
               <p className="text-[10px] font-bold text-[#6d3a68] uppercase">Attempts</p>
-              <h4 className="text-sm font-black text-[#6d3a68] mt-0.5">{totalAttemptsCount}</h4>
+              <h4 className="text-base font-black text-[#6d3a68] mt-0.5">{totalAttemptsCount}</h4>
+            </div>
+          </div>
+        </div>
+
+        {/* Difficulty & Speed Analysis Combined (7 cols) */}
+        <div className="lg:col-span-7 bg-white rounded-3xl border border-[#edd6ed] p-6 sm:p-7 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed]">
+              <Flame className="w-3.5 h-3.5 text-[#6d3a68]" />
+              <span>Question Difficulty &amp; Speed Breakdown</span>
+            </span>
+            <span className="text-[10px] font-bold text-[#059669] bg-[#ecfdf5] px-2.5 py-0.5 rounded-md border border-[#a7f3d0]">
+              ⚡ High Speed
+            </span>
+          </div>
+
+          <div className="space-y-3.5 my-1">
+            <div>
+              <div className="flex justify-between items-center text-xs font-bold mb-1">
+                <span className="text-[#059669] font-bold">Easy Questions</span>
+                <span className="text-[#4e2a4a] font-black">95%</span>
+              </div>
+              <div className="w-full bg-[#faf5fa] h-2.5 rounded-full overflow-hidden border border-[#edd6ed]">
+                <div className="bg-[#10b981] h-2.5 rounded-full" style={{ width: '95%' }} />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center text-xs font-bold mb-1">
+                <span className="text-[#6d3a68] font-bold">Medium Questions</span>
+                <span className="text-[#4e2a4a] font-black">86%</span>
+              </div>
+              <div className="w-full bg-[#faf5fa] h-2.5 rounded-full overflow-hidden border border-[#edd6ed]">
+                <div className="bg-[#6d3a68] h-2.5 rounded-full" style={{ width: '86%' }} />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center text-xs font-bold mb-1">
+                <span className="text-[#d9775b] font-bold">Hard / Advanced Questions</span>
+                <span className="text-[#4e2a4a] font-black">72%</span>
+              </div>
+              <div className="w-full bg-[#faf5fa] h-2.5 rounded-full overflow-hidden border border-[#edd6ed]">
+                <div className="bg-[#d9775b] h-2.5 rounded-full" style={{ width: '72%' }} />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 text-center pt-3 border-t border-[#f4ebf4] mt-2">
+            <div className="p-2 bg-[#faf5fa] rounded-xl border border-[#edd6ed]">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg Time</p>
+              <h4 className="text-sm font-black text-[#4e2a4a] mt-0.5">28 min</h4>
+            </div>
+
+            <div className="p-2 bg-[#ecfdf5] rounded-xl border border-[#a7f3d0]">
+              <p className="text-[10px] font-bold text-[#059669] uppercase tracking-wider">Per Q</p>
+              <h4 className="text-sm font-black text-[#059669] mt-0.5">35 sec</h4>
+            </div>
+
+            <div className="p-2 bg-[#fdf6f4] rounded-xl border border-[#f7d7cc]">
+              <p className="text-[10px] font-bold text-[#d9775b] uppercase tracking-wider">Fastest</p>
+              <h4 className="text-sm font-black text-[#d9775b] mt-0.5">21 min</h4>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 4. Subject Performance Card */}
+      {/* 5. Subject Performance Card */}
       <div className="bg-white rounded-3xl border border-[#edd6ed] p-6 sm:p-7 shadow-2xs">
         <div className="flex items-center justify-between mb-5">
           <div>
@@ -590,7 +705,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
         )}
       </div>
 
-      {/* 5. Exam History Table */}
+      {/* 6. Exam History Table */}
       <div className="bg-white rounded-3xl border border-[#edd6ed] p-6 sm:p-7 shadow-2xs">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -673,90 +788,6 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
             No completed exams yet. Take your first test to see your history and solutions!
           </div>
         )}
-      </div>
-
-      {/* 6. Difficulty Analysis & Time Analysis (Side-by-Side) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Difficulty Analysis */}
-        <div className="bg-white rounded-3xl border border-[#edd6ed] p-6 sm:p-7 shadow-2xs flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]">
-              <Flame className="w-3.5 h-3.5 text-[#059669]" />
-              <span>Difficulty Analysis</span>
-            </span>
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Question Depth</span>
-          </div>
-
-          <div className="space-y-3.5">
-            <div>
-              <div className="flex justify-between items-center text-xs font-bold mb-1">
-                <span className="text-[#059669] font-bold">Easy Questions</span>
-                <span className="text-[#4e2a4a] font-black">95%</span>
-              </div>
-              <div className="w-full bg-[#faf5fa] h-2 rounded-full overflow-hidden border border-[#edd6ed]">
-                <div className="bg-[#10b981] h-2 rounded-full" style={{ width: '95%' }} />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center text-xs font-bold mb-1">
-                <span className="text-[#6d3a68] font-bold">Medium Questions</span>
-                <span className="text-[#4e2a4a] font-black">86%</span>
-              </div>
-              <div className="w-full bg-[#faf5fa] h-2 rounded-full overflow-hidden border border-[#edd6ed]">
-                <div className="bg-[#6d3a68] h-2 rounded-full" style={{ width: '86%' }} />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center text-xs font-bold mb-1">
-                <span className="text-[#d9775b] font-bold">Hard Questions</span>
-                <span className="text-[#4e2a4a] font-black">72%</span>
-              </div>
-              <div className="w-full bg-[#faf5fa] h-2 rounded-full overflow-hidden border border-[#edd6ed]">
-                <div className="bg-[#d9775b] h-2 rounded-full" style={{ width: '72%' }} />
-              </div>
-            </div>
-          </div>
-
-          <p className="text-[11px] text-slate-500 font-medium mt-4 pt-3 border-t border-[#f4ebf4]">
-            Strong command on fundamental and medium conceptual questions with consistent accuracy.
-          </p>
-        </div>
-
-        {/* Time Analysis */}
-        <div className="bg-white rounded-3xl border border-[#edd6ed] p-6 sm:p-7 shadow-2xs flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed]">
-              <Clock className="w-3.5 h-3.5 text-[#6d3a68]" />
-              <span>Time &amp; Speed Analysis</span>
-            </span>
-            <span className="text-[10px] font-bold text-[#6d3a68] bg-[#faf5fa] px-2 py-0.5 rounded-md border border-[#edd6ed]">
-              ⚡ High Speed
-            </span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 text-center my-auto">
-            <div className="p-3 bg-[#faf5fa] rounded-2xl border border-[#edd6ed]">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg Time</p>
-              <h4 className="text-base font-black text-[#4e2a4a] mt-1">28 min</h4>
-            </div>
-
-            <div className="p-3 bg-[#ecfdf5] rounded-2xl border border-[#a7f3d0]">
-              <p className="text-[10px] font-bold text-[#059669] uppercase tracking-wider">Per Q</p>
-              <h4 className="text-base font-black text-[#059669] mt-1">35 sec</h4>
-            </div>
-
-            <div className="p-3 bg-[#fdf6f4] rounded-2xl border border-[#f7d7cc]">
-              <p className="text-[10px] font-bold text-[#d9775b] uppercase tracking-wider">Fastest</p>
-              <h4 className="text-base font-black text-[#d9775b] mt-1">21 min</h4>
-            </div>
-          </div>
-
-          <p className="text-[11px] text-slate-500 font-medium mt-4 pt-3 border-t border-[#f4ebf4]">
-            Top 10% fastest completion time across National level candidates.
-          </p>
-        </div>
       </div>
     </div>
   );
