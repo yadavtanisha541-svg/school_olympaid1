@@ -447,27 +447,6 @@ export const StudentMyContentPage = ({
                 </div>
               </div>
 
-              {/* Series Banner matching user image */}
-              <div className="bg-[#859900] rounded-2xl p-5 sm:p-6 text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div className="space-y-1.5">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/20 text-white text-xs font-extrabold uppercase tracking-wider backdrop-blur-xs">
-                    <span>{studentClass} Mock Test Series</span>
-                    <span>•</span>
-                    <span>{subjectPapers.length} Mock Tests Available</span>
-                  </div>
-                  <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                    {currentSub.seriesTitle}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-lime-100 font-medium">
-                    National Ranking Mock Tests with Instant Analysis, Answer Keys &amp; Detailed Solutions
-                  </p>
-                </div>
-
-                <div className="shrink-0 bg-white/10 rounded-xl p-3 border border-white/20 hidden sm:block">
-                  <currentSub.icon className="w-10 h-10 text-white" />
-                </div>
-              </div>
-
               {/* Mock Tests Cards Grid (Exact design from user's image) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 {subjectPapers.map((paper) => {
