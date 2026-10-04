@@ -1545,12 +1545,32 @@ export const mockEngine = {
     // EXAM ENGINE
     if (root === 'exam-engine') {
       if (sub && cleanEndpoint.includes('/start')) {
+        const allPapers = getDb('exam_papers');
+        const allExams = getDb('exams');
+        const foundPaper = allPapers.find((p) => String(p.id) === String(sub));
+        const foundExam = allExams.find((e) => String(e.id) === String(sub));
+
+        const activeExamObj = foundPaper
+          ? {
+              id: foundPaper.id,
+              title: foundPaper.title,
+              subject_code: foundPaper.subject_code,
+              subject: foundPaper.subject_name || foundPaper.subject_code,
+              class: foundPaper.class_name || 'Class 6',
+              duration_minutes: foundPaper.duration_minutes || 60,
+              total_marks: foundPaper.total_marks || 60,
+              total_questions: foundPaper.questions?.length || 5,
+              passing_percentage: 40,
+              questions: foundPaper.questions || []
+            }
+          : (foundExam || allExams[0] || initialStore.exams[0]);
+
         return {
           success: true,
           data: {
             attempt_id: Date.now(),
-            exam: getDb('exams')[0] || initialStore.exams[0],
-            questions: (getDb('exams')[0] || initialStore.exams[0]).questions || []
+            exam: activeExamObj,
+            questions: activeExamObj.questions || []
           }
         };
       }
@@ -1559,21 +1579,26 @@ export const mockEngine = {
       }
       if (sub === 'submit') {
         const results = getDb('results');
+        const allPapers = getDb('exam_papers');
+        const foundPaper = allPapers.find((p) => String(p.id) === String(body.exam_id));
+        const totalMarks = Number(body.total_marks) || (foundPaper ? foundPaper.total_marks : 60);
+        const score = Number(body.score) || Math.round(totalMarks * 0.85);
+
         const newRes = {
           id: Date.now(),
           user_id: 2,
-          student_name: 'Aarav Sharma',
+          student_name: body.student_name || 'Aarav Sharma',
           exam_id: body.exam_id || 1,
-          exam_title: body.exam_title || 'Olympiad Exam',
-          subject: 'Mathematics',
-          subject_code: 'IMO',
-          score: 15,
-          total_marks: 15,
-          correct_count: 10,
+          exam_title: body.exam_title || (foundPaper ? foundPaper.title : 'Olympiad Exam'),
+          subject: foundPaper ? (foundPaper.subject_name || foundPaper.subject_code) : (body.subject || 'General Knowledge'),
+          subject_code: foundPaper ? foundPaper.subject_code : (body.subject_code || 'IGKO'),
+          score: score,
+          total_marks: totalMarks,
+          correct_count: Math.round(score / (totalMarks / 10 || 1)),
           incorrect_count: 0,
           unattempted_count: 0,
-          accuracy: 100,
-          percentile: 99.2,
+          accuracy: 95,
+          percentile: 98.4,
           rank: 1,
           time_taken_seconds: 1800,
           submitted_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
