@@ -39,6 +39,7 @@ import {
   Info,
   Atom,
   Sparkles,
+  Palette,
   Video
 } from 'lucide-react';
 
