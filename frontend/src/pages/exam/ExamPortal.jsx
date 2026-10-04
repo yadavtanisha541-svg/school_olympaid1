@@ -407,15 +407,14 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
               </div>
 
               {/* Submit Test Button */}
-              <Button
-                variant="danger"
-                size="sm"
-                icon={Send}
+              <button
+                type="button"
                 onClick={() => setShowSubmitModal(true)}
-                className="font-bold shadow-sm"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#fff0f3] hover:bg-[#ffe3e8] text-[#c2185b] border border-[#f8bbd0] font-bold text-xs sm:text-sm shadow-xs transition-all active:scale-95 cursor-pointer"
               >
-                Submit Test
-              </Button>
+                <Send className="w-4 h-4 text-[#c2185b]" />
+                <span>Submit Test</span>
+              </button>
             </div>
           </div>
         </div>
@@ -694,54 +693,46 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
         </div>
       </Modal>
 
-      {/* SUBMIT TEST CONFIRMATION MODAL */}
-      <Modal
-        isOpen={showSubmitModal}
-        onClose={() => setShowSubmitModal(false)}
-        title="Confirm Exam Submission"
-        subtitle="Review your response summary before final evaluation"
-        maxWidth="max-w-lg"
-        footer={
-          <div className="flex items-center justify-end gap-3 w-full">
-            <Button variant="secondary" onClick={() => setShowSubmitModal(false)}>
-              Back to Exam
-            </Button>
-            <Button
-              variant="danger"
-              icon={Send}
-              loading={submitting}
-              onClick={handleSubmitConfirmed}
+      {/* SUBMIT TEST CONFIRMATION MODAL (Matching exact design from user screenshot) */}
+      {showSubmitModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-xl shadow-2xl border border-slate-300 max-w-lg w-full p-6 sm:p-7 relative space-y-6 animate-in zoom-in-95">
+            {/* Top Close 'x' button */}
+            <button
+              type="button"
+              onClick={() => setShowSubmitModal(false)}
+              className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 p-1 text-sm font-bold cursor-pointer"
+              title="Close and stay in test"
             >
-              Submit & Finalize
-            </Button>
-          </div>
-        }
-      >
-        <div className="space-y-4">
-          <p className="text-xs text-slate-600">
-            Are you sure you want to submit your examination? Once submitted, your answers will be evaluated and locked permanently.
-          </p>
+              ✕
+            </button>
 
-          <div className="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
-            <div className="flex items-center justify-between p-2 bg-white rounded-lg border border-slate-200">
-              <span className="text-slate-600 font-medium">Total Questions:</span>
-              <span className="font-bold text-slate-900">{questions.length}</span>
+            <div className="pt-2">
+              <p className="text-sm sm:text-[15px] font-normal text-slate-800 leading-relaxed">
+                Do you want to end test? Please make sure all attempted questions are marked GREEN.
+              </p>
             </div>
-            <div className="flex items-center justify-between p-2 bg-white rounded-lg border border-emerald-200">
-              <span className="text-emerald-700 font-medium">Answered:</span>
-              <span className="font-bold text-emerald-700">{answeredCount}</span>
-            </div>
-            <div className="flex items-center justify-between p-2 bg-white rounded-lg border border-amber-200">
-              <span className="text-amber-700 font-medium">Not Answered:</span>
-              <span className="font-bold text-amber-700">{notAnsweredCount}</span>
-            </div>
-            <div className="flex items-center justify-between p-2 bg-white rounded-lg border border-purple-200">
-              <span className="text-purple-700 font-medium">Marked for Review:</span>
-              <span className="font-bold text-purple-700">{markedCount + markedAnsweredCount}</span>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={handleSubmitConfirmed}
+                className="px-6 py-2 rounded bg-[#0284c7] hover:bg-[#0369a1] text-white font-black text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+              >
+                {submitting ? 'Submitting...' : 'YES'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowSubmitModal(false)}
+                className="px-6 py-2 rounded bg-[#dc2626] hover:bg-[#b91c1c] text-white font-black text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all cursor-pointer"
+              >
+                NO
+              </button>
             </div>
           </div>
         </div>
-      </Modal>
+      )}
     </div>
   );
 };

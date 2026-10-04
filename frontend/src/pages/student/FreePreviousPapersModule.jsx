@@ -533,28 +533,30 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
             <button
               type="button"
               onClick={() => setShowExitConfirm(true)}
-              className="px-5 py-2 bg-[#00b074] hover:bg-[#009260] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#fff0f3] hover:bg-[#ffe3e8] text-[#c2185b] border border-[#f8bbd0] font-bold text-xs sm:text-sm shadow-xs transition-all active:scale-95 cursor-pointer"
             >
-              <span>Submit Test ✨</span>
+              <Send className="w-4 h-4 text-[#c2185b]" />
+              <span>Submit Test</span>
             </button>
           </div>
         </div>
 
         {/* Modal: Exit / Submit Confirmation (Exact replica of user screenshot) */}
         {showExitConfirm && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
-            <div className="bg-white rounded-2xl max-w-lg w-full p-6 border border-slate-200 shadow-2xl space-y-6 relative animate-in zoom-in-95">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
+            <div className="bg-white rounded-xl max-w-lg w-full p-6 sm:p-7 border border-slate-300 shadow-2xl space-y-6 relative animate-in zoom-in-95">
               <button
                 type="button"
                 onClick={() => setShowExitConfirm(false)}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-sm font-bold cursor-pointer p-1"
+                className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 p-1 text-sm font-bold cursor-pointer"
+                title="Close and stay in test"
               >
                 ✕
               </button>
 
               <div className="pt-2">
-                <p className="text-sm sm:text-base font-medium text-slate-800 leading-relaxed">
-                  Do you want to end test? Please make sure all attempted questions are marked <strong className="text-emerald-600 font-bold">GREEN</strong>.
+                <p className="text-sm sm:text-[15px] font-normal text-slate-800 leading-relaxed">
+                  Do you want to end test? Please make sure all attempted questions are marked GREEN.
                 </p>
               </div>
 
@@ -565,14 +567,14 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
                     setShowExitConfirm(false);
                     handleSubmitTest();
                   }}
-                  className="px-5 py-2 rounded-lg bg-[#2980b9] hover:bg-[#2471a3] text-white text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
+                  className="px-6 py-2 rounded bg-[#0284c7] hover:bg-[#0369a1] text-white font-black text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all cursor-pointer"
                 >
                   YES
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowExitConfirm(false)}
-                  className="px-5 py-2 rounded-lg bg-[#c0392b] hover:bg-[#a93226] text-white text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
+                  className="px-6 py-2 rounded bg-[#dc2626] hover:bg-[#b91c1c] text-white font-black text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all cursor-pointer"
                 >
                   NO
                 </button>
@@ -783,10 +785,10 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
                 <button
                   type="button"
                   onClick={() => setShowExitConfirm(true)}
-                  className="w-full py-3 bg-[#00b074] hover:bg-[#009260] text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full py-2.5 rounded-xl bg-[#fff0f3] hover:bg-[#ffe3e8] text-[#c2185b] border border-[#f8bbd0] font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <span>Submit Exam Now</span>
-                  <CheckCircle2 className="w-4 h-4" />
+                  <Send className="w-4 h-4 text-[#c2185b]" />
+                  <span>Submit Test</span>
                 </button>
               </div>
             </div>

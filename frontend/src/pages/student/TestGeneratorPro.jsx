@@ -852,40 +852,51 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
             {/* Submit Button */}
             <button
               type="button"
-              onClick={handleSubmitTest}
-              className="px-4 py-1.5 bg-[#00b074] hover:bg-[#009260] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer"
+              onClick={() => setShowExitConfirm(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#fff0f3] hover:bg-[#ffe3e8] text-[#c2185b] border border-[#f8bbd0] font-bold text-xs sm:text-sm shadow-xs transition-all active:scale-95 cursor-pointer"
             >
-              Submit Test ✨
+              <Send className="w-4 h-4 text-[#c2185b]" />
+              <span>Submit Test</span>
             </button>
           </div>
         </div>
 
-        {/* Modal: Exit Confirmation */}
+        {/* Modal: Submit / Exit Confirmation (Matching exact design from user screenshot) */}
         {showExitConfirm && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
-            <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-slate-200 shadow-2xl space-y-4 text-center">
-              <AlertCircle className="w-12 h-12 text-amber-500 mx-auto" />
-              <h3 className="text-lg font-black text-slate-900">Are you sure you want to exit?</h3>
-              <p className="text-xs text-slate-500">
-                Your answers will be evaluated up to this point and your test will be marked complete.
-              </p>
-              <div className="flex items-center justify-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowExitConfirm(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 cursor-pointer"
-                >
-                  Continue Test
-                </button>
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
+            <div className="bg-white rounded-xl max-w-lg w-full p-6 sm:p-7 border border-slate-300 shadow-2xl space-y-6 relative animate-in zoom-in-95">
+              <button
+                type="button"
+                onClick={() => setShowExitConfirm(false)}
+                className="absolute top-3 right-3 text-slate-400 hover:text-slate-600 p-1 text-sm font-bold cursor-pointer"
+                title="Close and stay in test"
+              >
+                ✕
+              </button>
+
+              <div className="pt-2">
+                <p className="text-sm sm:text-[15px] font-normal text-slate-800 leading-relaxed">
+                  Do you want to end test? Please make sure all attempted questions are marked GREEN.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => {
                     setShowExitConfirm(false);
                     handleSubmitTest();
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 cursor-pointer shadow-sm"
+                  className="px-6 py-2 rounded bg-[#0284c7] hover:bg-[#0369a1] text-white font-black text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all cursor-pointer"
                 >
-                  Yes, Submit &amp; Exit
+                  YES
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowExitConfirm(false)}
+                  className="px-6 py-2 rounded bg-[#dc2626] hover:bg-[#b91c1c] text-white font-black text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all cursor-pointer"
+                >
+                  NO
                 </button>
               </div>
             </div>
@@ -1012,11 +1023,11 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                 ) : (
                   <button
                     type="button"
-                    onClick={handleSubmitTest}
-                    className="px-6 py-2 rounded-xl text-xs font-black text-white bg-[#00b074] hover:bg-[#009260] transition-all cursor-pointer shadow-md flex items-center gap-1"
+                    onClick={() => setShowExitConfirm(true)}
+                    className="px-6 py-2 rounded-xl text-xs font-black text-[#c2185b] bg-[#fff0f3] hover:bg-[#ffe3e8] border border-[#f8bbd0] transition-all cursor-pointer shadow-xs flex items-center gap-2"
                   >
-                    <span>Submit &amp; View Results</span>
-                    <Send className="w-3.5 h-3.5" />
+                    <Send className="w-3.5 h-3.5 text-[#c2185b]" />
+                    <span>Submit Test</span>
                   </button>
                 )}
               </div>
