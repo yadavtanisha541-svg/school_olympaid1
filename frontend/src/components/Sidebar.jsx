@@ -381,10 +381,14 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                       <button
                         type="button"
                         onClick={() => {
-                          onSelectTab('performance');
+                          onSelectTab('analysis');
                           if (onClose) onClose();
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium cursor-pointer"
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all cursor-pointer ${
+                          currentTab === 'analysis' || currentTab === 'exam_solutions'
+                            ? 'bg-[#f4eaf4] text-[#80497D] font-bold'
+                            : 'text-slate-600 hover:bg-[#faf6fa] hover:text-[#80497D] font-medium'
+                        }`}
                       >
                         <TrendingUp className="w-4 h-4 text-slate-400 shrink-0" />
                         <span>Analysis</span>
