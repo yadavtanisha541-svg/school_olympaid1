@@ -125,92 +125,109 @@ export const WorkbookOrdersManagement = () => {
   return (
     <div className="space-y-6 font-sans">
       {/* Header & Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-black text-[#4e2a4a]">
-            Workbook Orders &amp; Dispatches
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Track student &amp; school workbook purchases, digital study kits, physical courier deliveries, and payment summaries.
-          </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="w-14 h-14 rounded-2xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-xs">
+            <BookOpen className="w-7 h-7 text-[#80497D]" />
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight">
+              Workbook Orders &amp; Dispatches
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+              Track student &amp; school workbook purchases, digital study kits, physical courier deliveries, and payment summaries.
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
           <button
             type="button"
             onClick={fetchOrders}
-            className="p-2 bg-white border border-[#edd6ed] text-[#6d3a68] hover:bg-[#faf5fa] rounded-sm text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+            className="px-4 py-2.5 bg-white border border-[#edd6ed] text-[#6d3a68] hover:bg-[#faf5fa] rounded-xl text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-xs"
             title="Refresh List"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Refresh</span>
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
           </button>
 
           <button
             type="button"
             onClick={exportCsv}
             disabled={orders.length === 0}
-            className="px-3.5 py-2 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-sm text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs disabled:opacity-50"
+            className="px-5 py-2.5 bg-[#80497D] hover:bg-[#6c3b69] text-white rounded-xl text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-md disabled:opacity-50"
           >
-            <Download className="w-3.5 h-3.5 text-[#e7b84b]" />
+            <Download className="w-4 h-4 text-[#e7b84b]" />
             <span>Export CSV</span>
           </button>
         </div>
       </div>
 
       {/* KPI Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-sm border border-[#edd6ed] shadow-2xs">
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Orders</p>
-          <div className="flex items-center justify-between mt-1">
-            <p className="text-2xl font-black text-[#4e2a4a]">{orders.length}</p>
-            <ShoppingBag className="w-5 h-5 text-[#6d3a68]/40" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
+            <ShoppingBag className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Orders</p>
+            <h3 className="text-2xl sm:text-3xl font-black text-[#80497D] mt-0.5 font-mono">{orders.length}</h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Total placed</p>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-sm border border-[#edd6ed] shadow-2xs">
-          <p className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Total Order Volume</p>
-          <div className="flex items-center justify-between mt-1">
-            <p className="text-2xl font-black text-emerald-700">₹{totalRevenue.toLocaleString()}</p>
-            <DollarSign className="w-5 h-5 text-emerald-600/40" />
+        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
+            <DollarSign className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Volume</p>
+            <h3 className="text-2xl sm:text-3xl font-black text-emerald-600 mt-0.5 font-mono">₹{totalRevenue.toLocaleString()}</h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Total revenue</p>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-sm border border-[#edd6ed] shadow-2xs">
-          <p className="text-[11px] font-bold text-blue-600 uppercase tracking-wider">Physical Couriers</p>
-          <div className="flex items-center justify-between mt-1">
-            <p className="text-2xl font-black text-blue-700">{physicalCount}</p>
-            <Truck className="w-5 h-5 text-blue-600/40" />
+        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
+            <Truck className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Physical Couriers</p>
+            <h3 className="text-2xl sm:text-3xl font-black text-blue-600 mt-0.5 font-mono">{physicalCount}</h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Printed books</p>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-sm border border-[#edd6ed] shadow-2xs">
-          <p className="text-[11px] font-bold text-purple-600 uppercase tracking-wider">Instant E-Books</p>
-          <div className="flex items-center justify-between mt-1">
-            <p className="text-2xl font-black text-purple-700">{digitalCount}</p>
-            <BookOpen className="w-5 h-5 text-purple-600/40" />
+        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 shrink-0">
+            <BookOpen className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Instant E-Books</p>
+            <h3 className="text-2xl sm:text-3xl font-black text-purple-600 mt-0.5 font-mono">{digitalCount}</h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">PDF editions</p>
           </div>
         </div>
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="bg-white p-3.5 rounded-sm border border-[#edd6ed] shadow-2xs flex flex-col md:flex-row items-center gap-3">
+      <div className="bg-white p-4 rounded-2xl border border-[#edd6ed] shadow-2xs flex flex-col md:flex-row items-center gap-3">
         <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4.5 h-4.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search by Order ID, customer name, email, WhatsApp, or class..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-[#faf5fa] border border-[#edd6ed] rounded-sm text-xs font-medium text-[#4e2a4a] placeholder:text-slate-400 focus:outline-none focus:border-[#6d3a68]"
+            className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-xl text-sm font-medium text-[#4e2a4a] placeholder:text-slate-400 focus:outline-none focus:border-[#6d3a68]"
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto">
+        <div className="flex items-center gap-2.5 w-full md:w-auto">
           <select
             value={filterFormat}
             onChange={(e) => setFilterFormat(e.target.value)}
-            className="px-2.5 py-1.5 bg-white border border-[#edd6ed] rounded-sm text-xs font-semibold text-[#4e2a4a] focus:outline-none focus:border-[#6d3a68]"
+            className="px-3.5 py-2.5 bg-white border border-[#edd6ed] rounded-xl text-sm font-semibold text-[#4e2a4a] focus:outline-none focus:border-[#6d3a68] cursor-pointer"
           >
             <option value="All">All Formats</option>
             <option value="physical">Physical Book (+ Delivery)</option>
@@ -220,7 +237,7 @@ export const WorkbookOrdersManagement = () => {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-2.5 py-1.5 bg-white border border-[#edd6ed] rounded-sm text-xs font-semibold text-[#4e2a4a] focus:outline-none focus:border-[#6d3a68]"
+            className="px-3.5 py-2.5 bg-white border border-[#edd6ed] rounded-xl text-sm font-semibold text-[#4e2a4a] focus:outline-none focus:border-[#6d3a68] cursor-pointer"
           >
             <option value="All">All Statuses</option>
             <option value="confirmed">Confirmed</option>
@@ -233,10 +250,10 @@ export const WorkbookOrdersManagement = () => {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white rounded-sm border border-[#edd6ed] shadow-xs overflow-hidden">
+      <div className="bg-white rounded-2xl border border-[#edd6ed] shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-[#2a1b29]">
-            <thead className="bg-[#faf5fa] text-[#4e2a4a] font-bold uppercase tracking-wider text-[10px] border-b border-[#edd6ed]">
+          <table className="w-full text-left text-sm text-[#2a1b29]">
+            <thead className="bg-[#faf5fa] text-[#4e2a4a] font-bold uppercase tracking-wider text-xs border-b border-[#edd6ed]">
               <tr>
                 <th className="py-3 px-4">Order ID &amp; Date</th>
                 <th className="py-3 px-4">Customer &amp; Contact</th>
