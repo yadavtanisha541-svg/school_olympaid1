@@ -559,7 +559,7 @@ export const App = () => {
       );
     }
 
-    if (currentTab === 'exam_solutions' || currentTab === 'analysis') {
+    if (currentTab === 'exam_solutions' && activeSolutionAttemptId) {
       return (
         <DetailedSolutionsPage
           attemptId={activeSolutionAttemptId}
@@ -715,7 +715,6 @@ export const App = () => {
               onViewCertificate={(certId) => handleOpenCertificateById(certId)}
             />
           );
-        case 'analysis':
         case 'exam_solutions':
           return (
             <DetailedSolutionsPage
@@ -731,7 +730,9 @@ export const App = () => {
               onNavigateTab={setCurrentTab}
             />
           );
+        case 'analysis':
         case 'performance':
+        case 'statistics':
           return (
             <StudentPerformancePage
               onNavigateTab={setCurrentTab}
