@@ -949,65 +949,107 @@ Section: General Awareness`);
         </div>
       </div>
 
-      {/* Main Tabs Navigation */}
-      <div className="bg-white rounded-2xl border border-[#edd6ed] p-1.5 flex items-center gap-2 shadow-2xs overflow-x-auto">
-        <button
-          type="button"
-          onClick={() => setActiveTab('exam_papers')}
-          className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'exam_papers'
-              ? 'bg-[#4e2a4a] text-white shadow-xs'
-              : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          <Sparkles className="w-4 h-4 text-[#e7b84b]" />
-          <span>Subject Mock Test Series Covers &amp; Tests ({examPapers.length})</span>
-        </button>
+      {/* 2. Rich Top Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Mock Series Covers */}
+        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
+            <Sparkles className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Series Covers</p>
+            <h3 className="text-2xl font-black text-[#80497D] mt-0.5 font-mono">{examPapers.length}</h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Subject test series</p>
+          </div>
+        </div>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab('packages')}
-          className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'packages'
-              ? 'bg-[#4e2a4a] text-white shadow-xs'
-              : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          <Package className="w-4 h-4" />
-          <span>Study Packages &amp; Bundles ({packages.length})</span>
-        </button>
+        {/* Study Packages */}
+        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-orange-50 text-[#C35B3F] flex items-center justify-center border border-orange-100 shrink-0">
+            <Package className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Study Bundles</p>
+            <h3 className="text-2xl font-black text-[#C35B3F] mt-0.5 font-mono">{packages.length}</h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">All-in-one packages</p>
+          </div>
+        </div>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab('orders')}
-          className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'orders'
-              ? 'bg-[#4e2a4a] text-white shadow-xs'
-              : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          <ShoppingBag className="w-4 h-4" />
-          <span>Student Purchases &amp; Orders ({orders.length})</span>
-        </button>
+        {/* Subjects Covered */}
+        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
+            <Award className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Subjects Covered</p>
+            <h3 className="text-2xl font-black text-emerald-600 mt-0.5 font-mono">6 Majors</h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">IMO, NSO, IEO, ICSO, IGKO</p>
+          </div>
+        </div>
+
+        {/* Student Orders */}
+        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
+            <ShoppingBag className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Student Orders</p>
+            <h3 className="text-2xl font-black text-blue-600 mt-0.5 font-mono">{orders.length}</h3>
+            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Verified enrollments</p>
+          </div>
+        </div>
       </div>
 
-      {/* Controls Bar: Subject & Class Dual Filter */}
-      <div className="bg-white rounded-2xl p-4 border border-[#edd6ed] shadow-2xs space-y-3.5">
+      {/* 3. Sub-Navigation Tabs */}
+      <div className="flex items-center gap-2.5 border-b border-[#ebd7eb] pb-3 overflow-x-auto">
+        {[
+          { id: 'exam_papers', label: 'Subject Mock Test Series Covers & Tests', icon: Sparkles, count: examPapers.length },
+          { id: 'packages', label: 'Study Packages & Bundles', icon: Package, count: packages.length },
+          { id: 'orders', label: 'Student Purchases & Orders', icon: ShoppingBag, count: orders.length }
+        ].map(tab => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
+                isActive
+                  ? 'bg-[#80497D] text-white shadow-md shadow-[#80497D]/20'
+                  : 'bg-white text-slate-600 border border-[#ebd7eb] hover:bg-[#faf6fa] hover:text-[#80497D]'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{tab.label}</span>
+              {tab.count !== undefined && (
+                <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                  isActive ? 'bg-white/20 text-white' : 'bg-[#f4eaf4] text-[#80497D]'
+                }`}>
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 4. Controls Bar: Subject & Class Dual Filter */}
+      <div className="bg-white rounded-2xl p-5 border border-[#edd6ed] shadow-2xs space-y-4">
         {/* Subject Selector Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 border-b border-slate-100 pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 border-b border-slate-100 pb-3.5">
           <span className="text-xs font-black text-[#6d3a68] uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1.5">
             <BookOpen className="w-4 h-4 text-[#80497D]" />
             Select Subject:
           </span>
-          <div className="flex flex-wrap gap-1.5 items-center">
+          <div className="flex flex-wrap gap-2 items-center">
             {SUBJECTS_LIST.map((subj) => (
               <button
                 key={subj.code}
                 type="button"
                 onClick={() => setPackageSubjectFilter(subj.code)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all ${
                   packageSubjectFilter === subj.code
-                    ? 'bg-[#4e2a4a] text-white shadow-xs font-black'
+                    ? 'bg-[#80497D] text-white shadow-xs font-black'
                     : 'bg-[#faf5fa] text-[#6d3a68] border border-[#ebd7eb] hover:bg-[#f4ebf4]'
                 }`}
               >
@@ -1027,7 +1069,7 @@ Section: General Awareness`);
                 onClick={() => setPackageClassFilter('All')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
                   packageClassFilter === 'All'
-                    ? 'bg-[#4e2a4a] text-white shadow-xs font-black'
+                    ? 'bg-[#80497D] text-white shadow-xs font-black'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
@@ -1040,7 +1082,7 @@ Section: General Awareness`);
                   onClick={() => setPackageClassFilter(c)}
                   className={`px-2.5 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
                     packageClassFilter === c
-                      ? 'bg-[#4e2a4a] text-white shadow-xs font-black'
+                      ? 'bg-[#80497D] text-white shadow-xs font-black'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -1050,28 +1092,21 @@ Section: General Awareness`);
             </div>
           </div>
 
-          {activeTab === 'exam_papers' ? (
-            <button
-              type="button"
-              onClick={handleOpenCreatePaper}
-              className="px-4 py-2.5 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white font-black text-xs transition-all shadow-sm active:scale-95 cursor-pointer flex items-center gap-2 shrink-0 self-start lg:self-auto"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Mock Test Paper</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                setEditingPackage(null);
-                setShowModal(true);
-              }}
-              className="px-4 py-2.5 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white font-black text-xs transition-all shadow-sm active:scale-95 cursor-pointer flex items-center gap-2 shrink-0 self-start lg:self-auto"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Study Package</span>
-            </button>
-          )}
+          <div className="flex items-center gap-2 self-end lg:self-auto">
+            {activeTab !== 'exam_papers' && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingPackage(null);
+                  setShowModal(true);
+                }}
+                className="px-4 py-2 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white font-black text-xs transition-all shadow-sm active:scale-95 cursor-pointer flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Study Package</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
