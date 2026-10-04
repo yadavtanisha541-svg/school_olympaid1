@@ -1264,26 +1264,6 @@ Explanation: Sir Tim Berners-Lee invented the WWW at CERN in 1989.`}
           {/* ------------------------------------------------------------------- */}
           {!selectedSubjectCover ? (
             <div className="space-y-6">
-              {/* Directory Hero Banner */}
-              <div className="bg-gradient-to-r from-[#4e2a4a] via-[#6d3a68] to-[#859900] rounded-3xl p-6 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <span className="text-xs font-black uppercase tracking-wider text-[#e7b84b]">
-                    Subject Series Covers
-                  </span>
-                  <h2 className="text-xl sm:text-2xl font-black">
-                    Select a Subject Cover to Open its Mock Tests &amp; Questions
-                  </h2>
-                  <p className="text-xs text-white/80 max-w-xl">
-                    Each Subject Cover holds multiple full-length mock tests. Click on any Subject Cover below to view its tests and edit individual questions.
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs bg-white/20 px-3 py-1.5 rounded-xl font-black">
-                    {packageClassFilter} Active
-                  </span>
-                </div>
-              </div>
-
               {/* Grid of Subject Series Covers */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {subjectCoversDirectory.map((cover) => {
