@@ -414,8 +414,24 @@ export const SuperAdminPackagesManager = () => {
   const [packages, setPackages] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loadingPackages, setLoadingPackages] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showPackageModal, setShowPackageModal] = useState(false);
   const [editingPackage, setEditingPackage] = useState(null);
+  const [packageForm, setPackageForm] = useState({
+    title: '',
+    class_name: 'Class 6',
+    subject_code: 'IMO',
+    price: '1499',
+    original_price: '1999',
+    header_color: '#0284c7',
+    status: 'active',
+    points: [
+      'Comprehensive Chapter-wise Theory & Formula Booklets',
+      '10 Full-Length Timed Model Examination Papers',
+      'Detailed Video Solutions & Step-by-Step Analysis',
+      'Instant Lifetime Digital Access Across All Devices'
+    ]
+  });
+  const [newPackagePoint, setNewPackagePoint] = useState('');
 
   const fetchPackages = async () => {
     setLoadingPackages(true);
@@ -429,6 +445,113 @@ export const SuperAdminPackagesManager = () => {
     } finally {
       setLoadingPackages(false);
     }
+  };
+
+  const handleOpenCreatePackage = () => {
+    setEditingPackage(null);
+    setPackageForm({
+      title: 'New Comprehensive Olympiad Study Package',
+      class_name: packageClassFilter !== 'All' ? packageClassFilter : 'Class 6',
+      subject_code: 'IMO',
+      price: '1499',
+      original_price: '1999',
+      header_color: '#0284c7',
+      status: 'active',
+      points: [
+        'Comprehensive Chapter-wise Theory & Formula Booklets',
+        '10 Full-Length Timed Model Examination Papers',
+        'Detailed Video Solutions & Step-by-Step Analysis',
+        'Instant Lifetime Digital Access Across All Devices'
+      ]
+    });
+    setNewPackagePoint('');
+    setShowPackageModal(true);
+  };
+
+  const handleOpenEditPackage = (pkg) => {
+    setEditingPackage(pkg);
+    setPackageForm({
+      title: pkg.title || '',
+      class_name: pkg.class_name || 'Class 6',
+      subject_code: pkg.subject_code || 'IMO',
+      price: String(pkg.price || '1499'),
+      original_price: String(pkg.original_price || '1999'),
+      header_color: pkg.header_color || '#0284c7',
+      status: pkg.status || 'active',
+      points: Array.isArray(pkg.points) ? [...pkg.points] : [
+        'Comprehensive Chapter-wise Theory & Formula Booklets',
+        '10 Full-Length Timed Model Examination Papers'
+      ]
+    });
+    setNewPackagePoint('');
+    setShowPackageModal(true);
+  };
+
+  const handleSavePackage = async (e) => {
+    e?.preventDefault();
+    if (!packageForm.title.trim()) {
+      showToast('Please enter a Package Title', 'error');
+      return;
+    }
+    try {
+      const payload = {
+        title: packageForm.title,
+        class_name: packageForm.class_name,
+        subject_code: packageForm.subject_code,
+        price: Number(packageForm.price) || 999,
+        original_price: Number(packageForm.original_price) || 1499,
+        header_color: packageForm.header_color || '#0284c7',
+        status: packageForm.status || 'active',
+        points: packageForm.points || []
+      };
+
+      if (editingPackage) {
+        await apiClient.put(`/packages/${editingPackage.id}`, payload);
+        showToast('✓ Study Package updated successfully in Database and Live Website!');
+      } else {
+        await apiClient.post('/packages', payload);
+        showToast('✓ New Study Package created and live on Student Dashboard!');
+      }
+      setShowPackageModal(false);
+      fetchPackages();
+    } catch (err) {
+      console.warn('Save package error:', err);
+      showToast('Failed to save package.', 'error');
+    }
+  };
+
+  const handleDeletePackage = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this Study Package?')) return;
+    try {
+      await apiClient.delete(`/packages/${id}`);
+      fetchPackages();
+      showToast('✓ Study Package deleted successfully from Database.', 'info');
+    } catch (err) {
+      console.warn('Delete package error:', err);
+      showToast('Failed to delete package.', 'error');
+    }
+  };
+
+  const handleAddPackagePoint = () => {
+    if (!newPackagePoint.trim()) return;
+    setPackageForm({
+      ...packageForm,
+      points: [...packageForm.points, newPackagePoint.trim()]
+    });
+    setNewPackagePoint('');
+  };
+
+  const handleRemovePackagePoint = (idx) => {
+    setPackageForm({
+      ...packageForm,
+      points: packageForm.points.filter((_, i) => i !== idx)
+    });
+  };
+
+  const handleUpdatePackagePoint = (idx, val) => {
+    const updated = [...packageForm.points];
+    updated[idx] = val;
+    setPackageForm({ ...packageForm, points: updated });
   };
 
   const fetchOrders = async () => {
@@ -1511,26 +1634,47 @@ Explanation: Sir Tim Berners-Lee invented the WWW at CERN in 1989.`}
       {/* ========================================================================= */}
       {activeTab === 'packages' && (
         <div className="space-y-6 animate-in fade-in">
+          {/* Top Bar for Packages */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-slate-900">
+                All-in-One Study Packages Studio ({packages.length})
+              </h2>
+              <p className="text-xs text-slate-500 font-medium">
+                Create, edit features, set pricing, or delete packages live from the Student Dashboard.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleOpenCreatePackage}
+              className="px-4 py-2.5 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white font-black text-xs sm:text-sm shadow-xs active:scale-95 cursor-pointer flex items-center gap-1.5 transition-all self-start sm:self-auto"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Create New Study Package</span>
+            </button>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {packages.map((pkg) => (
               <div
                 key={pkg.id}
-                className="bg-white rounded-2xl border-2 border-sky-300 p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 relative"
+                className="bg-white rounded-2xl border-2 border-sky-300 p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 relative overflow-hidden"
               >
                 <div>
                   <div
-                    className="text-white text-center py-2.5 px-3 rounded-t-xl -mt-5 -mx-5 font-black text-xs sm:text-sm shadow-xs mb-3"
+                    className="text-white text-center py-2.5 px-3 rounded-t-xl -mt-5 -mx-5 font-black text-xs sm:text-sm shadow-xs mb-3 truncate"
                     style={{ backgroundColor: pkg.header_color || '#4895d9' }}
                   >
                     {pkg.title}
                   </div>
 
                   <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px]">
-                      {pkg.class_name} &bull; {pkg.subject_code}
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px]">
+                      {pkg.class_name || 'Class 6'} &bull; {pkg.subject_code || 'ALL'}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px]">
-                      {Array.isArray(pkg.sub_items) ? pkg.sub_items.length : 6} Items
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px]">
+                      {Array.isArray(pkg.points) ? pkg.points.length : (Array.isArray(pkg.sub_items) ? pkg.sub_items.length : 4)} Key Features
                     </span>
                   </div>
 
@@ -1544,14 +1688,256 @@ Explanation: Sir Tim Berners-Lee invented the WWW at CERN in 1989.`}
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 space-y-2">
-                  <div className="text-center text-xs font-bold text-slate-500">
-                    Price: <span className="font-black text-[#6d3a68]">₹{parseFloat(pkg.price).toFixed(2)}</span>
+                <div className="pt-3 border-t border-slate-100 space-y-3">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-600">
+                    <div>
+                      <span>Price: </span>
+                      <span className="font-black text-base text-[#6d3a68]">₹{parseFloat(pkg.price).toFixed(2)}</span>
+                      {pkg.original_price && (
+                        <span className="ml-2 text-slate-400 line-through text-[11px]">
+                          ₹{parseFloat(pkg.original_price).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      Live
+                    </span>
+                  </div>
+
+                  {/* SuperAdmin Edit & Delete Action Buttons */}
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 bg-slate-50 -mx-5 -mb-5 p-3">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditPackage(pkg)}
+                      className="px-3.5 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                    >
+                      <Edit className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Edit</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeletePackage(pkg.id)}
+                      className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-red-600 hover:bg-red-50 text-xs transition-all cursor-pointer flex items-center gap-1"
+                      title="Delete Study Package"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                      <span className="text-xs font-bold text-rose-600">Delete</span>
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* PACKAGE CREATE / EDIT MODAL */}
+          {showPackageModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
+                {/* Modal Header */}
+                <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-xs shadow-2xs"
+                      style={{ backgroundColor: packageForm.header_color || '#0284c7' }}
+                    >
+                      <Package className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-black text-slate-900">
+                        {editingPackage ? 'Edit Study Package' : 'Create New Study Package'}
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Changes save immediately to the Database and update the live student catalog.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowPackageModal(false)}
+                    className="w-8 h-8 rounded-xl bg-slate-200/60 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-black transition-colors cursor-pointer"
+                  >
+                    &times;
+                  </button>
+                </div>
+
+                {/* Modal Form Body */}
+                <form onSubmit={handleSavePackage} className="p-6 space-y-4 overflow-y-auto flex-1 text-xs">
+                  <div>
+                    <label className="block font-black text-slate-700 mb-1">
+                      Package Title <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={packageForm.title}
+                      onChange={(e) => setPackageForm({ ...packageForm, title: e.target.value })}
+                      placeholder="e.g. Olympiads Level-2 Champs Package - Class 6"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-800 outline-none focus:border-[#4e2a4a]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-black text-slate-700 mb-1">Class / Grade</label>
+                      <select
+                        value={packageForm.class_name}
+                        onChange={(e) => setPackageForm({ ...packageForm, class_name: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-800 bg-white cursor-pointer"
+                      >
+                        {CLASSES_LIST.map((cls) => (
+                          <option key={cls} value={cls}>
+                            {cls}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-black text-slate-700 mb-1">Subject</label>
+                      <select
+                        value={packageForm.subject_code}
+                        onChange={(e) => setPackageForm({ ...packageForm, subject_code: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-800 bg-white cursor-pointer"
+                      >
+                        {SUBJECTS_LIST.map((sub) => (
+                          <option key={sub.code} value={sub.code}>
+                            {sub.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-black text-slate-700 mb-1">Offer Price (₹)</label>
+                      <input
+                        type="number"
+                        value={packageForm.price}
+                        onChange={(e) => setPackageForm({ ...packageForm, price: e.target.value })}
+                        placeholder="e.g. 1499"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-800"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-black text-slate-700 mb-1">Original Cut Price (₹)</label>
+                      <input
+                        type="number"
+                        value={packageForm.original_price}
+                        onChange={(e) => setPackageForm({ ...packageForm, original_price: e.target.value })}
+                        placeholder="e.g. 1999"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-800"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Header Color Palette */}
+                  <div>
+                    <label className="block font-black text-slate-700 mb-1.5">Header Banner Color</label>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {[
+                        { color: '#0284c7', label: 'Sky Blue' },
+                        { color: '#059669', label: 'Emerald' },
+                        { color: '#d97706', label: 'Amber' },
+                        { color: '#ea580c', label: 'Orange' },
+                        { color: '#7c3aed', label: 'Purple' },
+                        { color: '#db2777', label: 'Pink' },
+                        { color: '#1e3a8a', label: 'Navy' },
+                        { color: '#859900', label: 'Olive' },
+                        { color: '#4e2a4a', label: 'Plum' }
+                      ].map((item) => (
+                        <button
+                          key={item.color}
+                          type="button"
+                          onClick={() => setPackageForm({ ...packageForm, header_color: item.color })}
+                          className={`w-7 h-7 rounded-xl flex items-center justify-center cursor-pointer transition-all ${
+                            packageForm.header_color === item.color
+                              ? 'ring-2 ring-offset-2 ring-slate-800 scale-110'
+                              : 'hover:scale-105'
+                          }`}
+                          style={{ backgroundColor: item.color }}
+                          title={item.label}
+                        >
+                          {packageForm.header_color === item.color && (
+                            <Check className="w-4 h-4 text-white font-black" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Bullet Points Editor */}
+                  <div className="space-y-2 pt-2 border-t border-slate-100">
+                    <label className="block font-black text-slate-700">Package Features / Highlights</label>
+                    <div className="space-y-2">
+                      {packageForm.points.map((pt, pIdx) => (
+                        <div key={pIdx} className="flex items-center gap-2">
+                          <span className="w-5 text-slate-400 font-mono font-bold text-center">{pIdx + 1}.</span>
+                          <input
+                            type="text"
+                            value={pt}
+                            onChange={(e) => handleUpdatePackagePoint(pIdx, e.target.value)}
+                            className="flex-1 px-3 py-2 rounded-xl border border-slate-200 font-medium text-slate-800 bg-slate-50"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemovePackagePoint(pIdx)}
+                            className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+
+                      {/* Add new point input */}
+                      <div className="flex items-center gap-2 pt-1">
+                        <input
+                          type="text"
+                          value={newPackagePoint}
+                          onChange={(e) => setNewPackagePoint(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAddPackagePoint();
+                            }
+                          }}
+                          placeholder="+ Type new feature and click Add..."
+                          className="flex-1 px-3 py-2 rounded-xl border border-slate-300 font-medium text-slate-800 bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddPackagePoint}
+                          className="px-3 py-2 bg-[#4e2a4a] text-white rounded-xl font-bold cursor-pointer hover:bg-[#3d203a]"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Footer Buttons */}
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setShowPackageModal(false)}
+                      className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white font-black shadow-md cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Check className="w-4 h-4" />
+                      <span>{editingPackage ? 'Save Package Changes' : 'Create Package'}</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
