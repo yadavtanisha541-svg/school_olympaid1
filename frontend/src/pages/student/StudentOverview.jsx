@@ -384,18 +384,18 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult }) =>
       {/* ========================================================================= */}
       {/* 2. SECTION: OLYMPIAD SUBJECTS (6 Modern Pastel Cards Grid)                 */}
       {/* ========================================================================= */}
-      <div className="space-y-3.5 pt-2">
+      <div className="space-y-4 pt-2">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
-            <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-[#2563eb]" />
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+              <BookOpen className="w-6 h-6 text-[#2563eb]" />
               <span>Olympiad Subjects</span>
             </h2>
           </div>
         </div>
 
         {/* 6 Simple Square Subject Cards matching sidebar */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3.5 sm:gap-4 w-full">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5 w-full">
           {[
             {
               key: 'content_icso',
@@ -449,27 +449,27 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult }) =>
             <div
               key={sub.key}
               onClick={() => onNavigateTab(sub.key)}
-              className="bg-white rounded-2xl border border-slate-200 hover:border-[#2563eb] p-4 sm:p-5 shadow-2xs hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center aspect-square group hover:-translate-y-1"
+              className="bg-white rounded-3xl border-2 border-slate-200/80 hover:border-[#2563eb] p-5 sm:p-6 shadow-xs hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[210px] sm:min-h-[230px] group hover:-translate-y-1.5"
             >
               {/* Square Icon Container */}
-              <div className={`w-12 h-12 rounded-xl border ${sub.iconBg} ${sub.iconColor} flex items-center justify-center shadow-2xs group-hover:scale-110 transition-transform shrink-0`}>
-                <sub.icon className="w-6 h-6" />
+              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border ${sub.iconBg} ${sub.iconColor} flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform shrink-0`}>
+                <sub.icon className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
 
               {/* Subject Title & Subtitle */}
-              <div className="space-y-0.5 my-auto">
-                <h3 className="font-black text-slate-900 text-xs sm:text-sm tracking-tight group-hover:text-[#2563eb] transition-colors leading-tight">
+              <div className="space-y-1 my-auto pt-2">
+                <h3 className="font-black text-slate-900 text-sm sm:text-base tracking-tight group-hover:text-[#2563eb] transition-colors leading-snug">
                   {sub.title}
                 </h3>
-                <p className="text-[10px] text-slate-400 font-medium truncate">
+                <p className="text-xs text-slate-500 font-semibold truncate">
                   {sub.subtitle}
                 </p>
               </div>
 
               {/* Bottom Simple Indicator */}
-              <div className="w-full pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400 group-hover:text-[#2563eb] transition-colors">
+              <div className="w-full pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-black text-slate-500 group-hover:text-[#2563eb] transition-colors">
                 <span>0% Done</span>
-                <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           ))}
@@ -479,27 +479,27 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult }) =>
       {/* ========================================================================= */}
       {/* 3. SECTION: TWO FEATURED BANNERS (Matches exact brand colors)               */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2">
         
         {/* Left Banner: Reasoning Online Classes */}
-        <div className="bg-[#faf6fa] rounded-3xl border border-[#ebd7eb] p-5 sm:p-6 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-4">
+        <div className="bg-[#faf6fa] rounded-3xl border-2 border-[#ebd7eb] p-6 sm:p-7 shadow-xs hover:shadow-lg transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
           <div className="flex items-center gap-4 min-w-0">
             {/* Open Book with Bulb Vector Illustration */}
-            <div className="w-14 h-14 rounded-2xl bg-white border border-[#ebd7eb] flex items-center justify-center shadow-xs shrink-0 text-[#80497D]">
+            <div className="w-16 h-16 rounded-2xl bg-white border border-[#ebd7eb] flex items-center justify-center shadow-xs shrink-0 text-[#80497D]">
               <div className="relative">
-                <BookOpen className="w-7 h-7 text-[#80497D]" />
-                <Lightbulb className="w-4 h-4 text-[#e7b84b] fill-[#e7b84b] absolute -top-1.5 -right-1.5" />
+                <BookOpen className="w-8 h-8 text-[#80497D]" />
+                <Lightbulb className="w-4 h-4 text-[#e7b84b] fill-[#e7b84b] absolute -top-1 -right-1" />
               </div>
             </div>
 
-            <div className="min-w-0 space-y-1">
-              <span className="inline-block px-2.5 py-0.5 rounded-md bg-[#f4eaf4] text-[#80497D] text-[9px] font-black uppercase tracking-wider">
+            <div className="min-w-0 space-y-1.5">
+              <span className="inline-block px-3 py-1 rounded-lg bg-[#f4eaf4] text-[#80497D] text-[10px] font-black uppercase tracking-wider border border-[#ebd7eb]">
                 FEATURED
               </span>
-              <h3 className="text-xs sm:text-sm font-black text-slate-900 leading-snug">
+              <h3 className="text-sm sm:text-base font-black text-slate-900 leading-snug">
                 Reasoning Online Classes for IMO, ISO(NSO) &amp; IEO
               </h3>
-              <p className="text-[11px] text-slate-500 font-medium">
+              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
                 Get expert guidance and improve your problem-solving skills.
               </p>
             </div>
@@ -508,32 +508,32 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult }) =>
           <button
             type="button"
             onClick={() => onNavigateTab('my_classes')}
-            className="px-5 sm:px-6 py-2.5 sm:py-3 bg-[#80497D] hover:bg-[#683965] text-white rounded-full text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1.5"
+            className="w-full sm:w-auto px-6 py-3.5 bg-[#80497D] hover:bg-[#683965] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2"
           >
             <span>ENROLL NOW</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
         {/* Right Banner: Olympiad Intelligent Test Generator Pro */}
-        <div className="bg-[#fdf7f5] rounded-3xl border border-[#f6d6cc] p-5 sm:p-6 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-4">
+        <div className="bg-[#fdf7f5] rounded-3xl border-2 border-[#f6d6cc] p-6 sm:p-7 shadow-xs hover:shadow-lg transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
           <div className="flex items-center gap-4 min-w-0">
             {/* Target & Checklist Illustration */}
-            <div className="w-14 h-14 rounded-2xl bg-white border border-[#f6d6cc] flex items-center justify-center shadow-xs shrink-0 text-[#C35B3F]">
+            <div className="w-16 h-16 rounded-2xl bg-white border border-[#f6d6cc] flex items-center justify-center shadow-xs shrink-0 text-[#C35B3F]">
               <div className="relative">
-                <FileSpreadsheet className="w-7 h-7 text-[#C35B3F]" />
-                <Target className="w-4 h-4 text-[#dc2626] absolute -top-1.5 -right-1.5" />
+                <FileSpreadsheet className="w-8 h-8 text-[#C35B3F]" />
+                <Target className="w-4 h-4 text-[#dc2626] absolute -top-1 -right-1" />
               </div>
             </div>
 
-            <div className="min-w-0 space-y-1">
-              <span className="inline-block px-2.5 py-0.5 rounded-md bg-[#fbeee9] text-[#C35B3F] text-[9px] font-black uppercase tracking-wider">
+            <div className="min-w-0 space-y-1.5">
+              <span className="inline-block px-3 py-1 rounded-lg bg-[#fbeee9] text-[#C35B3F] text-[10px] font-black uppercase tracking-wider border border-[#f6d6cc]">
                 PRO TOOL
               </span>
-              <h3 className="text-xs sm:text-sm font-black text-slate-900 leading-snug">
+              <h3 className="text-sm sm:text-base font-black text-slate-900 leading-snug">
                 Olympiad Intelligent Test Generator Pro
               </h3>
-              <p className="text-[11px] text-slate-500 font-medium">
+              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
                 Create your own Olympiad tests in seconds.
               </p>
             </div>
@@ -542,10 +542,10 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult }) =>
           <button
             type="button"
             onClick={() => onNavigateTab('test_generator')}
-            className="px-5 sm:px-6 py-2.5 sm:py-3 bg-[#C35B3F] hover:bg-[#b04c31] text-white rounded-full text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1.5"
+            className="w-full sm:w-auto px-6 py-3.5 bg-[#C35B3F] hover:bg-[#b04c31] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2"
           >
             <span>TRY NOW</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
