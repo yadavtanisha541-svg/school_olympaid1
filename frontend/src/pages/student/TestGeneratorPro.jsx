@@ -28,8 +28,10 @@ import {
   Send,
   BookOpen,
   Printer,
-  ArrowLeft
+  ArrowLeft,
+  Download
 } from 'lucide-react';
+import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 
 const CHAPTERS_BY_SUBJECT = {
   reasoning: [
@@ -280,6 +282,33 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   const handleBackToConfigure = () => {
     setGeneratorStep('configure');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // PDF Terms & Conditions Modal State
+  const [pdfModalPaper, setPdfModalPaper] = useState(null);
+
+  const handleOpenPdfForCurrentSetup = () => {
+    const targetPaper = getMatchingPaper(selectedGrade, selectedSubject);
+    if (targetPaper && Array.isArray(targetPaper.questions) && targetPaper.questions.length > 0) {
+      setPdfModalPaper(targetPaper);
+    } else {
+      const generated = generateIntelligentOlympiadTest({
+        subject: selectedSubject,
+        grade: selectedGrade,
+        level: selectedLevel,
+        difficulty: selectedDifficulty,
+        questionCount: questionCount || 10,
+        selectedChapters: selectedChapters
+      });
+      setPdfModalPaper({
+        title: `${selectedGrade} ${subjectsMap[selectedSubject]?.name || selectedSubject} - Olympiad Test Paper`,
+        subject: selectedSubject,
+        subject_code: subjectsMap[selectedSubject]?.code || selectedSubject.toUpperCase(),
+        duration_minutes: testDurationMinutes || 15,
+        total_marks: generated.length,
+        questions: generated
+      });
+    }
   };
 
   // Active Test Session State
@@ -1189,7 +1218,16 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                type="button"
+                onClick={handleOpenPdfForCurrentSetup}
+                className="px-4 py-2.5 rounded-xl border border-blue-400 bg-blue-50 hover:bg-blue-100 text-blue-700 font-black text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                title="Download Question Paper PDF with Terms & Conditions"
+              >
+                <Download className="w-4 h-4 text-blue-600" />
+                <span>Download PDF</span>
+              </button>
               <button
                 type="button"
                 onClick={handleBackToConfigure}
@@ -1378,19 +1416,30 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
               <span>Back / Change Settings</span>
             </button>
 
-            <button
-              type="button"
-              disabled={!hasAgreedInstructions}
-              onClick={handleStartTest}
-              className={`w-full sm:w-auto px-8 py-3 rounded-2xl text-sm font-black uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
-                hasAgreedInstructions
-                  ? 'bg-[#00b074] hover:bg-[#009260] text-white hover:shadow-xl active:scale-95'
-                  : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-              }`}
-            >
-              <span>{hasMatchingPaper ? 'Start Test Now (Official Paper)' : 'Generate & Start Test Now ⚡'}</span>
-              <Play className="w-4 h-4 fill-current" />
-            </button>
+            <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-3">
+              <button
+                type="button"
+                onClick={handleOpenPdfForCurrentSetup}
+                className="w-full sm:w-auto px-6 py-3 rounded-2xl border-2 border-blue-400 bg-blue-50 hover:bg-blue-100 text-blue-700 font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm hover:shadow active:scale-95"
+              >
+                <Download className="w-4 h-4 text-blue-600" />
+                <span>Download PDF</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={!hasAgreedInstructions}
+                onClick={handleStartTest}
+                className={`w-full sm:w-auto px-8 py-3 rounded-2xl text-sm font-black uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
+                  hasAgreedInstructions
+                    ? 'bg-[#00b074] hover:bg-[#009260] text-white hover:shadow-xl active:scale-95'
+                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                }`}
+              >
+                <span>{hasMatchingPaper ? 'Start Test Now (Official Paper)' : 'Generate & Start Test Now ⚡'}</span>
+                <Play className="w-4 h-4 fill-current" />
+              </button>
+            </div>
           </div>
         </div>
       ) : (
@@ -1941,6 +1990,14 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
           </div>
         </div>
       )}
+
+      {/* PDF Download Terms & Conditions Modal */}
+      <DownloadPaperPdfModal
+        isOpen={!!pdfModalPaper}
+        onClose={() => setPdfModalPaper(null)}
+        paper={pdfModalPaper}
+        onStartExamAfterDownload={() => handleStartTest()}
+      />
     </div>
   );
 };

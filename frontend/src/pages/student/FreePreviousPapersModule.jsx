@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
+import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 import {
   FileText,
   Clock,
@@ -82,6 +83,7 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
   const [selectedYear, setSelectedYear] = useState('2024');
   const [selectedSampleSet, setSelectedSampleSet] = useState('Set 1');
   const [hasAgreedInstructions, setHasAgreedInstructions] = useState(true);
+  const [pdfModalPaper, setPdfModalPaper] = useState(null);
 
   // Super Admin Papers State
   const [adminPapers, setAdminPapers] = useState([]);
@@ -1251,20 +1253,42 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
               <span>Back / Change Selection</span>
             </button>
 
-            <button
-              type="button"
-              disabled={!paper || !hasAgreedInstructions}
-              onClick={() => handleStartTest(paper)}
-              className={`w-full sm:w-auto px-8 py-3 rounded-2xl text-sm font-black uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
-                paper && hasAgreedInstructions
-                  ? 'bg-[#00b074] hover:bg-[#009260] text-white hover:shadow-xl active:scale-95'
-                  : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-              }`}
-            >
-              <span>{paper ? 'Start Test Now ⚡' : 'Paper Not Available'}</span>
-              <Play className="w-4 h-4 fill-current" />
-            </button>
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+              <button
+                type="button"
+                disabled={!paper}
+                onClick={() => setPdfModalPaper(paper)}
+                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-700 font-bold text-xs sm:text-sm shadow-xs cursor-pointer flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-50"
+              >
+                <Download className="w-4 h-4 text-blue-600" />
+                <span>Download PDF</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={!paper || !hasAgreedInstructions}
+                onClick={() => handleStartTest(paper)}
+                className={`w-full sm:w-auto px-8 py-3 rounded-2xl text-sm font-black uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
+                  paper && hasAgreedInstructions
+                    ? 'bg-[#00b074] hover:bg-[#009260] text-white hover:shadow-xl active:scale-95'
+                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                }`}
+              >
+                <span>{paper ? 'Start Test Now ⚡' : 'Paper Not Available'}</span>
+                <Play className="w-4 h-4 fill-current" />
+              </button>
+            </div>
           </div>
+
+          {/* Terms & Conditions PDF Modal */}
+          <DownloadPaperPdfModal
+            isOpen={!!pdfModalPaper}
+            onClose={() => setPdfModalPaper(null)}
+            paper={pdfModalPaper}
+            onStartExamAfterDownload={() => {
+              if (pdfModalPaper) handleStartTest(pdfModalPaper);
+            }}
+          />
         </div>
       </div>
     );

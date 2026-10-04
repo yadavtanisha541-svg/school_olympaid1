@@ -14,8 +14,10 @@ import {
   Brain,
   Sparkles,
   Palette,
-  Layers
+  Layers,
+  Download
 } from 'lucide-react';
+import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 
 export const StudentMyContentPage = ({
   activeSubjectCode = null, // e.g. 'content_igko', 'content_imo', 'my_content'
@@ -40,6 +42,7 @@ export const StudentMyContentPage = ({
   const [openedMockSeries, setOpenedMockSeries] = useState(null);
 
   const [selectedPaperForInstructions, setSelectedPaperForInstructions] = useState(null);
+  const [pdfModalPaper, setPdfModalPaper] = useState(null);
   const [hasAgreedToRules, setHasAgreedToRules] = useState(true);
   const [myTestResults, setMyTestResults] = useState([]);
 
@@ -412,7 +415,7 @@ export const StudentMyContentPage = ({
         </div>
 
         {/* 3. Action Buttons (Seamless) */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+        <div className="flex items-center justify-between pt-4 border-t border-slate-200 flex-wrap gap-3">
           <button
             type="button"
             onClick={() => setSelectedPaperForInstructions(null)}
@@ -420,22 +423,45 @@ export const StudentMyContentPage = ({
           >
             Cancel
           </button>
-          <button
-            type="button"
-            disabled={!hasAgreedToRules}
-            onClick={() => {
-              const pId = paper.id;
-              setSelectedPaperForInstructions(null);
-              if (onStartExam) {
-                onStartExam(pId);
-              }
-            }}
-            className="px-7 py-3 rounded-2xl bg-[#859900] hover:bg-[#738400] text-white font-black text-xs sm:text-sm shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95 transition-all"
-          >
-            <Play className="w-4 h-4 fill-white" />
-            <span>Start Mock Test Now →</span>
-          </button>
+          
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setPdfModalPaper(paper)}
+              className="px-5 py-3 rounded-2xl bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-700 font-bold text-xs sm:text-sm shadow-xs cursor-pointer flex items-center gap-2 active:scale-95 transition-all"
+            >
+              <Download className="w-4 h-4 text-blue-600" />
+              <span>Download PDF</span>
+            </button>
+
+            <button
+              type="button"
+              disabled={!hasAgreedToRules}
+              onClick={() => {
+                const pId = paper.id;
+                setSelectedPaperForInstructions(null);
+                if (onStartExam) {
+                  onStartExam(pId);
+                }
+              }}
+              className="px-7 py-3 rounded-2xl bg-[#859900] hover:bg-[#738400] text-white font-black text-xs sm:text-sm shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95 transition-all"
+            >
+              <Play className="w-4 h-4 fill-white" />
+              <span>Start Mock Test Now →</span>
+            </button>
+          </div>
         </div>
+
+        {/* Terms & Conditions PDF Modal */}
+        <DownloadPaperPdfModal
+          isOpen={!!pdfModalPaper}
+          onClose={() => setPdfModalPaper(null)}
+          paper={pdfModalPaper}
+          onStartExamAfterDownload={(pId) => {
+            setSelectedPaperForInstructions(null);
+            if (onStartExam) onStartExam(pId);
+          }}
+        />
       </div>
     );
   }
