@@ -751,7 +751,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
           </div>
 
           {/* Studio Navigation Tabs */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-2 shadow-2xs flex items-center gap-2 overflow-x-auto custom-scrollbar">
+          <div className="bg-white rounded-2xl border border-slate-200 p-2.5 shadow-2xs flex items-center gap-2 overflow-x-auto custom-scrollbar">
             {[
               { id: 'basic', label: '1. Basic Info & Pricing', icon: FileText },
               { id: 'intro', label: '2. Overview & Why Reasons', icon: Sparkles },
@@ -766,13 +766,13 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                   key={tab.id}
                   type="button"
                   onClick={() => setEditorTab(tab.id)}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                  className={`px-5 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5 cursor-pointer whitespace-nowrap ${
                     isActive
-                      ? 'bg-[#4e2a4a] text-white shadow-sm'
+                      ? 'bg-[#4e2a4a] text-white shadow-md'
                       : 'text-slate-600 hover:bg-slate-100'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#e7b84b]' : 'text-slate-400'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-[#e7b84b]' : 'text-slate-400'}`} />
                   <span>{tab.label}</span>
                 </button>
               );
@@ -783,10 +783,10 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
           <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
             {/* TAB 1: BASIC INFO & PRICING */}
             {editorTab === 'basic' && (
-              <div className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-slate-800 block mb-1.5">
                         Program Code (Short Acronym) *
                       </label>
                       <input
@@ -794,12 +794,12 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                         value={formData.code}
                         onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                         placeholder="e.g. RSDP, MSDP, SSDP, AI-SDP"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-black uppercase focus:ring-2 focus:ring-[#7c3aed]"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-black uppercase tracking-wide focus:ring-2 focus:ring-[#7c3aed]"
                       />
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-slate-800 block mb-1.5">
                         Full Program Name *
                       </label>
                       <input
@@ -807,12 +807,12 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="e.g. Reasoning Skill Development Program"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-[#7c3aed]"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-bold focus:ring-2 focus:ring-[#7c3aed]"
                       />
                     </div>
 
                     <div className="sm:col-span-3">
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-slate-800 block mb-1.5">
                         Tagline / Inspirational Quote
                       </label>
                       <input
@@ -820,12 +820,12 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                         value={formData.quote}
                         onChange={(e) => setFormData({ ...formData, quote: e.target.value })}
                         placeholder="e.g. Children must be taught how to think, not what to think."
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs italic focus:ring-2 focus:ring-[#7c3aed]"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm italic focus:ring-2 focus:ring-[#7c3aed]"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-slate-800 block mb-1.5">
                         Discipline / Subject
                       </label>
                       <select
@@ -838,7 +838,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                             accentColor: matched ? matched.color : formData.accentColor
                           });
                         }}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold bg-white"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-bold bg-white"
                       >
                         {SUBJECT_OPTIONS.map(opt => (
                           <option key={opt.key} value={opt.key}>{opt.name}</option>
@@ -847,22 +847,22 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-slate-800 block mb-1.5">
                         Theme Color Accent
                       </label>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <input
                           type="color"
                           value={formData.accentColor}
                           onChange={(e) => setFormData({ ...formData, accentColor: e.target.value })}
-                          className="w-10 h-10 rounded-xl border border-slate-300 p-1 cursor-pointer"
+                          className="w-12 h-12 rounded-xl border border-slate-300 p-1 cursor-pointer"
                         />
-                        <span className="text-xs font-mono font-bold text-slate-700">{formData.accentColor}</span>
+                        <span className="text-sm font-mono font-bold text-slate-700">{formData.accentColor}</span>
                       </div>
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-slate-800 block mb-1.5">
                         Eligibility Text
                       </label>
                       <input
@@ -870,12 +870,12 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                         value={formData.eligibility}
                         onChange={(e) => setFormData({ ...formData, eligibility: e.target.value })}
                         placeholder="e.g. 1st Graders to 10th Graders"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-bold"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-slate-800 block mb-1.5">
                         Selling Price (₹) *
                       </label>
                       <input
@@ -883,12 +883,12 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                         value={formData.price}
                         onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
                         placeholder="649"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-black text-emerald-700"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 text-base font-black text-emerald-700"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-slate-800 block mb-1.5">
                         Original / Cross-out Price (₹)
                       </label>
                       <input
@@ -896,12 +896,12 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                         value={formData.originalPrice}
                         onChange={(e) => setFormData({ ...formData, originalPrice: parseInt(e.target.value) || 0 })}
                         placeholder="999"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-400"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 text-base font-bold text-slate-400"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-slate-800 block mb-1.5">
                         Validity Date Text
                       </label>
                       <input
@@ -909,7 +909,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                         value={formData.validUpto}
                         onChange={(e) => setFormData({ ...formData, validUpto: e.target.value })}
                         placeholder="e.g. 28th February 2027"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-bold"
                       />
                     </div>
                   </div>
@@ -920,15 +920,15 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
               {editorTab === 'intro' && (
                 <div className="space-y-6">
                   {/* Intro Paragraphs */}
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                  <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-black text-slate-900 uppercase">
+                      <h4 className="text-sm font-black text-slate-900 uppercase">
                         Course Introduction Paragraphs ({formData.introParagraphs.length})
                       </h4>
                       <button
                         type="button"
                         onClick={handleAddIntroParagraph}
-                        className="px-3 py-1 bg-[#6d3a68] text-white rounded-lg text-xs font-bold flex items-center gap-1 cursor-pointer"
+                        className="px-3.5 py-1.5 bg-[#6d3a68] text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Add Paragraph</span>
@@ -936,15 +936,15 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                     </div>
 
                     {formData.introParagraphs.map((para, idx) => (
-                      <div key={idx} className="flex items-start gap-2 bg-white p-3 rounded-xl border border-slate-200">
-                        <span className="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0 mt-1">
+                      <div key={idx} className="flex items-start gap-2 bg-white p-3.5 rounded-xl border border-slate-200">
+                        <span className="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 font-bold text-sm flex items-center justify-center shrink-0 mt-1">
                           {idx + 1}
                         </span>
                         <textarea
                           rows={3}
                           value={para}
                           onChange={(e) => handleUpdateIntroParagraph(idx, e.target.value)}
-                          className="flex-1 p-2 rounded-lg border border-slate-200 text-xs text-slate-800 focus:ring-1 focus:ring-[#7c3aed]"
+                          className="flex-1 p-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 focus:ring-1 focus:ring-[#7c3aed]"
                         />
                         <button
                           type="button"
@@ -959,15 +959,15 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                   </div>
 
                   {/* Why Reasons Bullet Points */}
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                  <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-black text-slate-900 uppercase">
+                      <h4 className="text-sm font-black text-slate-900 uppercase">
                         Why &quot;{formData.name}&quot; Key Value Points ({formData.whyReasons.length})
                       </h4>
                       <button
                         type="button"
                         onClick={handleAddWhyReason}
-                        className="px-3 py-1 bg-[#6d3a68] text-white rounded-lg text-xs font-bold flex items-center gap-1 cursor-pointer"
+                        className="px-3.5 py-1.5 bg-[#6d3a68] text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Add Bullet Point</span>
@@ -975,18 +975,19 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                     </div>
 
                     {formData.whyReasons.map((reason, idx) => (
-                      <div key={idx} className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-slate-200">
-                        <span className="w-2 h-2 rounded-full bg-[#7c3aed] shrink-0 ml-1" />
+                      <div key={idx} className="flex items-center gap-2 bg-white p-3 rounded-xl border border-slate-200">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#7c3aed] shrink-0 ml-1" />
                         <input
                           type="text"
                           value={reason}
                           onChange={(e) => handleUpdateWhyReason(idx, e.target.value)}
-                          className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-800"
+                          className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm text-slate-800"
                         />
                         <button
                           type="button"
                           onClick={() => handleRemoveWhyReason(idx)}
                           className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 cursor-pointer"
+                          title="Remove bullet point"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -1001,17 +1002,17 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between pb-2 border-b border-slate-200">
                     <div>
-                      <h4 className="text-sm font-black text-slate-900">
+                      <h4 className="text-base font-black text-slate-900">
                         Class-wise Skills Covered Syllabus Manager
                       </h4>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs sm:text-sm text-slate-500">
                         For each class, define the exact topics, skills, and puzzles covered in this program.
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={handleAddSkillClass}
-                      className="px-4 py-2 bg-[#6d3a68] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                      className="px-4 py-2 bg-[#6d3a68] text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add Another Grade</span>
@@ -1022,7 +1023,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                     {formData.skillsCovered.map((s, idx) => (
                       <div key={idx} className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="px-3 py-1 rounded-xl bg-purple-50 text-purple-900 font-black text-xs border border-purple-200">
+                          <span className="px-3.5 py-1 rounded-xl bg-purple-50 text-purple-900 font-black text-xs sm:text-sm border border-purple-200">
                             Class {s.classNum} Curriculum
                           </span>
                           <button
@@ -1039,7 +1040,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                           value={s.text}
                           onChange={(e) => handleUpdateSkillClass(idx, e.target.value)}
                           placeholder="e.g. Puzzles, Measuring Units, Geometrical Shapes, Odd One Out, Coding-Decoding..."
-                          className="w-full p-3 rounded-xl border border-slate-200 text-xs text-slate-800 focus:ring-2 focus:ring-[#7c3aed]"
+                          className="w-full p-3 rounded-xl border border-slate-200 text-sm text-slate-800 focus:ring-2 focus:ring-[#7c3aed]"
                         />
                       </div>
                     ))}
@@ -1049,10 +1050,10 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
 
               {/* TAB 4: LESSONS & STRUCTURE */}
               {editorTab === 'lessons' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-slate-800 block mb-1.5">
                         Interactive Tests &amp; Worksheets Text
                       </label>
                       <input
@@ -1060,12 +1061,12 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                         value={formData.lessonsCountText}
                         onChange={(e) => setFormData({ ...formData, lessonsCountText: e.target.value })}
                         placeholder="e.g. 25 Interactive Tests / Downloadable Worksheets"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-bold"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-slate-800 block mb-1.5">
                         Assessment Tests Text
                       </label>
                       <input
@@ -1073,12 +1074,12 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                         value={formData.assessmentCountText}
                         onChange={(e) => setFormData({ ...formData, assessmentCountText: e.target.value })}
                         placeholder="e.g. 4 Assessment Tests (1 after every 6th test)"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-bold"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-slate-800 block mb-1.5">
                         Challenger Rounds Text
                       </label>
                       <input
@@ -1086,12 +1087,12 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                         value={formData.challengerCountText}
                         onChange={(e) => setFormData({ ...formData, challengerCountText: e.target.value })}
                         placeholder="e.g. 2 Challenger Rounds"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-bold"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-slate-800 block mb-1.5">
                         Terms &amp; Conditions Footer Text
                       </label>
                       <input
@@ -1099,7 +1100,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                         value={formData.termsText}
                         onChange={(e) => setFormData({ ...formData, termsText: e.target.value })}
                         placeholder="Terms & Conditions agreement text"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-bold"
                       />
                     </div>
                   </div>
@@ -1262,18 +1263,18 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
             <button
               type="button"
               onClick={() => setShowEditorModal(false)}
-              className="px-4 py-2.5 rounded-2xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer flex items-center gap-2"
+              className="px-5 py-3 rounded-2xl text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer flex items-center gap-2"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4.5 h-4.5" />
               <span>Back to All Programs</span>
             </button>
 
             <button
               type="button"
               onClick={handleSaveProgram}
-              className="px-6 py-2.5 rounded-2xl text-xs font-black text-white bg-[#00b074] hover:bg-[#009260] transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
+              className="px-7 py-3 rounded-2xl text-sm font-black text-white bg-[#00b074] hover:bg-[#009260] transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
             >
-              <CheckCircle2 className="w-4 h-4" />
+              <CheckCircle2 className="w-5 h-5" />
               <span>Save &amp; Publish Program Live</span>
             </button>
           </div>
