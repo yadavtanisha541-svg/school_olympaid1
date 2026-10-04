@@ -13,11 +13,12 @@ import {
   Laptop,
   Brain,
   Sparkles,
-  Palette
+  Palette,
+  Layers
 } from 'lucide-react';
 
 export const StudentMyContentPage = ({
-  activeSubjectCode = null, // e.g. 'content_igko', 'IGKO', null
+  activeSubjectCode = null, // e.g. 'content_igko', 'content_imo', 'my_content'
   onNavigateTab,
   onStartExam
 }) => {
@@ -27,15 +28,16 @@ export const StudentMyContentPage = ({
   const [examPapers, setExamPapers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Initialize selected subject cover
-  const [selectedSubjectCover, setSelectedSubjectCover] = useState(() => {
+  // Active selected subject filter: 'ALL' or 'IGKO', 'IMO', 'ISO', etc.
+  const [selectedSubject, setSelectedSubject] = useState(() => {
     if (activeSubjectCode && activeSubjectCode.startsWith('content_')) {
       return activeSubjectCode.replace('content_', '').toUpperCase();
-    } else if (activeSubjectCode && activeSubjectCode !== 'my_content') {
-      return activeSubjectCode.toUpperCase();
     }
-    return null;
+    return 'ALL';
   });
+
+  // Level 2: Which subject's mock tests are open (null = showing covers, 'IGKO' = showing mock tests)
+  const [openedMockSeries, setOpenedMockSeries] = useState(null);
 
   const [selectedPaperForInstructions, setSelectedPaperForInstructions] = useState(null);
   const [hasAgreedToRules, setHasAgreedToRules] = useState(true);
@@ -70,12 +72,16 @@ export const StudentMyContentPage = ({
     fetchMyContentData();
   }, [user]);
 
-  // Synchronize with external activeSubjectCode change
+  // When activeSubjectCode changes from the sidebar (e.g. student clicks IGKO or ISO)
+  // We ALWAYS show the Subject Cover first (openedMockSeries = null) as requested!
   useEffect(() => {
     if (activeSubjectCode && activeSubjectCode.startsWith('content_')) {
-      setSelectedSubjectCover(activeSubjectCode.replace('content_', '').toUpperCase());
+      const code = activeSubjectCode.replace('content_', '').toUpperCase();
+      setSelectedSubject(code);
+      setOpenedMockSeries(null); // Show the Cover first!
     } else if (activeSubjectCode === 'my_content') {
-      setSelectedSubjectCover(null);
+      setSelectedSubject('ALL');
+      setOpenedMockSeries(null);
     }
   }, [activeSubjectCode]);
 
@@ -388,30 +394,36 @@ export const StudentMyContentPage = ({
     );
   }
 
+  // Filter covers according to selected subject (if not 'ALL', show only that subject's cover card)
+  const visibleCovers = useMemo(() => {
+    if (selectedSubject && selectedSubject !== 'ALL') {
+      const match = ALL_SUBJECT_COVERS.filter(s => s.code === selectedSubject || s.altCode === selectedSubject);
+      if (match.length > 0) return match;
+    }
+    return ALL_SUBJECT_COVERS;
+  }, [selectedSubject, ALL_SUBJECT_COVERS]);
+
   return (
     <div className="space-y-6 pb-14 font-sans w-full max-w-full overflow-x-hidden">
-      {selectedSubjectCover ? (
+      {openedMockSeries ? (
         /* ========================================================================= */
-        /* LEVEL 2: SPECIFIC SUBJECT MOCK TEST SERIES (User Image 3)                 */
+        /* LEVEL 2: SPECIFIC SUBJECT MOCK TEST SERIES (Opens ONLY after clicking Open) */
         /* ========================================================================= */
         (() => {
-          const currentSub = ALL_SUBJECT_COVERS.find(s => s.code === selectedSubjectCover) || ALL_SUBJECT_COVERS[0];
+          const currentSub = ALL_SUBJECT_COVERS.find(s => s.code === openedMockSeries) || ALL_SUBJECT_COVERS[0];
           const subjectPapers = getSubjectPapers(currentSub.code, currentSub.altCode);
 
           return (
             <div className="space-y-5 animate-in fade-in duration-200">
-              {/* Back to All Covers Navigation */}
+              {/* Back to Subject Cover Navigation */}
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    setSelectedSubjectCover(null);
-                    if (onNavigateTab) onNavigateTab('my_content');
-                  }}
+                  onClick={() => setOpenedMockSeries(null)}
                   className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-[#859900] px-4 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>← Back to All Subject Covers</span>
+                  <span>← Back to Subject Cover</span>
                 </button>
 
                 <div className="flex items-center gap-2">
@@ -419,10 +431,11 @@ export const StudentMyContentPage = ({
                     Switch Subject:
                   </span>
                   <select
-                    value={selectedSubjectCover}
+                    value={openedMockSeries}
                     onChange={(e) => {
                       const val = e.target.value;
-                      setSelectedSubjectCover(val);
+                      setOpenedMockSeries(val);
+                      setSelectedSubject(val);
                       if (onNavigateTab) onNavigateTab(`content_${val.toLowerCase()}`);
                     }}
                     className="text-xs font-bold bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700 focus:outline-none focus:border-[#859900] cursor-pointer"
@@ -455,7 +468,7 @@ export const StudentMyContentPage = ({
                 </div>
               </div>
 
-              {/* Mock Tests Cards Grid (Exact design from user's image 3) */}
+              {/* Mock Tests Cards Grid (Exact design from user's image) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 {subjectPapers.map((paper) => {
                   const result = myTestResults.find(
@@ -527,35 +540,55 @@ export const StudentMyContentPage = ({
         })()
       ) : (
         /* ========================================================================= */
-        /* LEVEL 1: ALL SUBJECT COVERS GRID (User Image 2)                           */
+        /* LEVEL 1: SUBJECT COVER(S) VIEW (Shown First when clicking subject)        */
         /* ========================================================================= */
         <div className="space-y-5 animate-in fade-in duration-150">
-          <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
                 <BookOpen className="w-6 h-6 text-[#859900]" />
-                <span>Olympiad Subject Series &amp; Mock Tests</span>
+                <span>
+                  {selectedSubject !== 'ALL'
+                    ? `${selectedSubject} Subject Cover & Mock Test Series`
+                    : 'Olympiad Subject Series & Mock Tests'}
+                </span>
               </h2>
               <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                Select any Olympiad subject cover below to view all official mock tests, previous year papers &amp; sample tests.
+                {selectedSubject !== 'ALL'
+                  ? `Click "Open ${selectedSubject} Mock Tests" below to view all official mock test papers.`
+                  : 'Select any Olympiad subject cover below to view all official mock tests, previous year papers & sample tests.'}
               </p>
             </div>
+
+            {selectedSubject !== 'ALL' && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedSubject('ALL');
+                  if (onNavigateTab) onNavigateTab('my_content');
+                }}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#859900] px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
+              >
+                <Layers className="w-4 h-4 text-[#859900]" />
+                <span>View All 9 Subject Covers</span>
+              </button>
+            )}
           </div>
 
-          {/* Grid of 9 Subject Covers */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 w-full">
-            {ALL_SUBJECT_COVERS.map((sub) => {
+          {/* Grid of Subject Covers (Shows 1 specific cover or all 9 covers) */}
+          <div className={`grid gap-4 sm:gap-5 w-full ${
+            visibleCovers.length === 1
+              ? 'grid-cols-1 max-w-xl'
+              : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+          }`}>
+            {visibleCovers.map((sub) => {
               const subPapers = getSubjectPapers(sub.code, sub.altCode);
               const SubIcon = sub.icon;
 
               return (
                 <div
                   key={sub.code}
-                  onClick={() => {
-                    setSelectedSubjectCover(sub.code);
-                    if (onNavigateTab) onNavigateTab(`content_${sub.code.toLowerCase()}`);
-                  }}
-                  className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-[#859900] p-5 sm:p-6 shadow-xs hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col justify-between group hover:-translate-y-1 relative overflow-hidden"
+                  className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-[#859900] p-6 shadow-xs hover:shadow-xl transition-all duration-200 flex flex-col justify-between group hover:-translate-y-1 relative overflow-hidden"
                 >
                   {/* Top Header */}
                   <div className="flex items-start justify-between gap-3 mb-4">
@@ -577,7 +610,7 @@ export const StudentMyContentPage = ({
                         {sub.code}
                       </span>
                     </div>
-                    <h3 className="font-black text-slate-900 text-base sm:text-lg tracking-tight group-hover:text-[#859900] transition-colors leading-snug">
+                    <h3 className="font-black text-slate-900 text-lg tracking-tight group-hover:text-[#859900] transition-colors leading-snug">
                       {sub.title}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium line-clamp-2">
@@ -585,13 +618,20 @@ export const StudentMyContentPage = ({
                     </p>
                   </div>
 
-                  {/* Action Button */}
-                  <div className="w-full pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-black text-[#859900] group-hover:translate-x-0.5 transition-all">
+                  {/* Action Button: Opens Mock Tests Series for this Subject */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenedMockSeries(sub.code);
+                      setSelectedSubject(sub.code);
+                    }}
+                    className="w-full pt-3 pb-1 border-t border-slate-100 flex items-center justify-between text-xs font-black text-[#859900] group-hover:translate-x-0.5 transition-all cursor-pointer"
+                  >
                     <span>Open {sub.code} Mock Tests</span>
-                    <div className="w-7 h-7 rounded-full bg-[#859900]/10 flex items-center justify-center text-[#859900] group-hover:bg-[#859900] group-hover:text-white transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-[#859900]/10 flex items-center justify-center text-[#859900] group-hover:bg-[#859900] group-hover:text-white transition-colors">
                       <ChevronRight className="w-4 h-4" />
                     </div>
-                  </div>
+                  </button>
                 </div>
               );
             })}
