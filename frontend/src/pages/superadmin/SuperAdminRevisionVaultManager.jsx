@@ -64,10 +64,15 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
 
   // Form fields
   const [formData, setFormData] = useState({
-    class_name: 'Class 1',
+    class_name: 'Class 6',
     subject: 'Mathematics (IMO)',
     subject_code: 'IMO',
     question_text: '',
+    option_a: '',
+    option_b: '',
+    option_c: '',
+    option_d: '',
+    correct_option: 'A',
     correct_answer: '',
     explanation: '',
     tags: 'Tricky Question',
@@ -111,10 +116,15 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
     setModalMode('create');
     setCurrentItem(null);
     setFormData({
-      class_name: selectedClass !== 'All' ? selectedClass : 'Class 1',
+      class_name: selectedClass !== 'All' ? selectedClass : 'Class 6',
       subject: selectedSubject !== 'All' ? selectedSubject : 'Mathematics (IMO)',
       subject_code: selectedSubject !== 'All' ? (SUBJECT_OPTIONS.find(s => s.name === selectedSubject)?.code || 'IMO') : 'IMO',
       question_text: '',
+      option_a: '',
+      option_b: '',
+      option_c: '',
+      option_d: '',
+      correct_option: 'A',
       correct_answer: '',
       explanation: '',
       tags: 'Tricky Question',
@@ -127,11 +137,17 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
   const handleOpenEditModal = (item) => {
     setModalMode('edit');
     setCurrentItem(item);
+    const opts = Array.isArray(item.options) ? item.options : [];
     setFormData({
-      class_name: item.class_name || 'Class 1',
+      class_name: item.class_name || item.class || 'Class 6',
       subject: item.subject || 'Mathematics (IMO)',
       subject_code: item.subject_code || 'IMO',
       question_text: item.question_text || '',
+      option_a: item.option_a || opts[0] || '',
+      option_b: item.option_b || opts[1] || '',
+      option_c: item.option_c || opts[2] || '',
+      option_d: item.option_d || opts[3] || '',
+      correct_option: item.correct_option || 'A',
       correct_answer: item.correct_answer || '',
       explanation: item.explanation || '',
       tags: item.tags || 'Tricky Question',
@@ -144,32 +160,51 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
   const handleSaveItem = async (e) => {
     e.preventDefault();
     if (!formData.question_text.trim()) {
-      alert('Please enter question text');
+      alert('Please enter question statement / text');
       return;
     }
-    if (!formData.correct_answer.trim()) {
-      alert('Please enter the correct answer');
-      return;
-    }
+
+    const optA = formData.option_a.trim() || 'Option A';
+    const optB = formData.option_b.trim() || 'Option B';
+    const optC = formData.option_c.trim() || 'Option C';
+    const optD = formData.option_d.trim() || 'Option D';
+    const optionsArray = [optA, optB, optC, optD];
+
+    const corrOpt = (formData.correct_option || 'A').toUpperCase();
+    const corrMap = { A: optA, B: optB, C: optC, D: optD };
+    const computedAnswer = formData.correct_answer.trim() || `Option ${corrOpt}: ${corrMap[corrOpt] || ''}`;
+
+    const payload = {
+      ...formData,
+      options: optionsArray,
+      option_a: optA,
+      option_b: optB,
+      option_c: optC,
+      option_d: optD,
+      correct_option: corrOpt,
+      correct_answer: computedAnswer
+    };
 
     try {
       setSaving(true);
       if (modalMode === 'create') {
-        const res = await apiClient.post('/revision-vault', formData);
+        const res = await apiClient.post('/revision-vault', payload);
         if (res.success) {
-          setSuccessMsg('Revision question created successfully!');
+          setSuccessMsg('Revision question created and synced successfully!');
           setIsModalOpen(false);
           fetchItems();
+          window.dispatchEvent(new CustomEvent('revision-vault-updated'));
         }
       } else if (modalMode === 'edit' && currentItem?.id) {
         const res = await apiClient.request(`/revision-vault/${currentItem.id}`, {
           method: 'PUT',
-          body: JSON.stringify(formData)
+          body: JSON.stringify(payload)
         });
         if (res.success) {
-          setSuccessMsg('Revision question updated successfully!');
+          setSuccessMsg('Revision question updated and synced successfully!');
           setIsModalOpen(false);
           fetchItems();
+          window.dispatchEvent(new CustomEvent('revision-vault-updated'));
         }
       }
     } catch (err) {
@@ -182,13 +217,15 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
   };
 
   const handleDeleteItem = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this revision question?')) return;
     try {
       const res = await apiClient.request(`/revision-vault/${id}`, {
         method: 'DELETE'
       });
       if (res.success) {
-        setSuccessMsg('Item deleted successfully!');
+        setSuccessMsg('Revision question deleted successfully!');
         fetchItems();
+        window.dispatchEvent(new CustomEvent('revision-vault-updated'));
       }
     } catch (err) {
       console.error('Error deleting revision item:', err);
@@ -204,6 +241,7 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
       if (res.success) {
         setSuccessMsg('Default Revision Vault questions re-seeded successfully!');
         fetchItems();
+        window.dispatchEvent(new CustomEvent('revision-vault-updated'));
       }
     } catch (err) {
       console.error(err);
@@ -232,7 +270,7 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
               Revision Vault &amp; Bookmarks Manager
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5 truncate">
-              Add, edit, and curate tricky questions, high-yield formulas, and AI-identified bookmarks for all classes (Class 1 to 12).
+              Add, edit, and curate tricky questions, 4 options, and step-by-step solutions that sync live with the Student Dashboard.
             </p>
           </div>
         </div>
@@ -276,40 +314,40 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
         <div className="p-5 bg-white rounded-2xl border border-[#edd6ed] shadow-xs space-y-1">
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Questions</p>
           <p className="text-2xl font-black text-[#4e2a4a]">{totalCount}</p>
-          <span className="text-[11px] text-emerald-600 font-semibold">In Database</span>
+          <span className="text-[11px] text-emerald-600 font-semibold">Active in Database</span>
         </div>
 
         <div className="p-5 bg-white rounded-2xl border border-[#edd6ed] shadow-xs space-y-1">
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Active Published</p>
-          <p className="text-2xl font-black text-emerald-600">{activeCount}</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Published</p>
+          <p className="text-2xl font-black text-[#059669]">{activeCount}</p>
           <span className="text-[11px] text-slate-500 font-medium">Visible to Students</span>
         </div>
 
         <div className="p-5 bg-white rounded-2xl border border-[#edd6ed] shadow-xs space-y-1">
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Classes Covered</p>
-          <p className="text-2xl font-black text-indigo-600">{distinctClasses} Classes</p>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Covered Classes</p>
+          <p className="text-2xl font-black text-[#6d3a68]">{distinctClasses || 12}</p>
           <span className="text-[11px] text-slate-500 font-medium">Class 1 to 12</span>
         </div>
 
         <div className="p-5 bg-white rounded-2xl border border-[#edd6ed] shadow-xs space-y-1">
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Olympiad Subjects</p>
-          <p className="text-2xl font-black text-[#d9775b]">{distinctSubjects} Subjects</p>
-          <span className="text-[11px] text-slate-500 font-medium">IMO, NSO, IEO, ICSO...</span>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Subjects</p>
+          <p className="text-2xl font-black text-[#d9775b]">{distinctSubjects || 6}</p>
+          <span className="text-[11px] text-slate-500 font-medium">IMO, NSO, IEO, ICSO, IGKO</span>
         </div>
       </div>
 
-      {/* Filter & Search Bar */}
-      <div className="bg-white rounded-3xl p-5 border border-[#edd6ed] shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3 flex-wrap w-full md:w-auto">
+      {/* Filter Toolbar */}
+      <div className="bg-white rounded-2xl p-4 border border-[#edd6ed] shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3 w-full md:w-auto flex-wrap">
           {/* Class Filter */}
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-500">Class:</span>
+            <span className="text-xs font-bold text-slate-600">Class:</span>
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-bold text-[#4e2a4a] bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#6d3a68] cursor-pointer"
+              className="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-800 bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-[#80497D]"
             >
-              {CLASS_OPTIONS.map((c) => (
+              {CLASS_OPTIONS.map(c => (
                 <option key={c} value={c}>{c === 'All' ? 'All Classes' : c}</option>
               ))}
             </select>
@@ -317,42 +355,40 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
 
           {/* Subject Filter */}
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-500">Subject:</span>
+            <span className="text-xs font-bold text-slate-600">Subject:</span>
             <select
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
-              className="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-bold text-[#4e2a4a] bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#6d3a68] cursor-pointer"
+              className="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-800 bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-[#80497D]"
             >
               <option value="All">All Subjects</option>
-              {SUBJECT_OPTIONS.map((s) => (
+              {SUBJECT_OPTIONS.map(s => (
                 <option key={s.code} value={s.name}>{s.name}</option>
               ))}
             </select>
           </div>
         </div>
 
-        {/* Search Input Form */}
-        <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 w-full md:w-80">
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search question, answer, tag..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-[#6d3a68] bg-slate-50 focus:bg-white"
-            />
-          </div>
+        {/* Search */}
+        <form onSubmit={handleSearchSubmit} className="relative w-full md:w-72">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search questions or keywords..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-16 py-1.5 rounded-xl border border-slate-300 text-xs focus:outline-hidden focus:ring-2 focus:ring-[#80497D] bg-slate-50"
+          />
           <button
             type="submit"
-            className="px-3.5 py-2 rounded-xl bg-[#6d3a68] hover:bg-[#5c3158] text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
+            className="absolute right-1 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-[#80497D] text-white rounded-lg text-[10px] font-bold hover:bg-[#6b3a69] transition-colors"
           >
             Search
           </button>
         </form>
       </div>
 
-      {/* Main Revision Cards List (Matching Screenshot Design) */}
+      {/* Main Revision Cards List */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#edd6ed] shadow-sm space-y-5">
         <div className="flex items-center justify-between pb-3 border-b border-[#f4ebf4]">
           <div className="flex items-center gap-2">
@@ -390,76 +426,118 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
           </div>
         ) : (
           <div className="space-y-4">
-            {items.map((item, idx) => (
-              <div
-                key={item.id}
-                className="p-5 rounded-2xl bg-[#faf5fa] border border-[#edd6ed] space-y-3 hover:border-[#6d3a68]/40 transition-all shadow-2xs group"
-              >
-                {/* Header Row */}
-                <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <span className="font-black text-xs text-[#6d3a68]">
-                      {item.subject}
-                    </span>
-                    <span className="px-2 py-0.5 rounded-md bg-white border border-[#edd6ed] text-[10px] font-bold text-slate-600">
-                      {item.class_name}
-                    </span>
-                    {item.tags && (
-                      <span className="px-2 py-0.5 rounded-md bg-pink-50 border border-pink-200 text-[10px] font-bold text-pink-700">
-                        {item.tags}
-                      </span>
-                    )}
-                    {item.status === 'inactive' && (
-                      <span className="px-2 py-0.5 rounded-md bg-slate-200 text-[10px] font-bold text-slate-600">
-                        Draft / Inactive
-                      </span>
-                    )}
-                  </div>
+            {items.map((item, idx) => {
+              const opts = Array.isArray(item.options) && item.options.length >= 2
+                ? item.options
+                : [item.option_a || 'Option A', item.option_b || 'Option B', item.option_c || 'Option C', item.option_d || 'Option D'];
+              const corrOpt = (item.correct_option || 'A').toUpperCase();
 
-                  <div className="flex items-center gap-2">
-                    <span className="text-slate-400 font-semibold text-xs">
-                      Question #{idx + 1}
-                    </span>
-                    <div className="flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEditModal(item)}
-                        className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-[#6d3a68] hover:text-white hover:border-[#6d3a68] transition-colors cursor-pointer shadow-2xs"
-                        title="Edit Question"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteItem(item.id)}
-                        className="p-1.5 rounded-lg bg-white border border-slate-200 text-red-600 hover:bg-red-600 hover:text-white hover:border-red-600 transition-colors cursor-pointer shadow-2xs"
-                        title="Delete Question"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+              return (
+                <div
+                  key={item.id}
+                  className="p-5 rounded-2xl bg-[#faf5fa] border border-[#edd6ed] space-y-3 hover:border-[#6d3a68]/40 transition-all shadow-2xs group"
+                >
+                  {/* Header Row */}
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-xs text-[#6d3a68]">
+                        {item.subject}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md bg-white border border-[#edd6ed] text-[10px] font-bold text-slate-600">
+                        {item.class_name || item.class}
+                      </span>
+                      {item.tags && (
+                        <span className="px-2 py-0.5 rounded-md bg-pink-50 border border-pink-200 text-[10px] font-bold text-pink-700">
+                          {item.tags}
+                        </span>
+                      )}
+                      {item.difficulty && (
+                        <span className="px-2 py-0.5 rounded-md bg-purple-50 border border-purple-200 text-[10px] font-bold text-purple-700">
+                          {item.difficulty}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-400 font-semibold text-xs">
+                        Question #{idx + 1}
+                      </span>
+                      <div className="flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditModal(item)}
+                          className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-[#6d3a68] hover:text-white hover:border-[#6d3a68] transition-colors cursor-pointer shadow-2xs"
+                          title="Edit Question"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteItem(item.id)}
+                          className="p-1.5 rounded-lg bg-white border border-slate-200 text-red-600 hover:bg-red-600 hover:text-white hover:border-red-600 transition-colors cursor-pointer shadow-2xs"
+                          title="Delete Question"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Question Statement */}
-                <p className="text-sm font-bold text-[#321630] leading-relaxed">
-                  {item.question_text}
-                </p>
+                  {/* Question Statement */}
+                  <p className="text-sm font-bold text-[#321630] leading-relaxed">
+                    {item.question_text || item.title}
+                  </p>
 
-                {/* Green Solution Box */}
-                <div className="p-3.5 rounded-xl bg-emerald-50/90 border border-emerald-200 text-xs text-emerald-950 font-semibold space-y-0.5">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="font-black text-emerald-900">Correct Answer:</span>
-                    <span className="font-bold">{item.correct_answer}</span>
+                  {/* 4 Options Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                    {['A', 'B', 'C', 'D'].map((letter, optIdx) => {
+                      const text = opts[optIdx] || item[`option_${letter.toLowerCase()}`] || `Option ${letter}`;
+                      const isCorrect = corrOpt === letter || item.correct_answer?.includes(`Option ${letter}`);
+
+                      return (
+                        <div
+                          key={letter}
+                          className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 text-xs transition-colors ${
+                            isCorrect
+                              ? 'bg-emerald-50 border-emerald-400 text-emerald-950 font-bold ring-1 ring-emerald-300'
+                              : 'bg-white border-slate-200 text-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`w-5 h-5 rounded-md font-bold flex items-center justify-center text-[10px] ${
+                                isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'
+                              }`}
+                            >
+                              {letter}
+                            </span>
+                            <span>{text}</span>
+                          </div>
+                          {isCorrect && (
+                            <span className="text-[10px] font-bold text-emerald-700 flex items-center gap-0.5">
+                              <Check className="w-3 h-3" /> Correct
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                  {item.explanation && (
-                    <p className="text-[11px] text-emerald-800 font-normal leading-relaxed pt-0.5">
-                      — {item.explanation}
-                    </p>
-                  )}
+
+                  {/* Green Solution Box */}
+                  <div className="p-3.5 rounded-xl bg-emerald-50/90 border border-emerald-200 text-xs text-emerald-950 font-semibold space-y-1">
+                    <div className="flex items-baseline gap-1.5 flex-wrap">
+                      <span className="font-black text-emerald-900">Correct Answer:</span>
+                      <span className="font-bold">{item.correct_answer || `Option ${corrOpt}`}</span>
+                    </div>
+                    {item.explanation && (
+                      <p className="text-[11px] text-emerald-800 font-normal leading-relaxed pt-0.5">
+                        <strong className="font-bold">Explanation / Solution:</strong> {item.explanation}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -478,7 +556,7 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
                     {modalMode === 'create' ? 'Add Revision Question' : 'Edit Revision Question'}
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Save to Revision Vault database &amp; sync with student dashboard
+                    Save question, 4 options, and solution to sync live with Student Dashboard
                   </p>
                 </div>
               </div>
@@ -535,7 +613,7 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
                 </label>
                 <textarea
                   rows={3}
-                  placeholder="e.g. If 3 apples cost ₹45, what is the cost of 7 apples?"
+                  placeholder="e.g. Find the sum of all prime numbers between 20 and 35."
                   value={formData.question_text}
                   onChange={(e) => setFormData({ ...formData, question_text: e.target.value })}
                   required
@@ -543,89 +621,119 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
                 />
               </div>
 
-              {/* Correct Answer */}
-              <div>
-                <label className="block text-slate-700 font-bold mb-1">
-                  Correct Answer *
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. ₹105 or Heart or 35 tens"
-                  value={formData.correct_answer}
-                  onChange={(e) => setFormData({ ...formData, correct_answer: e.target.value })}
-                  required
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-[#6d3a68]"
-                />
+              {/* 4 Options */}
+              <div className="space-y-2 pt-1">
+                <label className="block text-slate-700 font-bold">4 Multiple Choice Options *</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-600 block mb-0.5">Option A *</span>
+                    <input
+                      type="text"
+                      placeholder="e.g. 83"
+                      value={formData.option_a}
+                      onChange={(e) => setFormData({ ...formData, option_a: e.target.value })}
+                      required
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-[#6d3a68]"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-600 block mb-0.5">Option B *</span>
+                    <input
+                      type="text"
+                      placeholder="e.g. 87"
+                      value={formData.option_b}
+                      onChange={(e) => setFormData({ ...formData, option_b: e.target.value })}
+                      required
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-[#6d3a68]"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-600 block mb-0.5">Option C *</span>
+                    <input
+                      type="text"
+                      placeholder="e.g. 79"
+                      value={formData.option_c}
+                      onChange={(e) => setFormData({ ...formData, option_c: e.target.value })}
+                      required
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-[#6d3a68]"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-600 block mb-0.5">Option D *</span>
+                    <input
+                      type="text"
+                      placeholder="e.g. 89"
+                      value={formData.option_d}
+                      onChange={(e) => setFormData({ ...formData, option_d: e.target.value })}
+                      required
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-[#6d3a68]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Correct Option Selector */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    Select Correct Option *
+                  </label>
+                  <select
+                    value={formData.correct_option}
+                    onChange={(e) => setFormData({ ...formData, correct_option: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-emerald-700 bg-emerald-50 focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="A">Option A is Correct</option>
+                    <option value="B">Option B is Correct</option>
+                    <option value="C">Option C is Correct</option>
+                    <option value="D">Option D is Correct</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    Category Tag
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Tricky Question, Formula Rule"
+                    value={formData.tags}
+                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-[#6d3a68]"
+                  />
+                </div>
               </div>
 
               {/* Step-by-Step Explanation */}
               <div>
                 <label className="block text-slate-700 font-bold mb-1">
-                  Step-by-Step Explanation / Formula Hint
+                  Step-by-Step Mathematical / Conceptual Explanation *
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="e.g. Unit price = 45 / 3 = ₹15. For 7 apples = 7 × 15 = ₹105."
+                  placeholder="e.g. The prime numbers between 20 and 35 are 23, 29, and 31. Sum = 23 + 29 + 31 = 83."
                   value={formData.explanation}
                   onChange={(e) => setFormData({ ...formData, explanation: e.target.value })}
+                  required
                   className="w-full p-3 rounded-xl border border-slate-300 text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-[#6d3a68]"
                 />
               </div>
 
-              {/* Tags & Difficulty */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">Category / Tag</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Tricky, Unitary Method"
-                    value={formData.tags}
-                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-[#6d3a68]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">Difficulty</label>
-                  <select
-                    value={formData.difficulty}
-                    onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold focus:outline-hidden focus:ring-2 focus:ring-[#6d3a68] bg-slate-50"
-                  >
-                    <option value="Foundation">Foundation</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced (HOTS)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold focus:outline-hidden focus:ring-2 focus:ring-[#6d3a68] bg-slate-50"
-                  >
-                    <option value="active">Active (Visible)</option>
-                    <option value="inactive">Inactive (Draft)</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+              {/* Modal Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-slate-600 font-bold hover:bg-slate-100 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2 rounded-xl bg-[#6d3a68] hover:bg-[#5c3158] text-white font-black text-xs uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-50"
+                  className="px-6 py-2 rounded-xl bg-[#6d3a68] hover:bg-[#5c3158] text-white font-bold transition-all shadow-sm cursor-pointer disabled:opacity-50"
                 >
-                  {saving ? 'Saving...' : modalMode === 'create' ? 'Save & Publish' : 'Update Question'}
+                  {saving ? 'Saving...' : modalMode === 'create' ? 'Create Question' : 'Save Changes'}
                 </button>
               </div>
             </form>

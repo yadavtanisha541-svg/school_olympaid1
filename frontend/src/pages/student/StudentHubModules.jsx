@@ -728,6 +728,7 @@ const StudentRevisionVaultModule = ({ user, onNavigateTab }) => {
   const [loading, setLoading] = useState(true);
   const [selectedSubject, setSelectedSubject] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [userAnswers, setUserAnswers] = useState({});
 
   const userClass = user?.class_name || user?.class || 'Class 1';
 
@@ -739,14 +740,22 @@ const StudentRevisionVaultModule = ({ user, onNavigateTab }) => {
         subject: selectedSubject !== 'All' ? selectedSubject : '',
         search: searchQuery
       });
-      if (res.success && Array.isArray(res.data)) {
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
         setItems(res.data);
       } else {
-        setItems([]);
+        // If no class-specific match, fetch all available
+        const allRes = await apiClient.get('/revision-vault', {
+          subject: selectedSubject !== 'All' ? selectedSubject : '',
+          search: searchQuery
+        });
+        if (allRes.success && Array.isArray(allRes.data)) {
+          setItems(allRes.data);
+        } else {
+          setItems([]);
+        }
       }
     } catch (e) {
       console.warn('Error loading revision vault:', e);
-      // Fallback
       setItems([]);
     } finally {
       setLoading(false);
@@ -755,6 +764,17 @@ const StudentRevisionVaultModule = ({ user, onNavigateTab }) => {
 
   useEffect(() => {
     fetchRevisionVault();
+
+    const handleVaultSync = () => {
+      fetchRevisionVault();
+    };
+
+    window.addEventListener('revision-vault-updated', handleVaultSync);
+    window.addEventListener('storage', handleVaultSync);
+    return () => {
+      window.removeEventListener('revision-vault-updated', handleVaultSync);
+      window.removeEventListener('storage', handleVaultSync);
+    };
   }, [userClass, selectedSubject]);
 
   const subjectFilters = [
@@ -767,6 +787,13 @@ const StudentRevisionVaultModule = ({ user, onNavigateTab }) => {
     { label: 'Reasoning (ISSO)', value: 'Reasoning' }
   ];
 
+  const handleSelectOption = (questionId, optLetter) => {
+    setUserAnswers((prev) => ({
+      ...prev,
+      [questionId]: optLetter
+    }));
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
       {/* Top Hero Banner */}
@@ -777,7 +804,7 @@ const StudentRevisionVaultModule = ({ user, onNavigateTab }) => {
         </div>
         <h1 className="text-2xl sm:text-3xl font-black">My Revision Vault &amp; Question Bookmarks</h1>
         <p className="text-xs sm:text-sm text-pink-100 mt-1">
-          Review tricky questions, bookmarked concepts, and weak areas identified by AI analytics.
+          Review tricky questions, bookmarked concepts, and faculty-curated solutions for your class.
         </p>
       </div>
 
@@ -837,41 +864,112 @@ const StudentRevisionVaultModule = ({ user, onNavigateTab }) => {
             <p className="text-[11px] text-slate-400">Select another subject tab or check back later!</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {items.map((item, idx) => (
-              <div
-                key={item.id || idx}
-                className="p-4 sm:p-5 rounded-2xl bg-[#faf5fa] border border-[#edd6ed] space-y-2.5 hover:border-[#6d3a68]/40 transition-all shadow-2xs"
-              >
-                <div className="flex items-center justify-between text-[11px]">
-                  <div className="flex items-center gap-2">
-                    <span className="font-black text-[#6d3a68]">{item.subject}</span>
-                    {item.tags && (
-                      <span className="px-2 py-0.5 rounded-md bg-white border border-[#edd6ed] text-[10px] font-bold text-slate-500">
-                        {item.tags}
+          <div className="space-y-4">
+            {items.map((item, idx) => {
+              const opts = Array.isArray(item.options) && item.options.length >= 2
+                ? item.options
+                : [item.option_a || 'Option A', item.option_b || 'Option B', item.option_c || 'Option C', item.option_d || 'Option D'];
+              const corrOpt = (item.correct_option || 'A').toUpperCase();
+              const userPick = userAnswers[item.id || idx];
+
+              return (
+                <div
+                  key={item.id || idx}
+                  className="p-5 rounded-2xl bg-[#faf5fa] border border-[#edd6ed] space-y-3 hover:border-[#6d3a68]/40 transition-all shadow-2xs"
+                >
+                  <div className="flex items-center justify-between text-[11px] flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-[#6d3a68]">{item.subject}</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white border border-[#edd6ed] text-[10px] font-bold text-slate-600">
+                        {item.class_name || item.class || userClass}
                       </span>
+                      {item.tags && (
+                        <span className="px-2 py-0.5 rounded-md bg-pink-50 border border-pink-200 text-[10px] font-bold text-pink-700">
+                          {item.tags}
+                        </span>
+                      )}
+                      {item.difficulty && (
+                        <span className="px-2 py-0.5 rounded-md bg-purple-50 border border-purple-200 text-[10px] font-bold text-purple-700">
+                          {item.difficulty}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-slate-400 font-semibold">Question #{idx + 1}</span>
+                  </div>
+
+                  <p className="text-sm font-bold text-[#4e2a4a] leading-relaxed">
+                    {item.question_text || item.title}
+                  </p>
+
+                  {/* 4 Interactive Options */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                    {['A', 'B', 'C', 'D'].map((letter, optIdx) => {
+                      const text = opts[optIdx] || item[`option_${letter.toLowerCase()}`] || `Option ${letter}`;
+                      const isCorrect = corrOpt === letter;
+                      const isSelected = userPick === letter;
+
+                      let optStyle = 'bg-white border-slate-200 text-slate-700 hover:border-[#6d3a68]/50';
+                      if (isSelected) {
+                        if (isCorrect) {
+                          optStyle = 'bg-emerald-50 border-emerald-500 text-emerald-950 font-bold ring-2 ring-emerald-400/30';
+                        } else {
+                          optStyle = 'bg-rose-50 border-rose-400 text-rose-950 font-bold';
+                        }
+                      } else if (userPick && isCorrect) {
+                        optStyle = 'bg-emerald-50/70 border-emerald-300 text-emerald-950 font-bold';
+                      }
+
+                      return (
+                        <button
+                          key={letter}
+                          type="button"
+                          onClick={() => handleSelectOption(item.id || idx, letter)}
+                          className={`p-3 rounded-xl border flex items-center justify-between gap-2 text-xs transition-all text-left cursor-pointer ${optStyle}`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span
+                              className={`w-6 h-6 rounded-lg font-bold flex items-center justify-center text-xs shrink-0 ${
+                                isSelected && isCorrect
+                                  ? 'bg-emerald-600 text-white'
+                                  : isSelected && !isCorrect
+                                  ? 'bg-rose-600 text-white'
+                                  : 'bg-slate-100 text-slate-700'
+                              }`}
+                            >
+                              {letter}
+                            </span>
+                            <span className="font-semibold">{text}</span>
+                          </div>
+                          {isSelected && isCorrect && (
+                            <span className="text-[10px] font-bold text-emerald-700 flex items-center gap-0.5">
+                              <Check className="w-3 h-3" /> Correct!
+                            </span>
+                          )}
+                          {isSelected && !isCorrect && (
+                            <span className="text-[10px] font-bold text-rose-600">
+                              Your Pick
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Solution Box */}
+                  <div className="p-3.5 rounded-xl bg-emerald-50/90 border border-emerald-200 text-xs text-emerald-950 font-semibold space-y-1 mt-1">
+                    <div className="flex items-baseline gap-1.5 flex-wrap">
+                      <span className="font-black text-emerald-900">Correct Answer:</span>
+                      <span className="font-bold">{item.correct_answer || `Option ${corrOpt}`}</span>
+                    </div>
+                    {item.explanation && (
+                      <p className="text-[11px] text-emerald-800 font-normal leading-relaxed pt-0.5">
+                        <strong className="font-bold">Explanation / Solution:</strong> {item.explanation}
+                      </p>
                     )}
                   </div>
-                  <span className="text-slate-400 font-semibold">Question #{idx + 1}</span>
                 </div>
-
-                <p className="text-xs sm:text-sm font-bold text-[#4e2a4a] leading-relaxed">
-                  {item.question_text}
-                </p>
-
-                <div className="p-3 rounded-xl bg-emerald-50/90 border border-emerald-200 text-xs text-emerald-950 font-semibold space-y-0.5">
-                  <div>
-                    <span className="font-black text-emerald-900">Correct Answer: </span>
-                    <span>{item.correct_answer}</span>
-                  </div>
-                  {item.explanation && (
-                    <p className="text-[11px] text-emerald-800 font-normal leading-relaxed pt-0.5">
-                      — {item.explanation}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

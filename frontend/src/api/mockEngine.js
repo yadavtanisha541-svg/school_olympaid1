@@ -190,25 +190,87 @@ const initialStore = {
   revision_vault: [
     {
       id: 1,
-      title: 'IMO Class 6 - Formula Sheet & Speed Math Cheatsheet',
-      subject: 'Mathematics',
+      title: 'Sum of Prime Numbers Challenge',
+      question_text: 'Find the sum of all prime numbers between 20 and 35.',
+      subject: 'Mathematics (IMO)',
+      subject_name: 'Mathematics',
       subject_code: 'IMO',
       class: 'Class 6',
-      category: 'Formula Sheet',
-      download_count: 428,
-      status: 'published',
-      description: 'Complete one-page summary of all number system laws, geometry perimeter/area formulas, and unitary shortcuts.'
+      class_name: 'Class 6',
+      options: ['83', '87', '79', '89'],
+      option_a: '83',
+      option_b: '87',
+      option_c: '79',
+      option_d: '89',
+      correct_option: 'A',
+      correct_answer: 'Option A: 83',
+      explanation: 'The prime numbers between 20 and 35 are 23, 29, and 31. Therefore, Sum = 23 + 29 + 31 = 83.',
+      tags: 'Tricky Question',
+      difficulty: 'Intermediate',
+      status: 'active'
     },
     {
       id: 2,
-      title: 'NSO Class 6 - Science Quick Revision Mind Maps',
-      subject: 'Science',
+      title: 'Photosynthesis Byproduct & Stomata Role',
+      question_text: 'Which gas is predominantly released by green plants during the process of photosynthesis in daytime?',
+      subject: 'Science (NSO)',
+      subject_name: 'Science',
       subject_code: 'NSO',
       class: 'Class 6',
-      category: 'Mind Maps',
-      download_count: 312,
-      status: 'published',
-      description: 'Visual flowcharts summarizing plant parts, electricity circuits, motion types, and dietary nutrients.'
+      class_name: 'Class 6',
+      options: ['Oxygen (O2)', 'Carbon Dioxide (CO2)', 'Nitrogen (N2)', 'Methane (CH4)'],
+      option_a: 'Oxygen (O2)',
+      option_b: 'Carbon Dioxide (CO2)',
+      option_c: 'Nitrogen (N2)',
+      option_d: 'Methane (CH4)',
+      correct_option: 'A',
+      correct_answer: 'Option A: Oxygen (O2)',
+      explanation: 'During daytime photosynthesis, chlorophyll absorbs sunlight and converts carbon dioxide and water into glucose, releasing oxygen gas into the atmosphere.',
+      tags: 'Concept Revision',
+      difficulty: 'Easy',
+      status: 'active'
+    },
+    {
+      id: 3,
+      title: 'Roman Numeral Decoding Rule',
+      question_text: 'What is the value of Roman numeral CLXVIII in the standard Hindu-Arabic numeral system?',
+      subject: 'Mathematics (IMO)',
+      subject_name: 'Mathematics',
+      subject_code: 'IMO',
+      class: 'Class 6',
+      class_name: 'Class 6',
+      options: ['168', '148', '178', '158'],
+      option_a: '168',
+      option_b: '148',
+      option_c: '178',
+      option_d: '158',
+      correct_option: 'A',
+      correct_answer: 'Option A: 168',
+      explanation: 'C = 100, L = 50, X = 10, VIII = 8. Adding all together: 100 + 50 + 10 + 8 = 168.',
+      tags: 'Formula / Rules',
+      difficulty: 'Intermediate',
+      status: 'active'
+    },
+    {
+      id: 4,
+      title: 'Vocabulary & Idiomatic Expressions',
+      question_text: 'Choose the correct meaning of the idiom: "A piece of cake".',
+      subject: 'English (IEO)',
+      subject_name: 'English',
+      subject_code: 'IEO',
+      class: 'Class 6',
+      class_name: 'Class 6',
+      options: ['Something very easy to do', 'A sweet dessert', 'A difficult challenge', 'A birthday celebration'],
+      option_a: 'Something very easy to do',
+      option_b: 'A sweet dessert',
+      option_c: 'A difficult challenge',
+      option_d: 'A birthday celebration',
+      correct_option: 'A',
+      correct_answer: 'Option A: Something very easy to do',
+      explanation: '"A piece of cake" is an English colloquial idiom meaning a very simple task or accomplishment.',
+      tags: 'Vocabulary Sprint',
+      difficulty: 'Easy',
+      status: 'active'
     }
   ],
   exams: [
@@ -535,24 +597,115 @@ export const mockEngine = {
     // REVISION VAULT
     if (root === 'revision-vault') {
       let vault = getDb('revision_vault');
-      if (method === 'GET') {
-        return { success: true, data: vault };
+      if (!Array.isArray(vault) || vault.length === 0 || !vault[0]?.question_text) {
+        vault = initialStore.revision_vault;
+        saveDb('revision_vault', vault);
       }
+
+      if (method === 'POST' && sub === 'seed') {
+        saveDb('revision_vault', initialStore.revision_vault);
+        return { success: true, message: 'Reset to sample revision questions', data: initialStore.revision_vault };
+      }
+
+      if (method === 'GET') {
+        const queryParams = params || {};
+        const classFilter = queryParams.class || (endpoint.includes('class=') ? decodeURIComponent(endpoint.split('class=')[1].split('&')[0]) : '');
+        const subjectFilter = queryParams.subject || (endpoint.includes('subject=') ? decodeURIComponent(endpoint.split('subject=')[1].split('&')[0]) : '');
+        const searchFilter = (queryParams.search || (endpoint.includes('search=') ? decodeURIComponent(endpoint.split('search=')[1].split('&')[0]) : '')).toLowerCase();
+
+        let filtered = [...vault];
+        if (classFilter && classFilter !== 'All') {
+          filtered = filtered.filter((v) => {
+            const vCls = v.class_name || v.class || '';
+            const match1 = vCls.match(/\d+/);
+            const match2 = classFilter.match(/\d+/);
+            return match1 && match2 ? match1[0] === match2[0] : vCls.includes(classFilter);
+          });
+        }
+        if (subjectFilter && subjectFilter !== 'All' && subjectFilter !== 'ALL') {
+          filtered = filtered.filter((v) => {
+            const vSub = (v.subject || v.subject_name || v.subject_code || '').toUpperCase();
+            return vSub.includes(subjectFilter.toUpperCase());
+          });
+        }
+        if (searchFilter) {
+          filtered = filtered.filter((v) =>
+            (v.question_text || '').toLowerCase().includes(searchFilter) ||
+            (v.subject || '').toLowerCase().includes(searchFilter) ||
+            (v.explanation || '').toLowerCase().includes(searchFilter)
+          );
+        }
+
+        return { success: true, data: filtered };
+      }
+
       if (method === 'POST') {
-        const newItem = { id: Date.now(), ...body, download_count: 0 };
+        const rawOpts = Array.isArray(body.options) && body.options.length >= 2
+          ? body.options
+          : [body.option_a || 'Option A', body.option_b || 'Option B', body.option_c || 'Option C', body.option_d || 'Option D'];
+        
+        const corrOption = (body.correct_option || 'A').toUpperCase();
+        let corrAnswer = body.correct_answer || '';
+        if (!corrAnswer && body[`option_${corrOption.toLowerCase()}`]) {
+          corrAnswer = `Option ${corrOption}: ${body[`option_${corrOption.toLowerCase()}`]}`;
+        } else if (!corrAnswer) {
+          corrAnswer = `Option ${corrOption}`;
+        }
+
+        const newItem = {
+          id: Date.now(),
+          title: body.title || body.question_text?.substring(0, 40) || 'Revision Question',
+          question_text: body.question_text || 'Question Statement',
+          subject: body.subject || 'Mathematics (IMO)',
+          subject_name: body.subject_name || body.subject || 'Mathematics',
+          subject_code: body.subject_code || 'IMO',
+          class: body.class_name || body.class || 'Class 6',
+          class_name: body.class_name || body.class || 'Class 6',
+          options: rawOpts,
+          option_a: rawOpts[0] || body.option_a || '',
+          option_b: rawOpts[1] || body.option_b || '',
+          option_c: rawOpts[2] || body.option_c || '',
+          option_d: rawOpts[3] || body.option_d || '',
+          correct_option: corrOption,
+          correct_answer: corrAnswer,
+          explanation: body.explanation || '',
+          tags: body.tags || 'Tricky Question',
+          difficulty: body.difficulty || 'Intermediate',
+          status: body.status || 'active',
+          created_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
+        };
+
         vault.unshift(newItem);
         saveDb('revision_vault', vault);
-        return { success: true, message: 'Revision item created', data: newItem };
+        return { success: true, message: 'Revision question created successfully', data: newItem };
       }
+
       if (method === 'PUT' && sub) {
-        vault = vault.map((v) => (String(v.id) === String(sub) ? { ...v, ...body } : v));
+        vault = vault.map((v) => {
+          if (String(v.id) === String(sub)) {
+            const rawOpts = Array.isArray(body.options) && body.options.length >= 2
+              ? body.options
+              : (body.option_a ? [body.option_a, body.option_b, body.option_c, body.option_d] : (v.options || []));
+            return {
+              ...v,
+              ...body,
+              options: rawOpts,
+              option_a: rawOpts[0] || body.option_a || v.option_a,
+              option_b: rawOpts[1] || body.option_b || v.option_b,
+              option_c: rawOpts[2] || body.option_c || v.option_c,
+              option_d: rawOpts[3] || body.option_d || v.option_d
+            };
+          }
+          return v;
+        });
         saveDb('revision_vault', vault);
-        return { success: true, message: 'Revision item updated' };
+        return { success: true, message: 'Revision question updated successfully' };
       }
+
       if (method === 'DELETE' && sub) {
         vault = vault.filter((v) => String(v.id) !== String(sub));
         saveDb('revision_vault', vault);
-        return { success: true, message: 'Revision item deleted' };
+        return { success: true, message: 'Revision question deleted successfully' };
       }
     }
 
