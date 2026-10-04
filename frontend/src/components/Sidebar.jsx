@@ -521,11 +521,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     <div className="pl-7 pr-2 py-0.5 space-y-0.5">
                       {[
                         { id: 'info_datesheet', label: 'Date Sheet', icon: Calendar },
-                        { id: 'info_awards', label: 'Awards', icon: Trophy },
-                        { id: 'info_icso', label: 'ICSO', icon: Laptop },
-                        { id: 'info_nso', label: 'NSO', icon: Rocket },
-                        { id: 'info_imo', label: 'IMO', icon: Calculator },
-                        { id: 'info_ieo', label: 'IEO', icon: BookOpen }
+                        { id: 'info_awards', label: 'Awards', icon: Trophy }
                       ].map((sub) => {
                         const SubIcon = sub.icon;
                         const isSubActive = currentTab === sub.id;
