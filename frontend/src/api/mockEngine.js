@@ -16,13 +16,38 @@ const initialStore = {
     },
     {
       id: 2,
+      login_id: 'STU-2026-0100',
+      full_name: 'Aarav Sharma',
       name: 'Aarav Sharma',
       email: 'student@olympiadhub.com',
+      phone: '9876543210',
+      password: 'Student@123',
       role: 'student',
       status: 'active',
-      class: 'Class 6',
-      grade: 'Class 6',
       school: 'Delhi Public School',
+      school_name: 'Delhi Public School',
+      class: 'Class 6',
+      class_name: 'Class 6',
+      class_id: 6,
+      section: 'A',
+      roll_number: '12',
+      academic_year: '2026-2027',
+      dob: '2013-04-10',
+      gender: 'Male',
+      father_name: 'Rajesh Sharma',
+      mother_name: 'Pooja Sharma',
+      parent_name: 'Rajesh Sharma',
+      parent_phone: '9876543210',
+      parent_email: 'parent@gmail.com',
+      emergency_contact: '9876543210',
+      olympiad_category: 'Junior Olympiad',
+      subject: 'Mathematics',
+      registration_status: 'Registered',
+      registered_olympiads: ['Mathematics Olympiad', 'Science Olympiad'],
+      address: '42, Civil Lines',
+      city: 'New Delhi',
+      state: 'Delhi',
+      pincode: '110054',
       created_at: '2026-02-15 14:30:00'
     }
   ],
@@ -311,6 +336,10 @@ function getDb(table) {
     if (table === 'academic_classes' && (parsed.length < 15 || !parsed.some(c => c.name === 'Nursery'))) {
       localStorage.setItem(STORAGE_PREFIX + table, JSON.stringify(initialStore.academic_classes));
       return initialStore.academic_classes;
+    }
+    if (table === 'users' && (!parsed.some(u => u.school_name || u.school))) {
+      localStorage.setItem(STORAGE_PREFIX + table, JSON.stringify(initialStore.users));
+      return initialStore.users;
     }
     return parsed;
   } catch (e) {
@@ -1597,12 +1626,150 @@ export const mockEngine = {
     // USERS (STUDENTS & TEACHERS)
     if (root === 'users') {
       let users = getDb('users');
-      if (sub === 'students') {
-        return { success: true, data: users.filter((u) => u.role === 'student') };
+
+      // GET queries
+      if (method === 'GET') {
+        if (sub === 'students') {
+          return { success: true, data: users.filter((u) => u.role === 'student') };
+        }
+        if (sub === 'teachers') {
+          return { success: true, data: users.filter((u) => u.role === 'teacher') };
+        }
+        if (sub) {
+          const user = users.find((u) => String(u.id) === String(sub) || u.login_id === sub);
+          return { success: true, data: user || null };
+        }
+        return { success: true, data: users };
       }
-      if (sub === 'teachers') {
-        return { success: true, data: users.filter((u) => u.role === 'teacher') };
+
+      // Reset password (POST /users/:id/reset-password or POST /users/reset-password)
+      if (method === 'POST' && (sub === 'reset-password' || subId === 'reset-password')) {
+        const targetId = subId === 'reset-password' ? sub : body.user_id || body.id;
+        const newPass = body.new_password || body.password || 'Student@123';
+        users = users.map((u) =>
+          String(u.id) === String(targetId) || u.login_id === String(targetId)
+            ? { ...u, password: newPass, confirm_password: newPass }
+            : u
+        );
+        saveDb('users', users);
+        return { success: true, message: 'Password reset successfully', new_password: newPass };
       }
+
+      // Toggle status (POST /users/:id/toggle-status)
+      if (method === 'POST' && subId === 'toggle-status') {
+        users = users.map((u) => {
+          if (String(u.id) === String(sub)) {
+            const nextStatus = u.status === 'active' ? 'inactive' : 'active';
+            return { ...u, status: nextStatus };
+          }
+          return u;
+        });
+        saveDb('users', users);
+        return { success: true, message: 'Status updated successfully' };
+      }
+
+      // Bulk delete (POST /users/bulk-delete)
+      if (method === 'POST' && sub === 'bulk-delete') {
+        const idsToDelete = Array.isArray(body.ids) ? body.ids.map(String) : [];
+        users = users.filter((u) => !idsToDelete.includes(String(u.id)));
+        saveDb('users', users);
+        return { success: true, message: `${idsToDelete.length} user(s) deleted successfully` };
+      }
+
+      // Create new user (POST /users)
+      if (method === 'POST') {
+        const classes = getDb('academic_classes');
+        const assignedClass = classes.find((c) => String(c.id) === String(body.class_id)) || {};
+        const newId = Date.now();
+        const autoLoginId = body.login_id || `STU-${new Date().getFullYear()}-${String(users.length + 1).padStart(4, '0')}`;
+
+        const newUser = {
+          id: newId,
+          role: body.role || 'student',
+          login_id: autoLoginId,
+          student_id: autoLoginId,
+          full_name: body.full_name || 'New Student',
+          name: body.full_name || 'New Student',
+          email: body.email || '',
+          phone: body.phone || '',
+          password: body.password || 'Student@123',
+          confirm_password: body.password || 'Student@123',
+          status: body.status || 'active',
+          avatar: body.avatar || body.profile_photo || '',
+          profile_photo: body.avatar || body.profile_photo || '',
+
+          // School & Academic Details
+          school_name: body.school_name || 'Independent Candidate',
+          school: body.school_name || 'Independent Candidate',
+          school_address: body.school_address || '',
+          class_id: body.class_id || 6,
+          class_name: body.class_name || assignedClass.name || 'Class 6',
+          class: body.class_name || assignedClass.name || 'Class 6',
+          grade: body.class_name || assignedClass.name || 'Class 6',
+          section: body.section || 'A',
+          roll_number: body.roll_number || '1',
+          academic_year: body.academic_year || '2026-2027',
+          registration_status: body.registration_status || 'Registered',
+
+          // Personal & Parent Details
+          dob: body.dob || '2012-05-15',
+          gender: body.gender || 'Male',
+          father_name: body.father_name || '',
+          mother_name: body.mother_name || '',
+          guardian_name: body.guardian_name || body.father_name || '',
+          parent_name: body.parent_name || body.father_name || '',
+          parent_phone: body.parent_phone || body.phone || '',
+          parent_email: body.parent_email || body.email || '',
+          emergency_contact: body.emergency_contact || body.parent_phone || body.phone || '',
+
+          // Address
+          address: body.address || '',
+          city: body.city || '',
+          state: body.state || '',
+          pincode: body.pincode || '',
+
+          // Olympiad & Document Info
+          registered_olympiads: body.registered_olympiads || ['Mathematics Olympiad', 'Science Olympiad'],
+          created_at: new Date().toISOString()
+        };
+
+        users.unshift(newUser);
+        saveDb('users', users);
+        return { success: true, message: 'User created successfully', data: newUser };
+      }
+
+      // Update user (PUT /users/:id)
+      if (method === 'PUT' && sub) {
+        let updatedUser = null;
+        users = users.map((u) => {
+          if (String(u.id) === String(sub) || u.login_id === String(sub)) {
+            const updated = {
+              ...u,
+              ...body,
+              school_name: body.school_name !== undefined ? body.school_name : (u.school_name || u.school),
+              school: body.school_name !== undefined ? body.school_name : (u.school || u.school_name),
+              student_id: body.login_id || u.student_id || u.login_id,
+              login_id: body.login_id || u.login_id || u.student_id,
+              password: body.password || u.password,
+              confirm_password: body.password || u.confirm_password || u.password
+            };
+            updatedUser = updated;
+            return updated;
+          }
+          return u;
+        });
+
+        saveDb('users', users);
+        return { success: true, message: 'User updated successfully', data: updatedUser };
+      }
+
+      // Delete user (DELETE /users/:id)
+      if (method === 'DELETE' && sub) {
+        users = users.filter((u) => String(u.id) !== String(sub) && u.login_id !== String(sub));
+        saveDb('users', users);
+        return { success: true, message: 'User deleted successfully' };
+      }
+
       return { success: true, data: users };
     }
 
