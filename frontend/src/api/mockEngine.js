@@ -1953,6 +1953,71 @@ export const mockEngine = {
 
     // ANALYTICS
     if (root === 'analytics') {
+      if (sub === 'student') {
+        const results = getDb('results') || [];
+        const user = JSON.parse(sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user') || '{}');
+        
+        // Filter results for student
+        const studentResults = results.filter((r) => {
+          if (!user || (!user.id && !user.login_id)) return true;
+          return (r.student_id && (r.student_id === user.id || String(r.student_id) === String(user.id))) ||
+                 (r.student_login_id && (r.student_login_id === user.login_id || r.login_id === user.login_id)) ||
+                 (r.user_id && (r.user_id === user.id || String(r.user_id) === String(user.id))) ||
+                 !r.student_id;
+        });
+
+        const totalAttempts = studentResults.length;
+        const passedCount = studentResults.filter(r => !!r.passed || parseFloat(r.percentage || 0) >= 40).length;
+        const totalPct = studentResults.reduce((acc, r) => acc + parseFloat(r.percentage || 0), 0);
+        const avgScore = totalAttempts > 0 ? Math.round(totalPct / totalAttempts) : 0;
+        const bestScore = studentResults.length > 0 ? Math.round(Math.max(...studentResults.map(r => parseFloat(r.percentage || 0)))) : 0;
+        
+        // Subject breakdown
+        const subjectMap = {};
+        studentResults.forEach(r => {
+          const subName = r.subject_name || r.subject || r.exam_title || 'General Olympiad';
+          if (!subjectMap[subName]) {
+            subjectMap[subName] = { subject_name: subName, total_answered: 0, correct_count: 0, total_pct: 0, count: 0 };
+          }
+          subjectMap[subName].count += 1;
+          const qCount = parseInt(r.total_questions || r.total_marks || 10);
+          const cCount = parseInt(r.correct_count || r.score || 0);
+          subjectMap[subName].total_answered += qCount;
+          subjectMap[subName].correct_count += cCount;
+          subjectMap[subName].total_pct += parseFloat(r.percentage || (qCount > 0 ? (cCount / qCount) * 100 : 0));
+        });
+
+        const subjectProgress = Object.values(subjectMap).map(s => ({
+          subject_name: s.subject_name,
+          accuracy: s.total_answered > 0 ? Math.round((s.correct_count / s.total_answered) * 100) : Math.round(s.total_pct / s.count),
+          total_answered: s.total_answered,
+          correct_count: s.correct_count
+        }));
+
+        const scoreTrend = studentResults.slice(0, 10).reverse().map((r, idx) => ({
+          label: `Test ${idx + 1}`,
+          percentage: parseFloat(r.percentage || 0),
+          score: r.score,
+          exam_title: r.exam_title || r.title
+        }));
+
+        return {
+          success: true,
+          data: {
+            metrics: {
+              total_attempts: totalAttempts,
+              total_passed: passedCount,
+              avg_score: avgScore,
+              best_score: bestScore,
+              best_rank: totalAttempts > 0 ? 1 : null
+            },
+            recent_attempts: studentResults,
+            subject_progress: subjectProgress,
+            score_trend: scoreTrend
+          }
+        };
+      }
+
       return {
         success: true,
         data: {
