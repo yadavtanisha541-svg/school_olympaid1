@@ -1375,29 +1375,28 @@ export const TestGeneratorAdminManager = () => {
     <div className="space-y-6 font-sans pb-16 animate-in fade-in duration-150">
       
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-[#d97706] via-[#0284c7] to-[#059669] rounded-2xl px-6 py-4 sm:py-5 text-white shadow-sm flex items-center justify-between flex-wrap gap-4">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-bold uppercase tracking-wider">
-            <Award className="w-3.5 h-3.5 text-amber-300" />
-            <span>Super Admin &bull; Exam &amp; Question Paper Center</span>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="w-14 h-14 rounded-2xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-xs">
+            <Award className="w-7 h-7 text-[#80497D]" />
           </div>
-          <h1 className="text-lg sm:text-xl font-black tracking-tight text-white">
-            Sample Papers, Previous Year Papers &amp; Test Generator Manager
-          </h1>
-          <p className="text-xs text-amber-100 font-medium">
-            Create, author questions in bulk, export PDF with answers, and publish exam papers for students.
-          </p>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight">
+              Sample Papers, Previous Year Papers &amp; Test Generator Manager
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+              Create, author questions in bulk, export PDF with answers, and publish exam papers for students.
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
-
-
+        <div className="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
           <button
             type="button"
             onClick={() => handleOpenCreateModal(activeCategoryTab)}
-            className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-900 font-black rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-98 cursor-pointer flex items-center gap-2 shrink-0"
+            className="px-5 py-2.5 bg-[#00b074] hover:bg-[#009260] text-white font-black rounded-xl text-sm transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2 shrink-0"
           >
-            <Plus className="w-4 h-4 text-amber-600 font-black" />
+            <Plus className="w-4.5 h-4.5" />
             <span>Create New Paper</span>
           </button>
         </div>

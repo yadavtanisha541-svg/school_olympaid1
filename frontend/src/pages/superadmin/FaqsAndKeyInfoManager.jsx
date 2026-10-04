@@ -311,42 +311,41 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
         </div>
       )}
 
-      {/* Header Banner (Slim & Compact) */}
-      <div className="bg-gradient-to-r from-[#4e2a4a] via-[#6d3a68] to-[#8c4e8b] rounded-2xl p-4 sm:p-5 text-white shadow-xs relative overflow-hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 relative z-10">
+      {/* Header Banner */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="w-14 h-14 rounded-2xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-xs">
+            <Sparkles className="w-7 h-7 text-[#80497D]" />
+          </div>
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#e7b84b]/20 border border-[#e7b84b]/40 text-[#e7b84b] text-[10px] font-bold uppercase tracking-wider mb-1">
-              <Sparkles className="w-3 h-3" />
-              <span>Super Admin Content &amp; Navigation Suite</span>
-            </div>
-            <h1 className="text-lg sm:text-xl font-black tracking-tight leading-snug">
+            <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight">
               FAQs &amp; Key Info Content Manager
             </h1>
-            <p className="text-xs text-pink-100/90 mt-0.5 max-w-3xl">
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
               Manage the 5 key dropdown items (FAQs, Exam Dates, Syllabus, Sample Papers, Marking Scheme) across all subjects and grades.
             </p>
           </div>
+        </div>
 
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
-            {onGoToPublic && (
-              <button
-                type="button"
-                onClick={onGoToPublic}
-                className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <Eye className="w-3.5 h-3.5 text-[#e7b84b]" />
-                <span>Preview Public Website</span>
-              </button>
-            )}
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          {onGoToPublic && (
             <button
               type="button"
-              onClick={handleResetAllToDefaults}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-red-500/20 hover:bg-red-500/30 text-red-100 border border-red-400/30 transition-all flex items-center gap-1.5 cursor-pointer"
+              onClick={onGoToPublic}
+              className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-2 cursor-pointer shadow-xs"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset Defaults</span>
+              <Eye className="w-4 h-4 text-[#80497D]" />
+              <span>Preview Public Website</span>
             </button>
-          </div>
+          )}
+          <button
+            type="button"
+            onClick={handleResetAllToDefaults}
+            className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-all flex items-center gap-2 cursor-pointer shadow-xs"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>Reset Defaults</span>
+          </button>
         </div>
       </div>
 

@@ -922,31 +922,30 @@ Section: General Awareness`);
       )}
 
       {/* Top Header Banner */}
-      <div className="bg-gradient-to-r from-[#4e2a4a] via-[#6d3a68] to-[#8c4e8b] rounded-2xl p-4 sm:p-5 text-white shadow-xs relative overflow-hidden">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="w-14 h-14 rounded-2xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-xs">
+            <BookOpen className="w-7 h-7 text-[#80497D]" />
+          </div>
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-[#e7b84b] text-[10px] font-bold uppercase tracking-wider mb-1">
-              <BookOpen className="w-3 h-3 text-[#e7b84b]" />
-              <span>Super Admin Mock Test Series &amp; Covers Studio</span>
-            </div>
-            <h1 className="text-lg sm:text-xl font-black tracking-tight leading-snug">
+            <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight">
               Subject-wise Mock Test Series Covers &amp; Papers Studio
             </h1>
-            <p className="text-xs text-pink-100/90 mt-0.5 max-w-2xl font-medium">
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
               Create and manage Subject Mock Test Series Covers with multiple Mock Tests (Test 1, 2, 3...) that sync immediately to the Student Dashboard.
             </p>
           </div>
+        </div>
 
-          <div className="flex items-center gap-2 shrink-0 flex-wrap">
-            <button
-              type="button"
-              onClick={handleOpenCreatePaper}
-              className="px-4 py-2 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white font-black text-xs transition-all shadow-sm active:scale-95 cursor-pointer flex items-center gap-1.5"
-            >
-              <Plus className="w-4 h-4" />
-              <span>+ Create Mock Test Paper</span>
-            </button>
-          </div>
+        <div className="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
+          <button
+            type="button"
+            onClick={handleOpenCreatePaper}
+            className="px-5 py-2.5 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white font-black text-sm transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
+          >
+            <Plus className="w-4.5 h-4.5" />
+            <span>Create Mock Test Paper</span>
+          </button>
         </div>
       </div>
 
