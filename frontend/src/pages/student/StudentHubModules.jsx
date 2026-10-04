@@ -163,29 +163,24 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
 
     return (
       <div className="space-y-6">
-        <div
-          className="rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden"
-          style={{ background: `linear-gradient(135deg, ${cur.color} 0%, #4e2a4a 100%)` }}
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-wider mb-3">
-                <Icon className="w-3.5 h-3.5 text-[#e7b84b]" />
-                <span>Structured Skill Development Curriculum</span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-black">{cur.title}</h1>
-              <p className="text-xs sm:text-sm text-pink-100 mt-1">
-                4-Stage Structured Pathway for Class {user?.class || 'Class 1'} Mastery in {cur.subject}
-              </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed] mb-2 shadow-2xs">
+              <Icon className="w-3.5 h-3.5 text-[#6d3a68]" />
+              <span>Structured Skill Development Curriculum</span>
             </div>
-
-            <button
-              onClick={() => alert(`Enrolled in ${cur.code} Skill Certification!`)}
-              className="px-5 py-2.5 rounded-xl text-xs font-black bg-[#e7b84b] text-[#321630] hover:bg-[#deb145] transition-all shadow-md cursor-pointer shrink-0"
-            >
-              Resume Program →
-            </button>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">{cur.title}</h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+              4-Stage Structured Pathway for Class {user?.class || 'Class 1'} Mastery in {cur.subject}
+            </p>
           </div>
+
+          <button
+            onClick={() => alert(`Enrolled in ${cur.code} Skill Certification!`)}
+            className="px-5 py-2.5 rounded-xl text-xs font-black bg-[#6d3a68] text-white hover:bg-[#5c3158] transition-all shadow-md cursor-pointer shrink-0"
+          >
+            Resume Program →
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -230,13 +225,13 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
   if (activeModule === 'forum') {
     return (
       <div className="space-y-6">
-        <div className="bg-gradient-to-r from-[#4e2a4a] to-[#6d3a68] rounded-3xl p-6 sm:p-8 text-white shadow-md">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-black uppercase tracking-wider mb-2">
-            <Users className="w-4 h-4 text-[#e7b84b]" />
+        <div className="pb-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed] mb-2 shadow-2xs">
+            <Users className="w-3.5 h-3.5 text-[#6d3a68]" />
             <span>Peer Learning &amp; Faculty Support</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black">Student Discussion Forum &amp; Q&amp;A</h1>
-          <p className="text-xs sm:text-sm text-pink-100 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">Student Discussion Forum &amp; Q&amp;A</h1>
+          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
             Ask Olympiad doubts, discuss tricky sample questions, and get verified answers from expert faculty.
           </p>
         </div>
@@ -330,9 +325,13 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
       const faqsList = getDynamicFaqsList();
       return (
         <div className="space-y-6">
-          <div className="bg-gradient-to-r from-[#4e2a4a] to-[#6d3a68] rounded-3xl p-6 sm:p-8 text-white shadow-md">
-            <h1 className="text-2xl sm:text-3xl font-black">Student FAQs &amp; Key Instructions</h1>
-            <p className="text-xs sm:text-sm text-pink-100 mt-1">
+          <div className="pb-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed] mb-2 shadow-2xs">
+              <HelpCircle className="w-3.5 h-3.5 text-[#6d3a68]" />
+              <span>Help &amp; Guidelines</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">Student FAQs &amp; Key Instructions</h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
               Important questions regarding exam portal login, webcam requirements, timing rules and results.
             </p>
           </div>
@@ -355,9 +354,13 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
     if (infoType === 'datesheet') {
       return (
         <div className="space-y-6">
-          <div className="bg-gradient-to-r from-[#4e2a4a] to-[#6d3a68] rounded-3xl p-6 sm:p-8 text-white shadow-md">
-            <h1 className="text-2xl sm:text-3xl font-black">Official Olympiad Examination Date Sheet (2026-27)</h1>
-            <p className="text-xs sm:text-sm text-pink-100 mt-1">
+          <div className="pb-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed] mb-2 shadow-2xs">
+              <Calendar className="w-3.5 h-3.5 text-[#6d3a68]" />
+              <span>Exam Calendar 2026-27</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">Official Olympiad Examination Date Sheet (2026-27)</h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
               Level 1 online examination slots, Level 2 Grand Finale dates, and result publication calendar.
             </p>
           </div>
@@ -391,9 +394,13 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
     if (infoType === 'awards') {
       return (
         <div className="space-y-6">
-          <div className="bg-gradient-to-r from-[#4e2a4a] via-[#e7b84b] to-[#6d3a68] rounded-3xl p-6 sm:p-8 text-white shadow-md">
-            <h1 className="text-2xl sm:text-3xl font-black">Awards, Medals &amp; Scholarships Scheme</h1>
-            <p className="text-xs sm:text-sm text-pink-100 mt-1">
+          <div className="pb-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed] mb-2 shadow-2xs">
+              <Trophy className="w-3.5 h-3.5 text-[#e7b84b]" />
+              <span>Recognition &amp; Scholarships</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">Awards, Medals &amp; Scholarships Scheme</h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
               Celebrating national and international brilliance with ₹50,000 cash scholarships, gold medals, and trophies.
             </p>
           </div>
@@ -436,17 +443,14 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
 
     return (
       <div className="space-y-6">
-        <div
-          className="rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden"
-          style={{ background: `linear-gradient(135deg, ${meta.colorHex || '#4e2a4a'} 0%, #6d3a68 100%)` }}
-        >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-wider mb-3">
-            <Info className="w-3.5 h-3.5 text-[#e7b84b]" />
+        <div className="pb-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed] mb-2 shadow-2xs">
+            <Info className="w-3.5 h-3.5 text-[#6d3a68]" />
             <span>Official Discipline Information</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black">{meta.fullName} ({meta.code})</h1>
-          <p className="text-xs sm:text-sm text-pink-100 mt-1 italic">"{meta.quote}"</p>
-          <p className="text-xs text-white/80 mt-2">{meta.tagline}</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">{meta.fullName} ({meta.code})</h1>
+          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1 italic">"{meta.quote}"</p>
+          <p className="text-xs text-slate-400 mt-1">{meta.tagline}</p>
         </div>
 
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#edd6ed] shadow-sm space-y-4">
@@ -493,29 +497,24 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
 
     return (
       <div className="space-y-6">
-        <div
-          className="rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden"
-          style={{ background: `linear-gradient(135deg, ${cur.color} 0%, #4e2a4a 100%)` }}
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-wider mb-3">
-                <Icon className="w-3.5 h-3.5 text-[#e7b84b]" />
-                <span>Enrolled Subject Curriculum</span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-black">{cur.title}</h1>
-              <p className="text-xs sm:text-sm text-pink-100 mt-1">
-                Class {user?.class || 'Class 1'} Comprehensive Study Notes, Practice Tests &amp; Achievers Question Bank
-              </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed] mb-2 shadow-2xs">
+              <Icon className="w-3.5 h-3.5 text-[#6d3a68]" />
+              <span>Enrolled Subject Curriculum</span>
             </div>
-
-            <button
-              onClick={() => onNavigateTab && onNavigateTab('available_exams')}
-              className="px-5 py-2.5 rounded-xl text-xs font-black bg-[#e7b84b] text-[#321630] hover:bg-[#deb145] transition-all shadow-md cursor-pointer shrink-0"
-            >
-              Take Live Test →
-            </button>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">{cur.title}</h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+              Class {user?.class || 'Class 1'} Comprehensive Study Notes, Practice Tests &amp; Achievers Question Bank
+            </p>
           </div>
+
+          <button
+            onClick={() => onNavigateTab && onNavigateTab('available_exams')}
+            className="px-5 py-2.5 rounded-xl text-xs font-black bg-[#6d3a68] text-white hover:bg-[#5c3158] transition-all shadow-md cursor-pointer shrink-0"
+          >
+            Take Live Test →
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -609,9 +608,13 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
   if (activeModule === 'my_orders') {
     return (
       <div className="space-y-6">
-        <div className="bg-gradient-to-r from-[#4e2a4a] to-[#6d3a68] rounded-3xl p-6 sm:p-8 text-white shadow-md">
-          <h1 className="text-2xl sm:text-3xl font-black">My Workbook Orders &amp; Test Packs</h1>
-          <p className="text-xs sm:text-sm text-pink-100 mt-1">
+        <div className="pb-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed] mb-2 shadow-2xs">
+            <ShoppingBag className="w-3.5 h-3.5 text-[#6d3a68]" />
+            <span>Purchases &amp; Registrations</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">My Workbook Orders &amp; Test Packs</h1>
+          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
             Track workbook shipments, digital study kits, and examination registration receipts.
           </p>
         </div>
@@ -665,9 +668,13 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
   if (activeModule === 'my_wallet') {
     return (
       <div className="space-y-6">
-        <div className="bg-gradient-to-r from-[#4e2a4a] to-[#d9775b] rounded-3xl p-6 sm:p-8 text-white shadow-md">
-          <h1 className="text-2xl sm:text-3xl font-black">My Olympiad Wallet &amp; Test Credits</h1>
-          <p className="text-xs sm:text-sm text-pink-100 mt-1">
+        <div className="pb-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed] mb-2 shadow-2xs">
+            <Wallet className="w-3.5 h-3.5 text-[#6d3a68]" />
+            <span>Credits &amp; Rewards</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">My Olympiad Wallet &amp; Test Credits</h1>
+          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
             Redeem points, top up mock test balance, and view examination transaction history.
           </p>
         </div>
@@ -796,14 +803,16 @@ const StudentRevisionVaultModule = ({ user, onNavigateTab }) => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
-      {/* Top Hero Banner */}
-      <div className="bg-gradient-to-r from-[#6d3a68] to-[#8c4e8b] rounded-3xl p-6 sm:p-8 text-white shadow-md">
-        <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/10 backdrop-blur-xs text-xs font-bold text-pink-200 mb-2">
-          <Bookmark className="w-3.5 h-3.5" />
+      {/* Top Header on Page Background (No dark box) */}
+      <div className="pb-1">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed] mb-2 shadow-2xs">
+          <Bookmark className="w-3.5 h-3.5 text-[#6d3a68]" />
           <span>Curated Revision &amp; AI Analytics</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black">My Revision Vault &amp; Question Bookmarks</h1>
-        <p className="text-xs sm:text-sm text-pink-100 mt-1">
+        <h1 className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">
+          My Revision Vault &amp; Question Bookmarks
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
           Review tricky questions, bookmarked concepts, and faculty-curated solutions for your class.
         </p>
       </div>
@@ -1153,34 +1162,32 @@ const StudentFreeQuizzesModule = ({ activeModule, user, onNavigateTab }) => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-[#d9775b] via-[#e7b84b] to-[#6d3a68] rounded-3xl p-6 sm:p-8 text-white shadow-md">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-black uppercase tracking-wider mb-2">
-              <Gamepad2 className="w-4 h-4 text-white" />
-              <span>Daily Speed Challenge • {userClass}</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black">
-              {activeModule === 'free_quizzes' ? 'FREE 5-Minute Daily Quizzes' : 'Fun-Zone & Olympiad Riddles'}
-            </h1>
-            <p className="text-xs sm:text-sm text-pink-100 mt-1">
-              Solve instant interactive questions, test speed logic, and earn Scholar XP badges!
-            </p>
+      {/* Top Header on Page Background (No dark box) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
+        <div>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed] mb-2 shadow-2xs">
+            <Gamepad2 className="w-3.5 h-3.5 text-[#6d3a68]" />
+            <span>Daily Speed Challenge • {userClass}</span>
           </div>
-
-          {!isSubmitted && (
-            <div className="flex items-center gap-3 self-start sm:self-center">
-              <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-4 py-2.5 text-center">
-                <span className="text-[10px] uppercase tracking-wider font-extrabold text-pink-100 block">Time Left</span>
-                <span className="text-lg sm:text-xl font-mono font-black text-white flex items-center gap-1">
-                  <Clock className="w-4 h-4 text-white" />
-                  {formatTime(timeRemaining)}
-                </span>
-              </div>
-            </div>
-          )}
+          <h1 className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">
+            {activeModule === 'free_quizzes' ? 'FREE 5-Minute Daily Quizzes' : 'Fun-Zone & Olympiad Riddles'}
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+            Solve instant interactive questions, test speed logic, and earn Scholar XP badges!
+          </p>
         </div>
+
+        {!isSubmitted && (
+          <div className="flex items-center gap-3 self-start sm:self-center">
+            <div className="bg-white border border-[#edd6ed] rounded-2xl px-4 py-2.5 text-center shadow-xs">
+              <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#6d3a68] block">Time Left</span>
+              <span className="text-lg sm:text-xl font-mono font-black text-[#4e2a4a] flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-[#d9775b]" />
+                {formatTime(timeRemaining)}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Subject Filter Tabs */}
