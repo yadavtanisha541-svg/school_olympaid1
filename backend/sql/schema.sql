@@ -382,20 +382,23 @@ INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7);
 
--- Seed Academic Classes (Class 1 - Class 12)
+-- Seed Academic Classes (Nursery to Class 12)
 INSERT INTO `academic_classes` (`id`, `name`, `code`, `order_no`, `status`) VALUES
-(1, 'Class 1', 'CLASS-1', 1, 'active'),
-(2, 'Class 2', 'CLASS-2', 2, 'active'),
-(3, 'Class 3', 'CLASS-3', 3, 'active'),
-(4, 'Class 4', 'CLASS-4', 4, 'active'),
-(5, 'Class 5', 'CLASS-5', 5, 'active'),
-(6, 'Class 6', 'CLASS-6', 6, 'active'),
-(7, 'Class 7', 'CLASS-7', 7, 'active'),
-(8, 'Class 8', 'CLASS-8', 8, 'active'),
-(9, 'Class 9', 'CLASS-9', 9, 'active'),
-(10, 'Class 10', 'CLASS-10', 10, 'active'),
-(11, 'Class 11', 'CLASS-11', 11, 'active'),
-(12, 'Class 12', 'CLASS-12', 12, 'active');
+(1, 'Nursery', 'NUR', 1, 'active'),
+(2, 'LKG', 'LKG', 2, 'active'),
+(3, 'UKG', 'UKG', 3, 'active'),
+(4, 'Class 1', 'CLASS-1', 4, 'active'),
+(5, 'Class 2', 'CLASS-2', 5, 'active'),
+(6, 'Class 3', 'CLASS-3', 6, 'active'),
+(7, 'Class 4', 'CLASS-4', 7, 'active'),
+(8, 'Class 5', 'CLASS-5', 8, 'active'),
+(9, 'Class 6', 'CLASS-6', 9, 'active'),
+(10, 'Class 7', 'CLASS-7', 10, 'active'),
+(11, 'Class 8', 'CLASS-8', 11, 'active'),
+(12, 'Class 9', 'CLASS-9', 12, 'active'),
+(13, 'Class 10', 'CLASS-10', 13, 'active'),
+(14, 'Class 11', 'CLASS-11', 14, 'active'),
+(15, 'Class 12', 'CLASS-12', 15, 'active');
 
 -- Seed Subjects (9 Official Disciplines)
 INSERT INTO `subjects` (`id`, `name`, `code`, `icon`, `color`, `status`) VALUES

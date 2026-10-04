@@ -250,18 +250,21 @@ const initialStore = {
     }
   ],
   academic_classes: [
-    { id: 1, name: 'Class 1', code: 'C1', order_num: 1 },
-    { id: 2, name: 'Class 2', code: 'C2', order_num: 2 },
-    { id: 3, name: 'Class 3', code: 'C3', order_num: 3 },
-    { id: 4, name: 'Class 4', code: 'C4', order_num: 4 },
-    { id: 5, name: 'Class 5', code: 'C5', order_num: 5 },
-    { id: 6, name: 'Class 6', code: 'C6', order_num: 6 },
-    { id: 7, name: 'Class 7', code: 'C7', order_num: 7 },
-    { id: 8, name: 'Class 8', code: 'C8', order_num: 8 },
-    { id: 9, name: 'Class 9', code: 'C9', order_num: 9 },
-    { id: 10, name: 'Class 10', code: 'C10', order_num: 10 },
-    { id: 11, name: 'Class 11', code: 'C11', order_num: 11 },
-    { id: 12, name: 'Class 12', code: 'C12', order_num: 12 }
+    { id: 1, name: 'Nursery', code: 'NUR', order_num: 1, order_no: 1, category: 'Pre-Primary', age_group: '3-4 years old', description: 'Curriculum framework with early childhood foundational sets.', status: 'active' },
+    { id: 2, name: 'LKG', code: 'LKG', order_num: 2, order_no: 2, category: 'Pre-Primary', age_group: '4-5 years old', description: 'Curriculum framework with early childhood foundational sets.', status: 'active' },
+    { id: 3, name: 'UKG', code: 'UKG', order_num: 3, order_no: 3, category: 'Pre-Primary', age_group: '5-6 years old', description: 'Curriculum framework with early childhood foundational sets.', status: 'active' },
+    { id: 4, name: 'Class 1', code: 'C1', order_num: 4, order_no: 4, category: 'Primary', age_group: '5-7 years old', description: 'Curriculum framework with Olympiad practice sets.', status: 'active' },
+    { id: 5, name: 'Class 2', code: 'C2', order_num: 5, order_no: 5, category: 'Primary', age_group: '6-8 years old', description: 'Curriculum framework with Olympiad practice sets.', status: 'active' },
+    { id: 6, name: 'Class 3', code: 'C3', order_num: 6, order_no: 6, category: 'Primary', age_group: '7-9 years old', description: 'Curriculum framework with Olympiad practice sets.', status: 'active' },
+    { id: 7, name: 'Class 4', code: 'C4', order_num: 4, order_no: 4, category: 'Primary', age_group: '8-10 years old', description: 'Curriculum framework with Olympiad practice sets.', status: 'active' },
+    { id: 8, name: 'Class 5', code: 'C5', order_num: 5, order_no: 5, category: 'Primary', age_group: '9-11 years old', description: 'Curriculum framework with Olympiad practice sets.', status: 'active' },
+    { id: 9, name: 'Class 6', code: 'C6', order_num: 9, order_no: 9, category: 'Middle', age_group: '10-12 years old', description: 'Curriculum framework with Olympiad practice sets.', status: 'active' },
+    { id: 10, name: 'Class 7', code: 'C7', order_num: 10, order_no: 10, category: 'Middle', age_group: '11-13 years old', description: 'Curriculum framework with Olympiad practice sets.', status: 'active' },
+    { id: 11, name: 'Class 8', code: 'C8', order_num: 11, order_no: 11, category: 'Middle', age_group: '12-14 years old', description: 'Curriculum framework with Olympiad practice sets.', status: 'active' },
+    { id: 12, name: 'Class 9', code: 'C9', order_num: 12, order_no: 12, category: 'Secondary', age_group: '13-15 years old', description: 'Curriculum framework with Olympiad practice sets.', status: 'active' },
+    { id: 13, name: 'Class 10', code: 'C10', order_num: 13, order_no: 13, category: 'Secondary', age_group: '14-16 years old', description: 'Curriculum framework with Olympiad practice sets.', status: 'active' },
+    { id: 14, name: 'Class 11', code: 'C11', order_num: 14, order_no: 14, category: 'Senior Secondary', age_group: '15-17 years old', description: 'Curriculum framework with Olympiad practice sets.', status: 'active' },
+    { id: 15, name: 'Class 12', code: 'C12', order_num: 15, order_no: 15, category: 'Senior Secondary', age_group: '16-18 years old', description: 'Curriculum framework with Olympiad practice sets.', status: 'active' }
   ],
   academic_subjects: [
     { id: 1, name: 'Mathematics', full_name: 'Mathematics Olympiad (IMO)', code: 'IMO', slug: 'math', icon: 'Calculator', color: '#4e2a4a', category: 'Mathematics', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Comprehensive Olympiad testing conceptual mastery and analytical depth.' },
@@ -304,6 +307,10 @@ function getDb(table) {
     if (table === 'academic_subjects' && (parsed.length < 9 || parsed.some(s => s.code === 'NCO' || s.code === 'RAO'))) {
       localStorage.setItem(STORAGE_PREFIX + table, JSON.stringify(initialStore.academic_subjects));
       return initialStore.academic_subjects;
+    }
+    if (table === 'academic_classes' && (parsed.length < 15 || !parsed.some(c => c.name === 'Nursery'))) {
+      localStorage.setItem(STORAGE_PREFIX + table, JSON.stringify(initialStore.academic_classes));
+      return initialStore.academic_classes;
     }
     return parsed;
   } catch (e) {
