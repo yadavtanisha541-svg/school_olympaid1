@@ -246,6 +246,15 @@ export const StudentMyContentPage = ({
     return basePapers;
   };
 
+  // Filter covers according to selected subject (MUST BE DECLARED BEFORE ANY EARLY RETURN)
+  const visibleCovers = useMemo(() => {
+    if (selectedSubject && selectedSubject !== 'ALL') {
+      const match = ALL_SUBJECT_COVERS.filter(s => s.code === selectedSubject || s.altCode === selectedSubject);
+      if (match.length > 0) return match;
+    }
+    return ALL_SUBJECT_COVERS;
+  }, [selectedSubject, ALL_SUBJECT_COVERS]);
+
   // Pre-exam instruction screen
   if (selectedPaperForInstructions) {
     const paper = selectedPaperForInstructions;
@@ -393,15 +402,6 @@ export const StudentMyContentPage = ({
       </div>
     );
   }
-
-  // Filter covers according to selected subject (if not 'ALL', show only that subject's cover card)
-  const visibleCovers = useMemo(() => {
-    if (selectedSubject && selectedSubject !== 'ALL') {
-      const match = ALL_SUBJECT_COVERS.filter(s => s.code === selectedSubject || s.altCode === selectedSubject);
-      if (match.length > 0) return match;
-    }
-    return ALL_SUBJECT_COVERS;
-  }, [selectedSubject, ALL_SUBJECT_COVERS]);
 
   return (
     <div className="space-y-6 pb-14 font-sans w-full max-w-full overflow-x-hidden">
