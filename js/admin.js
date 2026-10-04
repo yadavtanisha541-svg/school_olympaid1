@@ -298,11 +298,9 @@ class AdminEngine {
   }
 
   deleteQuestion(id) {
-    if (confirm('Are you sure you want to delete this question?')) {
-      window.OlympiadDB.deleteQuestion(id);
-      this.renderAdminView();
-      if (window.OlympiadApp) window.OlympiadApp.showToast('Question deleted from Question Bank', 'info');
-    }
+    window.OlympiadDB.deleteQuestion(id);
+    this.renderAdminView();
+    if (window.OlympiadApp) window.OlympiadApp.showToast('Question deleted from Question Bank', 'info');
   }
 
   // ================= EXAMS TAB =================

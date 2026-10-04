@@ -182,9 +182,6 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
   };
 
   const handleDeleteItem = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this revision question?')) {
-      return;
-    }
     try {
       const res = await apiClient.request(`/revision-vault/${id}`, {
         method: 'DELETE'
@@ -195,16 +192,12 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
       }
     } catch (err) {
       console.error('Error deleting revision item:', err);
-      alert(err.message || 'Failed to delete item');
     } finally {
       setTimeout(() => setSuccessMsg(''), 4000);
     }
   };
 
   const handleResetDefaults = async () => {
-    if (!window.confirm('Reset all Revision Vault questions to initial default curriculum questions?')) {
-      return;
-    }
     try {
       setLoading(true);
       const res = await apiClient.post('/revision-vault/seed', {});
@@ -213,7 +206,7 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
         fetchItems();
       }
     } catch (err) {
-      alert(err.message || 'Failed to reset seed items');
+      console.error(err);
     } finally {
       setLoading(false);
       setTimeout(() => setSuccessMsg(''), 4000);

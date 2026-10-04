@@ -192,9 +192,6 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
   };
 
   const handleDeleteQuiz = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this quiz question?')) {
-      return;
-    }
     try {
       const res = await apiClient.request(`/free-quizzes/${id}`, {
         method: 'DELETE'
@@ -204,16 +201,13 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
         fetchQuizzes();
       }
     } catch (err) {
-      alert(err.message || 'Failed to delete quiz question');
+      console.warn(err);
     } finally {
       setTimeout(() => setSuccessMsg(''), 4000);
     }
   };
 
   const handleResetDefaults = async () => {
-    if (!window.confirm('Reset and re-seed default 5-minute Free Quizzes?')) {
-      return;
-    }
     try {
       setLoading(true);
       const res = await apiClient.post('/free-quizzes/seed', {});
@@ -222,7 +216,7 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
         fetchQuizzes();
       }
     } catch (err) {
-      alert(err.message || 'Failed to reset seed quizzes');
+      console.warn(err);
     } finally {
       setLoading(false);
       setTimeout(() => setSuccessMsg(''), 4000);

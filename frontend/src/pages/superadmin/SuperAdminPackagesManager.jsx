@@ -284,7 +284,6 @@ export const SuperAdminPackagesManager = () => {
 
   // Delete Exam Paper
   const handleDeletePaper = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this Mock Test?')) return;
     try {
       await apiClient.delete(`/exam-papers/${id}`);
       fetchExamPapers();
@@ -527,7 +526,6 @@ export const SuperAdminPackagesManager = () => {
   };
 
   const handleDeletePackage = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this Study Package?')) return;
     try {
       await apiClient.delete(`/packages/${id}`);
       fetchPackages();

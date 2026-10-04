@@ -425,12 +425,11 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
   };
 
   const handleDeleteClass = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this class? This will also remove class-subject associations.')) return;
     try {
       await apiClient.delete(`/academic/classes/${id}`);
       fetchClasses();
     } catch (err) {
-      alert(err.message);
+      console.warn(err);
     }
   };
 
@@ -447,19 +446,18 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
       setShowSubjectModal(false);
       fetchSubjects();
     } catch (err) {
-      alert(err.message);
+      console.warn(err);
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleDeleteSubject = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this discipline?')) return;
     try {
       await apiClient.delete(`/academic/subjects/${id}`);
       fetchSubjects();
     } catch (err) {
-      alert(err.message);
+      console.warn(err);
     }
   };
 
@@ -476,19 +474,18 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
       setShowChapterModal(false);
       fetchChapters();
     } catch (err) {
-      alert(err.message);
+      console.warn(err);
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleDeleteChapter = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this chapter?')) return;
     try {
       await apiClient.delete(`/academic/chapters/${id}`);
       fetchChapters();
     } catch (err) {
-      alert(err.message);
+      console.warn(err);
     }
   };
 
@@ -2389,9 +2386,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                         <button
                           type="button"
                           onClick={() => {
-                            if (window.confirm('Delete topic?')) {
-                              apiClient.delete(`/academic/topics/${t.id}`).then(() => fetchTopics());
-                            }
+                            apiClient.delete(`/academic/topics/${t.id}`).then(() => fetchTopics());
                           }}
                           className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                         >

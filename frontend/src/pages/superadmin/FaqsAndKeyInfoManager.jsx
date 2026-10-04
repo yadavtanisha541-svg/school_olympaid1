@@ -88,15 +88,14 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
   };
 
   const handleDeleteMenuItem = (id) => {
-    if (window.confirm('Are you sure you want to remove this dropdown item?')) {
-      const filtered = dropdownItems.filter(item => item.id !== id);
-      saveDropdownMenu(filtered);
-    }
+    const filtered = dropdownItems.filter(item => item.id !== id);
+    saveDropdownMenu(filtered);
+    showToast('Dropdown menu item removed.');
   };
 
   const handleSaveMenuForm = () => {
     if (!menuForm.label.trim() || !menuForm.page.trim()) {
-      alert('Please fill in both Menu Label and Page Route');
+      showToast('Please fill in both Menu Label and Page Route', 'error');
       return;
     }
     if (editingMenuItem) {
@@ -162,7 +161,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
 
   const handleSaveFaqForm = () => {
     if (!faqForm.q.trim() || !faqForm.a.trim()) {
-      alert('Please enter both Question and Answer');
+      showToast('Please enter both Question and Answer', 'error');
       return;
     }
     if (editingFaq) {
@@ -182,10 +181,9 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
   };
 
   const handleDeleteFaq = (id) => {
-    if (window.confirm('Are you sure you want to delete this FAQ?')) {
-      const filtered = faqsList.filter(item => item.id !== id);
-      saveFaqsList(filtered);
-    }
+    const filtered = faqsList.filter(item => item.id !== id);
+    saveFaqsList(filtered);
+    showToast('FAQ deleted successfully.');
   };
 
   // -------------------------------------------------------------
@@ -286,17 +284,15 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
   };
 
   const handleResetAllToDefaults = () => {
-    if (window.confirm('Are you sure you want to reset all FAQs, Dropdown and Key Info content to system defaults?')) {
-      localStorage.removeItem('olympiadhub_keyinfo_dropdown_v1');
-      localStorage.removeItem('olympiadhub_superadmin_faqs_v1');
-      localStorage.removeItem('olympiadhub_exam_dates_config_v1');
-      localStorage.removeItem('olympiadhub_custom_syllabus_v1');
-      localStorage.removeItem('olympiadhub_sample_papers_config_v1');
-      localStorage.removeItem('olympiadhub_pattern_config_v1');
-      setDropdownItems(DEFAULT_KEY_INFO_DROPDOWN);
-      setFaqsList(DEFAULT_SUPERADMIN_FAQS);
-      showToast('All Key Info data reset to system defaults!');
-    }
+    localStorage.removeItem('olympiadhub_keyinfo_dropdown_v1');
+    localStorage.removeItem('olympiadhub_superadmin_faqs_v1');
+    localStorage.removeItem('olympiadhub_exam_dates_config_v1');
+    localStorage.removeItem('olympiadhub_custom_syllabus_v1');
+    localStorage.removeItem('olympiadhub_sample_papers_config_v1');
+    localStorage.removeItem('olympiadhub_pattern_config_v1');
+    setDropdownItems(DEFAULT_KEY_INFO_DROPDOWN);
+    setFaqsList(DEFAULT_SUPERADMIN_FAQS);
+    showToast('All Key Info data reset to system defaults!');
   };
 
   const subjectKeys = Object.keys(OLYMPIAD_SUBJECT_METADATA);
