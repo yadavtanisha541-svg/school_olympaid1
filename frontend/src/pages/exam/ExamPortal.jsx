@@ -455,7 +455,7 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
             {currentQuestion ? (
               <div className="space-y-6">
                 <div className="text-base sm:text-lg font-medium text-slate-900 leading-relaxed">
-                  {currentQuestion.question_text}
+                  {currentQuestion.question_text || currentQuestion.q || currentQuestion.question || currentQuestion.title || 'Question Statement'}
                 </div>
 
                 {currentQuestion.question_image && (
@@ -470,8 +470,15 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
 
                 {/* 4 MCQ OPTIONS */}
                 <div className="space-y-3 pt-2">
-                  {['A', 'B', 'C', 'D'].map((optKey) => {
-                    const optText = currentQuestion ? currentQuestion[`option_${(optKey || '').toString().toLowerCase()}`] : '';
+                  {['A', 'B', 'C', 'D'].map((optKey, optIdx) => {
+                    const optLower = (optKey || '').toString().toLowerCase();
+                    const optText = currentQuestion
+                      ? currentQuestion[`option_${optLower}`] ||
+                        currentQuestion[optLower] ||
+                        (Array.isArray(currentQuestion.options) ? currentQuestion.options[optIdx] : '') ||
+                        (currentQuestion.options && currentQuestion.options[optKey]) ||
+                        `Option ${optKey}`
+                      : `Option ${optKey}`;
                     const active = isSelected(optKey);
 
                     return (

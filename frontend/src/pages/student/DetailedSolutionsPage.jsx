@@ -73,13 +73,20 @@ export const DetailedSolutionsPage = ({ attemptId, onBack }) => {
 
               {/* Question Text */}
               <h3 className="text-base font-bold text-slate-900 leading-relaxed">
-                {item.question_text}
+                {item.question_text || item.q || item.question || item.title || 'Question Statement'}
               </h3>
 
               {/* 4 MCQ Options */}
               <div className="space-y-2.5">
-                {['A', 'B', 'C', 'D'].map((opt) => {
-                  const text = item ? item[`option_${(opt || '').toString().toLowerCase()}`] : '';
+                {['A', 'B', 'C', 'D'].map((opt, optIdx) => {
+                  const optLower = (opt || '').toString().toLowerCase();
+                  const text = item
+                    ? item[`option_${optLower}`] ||
+                      item[optLower] ||
+                      (Array.isArray(item.options) ? item.options[optIdx] : '') ||
+                      (item.options && item.options[opt]) ||
+                      `Option ${opt}`
+                    : `Option ${opt}`;
                   const isUserPick = userSelected === opt;
                   const isThisCorrect = correctOpt === opt;
 

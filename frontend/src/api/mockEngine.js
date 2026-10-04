@@ -1483,6 +1483,37 @@ export const mockEngine = {
       }
 
       if (method === 'POST') {
+        const rawQs = Array.isArray(body.questions) ? body.questions : [];
+        const normQuestions = rawQs.map((q, idx) => {
+          const qText = q.question_text || q.q || q.question || q.title || `Question ${idx + 1}`;
+          const opts = Array.isArray(q.options) && q.options.length >= 2
+            ? q.options
+            : [q.option_a || 'Option A', q.option_b || 'Option B', q.option_c || 'Option C', q.option_d || 'Option D'];
+          let corr = 0;
+          if (typeof q.correct === 'number') corr = q.correct;
+          else if (q.correct_option === 'B' || q.correct === 'B') corr = 1;
+          else if (q.correct_option === 'C' || q.correct === 'C') corr = 2;
+          else if (q.correct_option === 'D' || q.correct === 'D') corr = 3;
+          const corrOpt = ['A', 'B', 'C', 'D'][corr] || 'A';
+          return {
+            id: q.id || idx + 1,
+            section: q.section || 'General Section',
+            q: qText,
+            question_text: qText,
+            question: qText,
+            options: opts,
+            option_a: opts[0] || 'Option A',
+            option_b: opts[1] || 'Option B',
+            option_c: opts[2] || 'Option C',
+            option_d: opts[3] || 'Option D',
+            correct: corr,
+            correct_option: corrOpt,
+            marks: Number(q.marks) || 1,
+            negative_marks: Number(q.negative_marks) || 0,
+            explanation: q.explanation || q.solution || ''
+          };
+        });
+
         const newPaper = {
           id: Date.now(),
           title: body.title || 'New Model Test Paper',
@@ -1493,13 +1524,13 @@ export const mockEngine = {
           paper_category: body.paper_category || 'previous_year',
           exam_year: body.exam_year || '2026',
           duration_minutes: Number(body.duration_minutes) || 60,
-          total_marks: Number(body.total_marks) || 60,
+          total_marks: Number(body.total_marks) || (normQuestions.length > 0 ? normQuestions.reduce((a, b) => a + (b.marks || 1), 0) : 60),
           cutoff_marks: Number(body.cutoff_marks) || 42,
           status: 'published',
           header_color: body.header_color || '#d97706',
           accent_color: body.accent_color || '#d97706',
           sections: Array.isArray(body.sections) && body.sections.length > 0 ? body.sections : ['General Awareness', 'Current Affairs', 'Achievers Section'],
-          questions: Array.isArray(body.questions) ? body.questions : []
+          questions: normQuestions
         };
         papers.unshift(newPaper);
         saveDb('exam_papers', papers);
@@ -1507,7 +1538,47 @@ export const mockEngine = {
       }
 
       if (method === 'PUT' && sub) {
-        papers = papers.map((p) => (String(p.id) === String(sub) ? { ...p, ...body, cutoff_marks: body.cutoff_marks !== undefined ? Number(body.cutoff_marks) : (p.cutoff_marks || 42) } : p));
+        papers = papers.map((p) => {
+          if (String(p.id) === String(sub)) {
+            const rawQs = Array.isArray(body.questions) ? body.questions : (p.questions || []);
+            const normQuestions = rawQs.map((q, idx) => {
+              const qText = q.question_text || q.q || q.question || q.title || `Question ${idx + 1}`;
+              const opts = Array.isArray(q.options) && q.options.length >= 2
+                ? q.options
+                : [q.option_a || 'Option A', q.option_b || 'Option B', q.option_c || 'Option C', q.option_d || 'Option D'];
+              let corr = 0;
+              if (typeof q.correct === 'number') corr = q.correct;
+              else if (q.correct_option === 'B' || q.correct === 'B') corr = 1;
+              else if (q.correct_option === 'C' || q.correct === 'C') corr = 2;
+              else if (q.correct_option === 'D' || q.correct === 'D') corr = 3;
+              const corrOpt = ['A', 'B', 'C', 'D'][corr] || 'A';
+              return {
+                id: q.id || idx + 1,
+                section: q.section || 'General Section',
+                q: qText,
+                question_text: qText,
+                question: qText,
+                options: opts,
+                option_a: opts[0] || 'Option A',
+                option_b: opts[1] || 'Option B',
+                option_c: opts[2] || 'Option C',
+                option_d: opts[3] || 'Option D',
+                correct: corr,
+                correct_option: corrOpt,
+                marks: Number(q.marks) || 1,
+                negative_marks: Number(q.negative_marks) || 0,
+                explanation: q.explanation || q.solution || ''
+              };
+            });
+            return {
+              ...p,
+              ...body,
+              cutoff_marks: body.cutoff_marks !== undefined ? Number(body.cutoff_marks) : (p.cutoff_marks || 42),
+              questions: normQuestions
+            };
+          }
+          return p;
+        });
         saveDb('exam_papers', papers);
         return { success: true, message: 'Model Test Paper updated successfully' };
       }
@@ -1547,30 +1618,95 @@ export const mockEngine = {
       if (sub && cleanEndpoint.includes('/start')) {
         const allPapers = getDb('exam_papers');
         const allExams = getDb('exams');
-        const foundPaper = allPapers.find((p) => String(p.id) === String(sub));
+        let localGenPapers = [];
+        try {
+          localGenPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+        } catch (e) {}
+
+        let foundPaper = allPapers.find((p) => String(p.id) === String(sub) || p.short_code === sub);
+        if (!foundPaper) {
+          foundPaper = localGenPapers.find((lp) => String(lp.id) === String(sub) || lp.short_code === sub);
+        }
         const foundExam = allExams.find((e) => String(e.id) === String(sub));
+
+        // If it's a mock test code like 'mock_igko_1'
+        let targetSubCode = 'IMO';
+        if (typeof sub === 'string' && sub.startsWith('mock_')) {
+          const parts = sub.split('_');
+          if (parts[1]) targetSubCode = parts[1].toUpperCase();
+          if (!foundPaper) {
+            foundPaper = allPapers.find((p) => (p.subject_code || '').toUpperCase() === targetSubCode);
+          }
+        }
+
+        const rawQuestions = (foundPaper && Array.isArray(foundPaper.questions) && foundPaper.questions.length > 0)
+          ? foundPaper.questions
+          : (foundExam && Array.isArray(foundExam.questions) && foundExam.questions.length > 0)
+          ? foundExam.questions
+          : (allExams[0]?.questions || initialStore.exams[0]?.questions || []);
+
+        const normalizedQuestions = rawQuestions.map((q, idx) => {
+          const qText = q.question_text || q.q || q.question || q.title || `Question ${idx + 1}`;
+          const opts = Array.isArray(q.options) && q.options.length >= 2
+            ? q.options
+            : [q.option_a || 'Option A', q.option_b || 'Option B', q.option_c || 'Option C', q.option_d || 'Option D'];
+          let corr = 0;
+          if (typeof q.correct === 'number') corr = q.correct;
+          else if (q.correct_option === 'B' || q.correct === 'B') corr = 1;
+          else if (q.correct_option === 'C' || q.correct === 'C') corr = 2;
+          else if (q.correct_option === 'D' || q.correct === 'D') corr = 3;
+          const corrOpt = ['A', 'B', 'C', 'D'][corr] || 'A';
+          return {
+            id: q.id || idx + 1,
+            section: q.section || 'General Section',
+            q: qText,
+            question_text: qText,
+            question: qText,
+            options: opts,
+            option_a: opts[0] || 'Option A',
+            option_b: opts[1] || 'Option B',
+            option_c: opts[2] || 'Option C',
+            option_d: opts[3] || 'Option D',
+            correct: corr,
+            correct_option: corrOpt,
+            marks: Number(q.marks) || 1,
+            negative_marks: Number(q.negative_marks) || 0,
+            explanation: q.explanation || q.solution || ''
+          };
+        });
 
         const activeExamObj = foundPaper
           ? {
               id: foundPaper.id,
               title: foundPaper.title,
-              subject_code: foundPaper.subject_code,
-              subject: foundPaper.subject_name || foundPaper.subject_code,
+              subject_code: foundPaper.subject_code || targetSubCode,
+              subject: foundPaper.subject_name || foundPaper.subject || targetSubCode,
               class: foundPaper.class_name || 'Class 6',
               duration_minutes: foundPaper.duration_minutes || 60,
-              total_marks: foundPaper.total_marks || 60,
-              total_questions: foundPaper.questions?.length || 5,
+              total_marks: foundPaper.total_marks || (normalizedQuestions.length * 1),
+              total_questions: normalizedQuestions.length,
               passing_percentage: 40,
-              questions: foundPaper.questions || []
+              questions: normalizedQuestions
             }
-          : (foundExam || allExams[0] || initialStore.exams[0]);
+          : (foundExam || {
+              id: sub,
+              title: `${targetSubCode} National Mock Examination`,
+              subject_code: targetSubCode,
+              subject: `${targetSubCode} Olympiad`,
+              class: 'Class 6',
+              duration_minutes: 60,
+              total_marks: normalizedQuestions.length * 1,
+              total_questions: normalizedQuestions.length,
+              passing_percentage: 40,
+              questions: normalizedQuestions
+            });
 
         return {
           success: true,
           data: {
             attempt_id: Date.now(),
             exam: activeExamObj,
-            questions: activeExamObj.questions || []
+            questions: normalizedQuestions
           }
         };
       }
