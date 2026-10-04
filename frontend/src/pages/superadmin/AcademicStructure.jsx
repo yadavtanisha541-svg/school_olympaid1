@@ -869,7 +869,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
       {/* Title & Top Action Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-[#4e2a4a]">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#4e2a4a]">
             {defaultTab === 'page_content'
               ? (activeTab === 'chapters'
                   ? 'Class Chapters Management'
@@ -880,7 +880,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                   ? 'Classes & Grades (Nursery–12)'
                   : 'Olympiad Disciplines & Subjects')}
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-sm text-slate-600 font-medium mt-1">
             {defaultTab === 'page_content'
               ? (activeTab === 'chapters'
                   ? 'Organize chapter modules across subjects and classes.'
@@ -917,10 +917,10 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                 });
                 setShowSubjectModal(true);
               }}
-              className="px-3.5 py-2 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+              className="px-4 py-2.5 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-2 shadow-xs"
             >
               <Plus className="w-4 h-4 text-[#e7b84b]" />
-              <span>Add New Discipline</span>
+              <span>+ Add New Discipline</span>
             </button>
           )}
 
@@ -940,10 +940,10 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                 });
                 setShowClassModal(true);
               }}
-              className="px-3.5 py-2 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+              className="px-4 py-2.5 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-2 shadow-xs"
             >
               <Plus className="w-4 h-4 text-[#e7b84b]" />
-              <span>Add New Class</span>
+              <span>+ Add New Class</span>
             </button>
           )}
 
@@ -963,10 +963,10 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                 });
                 setShowChapterModal(true);
               }}
-              className="px-3.5 py-2 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+              className="px-4 py-2.5 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-2 shadow-xs"
             >
               <Plus className="w-4 h-4 text-[#e7b84b]" />
-              <span>Add New Chapter</span>
+              <span>+ Add New Chapter</span>
             </button>
           )}
 
@@ -985,10 +985,10 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                 });
                 setShowTopicModal(true);
               }}
-              className="px-3.5 py-2 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+              className="px-4 py-2.5 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-2 shadow-xs"
             >
               <Plus className="w-4 h-4 text-[#e7b84b]" />
-              <span>Add New Topic</span>
+              <span>+ Add New Topic</span>
             </button>
           )}
         </div>
@@ -996,7 +996,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
 
       {/* Mode 1: Disciplines & Subjects Navigation Tabs */}
       {defaultTab === 'subjects' && (
-        <div className="w-full bg-white p-1.5 rounded-2xl border border-[#edd6ed] shadow-xs flex items-center gap-2 overflow-x-auto">
+        <div className="w-full bg-white p-2 rounded-2xl border border-[#edd6ed] shadow-xs flex items-center gap-2.5 overflow-x-auto">
           {[
             { id: 'subjects', label: '🌟 Disciplines & Subjects', icon: BookOpen, count: subjects.length },
             { id: 'classes', label: '🏫 Classes & Grades (Nursery–12)', icon: Layers, count: classes.length },
@@ -1011,16 +1011,16 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                   setActiveTab(tab.id);
                   setSearchQuery('');
                 }}
-                className={`py-2 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap ${
+                className={`py-2.5 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2.5 cursor-pointer whitespace-nowrap ${
                   isActive
                     ? 'bg-[#6d3a68] text-white shadow-xs'
                     : 'text-slate-600 hover:bg-[#faf5fa] hover:text-[#6d3a68]'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#e7b84b]' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-[#e7b84b]' : 'text-slate-400'}`} />
                 <span>{tab.label}</span>
                 {tab.count !== undefined && (
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold ${isActive ? 'bg-white/20 text-white' : 'bg-[#faf5fa] border border-[#edd6ed] text-[#6d3a68]'}`}>
+                  <span className={`text-xs px-2.5 py-0.5 rounded-full font-black ${isActive ? 'bg-white/20 text-white' : 'bg-[#faf5fa] border border-[#edd6ed] text-[#6d3a68]'}`}>
                     {tab.count}
                   </span>
                 )}
@@ -2015,19 +2015,19 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
           TAB 2: DISCIPLINES & OLYMPIADS LIST
          ========================================================================= */}
       {activeTab === 'subjects' && (
-        <div className="space-y-4">
-          <div className="bg-white p-3 rounded-2xl border border-[#edd6ed] flex items-center justify-between gap-3 shadow-2xs">
+        <div className="space-y-5">
+          <div className="bg-white p-4 rounded-2xl border border-[#edd6ed] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
             <div className="relative flex-1 max-w-md">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search disciplines by name, IMO/NSO/IEO code, or category..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 bg-[#faf5fa] border border-[#edd6ed] rounded-xl text-xs font-medium text-[#4e2a4a] placeholder:text-slate-400 focus:outline-none focus:border-[#6d3a68]"
+                className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-xl text-xs sm:text-sm font-semibold text-[#4e2a4a] placeholder:text-slate-400 focus:outline-none focus:border-[#6d3a68] focus:bg-white transition-all"
               />
             </div>
-            <span className="text-xs font-bold text-[#6d3a68]">
+            <span className="text-xs sm:text-sm font-black text-[#6d3a68] bg-[#faf5fa] px-3.5 py-1.5 rounded-xl border border-[#edd6ed] self-end sm:self-auto">
               {filteredSubjects.length} Active Olympiad Disciplines
             </span>
           </div>
@@ -2036,28 +2036,28 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
             {filteredSubjects.map((sub) => (
               <div
                 key={sub.id}
-                className="bg-white rounded-2xl border border-[#edd6ed] p-5 shadow-xs hover:shadow-md hover:border-[#6d3a68]/60 transition-all duration-200 flex flex-col justify-between"
+                className="bg-white rounded-3xl border-2 border-[#edd6ed] p-6 shadow-xs hover:shadow-md hover:border-[#6d3a68] transition-all duration-200 flex flex-col justify-between space-y-4"
               >
-                <div className="space-y-3.5">
+                <div className="space-y-4">
                   {/* Top Bar: Code, Category, and Active Badge */}
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-3">
                       <div
-                        className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-xs shadow-xs shrink-0"
+                        className="w-11 h-11 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-xs shrink-0 tracking-tight"
                         style={{ backgroundColor: sub.color || '#6d3a68' }}
                       >
                         {sub.code || 'OLY'}
                       </div>
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-lg bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed]">
+                      <span className="text-xs font-black uppercase tracking-wider px-3 py-1 rounded-xl bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed]">
                         {sub.category || 'General'}
                       </span>
                     </div>
 
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold capitalize ${
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-black capitalize ${
                         sub.status === 'active'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-slate-100 text-slate-500 border border-slate-200'
+                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                          : 'bg-slate-100 text-slate-600 border border-slate-200'
                       }`}
                     >
                       {sub.status || 'active'}
@@ -2066,37 +2066,37 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
 
                   {/* Title & Official Subtitle */}
                   <div>
-                    <h3 className="text-base font-black text-[#4e2a4a] leading-tight">
+                    <h3 className="text-xl sm:text-2xl font-black text-[#4e2a4a] leading-tight">
                       {sub.name}
                     </h3>
                     {sub.full_name && sub.full_name !== sub.name && (
-                      <p className="text-[11px] font-bold text-[#d9775b] mt-0.5">
+                      <p className="text-xs sm:text-sm font-bold text-[#d9775b] mt-0.5">
                         {sub.full_name}
                       </p>
                     )}
                   </div>
 
                   {/* Description */}
-                  <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                  <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed font-normal">
                     {sub.description || sub.tagline || 'Comprehensive Olympiad testing conceptual mastery and analytical depth.'}
                   </p>
 
                   {/* Meta Stats Badges */}
-                  <div className="pt-2 flex flex-wrap items-center gap-2 text-[10px] font-bold text-slate-600">
-                    <span className="bg-[#faf5fa] border border-[#edd6ed] px-2.5 py-1 rounded-lg text-[#6d3a68] flex items-center gap-1.5">
-                      <FileText className="w-3.5 h-3.5 text-[#d9775b]" />
+                  <div className="pt-2 flex flex-wrap items-center gap-2.5 text-xs font-black text-slate-700">
+                    <span className="bg-[#faf5fa] border border-[#edd6ed] px-3 py-1.5 rounded-xl text-[#6d3a68] flex items-center gap-1.5">
+                      <FileText className="w-4 h-4 text-[#d9775b]" />
                       {sub.questions_count || 50} Questions
                     </span>
-                    <span className="bg-[#faf5fa] border border-[#edd6ed] px-2.5 py-1 rounded-lg text-[#6d3a68] flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-[#d9775b]" />
+                    <span className="bg-[#faf5fa] border border-[#edd6ed] px-3 py-1.5 rounded-xl text-[#6d3a68] flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-[#d9775b]" />
                       {sub.duration_minutes || 60} Mins
                     </span>
                   </div>
                 </div>
 
                 {/* Bottom Action Bar */}
-                <div className="mt-5 pt-3.5 border-t border-[#f4ebf4] flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-slate-400 font-bold">
+                <div className="pt-4 border-t border-[#f4ebf4] flex items-center justify-between">
+                  <span className="text-xs font-mono text-slate-500 font-bold">
                     Slug: #{sub?.slug || sub?.code?.toLowerCase() || 'general'}
                   </span>
 
@@ -2124,9 +2124,9 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                         });
                         setShowSubjectModal(true);
                       }}
-                      className="px-3 py-1.5 bg-[#f4ebf4] hover:bg-[#edd6ed] text-[#6d3a68] rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-bold shadow-2xs active:scale-95"
+                      className="px-3.5 py-2 bg-[#f4ebf4] hover:bg-[#edd6ed] text-[#6d3a68] rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 text-xs sm:text-sm font-black shadow-2xs active:scale-95"
                     >
-                      <Edit2 className="w-3.5 h-3.5" />
+                      <Edit2 className="w-4 h-4" />
                       <span>Edit Subject</span>
                     </button>
 
@@ -2134,7 +2134,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                       type="button"
                       title="Delete Discipline"
                       onClick={() => handleDeleteSubject(sub.id)}
-                      className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                      className="p-2 text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -2150,19 +2150,19 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
           TAB 3: CLASSES & GRADES LIST
          ========================================================================= */}
       {activeTab === 'classes' && (
-        <div className="space-y-4">
-          <div className="bg-white p-3 rounded-2xl border border-[#edd6ed] flex items-center justify-between gap-3 shadow-2xs">
+        <div className="space-y-5">
+          <div className="bg-white p-4 rounded-2xl border border-[#edd6ed] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
             <div className="relative flex-1 max-w-md">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search classes by name, Nursery, LKG, UKG, or code..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 bg-[#faf5fa] border border-[#edd6ed] rounded-xl text-xs font-medium text-[#4e2a4a] placeholder:text-slate-400 focus:outline-none focus:border-[#6d3a68]"
+                className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-xl text-xs sm:text-sm font-semibold text-[#4e2a4a] placeholder:text-slate-400 focus:outline-none focus:border-[#6d3a68] focus:bg-white transition-all"
               />
             </div>
-            <span className="text-xs font-bold text-[#6d3a68]">
+            <span className="text-xs sm:text-sm font-black text-[#6d3a68] bg-[#faf5fa] px-3.5 py-1.5 rounded-xl border border-[#edd6ed] self-end sm:self-auto">
               {filteredClasses.length} Active Classes
             </span>
           </div>
@@ -2171,17 +2171,17 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
             {filteredClasses.map((cls) => (
               <div
                 key={cls.id}
-                className="bg-white rounded-2xl border border-[#edd6ed] p-4 shadow-xs hover:shadow-md hover:border-[#6d3a68]/50 transition-all flex flex-col justify-between group"
+                className="bg-white rounded-3xl border-2 border-[#edd6ed] p-5 shadow-xs hover:shadow-md hover:border-[#6d3a68] transition-all flex flex-col justify-between group"
               >
                 <div>
-                  <div className="flex items-center justify-between gap-1 mb-2">
-                    <span className="text-[10px] font-extrabold font-mono px-2 py-0.5 rounded-md bg-[#f4ebf4] text-[#6d3a68] border border-[#edd6ed]">
+                  <div className="flex items-center justify-between gap-1 mb-2.5">
+                    <span className="text-xs font-black font-mono px-2.5 py-1 rounded-lg bg-[#f4ebf4] text-[#6d3a68] border border-[#edd6ed]">
                       {cls.code}
                     </span>
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold capitalize ${
+                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black capitalize ${
                         cls.status === 'active'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
                           : 'bg-slate-100 text-slate-600 border border-slate-200'
                       }`}
                     >
@@ -2189,22 +2189,22 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                     </span>
                   </div>
 
-                  <h3 className="text-sm font-black text-[#4e2a4a] leading-tight">
+                  <h3 className="text-base sm:text-lg font-black text-[#4e2a4a] leading-tight">
                     {cls.name}
                   </h3>
 
-                  <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">
+                  <p className="text-xs text-slate-600 mt-1.5 line-clamp-2 leading-relaxed">
                     {cls.description || 'Curriculum framework with Olympiad practice sets.'}
                   </p>
 
-                  <div className="mt-2 flex items-center gap-1.5 text-[10px] text-slate-400 font-semibold">
+                  <div className="mt-3 flex items-center gap-2 text-xs text-slate-500 font-bold">
                     <span>Order #{cls.order_no}</span>
                     <span>&bull;</span>
                     <span>{cls.student_count || 0} Students</span>
                   </div>
                 </div>
 
-                <div className="mt-3 pt-2 border-t border-[#fdf2f8] flex items-center justify-end gap-1">
+                <div className="mt-4 pt-3 border-t border-[#fdf2f8] flex items-center justify-end gap-1.5">
                   <button
                     type="button"
                     title="Edit Class"
@@ -2221,18 +2221,18 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                       });
                       setShowClassModal(true);
                     }}
-                    className="p-1.5 text-[#6d3a68] hover:bg-[#f4ebf4] rounded-lg transition-colors cursor-pointer"
+                    className="p-2 text-[#6d3a68] hover:bg-[#f4ebf4] rounded-xl transition-colors cursor-pointer"
                   >
-                    <Edit2 className="w-3.5 h-3.5" />
+                    <Edit2 className="w-4 h-4" />
                   </button>
 
                   <button
                     type="button"
                     title="Delete Class"
                     onClick={() => handleDeleteClass(cls.id)}
-                    className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                    className="p-2 text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
