@@ -635,18 +635,18 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
             <div className="absolute bottom-full left-3 right-3 mb-2 bg-white rounded-2xl border border-[#ebd7eb] shadow-2xl p-2 space-y-1 z-50 animate-in fade-in zoom-in-95 duration-150">
               <div className="px-3 py-2 border-b border-[#f4eaf4]">
                 <p className="text-sm font-black text-[#4e2a4a] truncate">
-                  {user?.name || user?.email || 'Candidate'}
+                  {user?.full_name || user?.name || user?.login_id || 'Candidate'}
                 </p>
                 <p className="text-xs text-slate-500 truncate">
-                  {user?.email || ''}
+                  {user?.login_id || user?.email || ''}
                 </p>
                 <div className="flex items-center gap-1.5 mt-1.5">
                   <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-[#faf4e0] text-[#80497D] capitalize">
                     {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'teacher' ? 'Faculty' : 'Candidate'}
                   </span>
-                  {user?.class && (
+                  {(user?.class_name || user?.class || user?.grade) && (
                     <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-[#f4eaf4] text-[#80497D]">
-                      {user.class}
+                      {user?.class_name || user?.class || user?.grade}
                     </span>
                   )}
                 </div>
@@ -698,11 +698,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-9 h-9 rounded-full bg-[#f4eaf4] text-[#80497D] font-black text-sm flex items-center justify-center border border-[#ebd7eb] shrink-0">
-                {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
+                {(user?.full_name || user?.name || user?.login_id || 'C').charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-bold text-[#4e2a4a] truncate">
-                  {user?.name || user?.email || 'Candidate'}
+                  {user?.full_name || user?.name || user?.login_id || 'Candidate'}
                 </p>
                 <span className="inline-block px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#faf4e0] text-[#80497D] capitalize">
                   {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'teacher' ? 'Faculty' : 'Candidate'}

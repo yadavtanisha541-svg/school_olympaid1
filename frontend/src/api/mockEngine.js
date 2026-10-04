@@ -366,28 +366,69 @@ export const mockEngine = {
     // AUTH
     if (root === 'auth') {
       if (sub === 'login') {
-        const loginId = (body.login_id || body.email || '').toLowerCase().trim();
+        const rawLoginId = (body.login_id || body.email || body.username || '').trim();
+        const loginId = rawLoginId.toLowerCase();
         const isSuperAdmin = loginId.includes('admin') || loginId === 'superadmin' || loginId === 'admin@olympiadhub.com';
-        const user = isSuperAdmin
-          ? {
-              id: 1,
-              name: 'Super Administrator',
-              email: 'admin@olympiadhub.com',
-              role: 'superadmin',
-              status: 'active',
-              permissions: ['all']
-            }
-          : {
-              id: 2,
-              name: body.name || 'Aarav Sharma',
-              email: loginId || 'student@olympiadhub.com',
-              role: 'student',
-              status: 'active',
-              class: 'Class 6',
-              grade: 'Class 6',
-              school: 'Delhi Public School',
-              permissions: []
-            };
+        
+        let foundUser = null;
+        const allUsers = getDb('users') || [];
+        foundUser = allUsers.find(
+          (u) =>
+            (u.login_id && u.login_id.toLowerCase() === loginId) ||
+            (u.email && u.email.toLowerCase() === loginId) ||
+            (u.student_id && u.student_id.toLowerCase() === loginId) ||
+            (u.name && u.name.toLowerCase() === loginId) ||
+            (u.full_name && u.full_name.toLowerCase() === loginId)
+        );
+
+        let user = null;
+        if (isSuperAdmin) {
+          user = {
+            id: 1,
+            name: 'Super Administrator',
+            full_name: 'Super Administrator',
+            email: 'admin@olympiadhub.com',
+            login_id: 'admin',
+            role: 'superadmin',
+            status: 'active',
+            permissions: ['all']
+          };
+        } else if (foundUser) {
+          const uName = foundUser.full_name || foundUser.name || rawLoginId;
+          user = {
+            ...foundUser,
+            name: uName,
+            full_name: uName,
+            login_id: foundUser.login_id || rawLoginId,
+            student_id: foundUser.login_id || foundUser.student_id || rawLoginId,
+            role: foundUser.role || 'student',
+            class: foundUser.class_name || foundUser.class || foundUser.grade || 'Class 6',
+            class_name: foundUser.class_name || foundUser.class || foundUser.grade || 'Class 6',
+            school: foundUser.school_name || foundUser.school || 'Independent Candidate',
+            email: foundUser.email || (rawLoginId.includes('@') ? rawLoginId : `${rawLoginId || 'student'}@olympiadhub.com`)
+          };
+        } else {
+          // Capitalize loginId for proper display name (e.g., "sandeep" -> "Sandeep")
+          const cleanName = rawLoginId
+            ? rawLoginId.split(/[@._\s]+/).filter(Boolean).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ')
+            : 'Candidate Student';
+
+          user = {
+            id: Date.now(),
+            name: body.name || body.full_name || cleanName,
+            full_name: body.name || body.full_name || cleanName,
+            login_id: rawLoginId || `STU-${Date.now().toString().slice(-4)}`,
+            student_id: rawLoginId || `STU-${Date.now().toString().slice(-4)}`,
+            email: rawLoginId.includes('@') ? rawLoginId : `${rawLoginId || 'student'}@olympiadhub.com`,
+            role: 'student',
+            status: 'active',
+            class: body.class || 'Class 6',
+            class_name: body.class || 'Class 6',
+            grade: body.class || 'Class 6',
+            school: 'Independent Candidate',
+            permissions: []
+          };
+        }
 
         return {
           success: true,
@@ -400,9 +441,21 @@ export const mockEngine = {
       }
 
       if (sub === 'me') {
-        const savedUser = sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user');
-        const user = savedUser ? JSON.parse(savedUser) : initialStore.users[0];
-        return { success: true, data: user };
+        const savedUserRaw = sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user');
+        let user = savedUserRaw ? JSON.parse(savedUserRaw) : null;
+        if (user && user.role !== 'superadmin') {
+          // If the user's name is mismatched or missing, normalize it
+          if (!user.full_name || !user.name) {
+            const cleanName = (user.login_id || user.email || 'Student')
+              .split(/[@._\s]+/)
+              .filter(Boolean)
+              .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+              .join(' ');
+            user.name = cleanName;
+            user.full_name = cleanName;
+          }
+        }
+        return { success: true, data: user || initialStore.users[0] };
       }
 
       if (sub === 'logout') {

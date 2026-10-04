@@ -32,9 +32,9 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
   const [loading, setLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState(null);
 
-  const studentName = user?.full_name || user?.name || 'muskan';
-  const studentId = user?.login_id || user?.student_id || 'STUD001';
-  const studentClass = user?.class_name ? `${user.class_name}-A` : (user?.grade || 'Class 6-A');
+  const studentName = user?.full_name || user?.name || (user?.login_id ? user.login_id.split(/[@._\s]+/).filter(Boolean).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ') : 'Candidate');
+  const studentId = user?.login_id || user?.student_id || 'STU-001';
+  const studentClass = user?.class_name ? `${user.class_name}-A` : (user?.class ? `${user.class}-A` : 'Class 6-A');
   const studentAvatar = user?.avatar || user?.profile_photo;
 
   // Aggregate and calculate all analytics across API + LocalStorage
