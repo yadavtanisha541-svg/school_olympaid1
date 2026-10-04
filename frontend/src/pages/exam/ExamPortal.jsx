@@ -52,7 +52,10 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
           if (!mounted) return;
           setSessionData(res.data);
           setAnswers(res.data.answers || {});
-          setRemainingSeconds(res.data.remaining_seconds || 0);
+          const durSecs = (Number(res.data.remaining_seconds) > 0)
+            ? Number(res.data.remaining_seconds)
+            : (Number(res.data.exam?.duration_minutes) || 60) * 60;
+          setRemainingSeconds(durSecs);
           setTabWarnings(res.data.tab_switch_count || 0);
           setTabLimit(res.data.exam.tab_switch_limit || 3);
         }
@@ -368,7 +371,7 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
                   {sessionData?.exam?.title}
                 </h1>
                 <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono">
-                  <span>Code: {sessionData?.exam?.exam_code}</span>
+                  <span>Code: {sessionData?.exam?.exam_code || sessionData?.exam?.short_code || sessionData?.exam?.subject_code || 'OLY-2026'}</span>
                   {sessionData?.exam?.author_name && (
                     <>
                       <span>•</span>

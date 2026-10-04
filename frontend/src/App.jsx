@@ -565,8 +565,13 @@ export const App = () => {
           attemptId={activeSolutionAttemptId}
           onBack={() => {
             setActiveSolutionAttemptId(null);
+            setCurrentTab('my_content');
+          }}
+          onViewAnalysis={() => {
+            setActiveResultAttemptId(activeSolutionAttemptId);
             setCurrentTab('exam_result');
           }}
+          onNavigateTab={setCurrentTab}
         />
       );
     }
