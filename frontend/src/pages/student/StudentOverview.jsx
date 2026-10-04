@@ -359,7 +359,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
 
     if (matching.length > 0) return matching;
 
-    return [
+    const basePapers = [
       {
         id: `mock_${subCode.toLowerCase()}_prev`,
         title: `${studentClass} ${subCode} Previous Year Paper 2019`,
@@ -405,6 +405,22 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
         status: 'published'
       }
     ];
+
+    if (subCode === 'IMO') {
+      basePapers.push({
+        id: `mock_${subCode.toLowerCase()}_3`,
+        title: `${subCode} Level-1 Mock Test 3 ${studentClass}`,
+        short_code: `${subCode} - Mock 3`,
+        subject_code: subCode,
+        class_name: studentClass,
+        duration_minutes: 60,
+        total_marks: 60,
+        cutoff_marks: 46,
+        status: 'published'
+      });
+    }
+
+    return basePapers;
   };
 
   // Time of day greeting
