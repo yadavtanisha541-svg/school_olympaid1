@@ -2016,27 +2016,27 @@ export const StudentManagement = () => {
       </div>
 
       {/* 3. Search Bar & Filters */}
-      <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-3.5">
+      <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
         {/* Main Search */}
         <div className="relative w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by student name, Student ID, email or school..."
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+            className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm sm:text-base text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-all"
           />
         </div>
 
         {/* Filter Dropdowns Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 text-sm">
           <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Class</label>
+            <label className="text-xs font-black text-slate-600 uppercase tracking-wider block mb-1.5">Class</label>
             <select
               value={filterClass}
               onChange={(e) => setFilterClass(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
             >
               <option value="all">All Classes</option>
               {['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((c) => (
@@ -2046,11 +2046,11 @@ export const StudentManagement = () => {
           </div>
 
           <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Section</label>
+            <label className="text-xs font-black text-slate-600 uppercase tracking-wider block mb-1.5">Section</label>
             <select
               value={filterSection}
               onChange={(e) => setFilterSection(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
             >
               <option value="all">All Sections</option>
               <option value="A">Section A</option>
@@ -2060,11 +2060,11 @@ export const StudentManagement = () => {
           </div>
 
           <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">School</label>
+            <label className="text-xs font-black text-slate-600 uppercase tracking-wider block mb-1.5">School</label>
             <select
               value={filterSchool}
               onChange={(e) => setFilterSchool(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
             >
               <option value="all">All Schools</option>
               <option value="Delhi Public School">Delhi Public School</option>
@@ -2074,11 +2074,11 @@ export const StudentManagement = () => {
           </div>
 
           <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Olympiad</label>
+            <label className="text-xs font-black text-slate-600 uppercase tracking-wider block mb-1.5">Olympiad</label>
             <select
               value={filterOlympiad}
               onChange={(e) => setFilterOlympiad(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
             >
               <option value="all">All Olympiads</option>
               <option value="Mathematics Olympiad">Mathematics Olympiad</option>
@@ -2089,11 +2089,11 @@ export const StudentManagement = () => {
           </div>
 
           <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Status</label>
+            <label className="text-xs font-black text-slate-600 uppercase tracking-wider block mb-1.5">Status</label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -2102,11 +2102,11 @@ export const StudentManagement = () => {
           </div>
 
           <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Registration</label>
+            <label className="text-xs font-black text-slate-600 uppercase tracking-wider block mb-1.5">Registration</label>
             <select
               value={filterRegStatus}
               onChange={(e) => setFilterRegStatus(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
             >
               <option value="all">All Registrations</option>
               <option value="Registered">Registered</option>
@@ -2119,7 +2119,7 @@ export const StudentManagement = () => {
             <button
               type="button"
               onClick={handleClearFilters}
-              className="w-full px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs sm:text-sm font-black transition-colors cursor-pointer"
             >
               Clear Filters
             </button>
@@ -2129,36 +2129,36 @@ export const StudentManagement = () => {
 
       {/* 4. Bulk Actions Bar (When items selected) */}
       {selectedIds.length > 0 && (
-        <div className="p-3.5 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-center justify-between flex-wrap gap-3 animate-in fade-in duration-150">
-          <span className="text-xs font-bold text-indigo-900">
+        <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-center justify-between flex-wrap gap-3 animate-in fade-in duration-150">
+          <span className="text-sm font-black text-indigo-950">
             {selectedIds.length} student(s) selected
           </span>
-          <div className="flex items-center gap-2 flex-wrap text-xs">
+          <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
             <button
               type="button"
               onClick={handleBulkActivate}
-              className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl cursor-pointer shadow-2xs"
+              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl cursor-pointer shadow-2xs"
             >
               Activate
             </button>
             <button
               type="button"
               onClick={handleBulkDeactivate}
-              className="px-3 py-1 bg-slate-600 hover:bg-slate-700 text-white font-bold rounded-xl cursor-pointer shadow-2xs"
+              className="px-3.5 py-1.5 bg-slate-600 hover:bg-slate-700 text-white font-black rounded-xl cursor-pointer shadow-2xs"
             >
               Deactivate
             </button>
             <button
               type="button"
               onClick={handleExportCSV}
-              className="px-3 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl cursor-pointer"
+              className="px-3.5 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black rounded-xl cursor-pointer"
             >
               Export
             </button>
             <button
               type="button"
               onClick={handleBulkDelete}
-              className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl cursor-pointer shadow-2xs"
+              className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-black rounded-xl cursor-pointer shadow-2xs"
             >
               Delete
             </button>
@@ -2169,20 +2169,20 @@ export const StudentManagement = () => {
       {/* 5. Student Table */}
       <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-slate-400 text-xs font-medium">
+          <div className="p-12 text-center text-slate-400 text-sm font-medium">
             Loading students...
           </div>
         ) : filteredStudents.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 text-xs">
+          <div className="p-12 text-center text-slate-400 text-sm font-medium">
             No students found matching current filters.
           </div>
         ) : (
           <div className="overflow-x-auto relative">
-            <table className="w-full text-left text-xs whitespace-nowrap">
-              <thead className="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+            <table className="w-full text-left whitespace-nowrap">
+              <thead className="bg-slate-50 text-xs font-black text-slate-600 uppercase tracking-wider border-b border-slate-200">
                 <tr>
-                  <th className="py-3 px-2.5 w-8 text-center font-bold text-slate-400">#</th>
-                  <th className="py-3 px-2.5 w-8 text-center">
+                  <th className="py-3.5 px-3 w-10 text-center font-black text-slate-500">#</th>
+                  <th className="py-3.5 px-3 w-10 text-center">
                     <input
                       type="checkbox"
                       checked={paginatedStudents.length > 0 && paginatedStudents.every((s) => selectedIds.includes(s.id))}
@@ -2190,21 +2190,21 @@ export const StudentManagement = () => {
                       className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer align-middle"
                     />
                   </th>
-                  <th className="py-3 px-3 min-w-[160px]">Student</th>
-                  <th className="py-3 px-2.5">Student ID</th>
-                  <th className="py-3 px-2.5">Class</th>
-                  <th className="py-3 px-2.5">School</th>
-                  <th className="py-3 px-2.5">Olympiad</th>
-                  <th className="py-3 px-2.5 text-center">Attempts</th>
-                  <th className="py-3 px-2.5 text-center">Avg Score</th>
-                  <th className="py-3 px-2.5">Status</th>
-                  <th className="py-3 px-2.5">Registration</th>
-                  <th className="py-3 px-3 text-center min-w-[110px] sticky right-0 bg-slate-50/95 backdrop-blur-xs border-l border-slate-100 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.04)] z-10">
+                  <th className="py-3.5 px-4 min-w-[180px]">Student</th>
+                  <th className="py-3.5 px-3">Student ID</th>
+                  <th className="py-3.5 px-3">Class</th>
+                  <th className="py-3.5 px-3">School</th>
+                  <th className="py-3.5 px-3">Olympiad</th>
+                  <th className="py-3.5 px-3 text-center">Attempts</th>
+                  <th className="py-3.5 px-3 text-center">Avg Score</th>
+                  <th className="py-3.5 px-3">Status</th>
+                  <th className="py-3.5 px-3">Registration</th>
+                  <th className="py-3.5 px-4 text-center min-w-[120px] sticky right-0 bg-slate-50/95 backdrop-blur-xs border-l border-slate-200 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.04)] z-10 font-black">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 text-sm">
                 {paginatedStudents.map((s, idx) => {
                   const isSelected = selectedIds.includes(s.id);
                   const indexNumber = (currentPage - 1) * pageSize + idx + 1;
@@ -2217,12 +2217,12 @@ export const StudentManagement = () => {
                       }`}
                     >
                       {/* Index Number */}
-                      <td className="py-3 px-2.5 text-center font-mono font-bold text-slate-400 text-xs">
+                      <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-500 text-sm">
                         {indexNumber}
                       </td>
 
                       {/* Selection Checkbox */}
-                      <td className="py-3 px-2.5 text-center">
+                      <td className="py-3.5 px-3 text-center">
                         <input
                           type="checkbox"
                           checked={isSelected}
@@ -2232,47 +2232,47 @@ export const StudentManagement = () => {
                       </td>
 
                       {/* Student Profile Column */}
-                      <td className="py-3 px-3">
+                      <td className="py-3.5 px-4">
                         <div
                           onClick={() => handleOpenProfile(s)}
-                          className="flex items-center gap-2.5 cursor-pointer group/item"
+                          className="flex items-center gap-3 cursor-pointer group/item"
                         >
-                          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs group-hover/item:scale-105 transition-transform">
+                          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-2xs group-hover/item:scale-105 transition-transform">
                             {s.full_name ? s.full_name.charAt(0).toUpperCase() : 'S'}
                           </div>
                           <div className="leading-tight">
-                            <p className="font-bold text-slate-900 group-hover/item:text-indigo-600 transition-colors">
+                            <p className="font-black text-slate-900 text-sm sm:text-[15px] group-hover/item:text-indigo-600 transition-colors">
                               {s.full_name}
                             </p>
-                            <p className="text-[10px] text-slate-400">{s.email || 'no-email@domain.com'}</p>
+                            <p className="text-xs text-slate-500 font-medium mt-0.5">{s.email || 'no-email@domain.com'}</p>
                           </div>
                         </div>
                       </td>
 
                       {/* Student ID */}
-                      <td className="py-3 px-2.5">
-                        <span className="font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100 text-[11px]">
+                      <td className="py-3.5 px-3">
+                        <span className="font-mono font-black text-indigo-800 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-200 text-xs sm:text-sm">
                           {s.student_id || s.login_id}
                         </span>
                       </td>
 
                       {/* Class */}
-                      <td className="py-3 px-2.5 font-semibold text-slate-800">
+                      <td className="py-3.5 px-3 font-bold text-slate-900 text-sm">
                         {s.class_name || 'Class 6'} {s.section ? `(${s.section})` : ''}
                       </td>
 
                       {/* School */}
-                      <td className="py-3 px-2.5 text-slate-600 font-medium max-w-[140px] truncate" title={s.school_name || s.school || 'Delhi Public School'}>
+                      <td className="py-3.5 px-3 text-slate-700 font-semibold text-sm max-w-[160px] truncate" title={s.school_name || s.school || 'Delhi Public School'}>
                         {s.school_name || s.school || 'Delhi Public School'}
                       </td>
 
                       {/* Olympiad */}
-                      <td className="py-3 px-2.5">
-                        <div className="flex flex-wrap gap-1">
+                      <td className="py-3.5 px-3">
+                        <div className="flex flex-wrap gap-1.5">
                           {(s.registered_olympiads || ['Mathematics Olympiad']).map((oly, oIdx) => (
                             <span
                               key={oIdx}
-                              className="inline-block px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-medium"
+                              className="inline-block px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 text-xs font-bold"
                             >
                               {oly.replace(' Olympiad', '')}
                             </span>
@@ -2281,52 +2281,52 @@ export const StudentManagement = () => {
                       </td>
 
                       {/* Exams Attempted */}
-                      <td className="py-3 px-2.5 text-center font-bold text-slate-800">
+                      <td className="py-3.5 px-3 text-center font-black text-slate-900 text-sm">
                         {s.exams_attempted || 0}
                       </td>
 
                       {/* Average Score */}
-                      <td className="py-3 px-2.5 text-center">
-                        <span className="font-bold text-indigo-600">{s.average_score || '0%'}</span>
+                      <td className="py-3.5 px-3 text-center">
+                        <span className="font-black text-indigo-700 text-sm">{s.average_score || '0%'}</span>
                       </td>
 
                       {/* Status */}
-                      <td className="py-3 px-2.5">
+                      <td className="py-3.5 px-3">
                         <span
                           onClick={() => handleToggleStudentStatus(s)}
                           title="Click to toggle status"
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold cursor-pointer ${
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black cursor-pointer ${
                             s.status === 'active'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-rose-50 text-rose-700 border border-rose-200'
+                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs'
+                              : 'bg-rose-50 text-rose-800 border border-rose-300 shadow-2xs'
                           }`}
                         >
-                          <span className={`w-1.5 h-1.5 rounded-full ${s.status === 'active' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                          <span className={`w-2 h-2 rounded-full ${s.status === 'active' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                           {s.status === 'active' ? 'Active' : 'Inactive'}
                         </span>
                       </td>
 
                       {/* Registration Status */}
-                      <td className="py-3 px-2.5">
-                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                      <td className="py-3.5 px-3">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-black ${
                           s.registration_status === 'Registered'
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                            ? 'bg-blue-50 text-blue-800 border border-blue-300 shadow-2xs'
                             : s.registration_status === 'Pending'
-                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                            : 'bg-slate-100 text-slate-600'
+                            ? 'bg-amber-50 text-amber-800 border border-amber-300 shadow-2xs'
+                            : 'bg-slate-100 text-slate-700'
                         }`}>
                           {s.registration_status || 'Registered'}
                         </span>
                       </td>
 
                       {/* Actions (Always Fully Visible) */}
-                      <td className="py-3 px-3 text-center sticky right-0 bg-white group-hover:bg-[#f6f7fb] border-l border-slate-100 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.04)] z-10">
-                        <div className="flex items-center justify-center gap-1">
+                      <td className="py-3.5 px-4 text-center sticky right-0 bg-white group-hover:bg-[#f6f7fb] border-l border-slate-200 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.04)] z-10">
+                        <div className="flex items-center justify-center gap-1.5">
                           <button
                             type="button"
                             onClick={() => handleOpenProfile(s)}
                             title="View Profile"
-                            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors cursor-pointer"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
@@ -2334,7 +2334,7 @@ export const StudentManagement = () => {
                             type="button"
                             onClick={() => handleOpenEditStudent(s)}
                             title="Edit Student"
-                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors cursor-pointer"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
@@ -2342,7 +2342,7 @@ export const StudentManagement = () => {
                             type="button"
                             onClick={() => handleDeleteStudent(s)}
                             title="Delete Student"
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -2358,11 +2358,11 @@ export const StudentManagement = () => {
 
         {/* 6. Pagination Footer (10 items per page) */}
         {!loading && filteredStudents.length > 0 && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 border-t border-slate-100 bg-slate-50/60">
-            <div className="text-xs font-semibold text-slate-500">
-              Showing <span className="font-bold text-slate-900">{(currentPage - 1) * pageSize + 1}</span> to{' '}
-              <span className="font-bold text-slate-900">{Math.min(currentPage * pageSize, filteredStudents.length)}</span> of{' '}
-              <span className="font-bold text-slate-900">{filteredStudents.length}</span> students
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 border-t border-slate-200 bg-slate-50/80">
+            <div className="text-sm font-semibold text-slate-600">
+              Showing <span className="font-black text-slate-900">{(currentPage - 1) * pageSize + 1}</span> to{' '}
+              <span className="font-black text-slate-900">{Math.min(currentPage * pageSize, filteredStudents.length)}</span> of{' '}
+              <span className="font-black text-slate-900">{filteredStudents.length}</span> students
             </div>
 
             {totalPages > 1 && (
@@ -2371,9 +2371,9 @@ export const StudentManagement = () => {
                   type="button"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 hover:text-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-2xs"
+                  className="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 hover:text-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-2xs"
                 >
-                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <ChevronLeft className="w-4 h-4" />
                   <span>Previous</span>
                 </button>
 

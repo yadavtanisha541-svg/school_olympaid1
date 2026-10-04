@@ -1219,22 +1219,22 @@ export const UserManagement = ({ mode = 'teachers' }) => {
         {isTeacherView ? (
           /* TEACHERS TABLE */
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/50 text-slate-400 text-[10px] uppercase font-bold tracking-wider">
-                  <th className="py-3 px-3 w-10 text-center font-bold text-slate-400">#</th>
-                  <th className="py-3 px-4">Teacher Name & ID</th>
-                  <th className="py-3 px-4">Contact</th>
-                  <th className="py-3 px-4">Questions Authored</th>
-                  <th className="py-3 px-4">Exams</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+            <table className="w-full text-left whitespace-nowrap">
+              <thead className="bg-slate-50 text-xs font-black text-slate-600 uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th className="py-3.5 px-3 w-10 text-center font-black text-slate-500">#</th>
+                  <th className="py-3.5 px-4">Teacher Name & ID</th>
+                  <th className="py-3.5 px-4">Contact</th>
+                  <th className="py-3.5 px-4">Questions Authored</th>
+                  <th className="py-3.5 px-4">Exams</th>
+                  <th className="py-3.5 px-4">Status</th>
+                  <th className="py-3.5 px-4 text-right font-black">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 text-sm">
                 {teachers.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-slate-400">
+                    <td colSpan={7} className="py-8 text-center text-slate-400 text-sm font-medium">
                       No teachers found. Click "Add New Teacher" to create one.
                     </td>
                   </tr>
@@ -1243,58 +1243,58 @@ export const UserManagement = ({ mode = 'teachers' }) => {
                     const indexNumber = (currentPage - 1) * pageSize + idx + 1;
                     return (
                       <tr key={t.id} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="py-3 px-3 text-center font-mono font-bold text-slate-400 text-xs">
+                        <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-500 text-sm">
                           {indexNumber}
                         </td>
-                        <td className="py-3 px-4 cursor-pointer" onClick={() => handleOpenDetailView(t)}>
+                        <td className="py-3.5 px-4 cursor-pointer" onClick={() => handleOpenDetailView(t)}>
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 text-white flex items-center justify-center font-black text-sm shadow-xs">
                               {t.full_name ? t.full_name.charAt(0).toUpperCase() : 'T'}
                             </div>
                             <div>
-                              <p className="font-bold text-slate-900 hover:text-indigo-600 transition-colors">
+                              <p className="font-black text-slate-900 text-sm sm:text-[15px] hover:text-indigo-600 transition-colors">
                                 {t.full_name}
                               </p>
-                              <p className="text-[11px] font-mono text-indigo-600 font-bold">{t.login_id}</p>
+                              <p className="text-xs font-mono text-indigo-700 font-bold">{t.login_id}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 px-4 text-slate-600">
-                          <p>{t.email || '-'}</p>
-                          <p className="text-[11px] text-slate-400">{t.phone || '-'}</p>
+                        <td className="py-3.5 px-4 text-slate-700 text-sm">
+                          <p className="font-semibold">{t.email || '-'}</p>
+                          <p className="text-xs text-slate-400 font-medium">{t.phone || '-'}</p>
                         </td>
-                        <td className="py-3 px-4 font-bold text-slate-800">
+                        <td className="py-3.5 px-4 font-black text-slate-900 text-sm">
                           {t.questions_count || 0} Questions
                         </td>
-                        <td className="py-3 px-4 font-bold text-slate-800">
+                        <td className="py-3.5 px-4 font-black text-slate-900 text-sm">
                           {t.exams_count || 0} Exams
                         </td>
-                        <td className="py-3 px-4">
+                        <td className="py-3.5 px-4">
                           <span
                             onClick={() => handleToggleStatus(t)}
                             title="Click to toggle status"
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold cursor-pointer ${
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black cursor-pointer ${
                               t.status === 'active'
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs'
+                                : 'bg-rose-50 text-rose-800 border border-rose-300 shadow-2xs'
                             }`}
                           >
-                            <span className={`w-1.5 h-1.5 rounded-full ${t.status === 'active' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                            <span className={`w-2 h-2 rounded-full ${t.status === 'active' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                             {t.status === 'active' ? 'Active' : 'Inactive'}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-right">
+                        <td className="py-3.5 px-4 text-right">
                           <div className="flex items-center justify-end gap-1.5">
                             <Button
                               variant="secondary"
-                              size="xs"
+                              size="sm"
                               icon={Edit2}
                               title="View / Edit Profile"
                               onClick={() => handleOpenDetailView(t)}
                             />
                             <Button
                               variant="ghost"
-                              size="xs"
+                              size="sm"
                               icon={Trash2}
                               title="Delete Teacher"
                               onClick={() => handleDeleteUser(t)}
@@ -1311,23 +1311,23 @@ export const UserManagement = ({ mode = 'teachers' }) => {
         ) : (
           /* STUDENTS TABLE */
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/50 text-slate-400 text-[10px] uppercase font-bold tracking-wider">
-                  <th className="py-3 px-3 w-10 text-center font-bold text-slate-400">#</th>
-                  <th className="py-3 px-4">Student Name & Roll No</th>
-                  <th className="py-3 px-4">Academic Class</th>
-                  <th className="py-3 px-4">Contact</th>
-                  <th className="py-3 px-4">Exams Attempted</th>
-                  <th className="py-3 px-4">Avg Score</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+            <table className="w-full text-left whitespace-nowrap">
+              <thead className="bg-slate-50 text-xs font-black text-slate-600 uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th className="py-3.5 px-3 w-10 text-center font-black text-slate-500">#</th>
+                  <th className="py-3.5 px-4">Student Name & Roll No</th>
+                  <th className="py-3.5 px-4">Academic Class</th>
+                  <th className="py-3.5 px-4">Contact</th>
+                  <th className="py-3.5 px-4 text-center">Exams Attempted</th>
+                  <th className="py-3.5 px-4 text-center">Avg Score</th>
+                  <th className="py-3.5 px-4">Status</th>
+                  <th className="py-3.5 px-4 text-right font-black">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 text-sm">
                 {students.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-8 text-center text-slate-400">
+                    <td colSpan={8} className="py-8 text-center text-slate-400 text-sm font-medium">
                       No students found. Click "Add New Student" to create one.
                     </td>
                   </tr>
@@ -1336,61 +1336,61 @@ export const UserManagement = ({ mode = 'teachers' }) => {
                     const indexNumber = (currentPage - 1) * pageSize + idx + 1;
                     return (
                       <tr key={s.id} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="py-3 px-3 text-center font-mono font-bold text-slate-400 text-xs">
+                        <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-500 text-sm">
                           {indexNumber}
                         </td>
-                        <td className="py-3 px-4 cursor-pointer" onClick={() => handleOpenDetailView(s)}>
+                        <td className="py-3.5 px-4 cursor-pointer" onClick={() => handleOpenDetailView(s)}>
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center font-black text-sm shadow-xs">
                               {s.full_name ? s.full_name.charAt(0).toUpperCase() : 'S'}
                             </div>
                             <div>
-                              <p className="font-bold text-slate-900 hover:text-emerald-600 transition-colors">
+                              <p className="font-black text-slate-900 text-sm sm:text-[15px] hover:text-emerald-600 transition-colors">
                                 {s.full_name}
                               </p>
-                              <p className="text-[11px] font-mono text-emerald-600 font-bold">{s.login_id}</p>
+                              <p className="text-xs font-mono text-emerald-700 font-bold">{s.login_id}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 px-4 font-bold text-slate-800">
+                        <td className="py-3.5 px-4 font-bold text-slate-900 text-sm">
                           {s.class_name || 'Class 10'}
                         </td>
-                        <td className="py-3 px-4 text-slate-600">
-                          <p>{s.email || '-'}</p>
-                          <p className="text-[11px] text-slate-400">{s.phone || '-'}</p>
+                        <td className="py-3.5 px-4 text-slate-700 text-sm">
+                          <p className="font-semibold">{s.email || '-'}</p>
+                          <p className="text-xs text-slate-400 font-medium">{s.phone || '-'}</p>
                         </td>
-                        <td className="py-3 px-4 font-bold text-slate-800">
+                        <td className="py-3.5 px-4 text-center font-black text-slate-900 text-sm">
                           {s.attempts_count || 0} Attempts
                         </td>
-                        <td className="py-3 px-4 font-bold text-slate-800">
+                        <td className="py-3.5 px-4 text-center font-black text-indigo-700 text-sm">
                           {s.avg_score ? `${parseFloat(s.avg_score).toFixed(1)}%` : '0%'}
                         </td>
-                        <td className="py-3 px-4">
+                        <td className="py-3.5 px-4">
                           <span
                             onClick={() => handleToggleStatus(s)}
                             title="Click to toggle status"
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold cursor-pointer ${
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black cursor-pointer ${
                               s.status === 'active'
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs'
+                                : 'bg-rose-50 text-rose-800 border border-rose-300 shadow-2xs'
                             }`}
                           >
-                            <span className={`w-1.5 h-1.5 rounded-full ${s.status === 'active' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                            <span className={`w-2 h-2 rounded-full ${s.status === 'active' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                             {s.status === 'active' ? 'Active' : 'Inactive'}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-right">
+                        <td className="py-3.5 px-4 text-right">
                           <div className="flex items-center justify-end gap-1.5">
                             <Button
                               variant="secondary"
-                              size="xs"
+                              size="sm"
                               icon={Edit2}
                               title="View / Edit Profile"
                               onClick={() => handleOpenDetailView(s)}
                             />
                             <Button
                               variant="ghost"
-                              size="xs"
+                              size="sm"
                               icon={Trash2}
                               title="Delete Student"
                               onClick={() => handleDeleteUser(s)}
@@ -1408,11 +1408,11 @@ export const UserManagement = ({ mode = 'teachers' }) => {
 
         {/* Pagination Footer (10 items per page) */}
         {!loading && currentList.length > 0 && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 border-t border-slate-100 bg-slate-50/60">
-            <div className="text-xs font-semibold text-slate-500">
-              Showing <span className="font-bold text-slate-900">{(currentPage - 1) * pageSize + 1}</span> to{' '}
-              <span className="font-bold text-slate-900">{Math.min(currentPage * pageSize, currentList.length)}</span> of{' '}
-              <span className="font-bold text-slate-900">{currentList.length}</span> {isTeacherView ? 'teachers' : 'students'}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 border-t border-slate-200 bg-slate-50/80">
+            <div className="text-sm font-semibold text-slate-600">
+              Showing <span className="font-black text-slate-900">{(currentPage - 1) * pageSize + 1}</span> to{' '}
+              <span className="font-black text-slate-900">{Math.min(currentPage * pageSize, currentList.length)}</span> of{' '}
+              <span className="font-black text-slate-900">{currentList.length}</span> {isTeacherView ? 'teachers' : 'students'}
             </div>
 
             {totalPages > 1 && (
