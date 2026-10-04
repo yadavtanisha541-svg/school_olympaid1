@@ -397,13 +397,17 @@ INSERT INTO `academic_classes` (`id`, `name`, `code`, `order_no`, `status`) VALU
 (11, 'Class 11', 'CLASS-11', 11, 'active'),
 (12, 'Class 12', 'CLASS-12', 12, 'active');
 
--- Seed Subjects
+-- Seed Subjects (9 Official Disciplines)
 INSERT INTO `subjects` (`id`, `name`, `code`, `icon`, `color`, `status`) VALUES
-(1, 'Mathematics', 'MATH', 'Calculator', '#4F46E5', 'active'),
-(2, 'Science', 'SCI', 'Atom', '#059669', 'active'),
-(3, 'English', 'ENG', 'BookOpen', '#D97706', 'active'),
-(4, 'General Knowledge (GK)', 'GK', 'Globe', '#DC2626', 'active'),
-(5, 'Computer Science', 'CS', 'Cpu', '#7C3AED', 'active');
+(1, 'Mathematics', 'IMO', 'Calculator', '#4e2a4a', 'active'),
+(2, 'Science', 'NSO', 'Atom', '#d9775b', 'active'),
+(3, 'English', 'IEO', 'BookOpen', '#6d3a68', 'active'),
+(4, 'Reasoning', 'LRO', 'Brain', '#6c568d', 'active'),
+(5, 'Cyber & AI', 'ICO', 'Cpu', '#b17b25', 'active'),
+(6, 'Vocabulary', 'VC', 'Sparkles', '#6d3a68', 'active'),
+(7, 'Environment', 'EGO', 'Atom', '#059669', 'active'),
+(8, 'Creative Arts', 'CAO', 'Palette', '#80497D', 'active'),
+(9, 'General Knowledge', 'IGKO', 'Globe', '#906223', 'active');
 
 -- Seed Class-Subject links for all classes
 INSERT INTO `class_subjects` (`class_id`, `subject_id`)
