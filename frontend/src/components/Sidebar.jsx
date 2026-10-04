@@ -247,32 +247,54 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
                 {/* My Content Accordion Header */}
                 <div>
-                  <button
-                    type="button"
-                    onClick={() => toggleStudentAccordion('content')}
-                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D] cursor-pointer transition-colors"
-                  >
-                    <div className="flex items-center gap-2.5">
+                  <div className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-colors ${
+                    currentTab === 'my_content' || currentTab === 'overview'
+                      ? 'bg-[#f4eaf4] text-[#80497D]'
+                      : 'text-slate-800 hover:bg-[#faf6fa] hover:text-[#80497D]'
+                  }`}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSelectTab('my_content');
+                        if (!studentAccordions.content) {
+                          toggleStudentAccordion('content');
+                        }
+                        if (onClose) onClose();
+                      }}
+                      className="flex-1 flex items-center gap-2.5 text-left cursor-pointer"
+                    >
                       <BookOpen className="w-4.5 h-4.5 text-[#80497D] shrink-0" />
                       <span>My Content</span>
-                    </div>
-                    {studentAccordions.content ? (
-                      <ChevronUp className="w-4 h-4 text-slate-400" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-slate-400" />
-                    )}
-                  </button>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleStudentAccordion('content');
+                      }}
+                      className="p-1 hover:bg-[#ebd7eb]/50 rounded-lg text-slate-400 hover:text-[#80497D] cursor-pointer transition-colors"
+                    >
+                      {studentAccordions.content ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
 
-                  {/* Clean Sub-items */}
+                  {/* Clean Sub-items for all 9 Olympiad subjects */}
                   {studentAccordions.content && (
                     <div className="pl-7 pr-2 py-0.5 space-y-0.5">
                       {[
-                        { id: 'content_icso', label: 'ICSO (Cyber)', icon: Laptop },
-                        { id: 'content_iso', label: 'ISO (NSO)', icon: Rocket },
+                        { id: 'content_igko', label: 'IGKO (GK)', icon: Globe },
+                        { id: 'content_iso', label: 'ISO / NSO (Science)', icon: Rocket },
                         { id: 'content_imo', label: 'IMO (Maths)', icon: Calculator },
                         { id: 'content_ieo', label: 'IEO (English)', icon: BookOpen },
-                        { id: 'content_igko', label: 'IGKO (GK)', icon: Globe },
-                        { id: 'content_isso', label: 'ISSO (Reasoning)', icon: Brain }
+                        { id: 'content_icso', label: 'ICSO (Cyber)', icon: Laptop },
+                        { id: 'content_isso', label: 'ISSO (Reasoning)', icon: Brain },
+                        { id: 'content_vc', label: 'VC (Vocabulary)', icon: Sparkles },
+                        { id: 'content_ego', label: 'EGO (Environment)', icon: Atom },
+                        { id: 'content_cao', label: 'CAO (Creative Arts)', icon: Palette }
                       ].map((sub) => {
                         const SubIcon = sub.icon;
                         const isSubActive = currentTab === sub.id;

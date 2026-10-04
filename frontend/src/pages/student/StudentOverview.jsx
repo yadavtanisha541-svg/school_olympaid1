@@ -49,17 +49,32 @@ import {
   Palette
 } from 'lucide-react';
 
-export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult }) => {
+export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, activeSubjectTab }) => {
   const { user } = useAuth();
   const [data, setData] = useState(null);
   const [availableExams, setAvailableExams] = useState([]);
   const [examPapers, setExamPapers] = useState([]);
-  const [selectedSubjectCover, setSelectedSubjectCover] = useState(null); // null = all covers, 'IGKO' = IGKO mock tests
+  const [selectedSubjectCover, setSelectedSubjectCover] = useState(() => {
+    if (activeSubjectTab && activeSubjectTab.startsWith('content_')) {
+      return activeSubjectTab.replace('content_', '').toUpperCase();
+    }
+    return null;
+  }); // null = all covers, 'IGKO' = IGKO mock tests
   const [selectedPaperForInstructions, setSelectedPaperForInstructions] = useState(null);
   const [hasAgreedToRules, setHasAgreedToRules] = useState(true);
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(() => new Date());
+
+  // Synchronize when activeSubjectTab changes externally (e.g. from Sidebar)
+  useEffect(() => {
+    if (activeSubjectTab && activeSubjectTab.startsWith('content_')) {
+      const code = activeSubjectTab.replace('content_', '').toUpperCase();
+      setSelectedSubjectCover(code);
+    } else if (activeSubjectTab === 'my_content' || activeSubjectTab === 'overview') {
+      setSelectedSubjectCover(null);
+    }
+  }, [activeSubjectTab]);
 
   // Update clock once every minute to prevent constant re-renders
   useEffect(() => {
@@ -694,7 +709,10 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult }) =>
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <button
                     type="button"
-                    onClick={() => setSelectedSubjectCover(null)}
+                    onClick={() => {
+                      setSelectedSubjectCover(null);
+                      if (onNavigateTab) onNavigateTab('my_content');
+                    }}
                     className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-[#859900] px-4 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
                   >
                     <ArrowLeft className="w-4 h-4" />
@@ -707,8 +725,12 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult }) =>
                     </span>
                     <select
                       value={selectedSubjectCover}
-                      onChange={(e) => setSelectedSubjectCover(e.target.value)}
-                      className="text-xs font-bold bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700 focus:outline-none focus:border-[#859900]"
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setSelectedSubjectCover(val);
+                        if (onNavigateTab) onNavigateTab(`content_${val.toLowerCase()}`);
+                      }}
+                      className="text-xs font-bold bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700 focus:outline-none focus:border-[#859900] cursor-pointer"
                     >
                       {ALL_SUBJECT_COVERS.map(s => (
                         <option key={s.code} value={s.code}>{s.code} - {s.title}</option>
@@ -832,7 +854,10 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult }) =>
                 return (
                   <div
                     key={sub.code}
-                    onClick={() => setSelectedSubjectCover(sub.code)}
+                    onClick={() => {
+                      setSelectedSubjectCover(sub.code);
+                      if (onNavigateTab) onNavigateTab(`content_${sub.code.toLowerCase()}`);
+                    }}
                     className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-[#859900] p-5 sm:p-6 shadow-xs hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col justify-between group hover:-translate-y-1 relative overflow-hidden"
                   >
                     {/* Top Header */}

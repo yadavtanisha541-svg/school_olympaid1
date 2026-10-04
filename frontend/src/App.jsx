@@ -660,8 +660,19 @@ export const App = () => {
     if (user?.role === 'student' || !user?.role) {
       switch (currentTab) {
         case 'overview':
+        case 'my_content':
+        case 'content_icso':
+        case 'content_iso':
+        case 'content_imo':
+        case 'content_ieo':
+        case 'content_igko':
+        case 'content_isso':
+        case 'content_vc':
+        case 'content_ego':
+        case 'content_cao':
           return (
             <StudentOverview
+              activeSubjectTab={currentTab}
               onNavigateTab={setCurrentTab}
               onStartExam={(eId) => setActiveExamId(eId)}
               onViewResult={(attId) => {
@@ -706,19 +717,6 @@ export const App = () => {
           return <CertificatesPage />;
         case 'profile':
           return <StudentProfilePage />;
-        case 'content_icso':
-        case 'content_iso':
-        case 'content_imo':
-        case 'content_ieo':
-        case 'content_igko':
-        case 'content_isso':
-          return (
-            <SubjectContentPackagesPage
-              subjectCode={currentTab}
-              onNavigateTab={setCurrentTab}
-              onStartExam={(eId) => setActiveExamId(eId)}
-            />
-          );
         case 'prog_rsdp':
         case 'prog_msdp':
         case 'prog_ssdp':
