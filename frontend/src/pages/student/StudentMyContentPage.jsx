@@ -52,9 +52,33 @@ export const StudentMyContentPage = ({
         apiClient.get('/results', { scope: 'all' }).catch(() => ({ success: false }))
       ]);
 
+      let allPapers = [];
       if (papersRes && papersRes.success && Array.isArray(papersRes.data)) {
-        setExamPapers(papersRes.data);
+        allPapers = [...papersRes.data];
       }
+
+      // Also include any mock tests authored in admin generator or local storage
+      const localAdminPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+      if (Array.isArray(localAdminPapers)) {
+        localAdminPapers.forEach((lp) => {
+          if (!allPapers.some(p => p.id === lp.id || (p.title === lp.title && p.class_name === (lp.class_name || lp.class)))) {
+            allPapers.push({
+              id: lp.id,
+              title: lp.title,
+              short_code: lp.shortCode || lp.short_code || `${lp.subject_code || 'OLY'} - Mock`,
+              subject_code: (lp.subject_code || lp.subject || '').toUpperCase(),
+              class_name: lp.class_name || lp.class,
+              category: lp.paper_category || 'mock_test',
+              duration_minutes: lp.duration_minutes || 60,
+              total_marks: lp.total_marks || 60,
+              cutoff_marks: 42,
+              status: 'published'
+            });
+          }
+        });
+      }
+
+      setExamPapers(allPapers);
       if (resultsRes && resultsRes.success && Array.isArray(resultsRes.data)) {
         const filtered = resultsRes.data.filter(
           r => r.student_id === user?.id || (r.student_login_id && r.student_login_id === user?.login_id)
@@ -174,37 +198,28 @@ export const StudentMyContentPage = ({
 
   const getSubjectPapers = (subCode, altCode) => {
     const matching = examPapers.filter((p) => {
-      const pSub = (p.subject_code || '').toUpperCase();
+      const pSub = (p.subject_code || p.subject || '').toUpperCase();
       const codeMatches = pSub === subCode || (altCode && pSub === altCode);
       const classMatches = !p.class_name || p.class_name === studentClass || p.class_name === 'All';
+      
+      // Strict exclusion: NEVER show Previous Year Papers or Sample Papers in My Content
+      const titleLower = (p.title || '').toLowerCase();
+      const catLower = (p.category || p.paper_category || p.paper_type || '').toLowerCase();
+      
+      const isPreviousYear = catLower.includes('previous') || catLower.includes('pyq') || catLower.includes('past') || titleLower.includes('previous year') || titleLower.includes('pyq');
+      const isSamplePaper = catLower.includes('sample') || titleLower.includes('sample paper');
+      
+      if (isPreviousYear || isSamplePaper) {
+        return false;
+      }
+
       return codeMatches && classMatches;
     });
 
     if (matching.length > 0) return matching;
 
+    // Pure mock tests fallback (4 mocks per subject, 5 for IMO)
     const basePapers = [
-      {
-        id: `mock_${subCode.toLowerCase()}_prev`,
-        title: `${studentClass} ${subCode} Previous Year Paper 2019`,
-        short_code: `${subCode} - 2019`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 42,
-        status: 'published'
-      },
-      {
-        id: `mock_${subCode.toLowerCase()}_sample`,
-        title: `${studentClass} ${subCode} Official Sample Paper 2026`,
-        short_code: `${subCode} - Sample 2026`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 42,
-        status: 'published'
-      },
       {
         id: `mock_${subCode.toLowerCase()}_1`,
         title: `${subCode} Level-1 Mock Test 1 ${studentClass}`,
@@ -226,14 +241,36 @@ export const StudentMyContentPage = ({
         total_marks: 60,
         cutoff_marks: 45,
         status: 'published'
+      },
+      {
+        id: `mock_${subCode.toLowerCase()}_3`,
+        title: `${subCode} Level-1 Mock Test 3 ${studentClass}`,
+        short_code: `${subCode} - Mock 3`,
+        subject_code: subCode,
+        class_name: studentClass,
+        duration_minutes: 60,
+        total_marks: 60,
+        cutoff_marks: 45,
+        status: 'published'
+      },
+      {
+        id: `mock_${subCode.toLowerCase()}_4`,
+        title: `${subCode} Level-1 Mock Test 4 ${studentClass}`,
+        short_code: `${subCode} - Mock 4`,
+        subject_code: subCode,
+        class_name: studentClass,
+        duration_minutes: 60,
+        total_marks: 60,
+        cutoff_marks: 45,
+        status: 'published'
       }
     ];
 
     if (subCode === 'IMO') {
       basePapers.push({
-        id: `mock_${subCode.toLowerCase()}_3`,
-        title: `${subCode} Level-1 Mock Test 3 ${studentClass}`,
-        short_code: `${subCode} - Mock 3`,
+        id: `mock_${subCode.toLowerCase()}_5`,
+        title: `${subCode} Level-1 Mock Test 5 ${studentClass}`,
+        short_code: `${subCode} - Mock 5`,
         subject_code: subCode,
         class_name: studentClass,
         duration_minutes: 60,

@@ -106,15 +106,36 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
     try {
       const token = localStorage.getItem('token');
       const url = `/api/test-generator/admin-papers?paper_category=${encodeURIComponent(paperMode)}`;
-      const res = await fetch(url, {
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        }
-      });
-      const data = await res.json();
+      const [genRes, examRes] = await Promise.all([
+        fetch(url, {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+          }
+        }).then(r => r.json()).catch(() => ({ success: false })),
+        apiClient.get('/exam-papers').catch(() => ({ success: false }))
+      ]);
+
       let fetched = [];
-      if (data && data.success && Array.isArray(data.data)) {
-        fetched = data.data;
+      if (genRes && genRes.success && Array.isArray(genRes.data)) {
+        fetched = [...genRes.data];
+      }
+
+      if (examRes && examRes.success && Array.isArray(examRes.data)) {
+        const matchingCategoryExams = examRes.data.filter((ep) => {
+          const cat = (ep.category || ep.paper_category || ep.paper_type || '').toLowerCase();
+          const t = (ep.title || '').toLowerCase();
+          if (paperMode === 'previous_year') {
+            return cat.includes('previous') || cat.includes('pyq') || cat.includes('past') || t.includes('previous year') || t.includes('pyq');
+          } else if (paperMode === 'sample_paper') {
+            return cat.includes('sample') || t.includes('sample paper');
+          }
+          return false;
+        });
+        matchingCategoryExams.forEach((me) => {
+          if (!fetched.some(f => f.id === me.id || f.title === me.title)) {
+            fetched.push(me);
+          }
+        });
       }
 
       // Merge with localStorage
