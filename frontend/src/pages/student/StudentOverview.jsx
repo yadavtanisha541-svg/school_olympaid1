@@ -245,27 +245,6 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult }) =>
     return allStudentResults.filter(r => r.student_id === user.id || (r.student_login_id && r.student_login_id === user.login_id));
   }, [allStudentResults, user]);
 
-  // Time of day greeting
-  const hour = currentTime.getHours();
-  const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
-
-  const studentName = user?.full_name || 'Sandeep';
-
-  const formattedDateStr = currentTime.toLocaleDateString('en-US', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  });
-
-  if (loading) {
-    return (
-      <div className="p-12 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-3">
-        <div className="w-8 h-8 border-3 border-[#3b82f6] border-t-transparent rounded-full animate-spin" />
-        <span>Loading student learning portal...</span>
-      </div>
-    );
-  }
-
   const studentClass = user?.class || user?.grade || 'Class 6';
 
   const ALL_SUBJECT_COVERS = useMemo(() => [
@@ -412,6 +391,27 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult }) =>
       }
     ];
   };
+
+  // Time of day greeting
+  const hour = currentTime.getHours();
+  const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
+
+  const studentName = user?.full_name || 'Sandeep';
+
+  const formattedDateStr = currentTime.toLocaleDateString('en-US', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+
+  if (loading) {
+    return (
+      <div className="p-12 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-3">
+        <div className="w-8 h-8 border-3 border-[#3b82f6] border-t-transparent rounded-full animate-spin" />
+        <span>Loading student learning portal...</span>
+      </div>
+    );
+  }
 
   if (selectedPaperForInstructions) {
     const paper = selectedPaperForInstructions;
