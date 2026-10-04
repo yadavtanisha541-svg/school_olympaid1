@@ -63,6 +63,7 @@ import { TeacherOverview } from './pages/teacher/TeacherOverview';
 
 // Student Pages
 import { StudentOverview } from './pages/student/StudentOverview';
+import { StudentMyContentPage } from './pages/student/StudentMyContentPage';
 import { AvailableExamsPage } from './pages/student/AvailableExamsPage';
 import { ExamHistoryPage } from './pages/student/ExamHistoryPage';
 import { ExamResultView } from './pages/student/ExamResultView';
@@ -660,6 +661,16 @@ export const App = () => {
     if (user?.role === 'student' || !user?.role) {
       switch (currentTab) {
         case 'overview':
+          return (
+            <StudentOverview
+              onNavigateTab={setCurrentTab}
+              onStartExam={(eId) => setActiveExamId(eId)}
+              onViewResult={(attId) => {
+                setActiveResultAttemptId(attId);
+                setCurrentTab('exam_result');
+              }}
+            />
+          );
         case 'my_content':
         case 'content_icso':
         case 'content_iso':
@@ -671,14 +682,10 @@ export const App = () => {
         case 'content_ego':
         case 'content_cao':
           return (
-            <StudentOverview
-              activeSubjectTab={currentTab}
+            <StudentMyContentPage
+              activeSubjectCode={currentTab}
               onNavigateTab={setCurrentTab}
               onStartExam={(eId) => setActiveExamId(eId)}
-              onViewResult={(attId) => {
-                setActiveResultAttemptId(attId);
-                setCurrentTab('exam_result');
-              }}
             />
           );
         case 'available_exams':

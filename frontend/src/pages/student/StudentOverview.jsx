@@ -710,213 +710,110 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. SECTION: OLYMPIAD SUBJECT COVERS & MOCK TEST SERIES (User Design)       */}
+      {/* 2. SECTION: OLYMPIAD SUBJECTS (Clean Overview Cards Linking to My Content) */}
       {/* ========================================================================= */}
       <div className="space-y-4 pt-2">
-        {selectedSubjectCover ? (
-          /* LEVEL 2: SPECIFIC SUBJECT MOCK TEST SERIES (Matches user uploaded image) */
-          (() => {
-            const currentSub = ALL_SUBJECT_COVERS.find(s => s.code === selectedSubjectCover) || ALL_SUBJECT_COVERS[0];
-            const subjectPapers = getSubjectPapers(currentSub.code, currentSub.altCode);
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+              <BookOpen className="w-6 h-6 text-[#80497D]" />
+              <span>Olympiad Subjects</span>
+            </h2>
+            <p className="text-xs text-slate-500 font-semibold mt-0.5">
+              Explore subject-wise preparation material, previous year papers &amp; mock test series.
+            </p>
+          </div>
 
-            return (
-              <div className="space-y-5 animate-in fade-in duration-200">
-                {/* Back to All Covers Navigation */}
-                <div className="flex items-center justify-between flex-wrap gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedSubjectCover(null);
-                      if (onNavigateTab) onNavigateTab('my_content');
-                    }}
-                    className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-[#859900] px-4 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    <span>← Back to All Subject Covers</span>
-                  </button>
+          <button
+            type="button"
+            onClick={() => onNavigateTab && onNavigateTab('my_content')}
+            className="inline-flex items-center gap-1.5 text-xs font-black text-[#80497D] hover:text-[#653362] px-3.5 py-1.5 rounded-xl bg-[#f4eaf4] border border-[#ebd7eb] hover:bg-[#ebd7eb]/50 transition-colors cursor-pointer"
+          >
+            <span>View All Subject Covers</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
 
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-slate-500">
-                      Switch Subject:
-                    </span>
-                    <select
-                      value={selectedSubjectCover}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setSelectedSubjectCover(val);
-                        if (onNavigateTab) onNavigateTab(`content_${val.toLowerCase()}`);
-                      }}
-                      className="text-xs font-bold bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700 focus:outline-none focus:border-[#859900] cursor-pointer"
-                    >
-                      {ALL_SUBJECT_COVERS.map(s => (
-                        <option key={s.code} value={s.code}>{s.code} - {s.title}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Series Banner matching user image */}
-                <div className="bg-[#859900] rounded-2xl p-5 sm:p-6 text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                  <div className="space-y-1.5">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/20 text-white text-xs font-extrabold uppercase tracking-wider backdrop-blur-xs">
-                      <span>{studentClass} Mock Test Series</span>
-                      <span>•</span>
-                      <span>{subjectPapers.length} Mock Tests Available</span>
-                    </div>
-                    <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                      {currentSub.seriesTitle}
-                    </h2>
-                    <p className="text-xs sm:text-sm text-lime-100 font-medium">
-                      National Ranking Mock Tests with Instant Analysis, Answer Keys &amp; Detailed Solutions
-                    </p>
-                  </div>
-
-                  <div className="shrink-0 bg-white/10 rounded-xl p-3 border border-white/20 hidden sm:block">
-                    <currentSub.icon className="w-10 h-10 text-white" />
-                  </div>
-                </div>
-
-                {/* Mock Tests Cards Grid (Exact design from user's image) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-                  {subjectPapers.map((paper) => {
-                    const result = myTestResults.find(
-                      r => (r.exam_id && (r.exam_id === paper.id || String(r.exam_id) === String(paper.id))) ||
-                           (r.exam_title && r.exam_title.toLowerCase() === paper.title.toLowerCase())
-                    );
-                    const isCompleted = !!result;
-
-                    return (
-                      <div
-                        key={paper.id}
-                        className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm hover:shadow-md hover:border-[#859900] transition-all overflow-hidden flex flex-col justify-between"
-                      >
-                        {/* Top Olive Green Header */}
-                        <div className="bg-[#859900] text-white p-3.5 sm:p-4 text-center min-h-[72px] flex items-center justify-center">
-                          <h4 className="font-bold text-xs sm:text-sm leading-snug">
-                            {paper.title}
-                          </h4>
-                        </div>
-
-                        {/* Card Body */}
-                        <div className="p-4 space-y-3">
-                          {/* Row 1: Status */}
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="font-bold text-slate-700">Status:</span>
-                            {isCompleted ? (
-                              <span className="px-2.5 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-black uppercase tracking-wider">
-                                COMPLETED
-                              </span>
-                            ) : (
-                              <span className="px-2.5 py-0.5 rounded bg-[#d9534f] text-white text-[11px] font-black uppercase tracking-wider">
-                                UNATTEMPTED
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Row 2: Last Score */}
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="font-bold text-slate-700">Last Score:</span>
-                            {isCompleted ? (
-                              <span className="px-2.5 py-0.5 rounded bg-[#8cb82b] text-white text-[11px] font-black">
-                                {result.score} / {result.total_marks || paper.total_marks || 60} ({Math.round(result.percentage || 0)}%)
-                              </span>
-                            ) : (
-                              <span className="px-2.5 py-0.5 rounded bg-[#8cb82b] text-white text-[11px] font-black">
-                                none
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Card Footer: OPEN Button */}
-                        <div className="p-4 pt-0">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedPaperForInstructions(paper)}
-                            className="w-full py-2.5 bg-[#859900] hover:bg-[#738400] text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs hover:shadow flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
-                          >
-                            <span>OPEN</span>
-                            <ChevronRight className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+        {/* 6 Clean Square Subject Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5 w-full">
+          {[
+            {
+              key: 'igko',
+              title: 'IGKO (GK)',
+              subtitle: 'General Knowledge',
+              icon: Globe,
+              iconColor: 'text-amber-600',
+              iconBg: 'bg-amber-50 border-amber-200'
+            },
+            {
+              key: 'iso',
+              title: 'ISO (NSO)',
+              subtitle: 'Science & Discovery',
+              icon: Rocket,
+              iconColor: 'text-emerald-600',
+              iconBg: 'bg-emerald-50 border-emerald-200'
+            },
+            {
+              key: 'imo',
+              title: 'IMO (Maths)',
+              subtitle: 'Mathematics & Logic',
+              icon: Calculator,
+              iconColor: 'text-blue-600',
+              iconBg: 'bg-blue-50 border-blue-200'
+            },
+            {
+              key: 'ieo',
+              title: 'IEO (English)',
+              subtitle: 'English & Grammar',
+              icon: BookOpen,
+              iconColor: 'text-purple-600',
+              iconBg: 'bg-purple-50 border-purple-200'
+            },
+            {
+              key: 'icso',
+              title: 'ICSO (Cyber)',
+              subtitle: 'Cyber & Computer',
+              icon: Laptop,
+              iconColor: 'text-sky-600',
+              iconBg: 'bg-sky-50 border-sky-200'
+            },
+            {
+              key: 'isso',
+              title: 'ISSO (Reasoning)',
+              subtitle: 'Logical Reasoning',
+              icon: Brain,
+              iconColor: 'text-rose-600',
+              iconBg: 'bg-rose-50 border-rose-200'
+            }
+          ].map((sub) => (
+            <div
+              key={sub.key}
+              onClick={() => onNavigateTab && onNavigateTab(`content_${sub.key}`)}
+              className="bg-white rounded-3xl border-2 border-slate-200/80 hover:border-[#80497D] p-5 sm:p-6 shadow-xs hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1.5"
+            >
+              {/* Square Icon Container */}
+              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border ${sub.iconBg} ${sub.iconColor} flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform shrink-0`}>
+                <sub.icon className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
-            );
-          })()
-        ) : (
-          /* LEVEL 1: ALL SUBJECT COVERS (9 Olympiad Subjects with Mock Tests Count) */
-          <div className="space-y-4">
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                  <BookOpen className="w-6 h-6 text-[#859900]" />
-                  <span>Olympiad Subject Series &amp; Mock Tests</span>
-                </h2>
-                <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                  Select any Olympiad subject cover below to view all official mock tests, previous year papers &amp; sample tests.
+
+              {/* Subject Title & Subtitle */}
+              <div className="space-y-1 my-auto pt-2">
+                <h3 className="font-black text-slate-900 text-sm sm:text-base tracking-tight group-hover:text-[#80497D] transition-colors leading-snug">
+                  {sub.title}
+                </h3>
+                <p className="text-xs text-slate-500 font-semibold truncate">
+                  {sub.subtitle}
                 </p>
               </div>
+
+              {/* Bottom Action Indicator */}
+              <div className="w-full pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-black text-slate-500 group-hover:text-[#80497D] transition-colors">
+                <span>Explore Series</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
             </div>
-
-            {/* Grid of Subject Covers */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 w-full">
-              {ALL_SUBJECT_COVERS.map((sub) => {
-                const subPapers = getSubjectPapers(sub.code, sub.altCode);
-                const SubIcon = sub.icon;
-
-                return (
-                  <div
-                    key={sub.code}
-                    onClick={() => {
-                      setSelectedSubjectCover(sub.code);
-                      if (onNavigateTab) onNavigateTab(`content_${sub.code.toLowerCase()}`);
-                    }}
-                    className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-[#859900] p-5 sm:p-6 shadow-xs hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col justify-between group hover:-translate-y-1 relative overflow-hidden"
-                  >
-                    {/* Top Header */}
-                    <div className="flex items-start justify-between gap-3 mb-4">
-                      <div className={`w-14 h-14 rounded-2xl border ${sub.iconBg} flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform shrink-0`}>
-                        <SubIcon className="w-7 h-7" />
-                      </div>
-                      <span className="px-3 py-1 rounded-full bg-[#859900]/10 text-[#5e6d00] border border-[#859900]/20 text-[11px] font-black tracking-wide">
-                        {subPapers.length} Mock Tests
-                      </span>
-                    </div>
-
-                    {/* Subject Details */}
-                    <div className="space-y-1.5 mb-5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-extrabold text-[#859900] uppercase tracking-wider bg-lime-50 px-2 py-0.5 rounded">
-                          {studentClass}
-                        </span>
-                        <span className="text-[11px] font-bold text-slate-400">
-                          {sub.code}
-                        </span>
-                      </div>
-                      <h3 className="font-black text-slate-900 text-base sm:text-lg tracking-tight group-hover:text-[#859900] transition-colors leading-snug">
-                        {sub.title}
-                      </h3>
-                      <p className="text-xs text-slate-500 font-medium line-clamp-2">
-                        {sub.subtitle}
-                      </p>
-                    </div>
-
-                    {/* Action Button */}
-                    <div className="w-full pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-black text-[#859900] group-hover:translate-x-0.5 transition-all">
-                      <span>Open {sub.code} Mock Tests</span>
-                      <div className="w-7 h-7 rounded-full bg-[#859900]/10 flex items-center justify-center text-[#859900] group-hover:bg-[#859900] group-hover:text-white transition-colors">
-                        <ChevronRight className="w-4 h-4" />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+          ))}
+        </div>
       </div>
 
       {/* ========================================================================= */}
