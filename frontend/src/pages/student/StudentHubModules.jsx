@@ -368,7 +368,7 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
           <div className="bg-white rounded-3xl p-6 border border-[#edd6ed] shadow-sm overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="bg-[#faf5fa] text-[#6d3a68] border-b border-[#edd6ed] uppercase text-[11px] font-black">
+                <tr className="bg-[#faf5fa] text-[#6d3a68] border-b border-[#edd6ed] uppercase text-[11px] font-black tracking-wider">
                   <th className="py-3.5 px-4 rounded-l-xl">Olympiad Discipline</th>
                   <th className="py-3.5 px-4">Level 1 Exam Slot</th>
                   <th className="py-3.5 px-4">Level 2 Finale Slot</th>
@@ -378,10 +378,17 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
               <tbody className="divide-y divide-[#f4ebf4]">
                 {Object.values(OLYMPIAD_SUBJECT_METADATA).map((sub, idx) => (
                   <tr key={idx} className="hover:bg-[#fff9f2]">
-                    <td className="py-3 px-4 font-black text-[#4e2a4a]">{sub.fullName} ({sub.code})</td>
-                    <td className="py-3 px-4 text-slate-700">{sub.examDates2026_2027?.level1Dates}</td>
-                    <td className="py-3 px-4 font-bold text-[#d9775b]">{sub.examDates2026_2027?.level2Dates}</td>
-                    <td className="py-3 px-4 text-center text-slate-500">{sub.examDates2026_2027?.lastDateReg}</td>
+                    <td className="py-3.5 px-4 font-black text-[#4e2a4a]">
+                      <div className="flex items-center gap-2">
+                        <span>{sub.fullName}</span>
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-black bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed]">
+                          {sub.code}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4 text-slate-800 font-semibold">{sub.examDates2026_2027?.level1Dates}</td>
+                    <td className="py-3.5 px-4 font-bold text-[#d9775b]">{sub.examDates2026_2027?.level2Dates}</td>
+                    <td className="py-3.5 px-4 text-center text-slate-500 font-medium">{sub.examDates2026_2027?.lastDateReg}</td>
                   </tr>
                 ))}
               </tbody>
