@@ -818,17 +818,17 @@ const StudentRevisionVaultModule = ({ user, onNavigateTab }) => {
       </div>
 
       {/* Subject Filter Pills & Search */}
-      <div className="bg-white rounded-3xl p-4 sm:p-5 border border-[#edd6ed] shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-[#edd6ed] shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex flex-wrap items-center gap-2 flex-1">
           {subjectFilters.map((sub) => (
             <button
               key={sub.value}
               type="button"
               onClick={() => setSelectedSubject(sub.value)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 selectedSubject === sub.value
                   ? 'bg-[#6d3a68] text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-[#faf5fa] text-[#6d3a68] hover:bg-[#f4ebf4] border border-[#edd6ed]'
               }`}
             >
               {sub.label}
@@ -836,15 +836,15 @@ const StudentRevisionVaultModule = ({ user, onNavigateTab }) => {
           ))}
         </div>
 
-        <div className="relative w-full md:w-64">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+        <div className="relative w-full sm:w-72 shrink-0">
+          <Search className="w-4 h-4 text-[#6d3a68] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search questions..."
+            placeholder="Search questions or topics..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') fetchRevisionVault(); }}
-            className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs focus:outline-hidden focus:ring-2 focus:ring-[#6d3a68] bg-slate-50"
+            className="w-full pl-9 pr-4 py-2 rounded-xl border border-[#edd6ed] text-xs font-medium text-[#4e2a4a] focus:outline-none focus:ring-2 focus:ring-[#6d3a68] bg-[#faf5fa] placeholder:text-slate-400"
           />
         </div>
       </div>
