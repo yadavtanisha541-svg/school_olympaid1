@@ -684,74 +684,65 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
       ) : (
         /* 4. PROGRAM AUTHORING STUDIO & LIVE PREVIEW (FULL SCREEN DEDICATED PAGE) */
         <div className="space-y-6 pt-2 animate-in fade-in duration-150">
-          {/* Page Header Bar (Slim, Crisp & Perfectly Balanced) */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-3.5 sm:p-4 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5 min-w-0">
-              <button
-                type="button"
-                onClick={() => setShowEditorModal(false)}
-                className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-all cursor-pointer shrink-0 flex items-center gap-1.5 text-xs font-bold shadow-2xs hover:shadow-xs active:scale-95"
-                title="Back to All Skill Programs"
-              >
-                <ArrowLeft className="w-4 h-4 text-slate-600" />
-                <span>Back to Programs</span>
-              </button>
-
+          {/* Page Header Bar (Seamless Background & Perfectly Balanced) */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
+            <div className="flex items-center gap-4 min-w-0">
               <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-2xs shrink-0"
+                className="w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-xs shrink-0"
                 style={{ backgroundColor: formData.accentColor || '#7c3aed' }}
               >
                 {(() => {
                   const subOption = SUBJECT_OPTIONS.find((s) => s.key === formData.subjectKey) || SUBJECT_OPTIONS[0];
                   const IconComp = subOption?.icon || Brain;
-                  return <IconComp className="w-5 h-5 text-white" />;
+                  return <IconComp className="w-7 h-7 text-white" />;
                 })()}
               </div>
 
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span
-                    className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase text-white shadow-2xs"
+                    className="px-2.5 py-0.5 rounded-lg text-xs font-black uppercase text-white shadow-2xs"
                     style={{ backgroundColor: formData.accentColor || '#7c3aed' }}
                   >
                     {formData.code || 'PROGRAM'}
                   </span>
                   <span className="text-slate-300 font-bold text-xs">•</span>
-                  <span className="text-[11px] text-slate-500 font-bold">
+                  <span className="text-xs text-slate-500 font-bold">
                     {editingKey ? 'Editing Existing Program' : 'New Program Authoring'}
                   </span>
                 </div>
-                <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-snug truncate mt-0.5">
+                <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight mt-0.5">
                   {editingKey ? formData.name : 'Create New Skill Development Program'}
                 </h1>
-                <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+                <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
                   Author exact curriculum, class-wise skills covered, pricing, and live layout preview.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 shrink-0">
+            <div className="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
               <button
                 type="button"
                 onClick={() => setShowEditorModal(false)}
-                className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
+                className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-all cursor-pointer flex items-center gap-2 text-sm font-bold shadow-xs active:scale-95"
               >
-                Cancel
+                <ArrowLeft className="w-4 h-4 text-slate-600" />
+                <span>Back to Programs</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleSaveProgram}
-                className="px-4 py-2 rounded-xl text-xs font-black text-white bg-[#00b074] hover:bg-[#009260] transition-all shadow-sm active:scale-95 cursor-pointer flex items-center gap-1.5"
+                className="px-6 py-2.5 rounded-xl text-sm font-black text-white bg-[#00b074] hover:bg-[#009260] transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
               >
-                <CheckCircle2 className="w-4 h-4" />
+                <CheckCircle2 className="w-4.5 h-4.5" />
                 <span>Save &amp; Publish Program Live</span>
               </button>
             </div>
           </div>
 
           {/* Studio Navigation Tabs */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-2.5 shadow-2xs flex items-center gap-2 overflow-x-auto custom-scrollbar">
+          <div className="flex items-center gap-2.5 border-b border-[#ebd7eb] pb-3 overflow-x-auto">
             {[
               { id: 'basic', label: '1. Basic Info & Pricing', icon: FileText },
               { id: 'intro', label: '2. Overview & Why Reasons', icon: Sparkles },
@@ -766,10 +757,10 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                   key={tab.id}
                   type="button"
                   onClick={() => setEditorTab(tab.id)}
-                  className={`px-5 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5 cursor-pointer whitespace-nowrap ${
+                  className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5 cursor-pointer whitespace-nowrap ${
                     isActive
-                      ? 'bg-[#4e2a4a] text-white shadow-md'
-                      : 'text-slate-600 hover:bg-slate-100'
+                      ? 'bg-[#80497D] text-white shadow-md shadow-[#80497D]/20'
+                      : 'bg-white text-slate-600 border border-[#ebd7eb] hover:bg-[#faf6fa] hover:text-[#80497D]'
                   }`}
                 >
                   <Icon className={`w-4 h-4 ${isActive ? 'text-[#e7b84b]' : 'text-slate-400'}`} />
