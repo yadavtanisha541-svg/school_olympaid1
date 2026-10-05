@@ -636,39 +636,39 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
     <div className="space-y-6 pb-14 font-sans w-full max-w-full overflow-x-hidden">
       
       {/* ========================================================================= */}
-      {/* 1. HERO GREETING BANNER (Exact Design with Stacked Books & Cup)           */}
+      {/* 1. HERO GREETING BANNER (Dark Royal Blue & Purple Gradient Banner)          */}
       {/* ========================================================================= */}
-      <div className="bg-gradient-to-r from-[#faf6fa] via-white to-[#fdf7f5] border border-[#ebd7eb] rounded-3xl p-5 sm:p-6 md:p-7 shadow-xs relative overflow-hidden">
+      <div className="bg-gradient-to-r from-[#122459] via-[#241e54] to-[#5b3da8] border border-[#3e347e] rounded-3xl p-5 sm:p-6 md:p-7 shadow-xl shadow-purple-950/20 relative overflow-hidden text-white">
         {/* Soft Decorative Glow Circles */}
-        <div className="absolute top-0 right-1/4 w-48 h-48 bg-[#ebd7eb]/40 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-10 w-40 h-40 bg-[#f6d6cc]/40 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-10 w-40 h-40 bg-blue-500/20 rounded-full blur-2xl pointer-events-none" />
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           {/* Left Content */}
           <div className="space-y-3 max-w-2xl">
             <div className="flex items-start gap-3.5">
               {/* Waving Hand Circular Badge */}
-              <div className="w-11 h-11 rounded-2xl bg-white/90 border border-[#ebd7eb] shadow-2xs flex items-center justify-center text-2xl shrink-0 mt-0.5">
+              <div className="w-11 h-11 rounded-2xl bg-[#1b254b] border border-[#34457e] shadow-md flex items-center justify-center text-2xl shrink-0 mt-0.5">
                 👋
               </div>
               <div>
-                <p className="text-xs sm:text-sm font-semibold text-slate-500">
+                <p className="text-xs sm:text-sm font-semibold text-purple-200">
                   Welcome Back,
                 </p>
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
-                  {greeting}, <span className="text-[#80497D] capitalize">{studentName}</span>!
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight mt-0.5">
+                  {greeting}, <span className="text-purple-300 capitalize">{studentName}</span>!
                 </h1>
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm text-slate-600 font-medium pl-0.5">
+            <p className="text-xs sm:text-sm text-slate-200 font-medium pl-0.5">
               Keep learning, keep growing. Your next big achievement is near!
             </p>
 
             {/* Bottom Row: Date Pill */}
             <div className="pt-1 flex items-center flex-wrap gap-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#f4eaf4] border border-[#ebd7eb] rounded-xl text-xs font-bold text-[#80497D] shadow-2xs">
-                <Calendar className="w-3.5 h-3.5 text-[#80497D]" />
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#182650] border border-[#2d448c] rounded-xl text-xs font-bold text-blue-200 shadow-sm">
+                <Calendar className="w-3.5 h-3.5 text-blue-300" />
                 <span>Today: {formattedDateStr}</span>
               </div>
             </div>
@@ -677,56 +677,56 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           {/* Right Content: Vector Illustration of Stacked Books with Tea Cup & Plant + Scholar Star Badge */}
           <div className="shrink-0 flex items-center justify-center md:justify-end gap-4">
             {/* Scholar Star Tier Badge Card */}
-            <div className="hidden lg:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 border border-[#f6d6cc] shadow-2xs">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#C35B3F] to-[#b04c31] text-white flex items-center justify-center shadow-2xs">
-                <Trophy className="w-5 h-5 fill-amber-100 text-[#fdf7f5]" />
+            <div className="hidden lg:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-[#1e1c45] border border-[#42367d] shadow-md">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6242b5] to-[#4c2f9e] text-white flex items-center justify-center shadow-xs">
+                <Trophy className="w-5 h-5 fill-amber-300 text-amber-300" />
               </div>
               <div className="flex flex-col">
-                <span className="text-[11px] font-black uppercase tracking-wider text-[#422240]">
+                <span className="text-[11px] font-black uppercase tracking-wider text-white">
                   Scholar Star
                 </span>
-                <span className="text-[9px] text-[#C35B3F] font-semibold">Active Tier</span>
+                <span className="text-[9px] text-purple-300 font-semibold">Active Tier</span>
               </div>
             </div>
 
             {/* Flat Vector Stacked Books & Cheerful Cup SVG Illustration */}
             <div className="relative w-36 h-28 sm:w-44 sm:h-32 shrink-0">
-              <svg viewBox="0 0 200 160" className="w-full h-full drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 200 160" className="w-full h-full drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
                 {/* Small Potted Plant (Left) */}
-                <ellipse cx="42" cy="142" rx="20" ry="6" fill="#cbd5e1" opacity="0.4" />
+                <ellipse cx="42" cy="142" rx="20" ry="6" fill="#0f172a" opacity="0.4" />
                 {/* Pot */}
-                <path d="M 32 120 L 52 120 L 49 142 L 35 142 Z" fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="2" />
+                <path d="M 32 120 L 52 120 L 49 142 L 35 142 Z" fill="#1e293b" stroke="#334155" strokeWidth="2" />
                 {/* Leaves */}
                 <path d="M 42 120 C 30 105, 22 108, 25 95 C 38 95, 42 110, 42 120 Z" fill="#2dd4bf" />
                 <path d="M 42 120 C 46 100, 60 90, 62 80 C 68 95, 54 112, 42 120 Z" fill="#10b981" />
                 <path d="M 42 115 C 34 85, 48 70, 52 65 C 56 80, 50 102, 42 115 Z" fill="#059669" />
 
                 {/* Ground Shadow under Books */}
-                <ellipse cx="120" cy="148" rx="60" ry="8" fill="#cbd5e1" opacity="0.45" />
+                <ellipse cx="120" cy="148" rx="60" ry="8" fill="#0f172a" opacity="0.45" />
 
-                {/* Bottom Book (Green) */}
-                <rect x="68" y="122" width="105" height="22" rx="5" fill="#059669" />
+                {/* Bottom Book (Purple) */}
+                <rect x="68" y="122" width="105" height="22" rx="5" fill="#5b3da8" />
                 <rect x="74" y="124" width="97" height="18" rx="3" fill="#ffffff" />
-                <path d="M 68 122 Q 65 133 68 144 L 75 144 Q 72 133 75 122 Z" fill="#047857" />
-                <line x1="78" y1="129" x2="165" y2="129" stroke="#e2e8f0" strokeWidth="1.5" />
-                <line x1="78" y1="134" x2="165" y2="134" stroke="#e2e8f0" strokeWidth="1.5" />
-                <line x1="78" y1="139" x2="165" y2="139" stroke="#e2e8f0" strokeWidth="1.5" />
+                <path d="M 68 122 Q 65 133 68 144 L 75 144 Q 72 133 75 122 Z" fill="#432c7e" />
+                <line x1="78" y1="129" x2="165" y2="129" stroke="#cbd5e1" strokeWidth="1.5" />
+                <line x1="78" y1="134" x2="165" y2="134" stroke="#cbd5e1" strokeWidth="1.5" />
+                <line x1="78" y1="139" x2="165" y2="139" stroke="#cbd5e1" strokeWidth="1.5" />
 
-                {/* Middle Book (Orange / Yellow) */}
-                <rect x="72" y="98" width="98" height="22" rx="5" fill="#f59e0b" />
+                {/* Middle Book (Royal Blue) */}
+                <rect x="72" y="98" width="98" height="22" rx="5" fill="#16327a" />
                 <rect x="78" y="100" width="90" height="18" rx="3" fill="#ffffff" />
-                <path d="M 72 98 Q 69 109 72 120 L 79 120 Q 76 109 79 98 Z" fill="#d97706" />
-                <line x1="82" y1="105" x2="162" y2="105" stroke="#e2e8f0" strokeWidth="1.5" />
-                <line x1="82" y1="110" x2="162" y2="110" stroke="#e2e8f0" strokeWidth="1.5" />
-                <line x1="82" y1="115" x2="162" y2="115" stroke="#e2e8f0" strokeWidth="1.5" />
+                <path d="M 72 98 Q 69 109 72 120 L 79 120 Q 76 109 79 98 Z" fill="#0f2359" />
+                <line x1="82" y1="105" x2="162" y2="105" stroke="#cbd5e1" strokeWidth="1.5" />
+                <line x1="82" y1="110" x2="162" y2="110" stroke="#cbd5e1" strokeWidth="1.5" />
+                <line x1="82" y1="115" x2="162" y2="115" stroke="#cbd5e1" strokeWidth="1.5" />
 
-                {/* Top Book (Blue) */}
-                <rect x="76" y="74" width="92" height="22" rx="5" fill="#2563eb" />
+                {/* Top Book (Indigo) */}
+                <rect x="76" y="74" width="92" height="22" rx="5" fill="#4338ca" />
                 <rect x="82" y="76" width="84" height="18" rx="3" fill="#ffffff" />
-                <path d="M 76 74 Q 73 85 76 96 L 83 96 Q 80 85 83 74 Z" fill="#1d4ed8" />
-                <line x1="86" y1="81" x2="160" y2="81" stroke="#e2e8f0" strokeWidth="1.5" />
-                <line x1="86" y1="86" x2="160" y2="86" stroke="#e2e8f0" strokeWidth="1.5" />
-                <line x1="86" y1="91" x2="160" y2="91" stroke="#e2e8f0" strokeWidth="1.5" />
+                <path d="M 76 74 Q 73 85 76 96 L 83 96 Q 80 85 83 74 Z" fill="#312e81" />
+                <line x1="86" y1="81" x2="160" y2="81" stroke="#cbd5e1" strokeWidth="1.5" />
+                <line x1="86" y1="86" x2="160" y2="86" stroke="#cbd5e1" strokeWidth="1.5" />
+                <line x1="86" y1="91" x2="160" y2="91" stroke="#cbd5e1" strokeWidth="1.5" />
 
                 {/* Yellow Coffee/Tea Cup on Top */}
                 <path d="M 108 52 C 108 68, 138 68, 138 52 L 138 50 L 108 50 Z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2" />
@@ -751,13 +751,13 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. SECTION: OLYMPIAD SUBJECTS (Clean Overview Cards Linking to My Content) */}
+      {/* 2. SECTION: OLYMPIAD SUBJECTS (Dark Boxes on Light Background)              */}
       {/* ========================================================================= */}
       <div className="space-y-4 pt-2">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-              <BookOpen className="w-6 h-6 text-[#80497D]" />
+              <BookOpen className="w-6 h-6 text-[#5b3da8]" />
               <span>Olympiad Subjects</span>
             </h2>
             <p className="text-xs text-slate-500 font-semibold mt-0.5">
@@ -768,14 +768,14 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           <button
             type="button"
             onClick={() => onNavigateTab && onNavigateTab('my_content')}
-            className="inline-flex items-center gap-1.5 text-xs font-black text-[#80497D] hover:text-[#653362] px-3.5 py-1.5 rounded-xl bg-[#f4eaf4] border border-[#ebd7eb] hover:bg-[#ebd7eb]/50 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#5b3da8] hover:bg-[#4a2e91] px-4 py-2 rounded-xl transition-all shadow-md shadow-purple-950/20 cursor-pointer"
           >
             <span>View All Subject Covers</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
-        {/* 6 Clean Square Subject Cards */}
+        {/* 6 Dark Square Subject Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5 w-full">
           {[
             {
@@ -783,72 +783,72 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               title: 'IGKO (GK)',
               subtitle: 'General Knowledge',
               icon: Globe,
-              iconColor: 'text-amber-600',
-              iconBg: 'bg-amber-50 border-amber-200'
+              iconColor: 'text-amber-300',
+              iconBg: 'bg-amber-950/80 border-amber-800/60'
             },
             {
               key: 'iso',
               title: 'ISO (NSO)',
               subtitle: 'Science & Discovery',
               icon: Rocket,
-              iconColor: 'text-emerald-600',
-              iconBg: 'bg-emerald-50 border-emerald-200'
+              iconColor: 'text-emerald-300',
+              iconBg: 'bg-emerald-950/80 border-emerald-800/60'
             },
             {
               key: 'imo',
               title: 'IMO (Maths)',
               subtitle: 'Mathematics & Logic',
               icon: Calculator,
-              iconColor: 'text-blue-600',
-              iconBg: 'bg-blue-50 border-blue-200'
+              iconColor: 'text-blue-300',
+              iconBg: 'bg-blue-950/80 border-blue-800/60'
             },
             {
               key: 'ieo',
               title: 'IEO (English)',
               subtitle: 'English & Grammar',
               icon: BookOpen,
-              iconColor: 'text-purple-600',
-              iconBg: 'bg-purple-50 border-purple-200'
+              iconColor: 'text-purple-300',
+              iconBg: 'bg-purple-950/80 border-purple-800/60'
             },
             {
               key: 'icso',
               title: 'ICSO (Cyber)',
               subtitle: 'Cyber & Computer',
               icon: Laptop,
-              iconColor: 'text-sky-600',
-              iconBg: 'bg-sky-50 border-sky-200'
+              iconColor: 'text-sky-300',
+              iconBg: 'bg-sky-950/80 border-sky-800/60'
             },
             {
               key: 'isso',
               title: 'ISSO (Reasoning)',
               subtitle: 'Logical Reasoning',
               icon: Brain,
-              iconColor: 'text-rose-600',
-              iconBg: 'bg-rose-50 border-rose-200'
+              iconColor: 'text-rose-300',
+              iconBg: 'bg-rose-950/80 border-rose-800/60'
             }
           ].map((sub) => (
             <div
               key={sub.key}
               onClick={() => onNavigateTab && onNavigateTab(`content_${sub.key}`)}
-              className="bg-white rounded-3xl border-2 border-slate-200/80 hover:border-[#80497D] p-5 sm:p-6 shadow-xs hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1.5"
+              className="bg-[#121c3b] rounded-3xl border-2 border-[#2a3a68] hover:border-purple-400 p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1.5 text-white"
             >
               {/* Square Icon Container */}
-              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border ${sub.iconBg} ${sub.iconColor} flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform shrink-0`}>
+              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border ${sub.iconBg} ${sub.iconColor} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0`}>
                 <sub.icon className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
 
               {/* Subject Title & Subtitle */}
               <div className="space-y-1 my-auto pt-2">
-                <h3 className="font-black text-slate-900 text-sm sm:text-base tracking-tight group-hover:text-[#80497D] transition-colors leading-snug">
+                <h3 className="font-black text-white text-sm sm:text-base tracking-tight group-hover:text-purple-300 transition-colors leading-snug">
                   {sub.title}
                 </h3>
-                <p className="text-xs text-slate-500 font-semibold truncate">
+                <p className="text-xs text-slate-300 font-semibold truncate">
                   {sub.subtitle}
                 </p>
               </div>
 
               {/* Bottom Action Indicator */}
-              <div className="w-full pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-black text-slate-500 group-hover:text-[#80497D] transition-colors">
+              <div className="w-full pt-2.5 border-t border-slate-700/60 flex items-center justify-between text-xs font-black text-purple-300 group-hover:text-purple-200 transition-colors">
                 <span>Explore Series</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -858,29 +858,29 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. SECTION: TWO FEATURED BANNERS (Matches exact brand colors)               */}
+      {/* 3. SECTION: TWO FEATURED BANNERS (Dark Purple & Dark Royal Blue Boxes)     */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2">
         
-        {/* Left Banner: Reasoning Online Classes */}
-        <div className="bg-[#faf6fa] rounded-3xl border-2 border-[#ebd7eb] p-6 sm:p-7 shadow-xs hover:shadow-lg transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+        {/* Left Banner: Reasoning Online Classes (Dark Purple Box) */}
+        <div className="bg-[#231b4a] rounded-3xl border-2 border-[#48378c] p-6 sm:p-7 shadow-xl shadow-purple-950/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-white">
           <div className="flex items-center gap-4 min-w-0">
             {/* Open Book with Bulb Vector Illustration */}
-            <div className="w-16 h-16 rounded-2xl bg-white border border-[#ebd7eb] flex items-center justify-center shadow-xs shrink-0 text-[#80497D]">
+            <div className="w-16 h-16 rounded-2xl bg-[#1a1438] border border-[#503d96] flex items-center justify-center shadow-md shrink-0 text-purple-300">
               <div className="relative">
-                <BookOpen className="w-8 h-8 text-[#80497D]" />
-                <Lightbulb className="w-4 h-4 text-[#e7b84b] fill-[#e7b84b] absolute -top-1 -right-1" />
+                <BookOpen className="w-8 h-8 text-purple-300" />
+                <Lightbulb className="w-4 h-4 text-amber-300 fill-amber-300 absolute -top-1 -right-1" />
               </div>
             </div>
 
             <div className="min-w-0 space-y-1.5">
-              <span className="inline-block px-3 py-1 rounded-lg bg-[#f4eaf4] text-[#80497D] text-[10px] font-black uppercase tracking-wider border border-[#ebd7eb]">
+              <span className="inline-block px-3 py-1 rounded-lg bg-[#382b6e] text-purple-200 text-[10px] font-black uppercase tracking-wider border border-[#5d49a8]">
                 FEATURED
               </span>
-              <h3 className="text-sm sm:text-base font-black text-slate-900 leading-snug">
+              <h3 className="text-sm sm:text-base font-black text-white leading-snug">
                 Reasoning Online Classes for IMO, ISO(NSO) &amp; IEO
               </h3>
-              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+              <p className="text-xs sm:text-sm text-purple-200/90 font-medium leading-relaxed">
                 Get expert guidance and improve your problem-solving skills.
               </p>
             </div>
@@ -889,32 +889,32 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           <button
             type="button"
             onClick={() => onNavigateTab('my_classes')}
-            className="w-full sm:w-auto px-6 py-3.5 bg-[#80497D] hover:bg-[#683965] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-6 py-3.5 bg-[#5b3da8] hover:bg-[#4a2e91] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-lg shadow-purple-950/40 active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-[#7854d6]/40"
           >
             <span>ENROLL NOW</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Right Banner: Olympiad Intelligent Test Generator Pro */}
-        <div className="bg-[#fdf7f5] rounded-3xl border-2 border-[#f6d6cc] p-6 sm:p-7 shadow-xs hover:shadow-lg transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+        {/* Right Banner: Olympiad Intelligent Test Generator Pro (Dark Royal Blue Box) */}
+        <div className="bg-[#122459] rounded-3xl border-2 border-[#233d7c] p-6 sm:p-7 shadow-xl shadow-blue-950/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-white">
           <div className="flex items-center gap-4 min-w-0">
             {/* Target & Checklist Illustration */}
-            <div className="w-16 h-16 rounded-2xl bg-white border border-[#f6d6cc] flex items-center justify-center shadow-xs shrink-0 text-[#C35B3F]">
+            <div className="w-16 h-16 rounded-2xl bg-[#0e1c45] border border-[#23428a] flex items-center justify-center shadow-md shrink-0 text-blue-300">
               <div className="relative">
-                <FileSpreadsheet className="w-8 h-8 text-[#C35B3F]" />
-                <Target className="w-4 h-4 text-[#dc2626] absolute -top-1 -right-1" />
+                <FileSpreadsheet className="w-8 h-8 text-blue-300" />
+                <Target className="w-4 h-4 text-rose-400 absolute -top-1 -right-1" />
               </div>
             </div>
 
             <div className="min-w-0 space-y-1.5">
-              <span className="inline-block px-3 py-1 rounded-lg bg-[#fbeee9] text-[#C35B3F] text-[10px] font-black uppercase tracking-wider border border-[#f6d6cc]">
+              <span className="inline-block px-3 py-1 rounded-lg bg-[#1a3478] text-blue-200 text-[10px] font-black uppercase tracking-wider border border-[#2b4fa8]">
                 PRO TOOL
               </span>
-              <h3 className="text-sm sm:text-base font-black text-slate-900 leading-snug">
+              <h3 className="text-sm sm:text-base font-black text-white leading-snug">
                 Olympiad Intelligent Test Generator Pro
               </h3>
-              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+              <p className="text-xs sm:text-sm text-blue-200/90 font-medium leading-relaxed">
                 Create your own Olympiad tests in seconds.
               </p>
             </div>
@@ -923,7 +923,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           <button
             type="button"
             onClick={() => onNavigateTab('test_generator')}
-            className="w-full sm:w-auto px-6 py-3.5 bg-[#C35B3F] hover:bg-[#b04c31] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-6 py-3.5 bg-[#16327a] hover:bg-[#102356] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-lg shadow-blue-950/40 active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-[#2b4fa8]"
           >
             <span>TRY NOW</span>
             <ArrowRight className="w-4 h-4" />
@@ -933,22 +933,22 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. SECTION: FREE SAMPLE PAPERS & PREVIOUS YEAR PAPERS                       */}
+      {/* 4. SECTION: FREE SAMPLE PAPERS & PREVIOUS YEAR PAPERS (Dark Boxes)          */}
       {/* ========================================================================= */}
       <div className="pt-2">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           
           {/* Card 1: Spotlight: IGKO Quiz */}
-          <div className="bg-[#faf6fa] rounded-2xl border border-[#ebd7eb] p-4 sm:p-5 shadow-2xs hover:shadow-md transition-all flex items-center justify-between gap-3">
+          <div className="bg-[#231b4a] rounded-2xl border border-[#48378c] p-4 sm:p-5 shadow-lg flex items-center justify-between gap-3 text-white">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center shrink-0 shadow-2xs">
+              <div className="w-11 h-11 rounded-xl bg-[#1a1438] text-purple-300 border border-[#48378c] flex items-center justify-center shrink-0 shadow-xs">
                 <FileText className="w-5 h-5" />
               </div>
               <div className="min-w-0">
-                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                <h4 className="font-bold text-white text-xs sm:text-sm truncate">
                   Spotlight: IGKO Quiz
                 </h4>
-                <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
+                <p className="text-[10px] text-purple-200 font-medium truncate mt-0.5">
                   Test your knowledge with latest questions.
                 </p>
               </div>
@@ -957,7 +957,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             <button
               type="button"
               onClick={() => onNavigateTab('free_quizzes')}
-              className="px-4 py-1.5 bg-[#80497D] hover:bg-[#683965] text-white rounded-full text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1"
+              className="px-4 py-1.5 bg-[#5b3da8] hover:bg-[#4a2e91] text-white rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-[#7854d6]/40"
             >
               <span>Open</span>
               <ArrowRight className="w-3 h-3" />
@@ -965,16 +965,16 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </div>
 
           {/* Card 2: Free Sample Papers */}
-          <div className="bg-[#fdf7f5] rounded-2xl border border-[#f6d6cc] p-4 sm:p-5 shadow-2xs hover:shadow-md transition-all flex items-center justify-between gap-3">
+          <div className="bg-[#122459] rounded-2xl border border-[#233d7c] p-4 sm:p-5 shadow-lg flex items-center justify-between gap-3 text-white">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-[#fbeee9] text-[#C35B3F] flex items-center justify-center shrink-0 shadow-2xs">
+              <div className="w-11 h-11 rounded-xl bg-[#0e1c45] text-blue-300 border border-[#233d7c] flex items-center justify-center shrink-0 shadow-xs">
                 <FileSpreadsheet className="w-5 h-5" />
               </div>
               <div className="min-w-0">
-                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                <h4 className="font-bold text-white text-xs sm:text-sm truncate">
                   Free Sample Papers
                 </h4>
-                <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
+                <p className="text-[10px] text-blue-200 font-medium truncate mt-0.5">
                   Download and practice sample papers.
                 </p>
               </div>
@@ -983,7 +983,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             <button
               type="button"
               onClick={() => onNavigateTab('free_sample_papers')}
-              className="px-4 py-1.5 bg-[#C35B3F] hover:bg-[#b04c31] text-white rounded-full text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1"
+              className="px-4 py-1.5 bg-[#16327a] hover:bg-[#102356] text-white rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-[#2b4fa8]"
             >
               <span>Open</span>
               <ArrowRight className="w-3 h-3" />
@@ -991,16 +991,16 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </div>
 
           {/* Card 3: Free Previous Year Papers */}
-          <div className="bg-[#faf6fa] rounded-2xl border border-[#ebd7eb] p-4 sm:p-5 shadow-2xs hover:shadow-md transition-all flex items-center justify-between gap-3">
+          <div className="bg-[#231b4a] rounded-2xl border border-[#48378c] p-4 sm:p-5 shadow-lg flex items-center justify-between gap-3 text-white">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center shrink-0 shadow-2xs">
+              <div className="w-11 h-11 rounded-xl bg-[#1a1438] text-purple-300 border border-[#48378c] flex items-center justify-center shrink-0 shadow-xs">
                 <Award className="w-5 h-5" />
               </div>
               <div className="min-w-0">
-                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                <h4 className="font-bold text-white text-xs sm:text-sm truncate">
                   Free Previous Year Papers
                 </h4>
-                <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
+                <p className="text-[10px] text-purple-200 font-medium truncate mt-0.5">
                   Get past year papers with solutions.
                 </p>
               </div>
@@ -1009,7 +1009,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             <button
               type="button"
               onClick={() => onNavigateTab('free_past_papers')}
-              className="px-4 py-1.5 bg-[#80497D] hover:bg-[#683965] text-white rounded-full text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1"
+              className="px-4 py-1.5 bg-[#5b3da8] hover:bg-[#4a2e91] text-white rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-[#7854d6]/40"
             >
               <span>Open</span>
               <ArrowRight className="w-3 h-3" />
@@ -1025,14 +1025,14 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       <div className="space-y-3 pt-2">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Rocket className="w-5 h-5 text-[#f43f5e]" />
+            <Rocket className="w-5 h-5 text-[#5b3da8]" />
             <span>Skill Development Programs</span>
           </h2>
 
           <button
             type="button"
             onClick={() => onNavigateTab && onNavigateTab('prog_rsdp')}
-            className="text-xs font-bold text-[#2563eb] hover:text-[#1d4ed8] hover:underline flex items-center gap-1 transition-colors cursor-pointer"
+            className="text-xs font-bold text-[#5b3da8] hover:text-[#4a2e91] hover:underline flex items-center gap-1 transition-colors cursor-pointer"
           >
             <span>View All Programs</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -1045,35 +1045,35 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               id: 'prog_rsdp',
               title: 'Reasoning Skill Development',
               subtitle: 'Build a strong foundation with essential skills.',
-              gradient: 'from-[#fb7185] via-[#f43f5e] to-[#e11d48]',
+              gradient: 'from-[#5b3da8] via-[#4a2e91] to-[#231b4a]',
               icon: Brain
             },
             {
               id: 'prog_gksdp',
               title: 'GK Skill Development',
               subtitle: 'Improve your general knowledge and current affairs.',
-              gradient: 'from-[#60a5fa] via-[#3b82f6] to-[#2563eb]',
+              gradient: 'from-[#16327a] via-[#122459] to-[#0c183d]',
               icon: Globe
             },
             {
               id: 'prog_msdp',
               title: 'Maths Skill Development',
               subtitle: 'Sharpen your math skills with practice and theory.',
-              gradient: 'from-[#a78bfa] via-[#8b5cf6] to-[#7c3aed]',
+              gradient: 'from-[#6242b5] via-[#4d2f9e] to-[#241a4a]',
               isMath: true
             },
             {
               id: 'prog_esdp',
               title: 'English Skill Development',
               subtitle: 'Enhance your communication and language skills.',
-              gradient: 'from-[#a3e635] via-[#84cc16] to-[#65a30d]',
+              gradient: 'from-[#1e3a8a] via-[#172b69] to-[#101e48]',
               isLang: true
             },
             {
               id: 'prog_ssdp',
               title: 'Science Skill Development',
               subtitle: 'Explore science concepts with easy learning.',
-              gradient: 'from-[#22d3ee] via-[#06b6d4] to-[#0891b2]',
+              gradient: 'from-[#5b3da8] via-[#372b6e] to-[#182348]',
               icon: Rocket
             }
           ].map((prog) => {
@@ -1082,7 +1082,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               <div
                 key={prog.id}
                 onClick={() => onNavigateTab(prog.id)}
-                className={`rounded-3xl p-5 flex flex-col justify-between text-white shadow-xs hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1 min-h-[210px] relative overflow-hidden bg-gradient-to-b ${prog.gradient} cursor-pointer group`}
+                className={`rounded-3xl p-5 flex flex-col justify-between text-white shadow-lg hover:shadow-2xl transition-all duration-200 transform hover:-translate-y-1 min-h-[210px] relative overflow-hidden bg-gradient-to-b ${prog.gradient} cursor-pointer group border border-white/10`}
               >
                 {/* Frosted subtle geometric glow */}
                 <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none" />
@@ -1133,13 +1133,13 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 6. SECTION: LIVE STUDENT TEST RESULTS, SCORES & LEADERBOARD               */}
+      {/* 6. SECTION: LIVE STUDENT TEST RESULTS, SCORES & LEADERBOARD (Dark Box)    */}
       {/* ========================================================================= */}
       <div className="pt-2 space-y-4">
-        {/* Section Header (Flat on background, no box) */}
+        {/* Section Header */}
         <div className="space-y-0.5">
           <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-[#80497D]" />
+            <Trophy className="w-5 h-5 text-[#5b3da8]" />
             <span>Live Student Exam Results &amp; Percentages</span>
           </h2>
           <p className="text-[11px] text-slate-500 font-medium">
@@ -1147,150 +1147,148 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </p>
         </div>
 
-        {/* LIVE STUDENTS RESULTS TABLE */}
+        {/* LIVE STUDENTS RESULTS TABLE (Dark Box) */}
         <div className="space-y-3">
-
-            {/* Results Table */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 border-b border-slate-200/80 text-slate-500 text-[10px] uppercase font-bold tracking-wider">
+          <div className="bg-[#121c3b] rounded-3xl border border-[#2a3a68] shadow-xl overflow-hidden text-white">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-[#1a2850] border-b border-[#2a3a68] text-purple-200 text-[10px] uppercase font-bold tracking-wider">
+                  <tr>
+                    <th className="py-3 px-3 w-10 text-center">#</th>
+                    <th className="py-3 px-4">Student</th>
+                    <th className="py-3 px-3">Class</th>
+                    <th className="py-3 px-4">Test Title &amp; Subject</th>
+                    <th className="py-3 px-4">School</th>
+                    <th className="py-3 px-4">Percentage</th>
+                    <th className="py-3 px-4 text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#1f2c52] font-medium text-slate-200">
+                  {resultsLoading ? (
                     <tr>
-                      <th className="py-3 px-3 w-10 text-center">#</th>
-                      <th className="py-3 px-4">Student</th>
-                      <th className="py-3 px-3">Class</th>
-                      <th className="py-3 px-4">Test Title &amp; Subject</th>
-                      <th className="py-3 px-4">School</th>
-                      <th className="py-3 px-4">Percentage</th>
-                      <th className="py-3 px-4 text-right">Status</th>
+                      <td colSpan={7} className="py-10 text-center text-slate-400">
+                        <div className="flex items-center justify-center gap-2">
+                          <RotateCcw className="w-4 h-4 animate-spin text-purple-400" />
+                          <span>Loading live student exam results...</span>
+                        </div>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 font-medium">
-                    {resultsLoading ? (
-                      <tr>
-                        <td colSpan={7} className="py-10 text-center text-slate-400">
-                          <div className="flex items-center justify-center gap-2">
-                            <RotateCcw className="w-4 h-4 animate-spin text-indigo-600" />
-                            <span>Loading live student exam results...</span>
-                          </div>
-                        </td>
-                      </tr>
-                    ) : filteredStudentResults.length === 0 ? (
-                      <tr>
-                        <td colSpan={7} className="py-10 text-center text-slate-400">
-                          No student test results match your filter criteria.
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredStudentResults.map((r, idx) => {
-                        const pct = parseFloat(r.percentage || 0).toFixed(1);
-                        const isPassed = Number(r.passed) === 1 || parseFloat(pct) >= 50;
-                        const isMyRecord = user && (
-                          r.student_id === user.id ||
-                          String(r.student_id) === String(user.id) ||
-                          (r.user_id && (r.user_id === user.id || String(r.user_id) === String(user.id))) ||
-                          (r.student_login_id && user.login_id && r.student_login_id.toLowerCase() === user.login_id.toLowerCase()) ||
-                          (r.student_email && user.email && r.student_email.toLowerCase() === user.email.toLowerCase())
-                        );
+                  ) : filteredStudentResults.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="py-10 text-center text-slate-400">
+                        No student test results match your filter criteria.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredStudentResults.map((r, idx) => {
+                      const pct = parseFloat(r.percentage || 0).toFixed(1);
+                      const isPassed = Number(r.passed) === 1 || parseFloat(pct) >= 50;
+                      const isMyRecord = user && (
+                        r.student_id === user.id ||
+                        String(r.student_id) === String(user.id) ||
+                        (r.user_id && (r.user_id === user.id || String(r.user_id) === String(user.id))) ||
+                        (r.student_login_id && user.login_id && r.student_login_id.toLowerCase() === user.login_id.toLowerCase()) ||
+                        (r.student_email && user.email && r.student_email.toLowerCase() === user.email.toLowerCase())
+                      );
 
-                        return (
-                          <tr
-                            key={r.id || idx}
-                            className={`hover:bg-slate-50/80 transition-colors ${
-                              isMyRecord ? 'bg-indigo-50/30 font-semibold' : ''
-                            }`}
-                          >
-                            <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-400 text-xs">
-                              {idx + 1}
-                            </td>
+                      return (
+                        <tr
+                          key={r.id || idx}
+                          className={`hover:bg-[#1b2852]/80 transition-colors ${
+                            isMyRecord ? 'bg-purple-950/40 font-semibold' : ''
+                          }`}
+                        >
+                          <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-400 text-xs">
+                            {idx + 1}
+                          </td>
 
-                            <td className="py-3.5 px-4">
-                              <div className="flex items-center gap-2.5">
-                                <div className="w-8 h-8 rounded-xl bg-[#80497D] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
-                                  {r.student_name ? r.student_name.charAt(0).toUpperCase() : 'S'}
-                                </div>
-                                <div className="min-w-0">
-                                  <div className="flex items-center gap-1.5">
-                                    <p className="font-bold text-slate-900 truncate">
-                                      {r.student_name || 'Student'}
-                                    </p>
-                                    {isMyRecord && (
-                                      <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-[#f4eaf4] text-[#80497D]">
-                                        YOU
-                                      </span>
-                                    )}
-                                  </div>
-                                  <p className="text-[10px] font-mono text-slate-400 truncate uppercase">
-                                    {r.student_login_id || 'ID'}
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#5b3da8] to-[#16327a] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-md">
+                                {r.student_name ? r.student_name.charAt(0).toUpperCase() : 'S'}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <p className="font-bold text-white truncate">
+                                    {r.student_name || 'Student'}
                                   </p>
+                                  {isMyRecord && (
+                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-purple-900 text-purple-200 border border-purple-700">
+                                      YOU
+                                    </span>
+                                  )}
                                 </div>
+                                <p className="text-[10px] font-mono text-purple-300 truncate uppercase">
+                                  {r.student_login_id || 'ID'}
+                                </p>
                               </div>
-                            </td>
+                            </div>
+                          </td>
 
-                            <td className="py-3.5 px-3 whitespace-nowrap">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#f4eaf4] text-[#80497D] border border-[#ebd7eb]">
-                                {r.class_name || 'Class 6'}
-                              </span>
-                            </td>
+                          <td className="py-3.5 px-3 whitespace-nowrap">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-[#1e2246] text-purple-300 border border-purple-800/60">
+                              {r.class_name || 'Class 6'}
+                            </span>
+                          </td>
 
-                            <td className="py-3.5 px-4">
-                              <p className="font-bold text-slate-900 line-clamp-1">
-                                {r.exam_title || 'Olympiad Test Paper'}
-                              </p>
-                              <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium mt-0.5">
-                                {r.subject_name ? (
-                                  <span className="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">
-                                    {r.subject_name}
-                                  </span>
-                                ) : (
-                                  <span className="text-purple-700 font-bold bg-purple-50 px-1.5 py-0.2 rounded border border-purple-100">
-                                    Olympiad
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-
-                            <td className="py-3.5 px-4 font-semibold text-slate-700 whitespace-nowrap">
-                              <div className="flex items-center gap-1.5">
-                                <Building2 className="w-3.5 h-3.5 text-[#80497D] shrink-0" />
-                                <span className="font-bold text-slate-800 truncate max-w-[220px]" title={r.school_name || 'Independent Candidate'}>
-                                  {r.school_name || 'Independent Candidate'}
+                          <td className="py-3.5 px-4">
+                            <p className="font-bold text-white line-clamp-1">
+                              {r.exam_title || 'Olympiad Test Paper'}
+                            </p>
+                            <div className="flex items-center gap-1.5 text-[10px] text-slate-300 font-medium mt-0.5">
+                              {r.subject_name ? (
+                                <span className="text-emerald-300 font-bold bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/60">
+                                  {r.subject_name}
                                 </span>
-                              </div>
-                            </td>
+                              ) : (
+                                <span className="text-purple-300 font-bold bg-purple-950/80 px-2 py-0.5 rounded border border-purple-800/60">
+                                  Olympiad
+                                </span>
+                              )}
+                            </div>
+                          </td>
 
-                            <td className="py-3.5 px-4 whitespace-nowrap">
-                              <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-black font-mono ${
-                                  parseFloat(pct) >= 80
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                    : parseFloat(pct) >= 50
-                                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
-                                    : 'bg-rose-50 text-rose-700 border border-rose-200'
-                                }`}
-                              >
-                                {pct}%
+                          <td className="py-3.5 px-4 font-semibold text-slate-300 whitespace-nowrap">
+                            <div className="flex items-center gap-1.5">
+                              <Building2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                              <span className="font-bold text-slate-200 truncate max-w-[220px]" title={r.school_name || 'Independent Candidate'}>
+                                {r.school_name || 'Independent Candidate'}
                               </span>
-                            </td>
+                            </div>
+                          </td>
 
-                            <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                              <span
-                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                                  isPassed
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                    : 'bg-rose-50 text-rose-700 border border-rose-200'
-                                }`}
-                              >
-                                <span className={`w-1.5 h-1.5 rounded-full ${isPassed ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                                <span>{isPassed ? 'Passed' : 'Completed'}</span>
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-black font-mono ${
+                                parseFloat(pct) >= 80
+                                  ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/60'
+                                  : parseFloat(pct) >= 50
+                                  ? 'bg-blue-950/80 text-blue-300 border border-blue-800/60'
+                                  : 'bg-rose-950/80 text-rose-300 border border-rose-800/60'
+                              }`}
+                            >
+                              {pct}%
+                            </span>
+                          </td>
+
+                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                            <span
+                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                                isPassed
+                                  ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/60'
+                                  : 'bg-rose-950/80 text-rose-300 border border-rose-800/60'
+                              }`}
+                            >
+                              <span className={`w-1.5 h-1.5 rounded-full ${isPassed ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+                              <span>{isPassed ? 'Passed' : 'Completed'}</span>
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
