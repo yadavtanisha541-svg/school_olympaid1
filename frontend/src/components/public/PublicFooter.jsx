@@ -22,10 +22,10 @@ export const PublicFooter = ({ onNavigatePublic, onOpenLogin, onOpenRegister }) 
   };
 
   return (
-    <footer className="bg-[#321630] text-[#f4ebf4] border-t border-[#4e2a4a] relative overflow-hidden">
+    <footer className="bg-gradient-to-b from-[#0e1738] via-[#121c44] to-[#0a1028] text-slate-200 border-t border-[#1e295d] relative overflow-hidden">
       {/* Background Decorative Gradient Glow */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#6d3a68]/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-10 w-96 h-96 bg-[#d9775b]/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#5b3da8]/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-10 w-96 h-96 bg-[#16327a]/25 rounded-full blur-3xl pointer-events-none" />
 
       {/* Main 5-Column Navigation Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

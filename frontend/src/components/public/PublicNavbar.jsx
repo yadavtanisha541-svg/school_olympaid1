@@ -124,9 +124,9 @@ export const PublicNavbar = ({
       }`}
     >
       {/* Top Banner Notice */}
-      <div className="bg-gradient-to-r from-[#6d3a68] via-[#a868a7] to-[#d9775b] text-white text-[11px] font-semibold py-1.5 px-4 text-center">
+      <div className="bg-gradient-to-r from-[#122459] via-[#241e6e] to-[#5b3da8] text-white text-[11px] font-semibold py-1.5 px-4 text-center">
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 flex-wrap">
-          <span className="inline-flex items-center gap-1 bg-[#e7b84b] text-[#321630] font-black px-2 py-0.5 rounded-sm text-[10px] uppercase tracking-wider">
+          <span className="inline-flex items-center gap-1 bg-[#fbbf24] text-[#122459] font-black px-2 py-0.5 rounded-sm text-[10px] uppercase tracking-wider">
             ★ Registrations Open 2026-27
           </span>
           <span>National &amp; International Online Olympiads for Classes 1 to 12.</span>
@@ -656,7 +656,7 @@ export const PublicNavbar = ({
                   <button
                     type="button"
                     onClick={() => setOpenDropdown(openDropdown === 'register' ? null : 'register')}
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-[#d9775b] to-[#c85e42] hover:from-[#c85e42] hover:to-[#a74a32] text-white rounded-md text-xs font-extrabold transition-all shadow-md shadow-[#d9775b]/30 cursor-pointer active:scale-95"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-[#16327a] via-[#322378] to-[#5b3da8] hover:from-[#122459] hover:to-[#4d3291] text-white rounded-md text-xs font-extrabold transition-all shadow-md shadow-[#16327a]/30 cursor-pointer active:scale-95"
                   >
                     <span>Register Now</span>
                     <ChevronDown

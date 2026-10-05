@@ -207,11 +207,11 @@ export const PublicHomePage = ({
               onMouseLeave={() => setIsPaused(false)}
             >
               {/* Slider Main Viewport - Simple Square Box */}
-              <div className="relative w-full h-[460px] sm:h-[480px] rounded-md overflow-hidden shadow-md border border-[#edd6ed] bg-gradient-to-br from-[#4e2a4a] via-[#6d3a68] to-[#8c4e8b] text-white flex flex-col justify-between p-6 sm:p-10 transition-all duration-500">
+              <div className="relative w-full h-[460px] sm:h-[480px] rounded-md overflow-hidden shadow-md border border-[#2b3875] bg-gradient-to-br from-[#101e4a] via-[#1c2468] to-[#55359e] text-white flex flex-col justify-between p-6 sm:p-10 transition-all duration-500">
                 
                 {/* Background Pattern Glow */}
-                <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#d9775b]/20 rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute top-0 right-0 w-80 h-80 bg-[#5b3da8]/25 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#16327a]/30 rounded-full blur-2xl pointer-events-none" />
 
                 {/* Slide Header Tag */}
                 <div className="relative z-10 flex items-center justify-between gap-4">
@@ -248,7 +248,7 @@ export const PublicHomePage = ({
                         else if (slide.id === 3) onNavigatePublic('rankings');
                         else onNavigatePublic('practice-hub');
                       }}
-                      className="px-6 py-3 bg-[#d9775b] hover:bg-[#c85e42] text-white rounded-md text-xs font-black shadow-md shadow-[#d9775b]/30 transition-all cursor-pointer flex items-center gap-2 active:scale-95"
+                      className="px-6 py-3 bg-gradient-to-r from-[#16327a] via-[#322378] to-[#5b3da8] hover:from-[#122459] hover:to-[#4d3291] text-white rounded-md text-xs font-black shadow-md shadow-[#16327a]/30 transition-all cursor-pointer flex items-center gap-2 active:scale-95"
                     >
                       <span>{slide.ctaText}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -307,15 +307,15 @@ export const PublicHomePage = ({
 
             {/* RIGHT SIDE: REGISTRATION / APPLICANT FORM (5 COLS) - SIMPLE SQUARE BOX */}
             <div className="lg:col-span-5 flex flex-col">
-              <div className="bg-white rounded-md border border-[#edd6ed] shadow-md p-6 sm:p-7 flex flex-col justify-between flex-1 relative">
+              <div className="bg-white rounded-md border border-[#c7d2fe] shadow-md p-6 sm:p-7 flex flex-col justify-between flex-1 relative">
                 
                 {/* Form Header */}
                 <div>
-                  <div className="border-b border-[#edd6ed] pb-2.5 mb-5 flex items-center justify-between">
-                    <span className="text-xs font-black uppercase tracking-wider text-[#6d3a68]">
+                  <div className="border-b border-[#e0e7ff] pb-2.5 mb-5 flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-[#16327a]">
                       New Applicant Registration
                     </span>
-                    <span className="text-[10px] font-bold text-[#d9775b] bg-[#faf4e0] px-2 py-0.5 rounded-sm">
+                    <span className="text-[10px] font-bold text-white bg-gradient-to-r from-[#16327a] to-[#5b3da8] px-2 py-0.5 rounded-sm shadow-xs">
                       Online 2026-27
                     </span>
                   </div>
@@ -328,7 +328,7 @@ export const PublicHomePage = ({
                         <select
                           value={applicantData.country}
                           onChange={(e) => setApplicantData({ ...applicantData, country: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-md text-xs font-bold text-[#4e2a4a] focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
+                          className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-bold text-[#1e293b] focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
                         >
                           <option value="India">Select Country (India)</option>
                           <option value="United Arab Emirates">United Arab Emirates</option>
@@ -349,17 +349,17 @@ export const PublicHomePage = ({
                           placeholder="Candidate Name *"
                           value={applicantData.candidateName}
                           onChange={(e) => setApplicantData({ ...applicantData, candidateName: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-md text-xs font-semibold text-[#4e2a4a] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
+                          className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
                         />
                       </div>
 
                       {/* Select Class */}
                       <div className="relative">
-                        <Star className="w-4 h-4 text-[#e7b84b] absolute left-3.5 top-3 pointer-events-none" />
+                        <Star className="w-4 h-4 text-[#fbbf24] absolute left-3.5 top-3 pointer-events-none" />
                         <select
                           value={applicantData.className}
                           onChange={(e) => setApplicantData({ ...applicantData, className: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-md text-xs font-bold text-[#4e2a4a] focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
+                          className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-bold text-[#1e293b] focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
                         >
                           {['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((cls) => (
                             <option key={cls} value={cls}>Select Class ({cls})</option>
@@ -375,7 +375,7 @@ export const PublicHomePage = ({
                           placeholder="School Name (Optional)"
                           value={applicantData.schoolName}
                           onChange={(e) => setApplicantData({ ...applicantData, schoolName: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-md text-xs font-semibold text-[#4e2a4a] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
+                          className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
                         />
                       </div>
 
@@ -388,7 +388,7 @@ export const PublicHomePage = ({
                           placeholder="Email Address (Login ID) *"
                           value={applicantData.email}
                           onChange={(e) => setApplicantData({ ...applicantData, email: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-md text-xs font-semibold text-[#4e2a4a] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
+                          className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
                         />
                       </div>
 
@@ -406,28 +406,28 @@ export const PublicHomePage = ({
                             const val = e.target.value.replace(/\D/g, '').slice(0, 10);
                             setApplicantData({ ...applicantData, mobile: val });
                           }}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-md text-xs font-semibold text-[#4e2a4a] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
+                          className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
                         />
                       </div>
 
                       {/* Submit CTA */}
                       <button
                         type="submit"
-                        className="w-full py-3 bg-gradient-to-r from-[#d9775b] to-[#c85e42] hover:from-[#c85e42] hover:to-[#a74a32] text-white rounded-md text-xs font-black shadow-sm cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2"
+                        className="w-full py-3 bg-gradient-to-r from-[#16327a] via-[#322378] to-[#5b3da8] hover:from-[#122459] hover:to-[#4d3291] text-white rounded-md text-xs font-black shadow-md shadow-[#16327a]/25 cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2"
                       >
                         <span>Proceed to Register Student</span>
-                        <ArrowRight className="w-4 h-4 text-[#e7b84b]" />
+                        <ArrowRight className="w-4 h-4 text-[#fbbf24]" />
                       </button>
                     </form>
                 </div>
 
                 {/* Bottom Already Registered Link */}
-                <div className="pt-3 mt-3 border-t border-[#f4ebf4] text-center text-[11px] text-slate-500">
+                <div className="pt-3 mt-3 border-t border-slate-100 text-center text-[11px] text-slate-500">
                   <span>Already enrolled? </span>
                   <button
                     type="button"
                     onClick={onOpenLogin}
-                    className="font-extrabold text-[#6d3a68] hover:text-[#d9775b] underline cursor-pointer"
+                    className="font-extrabold text-[#16327a] hover:text-[#5b3da8] underline cursor-pointer"
                   >
                     Log In to Dashboard
                   </button>
@@ -732,15 +732,15 @@ export const PublicHomePage = ({
               <button
                 type="button"
                 onClick={onOpenRegister}
-                className="px-6 py-2.5 bg-gradient-to-r from-[#d9775b] to-[#c85e42] hover:from-[#c85e42] hover:to-[#a74a32] text-white rounded-md text-xs font-black shadow-md shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95 flex items-center gap-2"
+                className="px-6 py-2.5 bg-gradient-to-r from-[#16327a] via-[#322378] to-[#5b3da8] hover:from-[#122459] hover:to-[#4d3291] text-white rounded-md text-xs font-black shadow-md shadow-[#16327a]/30 cursor-pointer transition-all active:scale-95 flex items-center gap-2"
               >
                 <span>Register Student Now</span>
-                <ArrowRight className="w-4 h-4 text-[#e7b84b]" />
+                <ArrowRight className="w-4 h-4 text-[#fbbf24]" />
               </button>
               <button
                 type="button"
                 onClick={() => onNavigatePublic('practice-hub')}
-                className="px-5 py-2.5 bg-[#f4ebf4] hover:bg-[#edd6ed] text-[#6d3a68] border border-[#edd6ed] rounded-md text-xs font-bold transition-all cursor-pointer"
+                className="px-5 py-2.5 bg-[#eef2ff] hover:bg-[#e0e7ff] text-[#16327a] border border-[#c7d2fe] rounded-md text-xs font-bold transition-all cursor-pointer"
               >
                 Explore Free Practice Hub
               </button>
@@ -762,8 +762,8 @@ export const PublicHomePage = ({
 
             {/* Video Caption Badge */}
             <div className="flex items-center justify-between text-[11px] text-slate-500 px-1">
-              <span className="font-bold text-[#6d3a68] flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-[#e7b84b]" />
+              <span className="font-bold text-[#16327a] flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5 text-[#fbbf24]" />
                 <span>Video: How Online Olympiad Exams Work</span>
               </span>
               <span className="text-[10px] text-slate-400">Walkthrough &amp; Guidelines</span>
@@ -776,88 +776,88 @@ export const PublicHomePage = ({
       {/* 6. OLYMPIADS EXAM PREPARATIONS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 py-6">
         <div className="text-center max-w-2xl mx-auto space-y-1.5">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#4e2a4a] tracking-tight leading-snug">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#16327a] tracking-tight leading-snug">
             Olympiads Exam Preparations
           </h2>
-          <p className="text-xs sm:text-sm text-[#6c568d] font-semibold">
+          <p className="text-xs sm:text-sm text-[#475569] font-semibold">
             Comprehensive study materials, question banks, and learning resources to master every discipline.
           </p>
         </div>
 
-        {/* 7 Preparation Cards Grid with Rich Colorful Tints */}
+        {/* 7 Preparation Cards Grid with Dark Royal Blue & Purple Theme */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-3.5 max-w-6xl mx-auto">
           {[
             {
               id: 'sample-paper',
               title: 'Sample Paper',
               type: 'sample-paper',
-              bgGradient: 'bg-gradient-to-b from-[#fdeae6] to-[#f8cec5]',
-              borderColor: 'border-[#f2a898]',
-              textColor: 'text-[#8a2e1c]',
+              bgGradient: 'bg-gradient-to-b from-[#101b44] via-[#16225a] to-[#2b1b56]',
+              borderColor: 'border-[#303c78] hover:border-[#818cf8]',
+              textColor: 'text-white',
               action: () => onNavigatePublic('sample-papers')
             },
             {
               id: 'previous-paper',
               title: 'Previous Paper',
               type: 'previous-paper',
-              bgGradient: 'bg-gradient-to-b from-[#f6e9f6] to-[#e6d0e6]',
-              borderColor: 'border-[#d4aed5]',
-              textColor: 'text-[#582155]',
+              bgGradient: 'bg-gradient-to-b from-[#161440] via-[#1f1a52] to-[#341860]',
+              borderColor: 'border-[#3f327a] hover:border-[#c084fc]',
+              textColor: 'text-white',
               action: () => onNavigatePublic('sample-papers')
             },
             {
               id: 'test-generator',
               title: 'Test Generator',
               type: 'test-generator',
-              bgGradient: 'bg-gradient-to-b from-[#fef2d0] to-[#fce098]',
-              borderColor: 'border-[#f6c75c]',
-              textColor: 'text-[#7a5108]',
+              bgGradient: 'bg-gradient-to-b from-[#0d1840] via-[#162054] to-[#281850]',
+              borderColor: 'border-[#2d3a72] hover:border-[#fbbf24]',
+              textColor: 'text-white',
               action: () => onNavigatePublic('practice-hub')
             },
             {
               id: 'mock-test',
               title: 'Mock Test',
               type: 'mock-test',
-              bgGradient: 'bg-gradient-to-b from-[#fdeae6] to-[#f8d0c8]',
-              borderColor: 'border-[#f0a99c]',
-              textColor: 'text-[#8a2e1c]',
+              bgGradient: 'bg-gradient-to-b from-[#14123e] via-[#1d1750] to-[#30165c]',
+              borderColor: 'border-[#3a2d74] hover:border-[#818cf8]',
+              textColor: 'text-white',
               action: () => onNavigatePublic('practice-hub')
             },
             {
               id: 'live-class',
               title: 'Live Online Class',
               type: 'live-class',
-              bgGradient: 'bg-gradient-to-b from-[#f7eaf7] to-[#e8d0e8]',
-              borderColor: 'border-[#d6abd8]',
-              textColor: 'text-[#582155]',
+              bgGradient: 'bg-gradient-to-b from-[#0e163c] via-[#171e52] to-[#2a1754]',
+              borderColor: 'border-[#333774] hover:border-[#c084fc]',
+              textColor: 'text-white',
               action: () => onNavigatePublic('practice-hub')
             },
             {
               id: 'revision',
               title: 'Revision',
               type: 'revision',
-              bgGradient: 'bg-gradient-to-b from-[#fdf5db] to-[#fae6b2]',
-              borderColor: 'border-[#f2ce79]',
-              textColor: 'text-[#7a5108]',
+              bgGradient: 'bg-gradient-to-b from-[#16153e] via-[#201b50] to-[#33175c]',
+              borderColor: 'border-[#3c2f78] hover:border-[#fbbf24]',
+              textColor: 'text-white',
               action: () => onNavigatePublic('workbooks')
             },
             {
               id: 'free-quiz',
               title: 'Free Quiz',
               type: 'free-quiz',
-              bgGradient: 'bg-gradient-to-b from-[#faeafa] to-[#ebd0eb]',
-              borderColor: 'border-[#d9aed9]',
-              textColor: 'text-[#582155]',
+              bgGradient: 'bg-gradient-to-b from-[#0e173e] via-[#181f54] to-[#2d1858]',
+              borderColor: 'border-[#353b78] hover:border-[#c084fc]',
+              textColor: 'text-white',
               action: () => onNavigatePublic('free-trial')
             }
           ].map((item) => (
             <div
               key={item.id}
               onClick={item.action}
-              className={`${item.bgGradient} rounded-md border-2 ${item.borderColor} shadow-2xs hover:shadow-md transition-all duration-300 p-2 sm:p-2.5 flex flex-col justify-between items-center text-center cursor-pointer group select-none hover:-translate-y-1`}
+              className={`${item.bgGradient} rounded-md border-2 ${item.borderColor} shadow-md hover:shadow-xl transition-all duration-300 p-2 sm:p-2.5 flex flex-col justify-between items-center text-center cursor-pointer group select-none hover:-translate-y-1`}
             >
               {/* Card Title on Top */}
-              <h3 className={`text-[11px] sm:text-xs font-black ${item.textColor} leading-snug h-7 flex items-center justify-center`}>
+              <h3 className={`text-[11px] sm:text-xs font-black ${item.textColor} leading-snug h-7 flex items-center justify-center tracking-tight`}>
                 {item.title}
               </h3>
 

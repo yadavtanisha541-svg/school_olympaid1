@@ -33,7 +33,7 @@ export const OlympiadCard = ({
 
       <div className="p-3.5 sm:p-4 flex flex-col flex-1 justify-between space-y-3.5">
         {/* 2. COLORED TITLE STRIP */}
-        <div className="bg-[#fde8e4] border border-[#f7d7cc] text-[#4e2a4a] text-center py-1.5 px-2 rounded-sm font-black text-[11px] sm:text-xs uppercase tracking-tight shadow-2xs">
+        <div className="bg-gradient-to-r from-[#122459] via-[#241e6e] to-[#5b3da8] text-white text-center py-1.5 px-2 rounded-sm font-black text-[11px] sm:text-xs uppercase tracking-tight shadow-xs">
           {cat.name} ({shortCode})
         </div>
 
@@ -134,7 +134,7 @@ export const OlympiadCard = ({
           <button
             type="button"
             onClick={onOpenRegister}
-            className="w-full sm:w-auto min-w-[140px] px-5 py-2 bg-[#6d3a68] hover:bg-[#5c3158] active:bg-[#4e2a4a] text-white rounded-md text-xs font-black shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 group-hover:bg-[#d9775b]"
+            className="w-full sm:w-auto min-w-[140px] px-5 py-2 bg-gradient-to-r from-[#16327a] via-[#322378] to-[#5b3da8] hover:from-[#122459] hover:to-[#4d3291] text-white rounded-md text-xs font-black shadow-sm transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
           >
             <span>Apply now</span>
           </button>
