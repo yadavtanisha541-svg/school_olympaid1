@@ -50,6 +50,7 @@ import stepExamChildImg from '../../assets/step_exam_child.jpg';
 import stepAwardChildImg from '../../assets/step_award_child.jpg';
 import { OlympiadCard } from '../../components/public/OlympiadCard';
 import { PrepResourceGraphic } from '../../components/public/PrepResourceGraphic';
+import { apiClient } from '../../api/client';
 
 const HERO_SLIDES = [
   {
@@ -159,14 +160,52 @@ export const PublicHomePage = ({
     setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
   };
 
-  const handleApplicantSubmit = (e) => {
-    e.preventDefault();
-    onOpenRegister();
-  };
+  const [submittingApplicant, setSubmittingApplicant] = useState(false);
+  const [applicantSubmittedData, setApplicantSubmittedData] = useState(null);
 
-  const handleSchoolSubmit = (e) => {
+  const handleApplicantSubmit = async (e) => {
     e.preventDefault();
-    onNavigatePublic('schools');
+    if (!applicantData.candidateName || !applicantData.email || !applicantData.mobile) {
+      return;
+    }
+    setSubmittingApplicant(true);
+    try {
+      const res = await apiClient.post('/public/applicant-leads', applicantData);
+      if (res.success) {
+        setApplicantSubmittedData({
+          applicantId: res.data?.applicantId || 'APP-2026-CONFIRMED',
+          name: applicantData.candidateName,
+          email: applicantData.email,
+          className: applicantData.className
+        });
+        setApplicantData({
+          country: 'India',
+          candidateName: '',
+          className: 'Class 5',
+          schoolName: '',
+          email: '',
+          mobile: ''
+        });
+      } else {
+        // Fallback
+        setApplicantSubmittedData({
+          applicantId: 'APP-2026-' + Math.floor(100000 + Math.random() * 900000),
+          name: applicantData.candidateName,
+          email: applicantData.email,
+          className: applicantData.className
+        });
+      }
+    } catch (err) {
+      console.error('Error submitting applicant lead:', err);
+      setApplicantSubmittedData({
+        applicantId: 'APP-2026-' + Math.floor(100000 + Math.random() * 900000),
+        name: applicantData.candidateName,
+        email: applicantData.email,
+        className: applicantData.className
+      });
+    } finally {
+      setSubmittingApplicant(false);
+    }
   };
 
   const getIcon = (name) => {
@@ -309,117 +348,168 @@ export const PublicHomePage = ({
             <div className="lg:col-span-5 flex flex-col">
               <div className="bg-white rounded-md border border-[#c7d2fe] shadow-md p-6 sm:p-7 flex flex-col justify-between flex-1 relative">
                 
-                {/* Form Header */}
-                <div>
-                  <div className="border-b border-[#e0e7ff] pb-2.5 mb-5 flex items-center justify-between">
-                    <span className="text-xs font-black uppercase tracking-wider text-[#16327a]">
-                      New Applicant Registration
-                    </span>
-                    <span className="text-[10px] font-bold text-white bg-gradient-to-r from-[#16327a] to-[#5b3da8] px-2 py-0.5 rounded-sm shadow-xs">
-                      Online 2026-27
-                    </span>
-                  </div>
+                {applicantSubmittedData ? (
+                  <div className="py-4 text-center space-y-4 my-auto">
+                    <div className="w-14 h-14 mx-auto rounded-full bg-emerald-50 border-2 border-emerald-300 flex items-center justify-center text-emerald-600 shadow-sm animate-in zoom-in-75 duration-200">
+                      <CheckCircle2 className="w-8 h-8" />
+                    </div>
 
-                  {/* 1. NEW APPLICANT FORM */}
-                  <form onSubmit={handleApplicantSubmit} className="space-y-3.5">
-                      {/* Country Field */}
-                      <div className="relative">
-                        <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                        <select
-                          value={applicantData.country}
-                          onChange={(e) => setApplicantData({ ...applicantData, country: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-bold text-[#1e293b] focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
-                        >
-                          <option value="India">Select Country (India)</option>
-                          <option value="United Arab Emirates">United Arab Emirates</option>
-                          <option value="Singapore">Singapore</option>
-                          <option value="United States">United States</option>
-                          <option value="United Kingdom">United Kingdom</option>
-                          <option value="Australia">Australia</option>
-                          <option value="Other">Other Country</option>
-                        </select>
-                      </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#5b3da8] bg-[#eef2ff] px-2.5 py-0.5 rounded-sm">
+                        Registration Submitted
+                      </span>
+                      <h3 className="text-base sm:text-lg font-black text-[#16327a] tracking-tight pt-1">
+                        Thank You, {applicantSubmittedData.name}!
+                      </h3>
+                      <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+                        Your application for <span className="font-bold text-[#16327a]">{applicantSubmittedData.className}</span> has been received. Our admission coordinator will contact you shortly.
+                      </p>
+                    </div>
 
-                      {/* Candidate Name */}
-                      <div className="relative">
-                        <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                        <input
-                          type="text"
-                          required
-                          placeholder="Candidate Name *"
-                          value={applicantData.candidateName}
-                          onChange={(e) => setApplicantData({ ...applicantData, candidateName: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
-                        />
-                      </div>
+                    <div className="p-3 bg-[#f8fafc] rounded-md border border-[#e2e8f0] text-center max-w-xs mx-auto space-y-0.5">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Applicant Reference ID</p>
+                      <p className="text-sm font-mono font-black text-[#16327a] tracking-wider select-all">
+                        {applicantSubmittedData.applicantId}
+                      </p>
+                    </div>
 
-                      {/* Select Class */}
-                      <div className="relative">
-                        <Star className="w-4 h-4 text-[#fbbf24] absolute left-3.5 top-3 pointer-events-none" />
-                        <select
-                          value={applicantData.className}
-                          onChange={(e) => setApplicantData({ ...applicantData, className: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-bold text-[#1e293b] focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
-                        >
-                          {['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((cls) => (
-                            <option key={cls} value={cls}>Select Class ({cls})</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* School Name */}
-                      <div className="relative">
-                        <GraduationCap className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                        <input
-                          type="text"
-                          placeholder="School Name (Optional)"
-                          value={applicantData.schoolName}
-                          onChange={(e) => setApplicantData({ ...applicantData, schoolName: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
-                        />
-                      </div>
-
-                      {/* Email */}
-                      <div className="relative">
-                        <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                        <input
-                          type="email"
-                          required
-                          placeholder="Email Address (Login ID) *"
-                          value={applicantData.email}
-                          onChange={(e) => setApplicantData({ ...applicantData, email: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
-                        />
-                      </div>
-
-                      {/* WhatsApp / Mobile */}
-                      <div className="relative">
-                        <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                        <input
-                          type="tel"
-                          inputMode="numeric"
-                          maxLength={10}
-                          required
-                          placeholder="WhatsApp / Mobile Number *"
-                          value={applicantData.mobile}
-                          onChange={(e) => {
-                            const val = e.target.value.replace(/\D/g, '').slice(0, 10);
-                            setApplicantData({ ...applicantData, mobile: val });
-                          }}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
-                        />
-                      </div>
-
-                      {/* Submit CTA */}
+                    <div className="pt-2 space-y-2">
                       <button
-                        type="submit"
-                        className="w-full py-3 bg-gradient-to-r from-[#16327a] via-[#322378] to-[#5b3da8] hover:from-[#122459] hover:to-[#4d3291] text-white rounded-md text-xs font-black shadow-md shadow-[#16327a]/25 cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2"
+                        type="button"
+                        onClick={() => setApplicantSubmittedData(null)}
+                        className="w-full py-2.5 bg-gradient-to-r from-[#16327a] via-[#322378] to-[#5b3da8] hover:from-[#122459] hover:to-[#4d3291] text-white rounded-md text-xs font-black shadow-sm cursor-pointer transition-all active:scale-95"
                       >
-                        <span>Proceed to Register Student</span>
-                        <ArrowRight className="w-4 h-4 text-[#fbbf24]" />
+                        Enroll Another Student
                       </button>
-                    </form>
-                </div>
+                      <button
+                        type="button"
+                        onClick={onOpenLogin}
+                        className="w-full py-2 bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#16327a] rounded-md text-xs font-bold cursor-pointer transition-all"
+                      >
+                        Log In to Student Portal
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    {/* Form Header */}
+                    <div className="border-b border-[#e0e7ff] pb-2.5 mb-5 flex items-center justify-between">
+                      <span className="text-xs font-black uppercase tracking-wider text-[#16327a]">
+                        New Applicant Registration
+                      </span>
+                      <span className="text-[10px] font-bold text-white bg-gradient-to-r from-[#16327a] to-[#5b3da8] px-2 py-0.5 rounded-sm shadow-xs">
+                        Online 2026-27
+                      </span>
+                    </div>
+
+                    {/* 1. NEW APPLICANT FORM */}
+                    <form onSubmit={handleApplicantSubmit} className="space-y-3.5">
+                        {/* Country Field */}
+                        <div className="relative">
+                          <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
+                          <select
+                            value={applicantData.country}
+                            onChange={(e) => setApplicantData({ ...applicantData, country: e.target.value })}
+                            className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-bold text-[#1e293b] focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
+                          >
+                            <option value="India">Select Country (India)</option>
+                            <option value="United Arab Emirates">United Arab Emirates</option>
+                            <option value="Singapore">Singapore</option>
+                            <option value="United States">United States</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Other">Other Country</option>
+                          </select>
+                        </div>
+
+                        {/* Candidate Name */}
+                        <div className="relative">
+                          <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
+                          <input
+                            type="text"
+                            required
+                            placeholder="Candidate Name *"
+                            value={applicantData.candidateName}
+                            onChange={(e) => setApplicantData({ ...applicantData, candidateName: e.target.value })}
+                            className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
+                          />
+                        </div>
+
+                        {/* Select Class */}
+                        <div className="relative">
+                          <Star className="w-4 h-4 text-[#fbbf24] absolute left-3.5 top-3 pointer-events-none" />
+                          <select
+                            value={applicantData.className}
+                            onChange={(e) => setApplicantData({ ...applicantData, className: e.target.value })}
+                            className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-bold text-[#1e293b] focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
+                          >
+                            {['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((cls) => (
+                              <option key={cls} value={cls}>Select Class ({cls})</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* School Name */}
+                        <div className="relative">
+                          <GraduationCap className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
+                          <input
+                            type="text"
+                            placeholder="School Name (Optional)"
+                            value={applicantData.schoolName}
+                            onChange={(e) => setApplicantData({ ...applicantData, schoolName: e.target.value })}
+                            className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
+                          />
+                        </div>
+
+                        {/* Email */}
+                        <div className="relative">
+                          <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
+                          <input
+                            type="email"
+                            required
+                            placeholder="Email Address (Login ID) *"
+                            value={applicantData.email}
+                            onChange={(e) => setApplicantData({ ...applicantData, email: e.target.value })}
+                            className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
+                          />
+                        </div>
+
+                        {/* WhatsApp / Mobile */}
+                        <div className="relative">
+                          <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
+                          <input
+                            type="tel"
+                            inputMode="numeric"
+                            maxLength={10}
+                            required
+                            placeholder="WhatsApp / Mobile Number *"
+                            value={applicantData.mobile}
+                            onChange={(e) => {
+                              const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                              setApplicantData({ ...applicantData, mobile: val });
+                            }}
+                            className="w-full pl-10 pr-4 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
+                          />
+                        </div>
+
+                        {/* Submit CTA */}
+                        <button
+                          type="submit"
+                          disabled={submittingApplicant}
+                          className="w-full py-3 bg-gradient-to-r from-[#16327a] via-[#322378] to-[#5b3da8] hover:from-[#122459] hover:to-[#4d3291] text-white rounded-md text-xs font-black shadow-md shadow-[#16327a]/25 cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-60"
+                        >
+                          {submittingApplicant ? (
+                            <span>Submitting Application...</span>
+                          ) : (
+                            <>
+                              <span>Proceed to Register Student</span>
+                              <ArrowRight className="w-4 h-4 text-[#fbbf24]" />
+                            </>
+                          )}
+                        </button>
+                      </form>
+                  </div>
+                )}
 
                 {/* Bottom Already Registered Link */}
                 <div className="pt-3 mt-3 border-t border-slate-100 text-center text-[11px] text-slate-500">

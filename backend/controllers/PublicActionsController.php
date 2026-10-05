@@ -300,4 +300,110 @@ class PublicActionsController {
             Response::error('Database error: ' . $e->getMessage(), 500);
         }
     }
+
+    /**
+     * Save New Applicant Lead from Website Homepage Form
+     */
+    public function saveApplicantLead(): void {
+        $input = Validator::getJsonInput();
+
+        if (empty($input['candidateName']) || empty($input['email']) || empty($input['mobile'])) {
+            Response::error('Candidate name, email address, and mobile number are required.', 422);
+            return;
+        }
+
+        try {
+            $candidateName = trim($input['candidateName']);
+            $country = !empty($input['country']) ? trim($input['country']) : 'India';
+            $className = !empty($input['className']) ? trim($input['className']) : 'Class 5';
+            $schoolName = !empty($input['schoolName']) ? trim($input['schoolName']) : null;
+            $email = strtolower(trim($input['email']));
+            $mobile = trim($input['mobile']);
+            $applicantId = 'APP-2026-' . rand(100000, 999999);
+
+            $stmt = $this->db->prepare("
+                INSERT INTO `new_applicant_leads`
+                (`applicant_id`, `candidate_name`, `country`, `class_name`, `school_name`, `email`, `mobile`, `status`, `created_at`)
+                VALUES
+                (?, ?, ?, ?, ?, ?, ?, 'new', NOW())
+            ");
+
+            $stmt->execute([
+                $applicantId,
+                $candidateName,
+                $country,
+                $className,
+                $schoolName,
+                $email,
+                $mobile
+            ]);
+
+            Logger::log('NEW_APPLICANT_LEAD_SUBMITTED', 'Applicants', [
+                'applicant_id' => $applicantId,
+                'candidate_name' => $candidateName,
+                'email' => $email,
+                'class_name' => $className
+            ]);
+
+            Response::success([
+                'id' => $this->db->lastInsertId(),
+                'applicantId' => $applicantId,
+                'candidateName' => $candidateName,
+                'email' => $email,
+                'status' => 'new',
+                'message' => 'Applicant lead registered successfully.'
+            ], 'Application submitted successfully! Our admissions coordinator will reach out shortly.', 201);
+        } catch (\PDOException $e) {
+            Response::error('Failed to save applicant lead: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get All Applicant Leads (Admin View)
+     */
+    public function getApplicantLeads(): void {
+        try {
+            $stmt = $this->db->query("SELECT * FROM `new_applicant_leads` ORDER BY `created_at` DESC LIMIT 500");
+            $leads = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            Response::success($leads, 'Applicant leads retrieved successfully.');
+        } catch (\PDOException $e) {
+            Response::error('Database error: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Update Applicant Lead Status / Notes
+     */
+    public function updateApplicantLeadStatus(int $id): void {
+        $input = Validator::getJsonInput();
+        $status = $input['status'] ?? 'new';
+        $notes = $input['notes'] ?? null;
+
+        try {
+            if ($notes !== null) {
+                $stmt = $this->db->prepare("UPDATE `new_applicant_leads` SET `status` = ?, `notes` = ? WHERE `id` = ?");
+                $stmt->execute([$status, $notes, $id]);
+            } else {
+                $stmt = $this->db->prepare("UPDATE `new_applicant_leads` SET `status` = ? WHERE `id` = ?");
+                $stmt->execute([$status, $id]);
+            }
+
+            Response::success(null, "Applicant lead status updated to $status.");
+        } catch (\PDOException $e) {
+            Response::error('Failed to update applicant lead: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Delete Applicant Lead
+     */
+    public function deleteApplicantLead(int $id): void {
+        try {
+            $stmt = $this->db->prepare("DELETE FROM `new_applicant_leads` WHERE `id` = ?");
+            $stmt->execute([$id]);
+            Response::success(null, 'Applicant lead deleted successfully.');
+        } catch (\PDOException $e) {
+            Response::error('Failed to delete applicant lead: ' . $e->getMessage(), 500);
+        }
+    }
 }

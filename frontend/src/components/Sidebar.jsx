@@ -83,7 +83,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
     { id: 'online_classes_manager', label: 'Online Classes Studio', icon: Video },
     { id: 'skill_programs_manager', label: 'Skill Programs Studio', icon: Rocket },
     { id: 'superadmin_packages', label: 'Subject Model Tests & Packages', icon: BookOpen },
-
+    { id: 'applicant_leads', label: 'New Applicant Leads', icon: UserCheck },
     { id: 'coordinators', label: 'Coordinator Applicants', icon: UserCheck },
     { id: 'workbook_orders', label: 'Workbook Orders', icon: ShoppingBag },
     { id: 'students', label: 'Student Management', icon: Users },

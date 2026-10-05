@@ -141,6 +141,24 @@ try {
         (new App\Controllers\PublicActionsController())->getFreeTrialAttempts();
     }
 
+    // New Applicant Leads (Public Submission & Admin Management)
+    if (($uri === '/api/public/applicant-leads' || $uri === '/api/applicant-leads') && $method === 'POST') {
+        (new App\Controllers\PublicActionsController())->saveApplicantLead();
+    }
+    if (($uri === '/api/applicant-leads' || $uri === '/api/admin/applicant-leads') && $method === 'GET') {
+        (new App\Controllers\PublicActionsController())->getApplicantLeads();
+    }
+    if (preg_match('#^/api/applicant-leads/(\d+)/status$#', $uri, $m) && ($method === 'PUT' || $method === 'POST')) {
+        (new App\Controllers\PublicActionsController())->updateApplicantLeadStatus((int)$m[1]);
+    }
+    if (preg_match('#^/api/applicant-leads/(\d+)$#', $uri, $m)) {
+        if ($method === 'PUT' || $method === 'POST') {
+            (new App\Controllers\PublicActionsController())->updateApplicantLeadStatus((int)$m[1]);
+        } elseif ($method === 'DELETE') {
+            (new App\Controllers\PublicActionsController())->deleteApplicantLead((int)$m[1]);
+        }
+    }
+
     // 2. User Routes
     if ($uri === '/api/users/teachers' && $method === 'GET') {
         (new App\Controllers\UserController())->getTeachers();

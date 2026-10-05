@@ -38,6 +38,7 @@ import { ContactPage } from './pages/public/ContactPage';
 import { SuperAdminOverview } from './pages/superadmin/SuperAdminOverview';
 import { SchoolManagement } from './pages/superadmin/SchoolManagement';
 import { CoordinatorManagement } from './pages/superadmin/CoordinatorManagement';
+import { ApplicantLeadsManagement } from './pages/superadmin/ApplicantLeadsManagement';
 import { WorkbookOrdersManagement } from './pages/superadmin/WorkbookOrdersManagement';
 import { UserManagement } from './pages/superadmin/UserManagement';
 import { StudentManagement } from './pages/superadmin/StudentManagement';
@@ -615,6 +616,10 @@ export const App = () => {
         case 'payment_settings':
         case 'payment_orders':
           return <SuperAdminPaymentManager onNavigateTab={setCurrentTab} />;
+        case 'applicant_leads':
+        case 'applicant-leads':
+        case 'applicant_registrations':
+          return <ApplicantLeadsManagement />;
         case 'schools':
           return <SchoolManagement />;
         case 'coordinators':
