@@ -625,6 +625,11 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
           setIsSubmitted(false);
           if (onExitToDashboard) onExitToDashboard();
         }}
+        onGoToList={() => {
+          setIsTestRunning(false);
+          setIsSubmitted(false);
+          if (onExitToDashboard) onExitToDashboard();
+        }}
         onViewAnalysis={() => {
           if (onNavigateTab) onNavigateTab('performance');
         }}

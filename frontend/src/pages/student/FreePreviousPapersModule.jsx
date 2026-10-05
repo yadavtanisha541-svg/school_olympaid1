@@ -859,6 +859,10 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
           setCurrentStep('configure');
           if (onExitToDashboard) onExitToDashboard();
         }}
+        onGoToList={() => {
+          setCurrentStep('configure');
+          if (onExitToDashboard) onExitToDashboard();
+        }}
         onViewAnalysis={() => {
           if (onNavigateTab) onNavigateTab('performance');
         }}

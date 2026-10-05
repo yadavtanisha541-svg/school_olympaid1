@@ -14,12 +14,23 @@ import {
   Check,
   X,
   HelpCircle,
-  FileText
+  FileText,
+  Globe,
+  Calendar,
+  BarChart2
 } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
 
-export const DetailedSolutionsPage = ({ attemptId, onBack, initialSolutions, initialAttemptMeta }) => {
+export const DetailedSolutionsPage = ({
+  attemptId,
+  onBack,
+  onViewAnalysis,
+  onGoToList,
+  onNavigateTab,
+  initialSolutions,
+  initialAttemptMeta
+}) => {
   const [solutions, setSolutions] = useState(initialSolutions || []);
   const [attemptMeta, setAttemptMeta] = useState(initialAttemptMeta || null);
   const [loading, setLoading] = useState(!initialSolutions || initialSolutions.length === 0);
@@ -211,9 +222,15 @@ export const DetailedSolutionsPage = ({ attemptId, onBack, initialSolutions, ini
   const wrongCount = wrongQuestions.length;
   const unattemptedCount = unattemptedQuestions.length;
 
-  const totalMarks = attemptMeta?.total_marks || attemptMeta?.exam_total_marks || (totalQuestionsCount > 0 ? totalQuestionsCount : 60);
-  const scoreObtained = attemptMeta?.score !== undefined ? attemptMeta.score : correctCount;
-  const cutoffMarks = attemptMeta?.cutoff_marks || Math.round(totalMarks * 0.7);
+  const calculatedMaxMarks = normalizedSolutions.reduce((sum, q) => sum + (Number(q.marks) || 1), 0);
+  const totalMarks = Number(attemptMeta?.total_marks) || Number(attemptMeta?.exam_total_marks) || calculatedMaxMarks || (totalQuestionsCount > 0 ? totalQuestionsCount : 10);
+  
+  let scoreObtained = correctCount;
+  if (attemptMeta?.score !== undefined && !isNaN(Number(attemptMeta.score))) {
+    const rawScore = Number(attemptMeta.score);
+    scoreObtained = (rawScore <= totalMarks) ? rawScore : correctCount;
+  }
+  const cutoffMarks = attemptMeta?.cutoff_marks || Math.round(totalMarks * 0.4) || 1;
   const timeTakenSecs = attemptMeta?.time_taken_seconds || attemptMeta?.time_spent_seconds || 1800;
   const totalDurationSecs = (attemptMeta?.duration_minutes || 60) * 60;
 
@@ -228,6 +245,24 @@ export const DetailedSolutionsPage = ({ attemptId, onBack, initialSolutions, ini
 
   const timeFormatted = `${formatTimeFull(timeTakenSecs)} / ${formatTimeFull(totalDurationSecs)}`;
   const examTitle = attemptMeta?.exam_title || attemptMeta?.title || 'Olympiad Exam';
+
+  const handleViewAnalysis = () => {
+    if (onViewAnalysis) {
+      onViewAnalysis();
+    } else if (onNavigateTab) {
+      onNavigateTab('performance');
+    }
+  };
+
+  const handleGoToList = () => {
+    if (onGoToList) {
+      onGoToList();
+    } else if (onBack) {
+      onBack();
+    } else if (onNavigateTab) {
+      onNavigateTab('available_exams');
+    }
+  };
 
   // Filtered solutions to render based on current radio selection
   const filteredSolutions = useMemo(() => {
@@ -262,17 +297,40 @@ export const DetailedSolutionsPage = ({ attemptId, onBack, initialSolutions, ini
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center flex-wrap gap-2 sm:gap-2.5">
+          {/* View Analysis Button */}
+          <button
+            type="button"
+            onClick={handleViewAnalysis}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-indigo-200 bg-white hover:bg-indigo-50 text-indigo-700 font-bold text-xs shadow-2xs transition-all cursor-pointer"
+          >
+            <Globe className="w-3.5 h-3.5 text-indigo-600" />
+            <span>View Analysis</span>
+          </button>
+
+          {/* Go to Test List Button */}
+          <button
+            type="button"
+            onClick={handleGoToList}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-all cursor-pointer"
+          >
+            <Calendar className="w-3.5 h-3.5 text-slate-600" />
+            <span>Go to Test List</span>
+          </button>
+
+          {/* Back Button */}
           {onBack && (
             <button
               type="button"
               onClick={onBack}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-all cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back</span>
             </button>
           )}
+
+          {/* Print Solutions Button */}
           <button
             type="button"
             onClick={() => window.print()}

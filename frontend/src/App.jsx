@@ -552,6 +552,11 @@ export const App = () => {
             setActiveResultAttemptId(null);
             setCurrentTab('overview');
           }}
+          onGoToList={() => {
+            setActiveResultAttemptId(null);
+            setActiveSolutionAttemptId(null);
+            setCurrentTab('available_exams');
+          }}
           onViewAnalysis={() => {
             setCurrentTab('performance');
           }}
@@ -567,6 +572,11 @@ export const App = () => {
           onBack={() => {
             setActiveSolutionAttemptId(null);
             setCurrentTab('my_content');
+          }}
+          onGoToList={() => {
+            setActiveResultAttemptId(null);
+            setActiveSolutionAttemptId(null);
+            setCurrentTab('available_exams');
           }}
           onViewAnalysis={() => {
             setActiveResultAttemptId(activeSolutionAttemptId);
@@ -728,6 +738,11 @@ export const App = () => {
               onBack={() => {
                 setActiveSolutionAttemptId(null);
                 setCurrentTab('my_content');
+              }}
+              onGoToList={() => {
+                setActiveResultAttemptId(null);
+                setActiveSolutionAttemptId(null);
+                setCurrentTab('available_exams');
               }}
               onViewAnalysis={() => {
                 setActiveResultAttemptId(activeSolutionAttemptId);
