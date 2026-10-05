@@ -124,12 +124,43 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
   const fetchResultsStream = async (showLoading = false) => {
     try {
       if (showLoading) setResultsLoading(true);
-      const res = await apiClient.get('/results', {
-        scope: 'all'
+      let apiList = [];
+      try {
+        const res = await apiClient.get('/results', { scope: 'all' });
+        if (res.success && Array.isArray(res.data)) {
+          apiList = res.data;
+        }
+      } catch (err) {}
+
+      // Also merge local client-side saved attempts for instant live reflection
+      const localKeys = ['olympiadhub_student_attempts', 'olympiadhub_db_results', 'student_test_attempts', 'test_generator_attempts'];
+      let localList = [];
+      localKeys.forEach((key) => {
+        try {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) localList = [...localList, ...parsed];
+            else if (parsed && typeof parsed === 'object') localList.push(parsed);
+          }
+        } catch (e) {}
       });
-      if (res.success && Array.isArray(res.data)) {
-        setAllStudentResults(res.data);
-      }
+
+      const combined = [...localList, ...apiList];
+      const seen = new Set();
+      const unique = [];
+      combined.forEach((r) => {
+        if (!r) return;
+        const uid = r.id || r.attempt_id || `${r.student_login_id || r.student_name}_${r.exam_title}_${r.submitted_at}`;
+        if (!seen.has(uid)) {
+          seen.add(uid);
+          unique.push(r);
+        }
+      });
+
+      // Sort newest first
+      unique.sort((a, b) => new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0));
+      setAllStudentResults(unique);
     } catch (e) {
       console.error('Error fetching student results stream:', e);
     } finally {

@@ -49,14 +49,46 @@ export const ExamResultsPage = () => {
     try {
       setLoading(true);
       const [resRes, exRes] = await Promise.all([
-        apiClient.get('/results'),
-        apiClient.get('/exams')
+        apiClient.get('/results').catch(() => ({ success: false, data: [] })),
+        apiClient.get('/exams').catch(() => ({ success: false, data: [] }))
       ]);
-      if (resRes.success && resRes.data) {
-        setResults(resRes.data || []);
+
+      let apiResults = [];
+      if (resRes.success && Array.isArray(resRes.data)) {
+        apiResults = resRes.data;
       }
-      if (exRes.success) {
-        setExams(exRes.data || []);
+
+      // Merge client saved attempts
+      const localKeys = ['olympiadhub_student_attempts', 'olympiadhub_db_results', 'student_test_attempts', 'test_generator_attempts'];
+      let localList = [];
+      localKeys.forEach((key) => {
+        try {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) localList = [...localList, ...parsed];
+            else if (parsed && typeof parsed === 'object') localList.push(parsed);
+          }
+        } catch (e) {}
+      });
+
+      const combined = [...localList, ...apiResults];
+      const seen = new Set();
+      const unique = [];
+      combined.forEach((r) => {
+        if (!r) return;
+        const uid = r.id || r.attempt_id || `${r.student_login_id || r.student_name}_${r.exam_title}_${r.submitted_at}`;
+        if (!seen.has(uid)) {
+          seen.add(uid);
+          unique.push(r);
+        }
+      });
+
+      unique.sort((a, b) => new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0));
+      setResults(unique);
+
+      if (exRes.success && Array.isArray(exRes.data)) {
+        setExams(exRes.data);
       }
     } catch (err) {
       console.error('Failed to load exam results:', err);

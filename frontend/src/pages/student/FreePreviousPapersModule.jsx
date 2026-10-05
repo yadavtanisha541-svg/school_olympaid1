@@ -467,17 +467,55 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
       questions: detailedBreakdown
     };
 
+    // Save attempt to client storage
+    const newAttemptRecord = {
+      id: Date.now(),
+      attempt_id: Date.now(),
+      exam_id: activePaper?.id || Date.now(),
+      exam_title: payload.title,
+      title: payload.title,
+      paper_title: payload.title,
+      subject: activePaper?.subjectName || SUBJECTS_CONFIG[selectedSubjectKey]?.name || 'Olympiad',
+      subject_name: activePaper?.subjectName || SUBJECTS_CONFIG[selectedSubjectKey]?.name || 'Olympiad',
+      subject_code: selectedSubjectKey?.toUpperCase() || 'IMO',
+      score: earnedMarks,
+      total_marks: totalMarks,
+      total_questions: totalQ,
+      correct_count: correctCount,
+      incorrect_count: Math.max(0, answeredCount - correctCount),
+      unanswered_count: unansweredCount,
+      percentage: pct,
+      accuracy: answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : pct,
+      passed: pct >= 40,
+      time_taken_seconds: timeSpentSec,
+      submitted_at: new Date().toISOString().replace('T', ' ').substring(0, 19),
+      student_id: user?.id || 1,
+      student_name: user?.full_name || user?.name || 'Candidate',
+      student_login_id: user?.login_id || 'STU-001',
+      student_email: user?.email || '',
+      student_school: user?.school_name || 'Independent Candidate',
+      class_name: selectedClass,
+      questions: detailedBreakdown
+    };
+
+    try {
+      const existing = JSON.parse(localStorage.getItem('olympiadhub_student_attempts') || '[]');
+      localStorage.setItem('olympiadhub_student_attempts', JSON.stringify([newAttemptRecord, ...existing]));
+      const existingResults = JSON.parse(localStorage.getItem('olympiadhub_db_results') || '[]');
+      localStorage.setItem('olympiadhub_db_results', JSON.stringify([newAttemptRecord, ...existingResults]));
+    } catch (e) {}
+
     apiClient.post('/test-generator/submit', payload)
       .then((data) => {
-        if (data && data.success) {
-          setSaveStatus('saved');
-        } else {
-          setSaveStatus('saved');
-        }
+        setSaveStatus('saved');
+        window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: newAttemptRecord }));
+        window.dispatchEvent(new Event('exam-submitted'));
       })
       .catch((err) => {
         console.warn('Auto-save result error:', err);
         setSaveStatus('saved');
+        window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: newAttemptRecord }));
+        window.dispatchEvent(new Event('exam-submitted'));
       });
   };
 

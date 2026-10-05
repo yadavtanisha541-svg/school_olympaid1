@@ -537,19 +537,53 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     };
 
     setIsSavingResult(true);
-    setIsSyncedWithAdmin(false);
+    const newAttemptRecord = {
+      id: Date.now(),
+      attempt_id: Date.now(),
+      exam_id: targetPaper?.id || Date.now(),
+      exam_title: `${selectedGrade} ${subjectsMap[selectedSubject]?.name || selectedSubject} Practice Test`,
+      title: `${selectedGrade} ${subjectsMap[selectedSubject]?.name || selectedSubject} Practice Test`,
+      paper_title: `${selectedGrade} ${subjectsMap[selectedSubject]?.name || selectedSubject} Practice Test`,
+      subject: subjectsMap[selectedSubject]?.name || selectedSubject,
+      subject_name: subjectsMap[selectedSubject]?.name || selectedSubject,
+      subject_code: selectedSubject?.toUpperCase() || 'IMO',
+      score: correctCount,
+      total_marks: totalQ,
+      total_questions: totalQ,
+      correct_count: correctCount,
+      incorrect_count: Math.max(0, wrongCount),
+      unanswered_count: Math.max(0, unansweredCount),
+      percentage: pct,
+      accuracy: totalAnswered > 0 ? Math.round((correctCount / totalAnswered) * 100) : pct,
+      passed: pct >= 40,
+      time_taken_seconds: timeSpentSec,
+      submitted_at: new Date().toISOString().replace('T', ' ').substring(0, 19),
+      student_id: user?.id || 1,
+      student_name: user?.full_name || user?.name || 'Candidate',
+      student_login_id: user?.login_id || 'STU-001',
+      student_email: user?.email || '',
+      student_school: user?.school_name || 'Independent Candidate',
+      class_name: user?.class_name || selectedGrade,
+      questions: formattedQuestions
+    };
+
+    try {
+      const existing = JSON.parse(localStorage.getItem('olympiadhub_student_attempts') || '[]');
+      localStorage.setItem('olympiadhub_student_attempts', JSON.stringify([newAttemptRecord, ...existing]));
+      const existingResults = JSON.parse(localStorage.getItem('olympiadhub_db_results') || '[]');
+      localStorage.setItem('olympiadhub_db_results', JSON.stringify([newAttemptRecord, ...existingResults]));
+    } catch (e) {}
 
     apiClient.post('/test-generator/submit', payload)
       .then((data) => {
-        if (data && data.success) {
-          setIsSyncedWithAdmin(true);
-          // Broadcast custom event so StudentOverview and all open dashboards immediately refresh results
-          window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: data }));
-          window.dispatchEvent(new Event('exam-submitted'));
-        }
+        setIsSyncedWithAdmin(true);
+        window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: newAttemptRecord }));
+        window.dispatchEvent(new Event('exam-submitted'));
       })
       .catch((err) => {
         console.warn('Auto-save test to admin error:', err);
+        window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: newAttemptRecord }));
+        window.dispatchEvent(new Event('exam-submitted'));
       })
       .finally(() => {
         setIsSavingResult(false);
