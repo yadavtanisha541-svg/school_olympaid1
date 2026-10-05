@@ -295,10 +295,14 @@ class ResultController {
         $stmt = $db->prepare("
             SELECT ea.*, e.title as exam_title, e.exam_code, e.exam_type, e.total_marks as exam_total_marks,
                    e.passing_percentage, e.solution_visibility, e.certificate_eligibility,
+                   u.full_name as student_name, u.login_id as student_login_id,
+                   s.name as subject_name, s.code as subject_code,
                    tu.full_name as teacher_author_name,
                    c.certificate_number, c.id as certificate_id
             FROM exam_attempts ea
             JOIN exams e ON ea.exam_id = e.id
+            JOIN users u ON ea.student_id = u.id
+            LEFT JOIN subjects s ON e.subject_id = s.id
             LEFT JOIN users tu ON e.created_by = tu.id
             LEFT JOIN certificates c ON ea.id = c.attempt_id
             WHERE ea.student_id = ? AND ea.status IN ('submitted', 'timed_out', 'terminated')

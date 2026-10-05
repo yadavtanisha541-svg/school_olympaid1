@@ -46,10 +46,10 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
   const fetchAnalytics = useCallback(async () => {
     setLoading(true);
     try {
-      const currentStudentId = user?.id;
-      const currentStudentLoginId = (user?.login_id || '').toLowerCase();
-      const currentStudentEmail = (user?.email || '').toLowerCase();
-      const currentStudentName = (user?.full_name || user?.name || user?.username || '').toLowerCase();
+      const currentStudentId = user?.id ? String(user.id) : null;
+      const currentStudentLoginId = (user?.login_id || '').toLowerCase().trim();
+      const currentStudentEmail = (user?.email || '').toLowerCase().trim();
+      const currentStudentName = (user?.full_name || user?.name || user?.username || '').toLowerCase().trim();
 
       let apiAttempts = [];
 
@@ -81,12 +81,13 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
         }
       } catch (err) {}
 
-      // 4. Read client-side saved attempts with STRICT filtering for the active student
+      // 4. Read client-side saved attempts for the active student
       const localKeys = [
         'olympiadhub_student_attempts',
         'student_test_attempts',
         'test_generator_attempts',
-        'olympiadhub_db_results'
+        'olympiadhub_db_results',
+        'olympiadhub_last_submitted_exam'
       ];
 
       let localAttempts = [];
@@ -99,15 +100,18 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
             list.forEach((item) => {
               if (!item) return;
 
-              // STRICT user filter: only include if matches current student
+              // Match student
+              const itemSid = item.student_id ? String(item.student_id) : (item.user_id ? String(item.user_id) : null);
+              const itemLid = (item.student_login_id || item.login_id || '').toLowerCase().trim();
+              const itemEmail = (item.student_email || item.email || '').toLowerCase().trim();
+              const itemName = (item.student_name || item.name || '').toLowerCase().trim();
+
               const isMatch = 
-                (currentStudentId && (String(item.student_id) === String(currentStudentId) || String(item.user_id) === String(currentStudentId))) ||
-                (currentStudentLoginId && (
-                  (item.student_login_id && item.student_login_id.toLowerCase() === currentStudentLoginId) ||
-                  (item.login_id && item.login_id.toLowerCase() === currentStudentLoginId)
-                )) ||
-                (currentStudentEmail && (item.student_email && item.student_email.toLowerCase() === currentStudentEmail)) ||
-                (currentStudentName && (item.student_name && item.student_name.toLowerCase() === currentStudentName));
+                (currentStudentId && itemSid && itemSid === currentStudentId) ||
+                (currentStudentLoginId && itemLid && itemLid === currentStudentLoginId) ||
+                (currentStudentEmail && itemEmail && itemEmail === currentStudentEmail) ||
+                (currentStudentName && itemName && (itemName === currentStudentName || itemName.includes(currentStudentName) || currentStudentName.includes(itemName))) ||
+                (!itemSid && !itemLid && key === 'olympiadhub_last_submitted_exam');
 
               if (isMatch) {
                 localAttempts.push(item);
@@ -121,10 +125,12 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
       const validApiAttempts = apiAttempts.filter((att) => {
         if (!att) return false;
         if (user?.role === 'student') {
-          if (att.student_id && currentStudentId && String(att.student_id) !== String(currentStudentId)) {
+          const attSid = att.student_id ? String(att.student_id) : null;
+          const attLid = (att.student_login_id || att.login_id || '').toLowerCase().trim();
+          if (attSid && currentStudentId && attSid !== currentStudentId) {
             return false;
           }
-          if (att.student_login_id && currentStudentLoginId && att.student_login_id.toLowerCase() !== currentStudentLoginId) {
+          if (attLid && currentStudentLoginId && attLid !== currentStudentLoginId) {
             return false;
           }
         }
@@ -132,7 +138,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
       });
 
       // Merge and deduplicate attempts by id or timestamp/title
-      const combined = [...localAttempts, ...validApiAttempts];
+      const combined = [...validApiAttempts, ...localAttempts];
       const seenIds = new Set();
       const uniqueAttempts = [];
 

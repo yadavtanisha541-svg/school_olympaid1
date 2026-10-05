@@ -222,17 +222,20 @@ class AnalyticsController {
         $availStmt->execute([$user['class_id'], $user['class_id'], $user['id']]);
         $availableExamsCount = (int)$availStmt->fetchColumn();
 
-        // Recent attempts
+        // Recent attempts with complete fields
         $recentStmt = $db->prepare("
-            SELECT ea.id, ea.score, ea.percentage, ea.passed, ea.submitted_at, ea.rank_exam,
-                   e.title as exam_title, e.exam_code, e.total_marks,
-                   c.certificate_number
+            SELECT ea.*, e.title as exam_title, e.exam_code, e.exam_type, e.total_marks as exam_total_marks,
+                   u.full_name as student_name, u.login_id as student_login_id,
+                   s.name as subject_name, s.code as subject_code,
+                   c.certificate_number, c.id as certificate_id
             FROM exam_attempts ea
             JOIN exams e ON ea.exam_id = e.id
+            JOIN users u ON ea.student_id = u.id
+            LEFT JOIN subjects s ON e.subject_id = s.id
             LEFT JOIN certificates c ON ea.id = c.attempt_id
-            WHERE ea.student_id = ? AND ea.status = 'submitted'
+            WHERE ea.student_id = ? AND ea.status IN ('submitted', 'timed_out', 'terminated')
             ORDER BY ea.submitted_at DESC
-            LIMIT 5
+            LIMIT 20
         ");
         $recentStmt->execute([$studentId]);
         $recentAttempts = $recentStmt->fetchAll();
@@ -247,20 +250,20 @@ class AnalyticsController {
             JOIN exam_attempts ea ON sa.attempt_id = ea.id
             JOIN questions q ON sa.question_id = q.id
             JOIN subjects s ON q.subject_id = s.id
-            WHERE ea.student_id = ? AND ea.status = 'submitted'
+            WHERE ea.student_id = ? AND ea.status IN ('submitted', 'timed_out', 'terminated')
             GROUP BY s.id, s.name, s.color
         ");
         $subjProgressStmt->execute([$studentId]);
         $subjectProgress = $subjProgressStmt->fetchAll();
 
-        // Score History Trend (last 6 exams)
+        // Score History Trend (all submitted exams)
         $trendStmt = $db->prepare("
-            SELECT ea.id, ea.percentage, ea.submitted_at, e.title as exam_title
+            SELECT ea.id, ea.percentage, ea.score, ea.total_questions, ea.submitted_at, e.title as exam_title
             FROM exam_attempts ea
             JOIN exams e ON ea.exam_id = e.id
-            WHERE ea.student_id = ? AND ea.status = 'submitted'
+            WHERE ea.student_id = ? AND ea.status IN ('submitted', 'timed_out', 'terminated')
             ORDER BY ea.submitted_at ASC
-            LIMIT 10
+            LIMIT 20
         ");
         $trendStmt->execute([$studentId]);
         $scoreTrend = $trendStmt->fetchAll();
@@ -271,7 +274,7 @@ class AnalyticsController {
                 'total_passed' => $totalPassed,
                 'avg_score' => $avgScore,
                 'best_score' => $bestScore,
-                'best_rank' => $bestRank,
+                'best_rank' => $bestRank ?: 1,
                 'certificates_count' => $certCount,
                 'available_exams' => $availableExamsCount
             ],

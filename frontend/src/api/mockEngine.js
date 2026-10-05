@@ -2046,7 +2046,38 @@ export const mockEngine = {
           }
         };
       }
-      if (sub) {
+      if (cleanEndpoint.includes('/history') || sub === 'history') {
+        const user = JSON.parse(sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user') || '{}');
+        const localKeys = [
+          'olympiadhub_last_submitted_exam',
+          'olympiadhub_student_attempts',
+          'olympiadhub_db_results',
+          'test_generator_attempts',
+          'student_test_attempts'
+        ];
+        let allAtts = [];
+        localKeys.forEach(k => {
+          try {
+            const raw = localStorage.getItem(k);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) allAtts.push(...parsed);
+              else if (parsed && typeof parsed === 'object') allAtts.push(parsed);
+            }
+          } catch (e) {}
+        });
+        getDb('results')?.forEach(r => allAtts.push(r));
+
+        const matched = allAtts.filter(a => {
+          if (!user || (!user.id && !user.login_id && !user.email)) return true;
+          return (user.id && (String(a.student_id) === String(user.id) || String(a.user_id) === String(user.id))) ||
+                 (user.login_id && ((a.student_login_id && a.student_login_id.toLowerCase() === user.login_id.toLowerCase()) || (a.login_id && a.login_id.toLowerCase() === user.login_id.toLowerCase()))) ||
+                 (user.email && a.student_email && a.student_email.toLowerCase() === user.email.toLowerCase()) ||
+                 (user.full_name && a.student_name && a.student_name.toLowerCase() === user.full_name.toLowerCase());
+        });
+        return { success: true, data: matched.length > 0 ? matched : allAtts };
+      }
+      if (sub && sub !== 'all') {
         const found = results.find((r) => String(r.id) === String(sub));
         return { success: true, data: found || results[0] };
       }
