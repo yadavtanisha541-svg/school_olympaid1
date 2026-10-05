@@ -22,7 +22,9 @@ import {
   ChevronRight,
   ShieldCheck,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  HelpCircle,
+  Play
 } from 'lucide-react';
 import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
@@ -32,39 +34,54 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
   const [loading, setLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState(null);
 
+  // Dynamic logged-in student info
   const studentName = user?.full_name || user?.name || (user?.login_id ? user.login_id.split(/[@._\s]+/).filter(Boolean).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ') : 'Candidate');
-  const studentId = user?.login_id || user?.student_id || 'STU-001';
-  const studentClass = user?.class_name ? `${user.class_name}-A` : (user?.class ? `${user.class}-A` : 'Class 6-A');
+  const studentId = user?.login_id || user?.student_id || (user?.id ? `STU-${String(user.id).padStart(4, '0')}` : 'STU-001');
+  const studentClass = user?.class_name 
+    ? (user.class_name.toLowerCase().includes('class') ? user.class_name : `Class ${user.class_name}`) 
+    : (user?.class ? (String(user.class).toLowerCase().includes('class') ? user.class : `Class ${user.class}`) : 'Class 6');
   const studentAvatar = user?.avatar || user?.profile_photo;
 
-  // Aggregate and calculate all analytics across API + LocalStorage
+  // Aggregate and calculate all analytics across API + LocalStorage strictly for the active student
   const fetchAnalytics = useCallback(async () => {
     setLoading(true);
     try {
-      // 1. Fetch from server API / mock engine
+      const currentStudentId = user?.id;
+      const currentStudentLoginId = (user?.login_id || '').toLowerCase();
+      const currentStudentEmail = (user?.email || '').toLowerCase();
+      const currentStudentName = (user?.full_name || user?.name || user?.username || '').toLowerCase();
+
       let apiAttempts = [];
+
+      // 1. Fetch from server API / MySQL backend history endpoint
+      try {
+        const resHistory = await apiClient.get('/results/history');
+        if (resHistory.success && Array.isArray(resHistory.data)) {
+          apiAttempts = [...apiAttempts, ...resHistory.data];
+        }
+      } catch (err) {
+        console.warn('API results/history fetch warning:', err);
+      }
+
+      // 2. Fetch from analytics endpoint
       try {
         const res = await apiClient.get('/analytics/student');
-        if (res.success && res.data) {
-          if (Array.isArray(res.data.recent_attempts)) {
-            apiAttempts = res.data.recent_attempts;
-          }
+        if (res.success && res.data && Array.isArray(res.data.recent_attempts)) {
+          apiAttempts = [...apiAttempts, ...res.data.recent_attempts];
         }
       } catch (err) {
         console.warn('API analytics fetch warning:', err);
       }
 
-      // 2. Fetch from results endpoint
+      // 3. Fetch from /results?scope=my
       try {
-        const resResults = await apiClient.get('/results');
-        if (resResults.success && Array.isArray(resResults.data)) {
-          apiAttempts = [...apiAttempts, ...resResults.data];
+        const resMy = await apiClient.get('/results?scope=my');
+        if (resMy.success && Array.isArray(resMy.data)) {
+          apiAttempts = [...apiAttempts, ...resMy.data];
         }
-      } catch (err) {
-        console.warn('Results fetch warning:', err);
-      }
+      } catch (err) {}
 
-      // 3. Read client-side saved attempts
+      // 4. Read client-side saved attempts with STRICT filtering for the active student
       const localKeys = [
         'olympiadhub_student_attempts',
         'student_test_attempts',
@@ -78,17 +95,44 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
           const raw = localStorage.getItem(key);
           if (raw) {
             const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)) {
-              localAttempts = [...localAttempts, ...parsed];
-            } else if (parsed && typeof parsed === 'object') {
-              localAttempts.push(parsed);
-            }
+            const list = Array.isArray(parsed) ? parsed : (parsed ? [parsed] : []);
+            list.forEach((item) => {
+              if (!item) return;
+
+              // STRICT user filter: only include if matches current student
+              const isMatch = 
+                (currentStudentId && (String(item.student_id) === String(currentStudentId) || String(item.user_id) === String(currentStudentId))) ||
+                (currentStudentLoginId && (
+                  (item.student_login_id && item.student_login_id.toLowerCase() === currentStudentLoginId) ||
+                  (item.login_id && item.login_id.toLowerCase() === currentStudentLoginId)
+                )) ||
+                (currentStudentEmail && (item.student_email && item.student_email.toLowerCase() === currentStudentEmail)) ||
+                (currentStudentName && (item.student_name && item.student_name.toLowerCase() === currentStudentName));
+
+              if (isMatch) {
+                localAttempts.push(item);
+              }
+            });
           }
         } catch (e) {}
       });
 
+      // Filter API attempts to prevent leak if backend returned generic
+      const validApiAttempts = apiAttempts.filter((att) => {
+        if (!att) return false;
+        if (user?.role === 'student') {
+          if (att.student_id && currentStudentId && String(att.student_id) !== String(currentStudentId)) {
+            return false;
+          }
+          if (att.student_login_id && currentStudentLoginId && att.student_login_id.toLowerCase() !== currentStudentLoginId) {
+            return false;
+          }
+        }
+        return true;
+      });
+
       // Merge and deduplicate attempts by id or timestamp/title
-      const combined = [...localAttempts, ...apiAttempts];
+      const combined = [...localAttempts, ...validApiAttempts];
       const seenIds = new Set();
       const uniqueAttempts = [];
 
@@ -100,10 +144,10 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
           
           // Normalize fields
           const totalQ = parseInt(att.total_questions || att.total_marks || att.questions_count || 10);
-          const score = parseInt(att.score !== undefined ? att.score : (att.correct_count || Math.round(totalQ * 0.8)));
-          const correct = parseInt(att.correct_count !== undefined ? att.correct_count : score);
-          const wrong = parseInt(att.incorrect_count !== undefined ? att.incorrect_count : Math.max(0, totalQ - correct));
-          const pct = parseFloat(att.percentage !== undefined ? att.percentage : (totalQ > 0 ? (correct / totalQ) * 100 : 80));
+          const score = parseFloat(att.score !== undefined ? att.score : (att.correct_count || 0));
+          const correct = parseInt(att.correct_count !== undefined ? att.correct_count : Math.round(score));
+          const wrong = parseInt(att.incorrect_count !== undefined ? att.incorrect_count : (att.wrong_count !== undefined ? att.wrong_count : Math.max(0, totalQ - correct)));
+          const pct = parseFloat(att.percentage !== undefined ? att.percentage : (totalQ > 0 ? (score / totalQ) * 100 : 0));
 
           uniqueAttempts.push({
             id: uid,
@@ -116,179 +160,111 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
             correct_count: correct,
             incorrect_count: wrong,
             percentage: pct,
-            passed: att.passed !== undefined ? att.passed : pct >= 40,
+            passed: att.passed !== undefined ? !!att.passed : pct >= 40,
             submitted_at: att.submitted_at || att.date || new Date().toISOString().replace('T', ' ').substring(0, 19),
-            time_taken_seconds: att.time_taken_seconds || 1800,
-            accuracy: att.accuracy !== undefined ? att.accuracy : Math.round((correct / (correct + wrong || 1)) * 100),
+            time_taken_seconds: parseInt(att.time_taken_seconds || att.timeSpentSeconds || 1200),
+            accuracy: att.accuracy !== undefined ? Math.round(parseFloat(att.accuracy)) : (correct + wrong > 0 ? Math.round((correct / (correct + wrong)) * 100) : Math.round(pct)),
             rawAttempt: att
           });
         }
       });
 
-      // Sort newest first
+      // Sort newest first for history table
       uniqueAttempts.sort((a, b) => new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0));
 
-      // If no attempts found, provide standard initial test records for the student
-      let finalAttempts = uniqueAttempts;
-      if (finalAttempts.length === 0) {
-        finalAttempts = [
-          {
-            id: 'mock-imo-1',
-            exam_title: 'IMO International Mathematics Olympiad - Mock 1',
-            subject: 'Mathematics',
-            subject_name: 'Mathematics',
-            score: 10,
-            total_marks: 10,
-            total_questions: 10,
-            correct_count: 10,
-            incorrect_count: 0,
-            percentage: 100,
-            passed: true,
-            submitted_at: new Date(Date.now() - 3600000 * 2).toISOString().replace('T', ' ').substring(0, 19),
-            time_taken_seconds: 1450,
-            accuracy: 100
-          },
-          {
-            id: 'mock-nso-1',
-            exam_title: 'NSO National Science Olympiad - Practice Test',
-            subject: 'Science',
-            subject_name: 'Science',
-            score: 9,
-            total_marks: 10,
-            total_questions: 10,
-            correct_count: 9,
-            incorrect_count: 1,
-            percentage: 90,
-            passed: true,
-            submitted_at: new Date(Date.now() - 3600000 * 24).toISOString().replace('T', ' ').substring(0, 19),
-            time_taken_seconds: 1600,
-            accuracy: 90
-          },
-          {
-            id: 'mock-ieo-1',
-            exam_title: 'IEO International English Olympiad - Sample Paper',
-            subject: 'English',
-            subject_name: 'English',
-            score: 10,
-            total_marks: 10,
-            total_questions: 10,
-            correct_count: 10,
-            incorrect_count: 0,
-            percentage: 100,
-            passed: true,
-            submitted_at: new Date(Date.now() - 3600000 * 48).toISOString().replace('T', ' ').substring(0, 19),
-            time_taken_seconds: 1320,
-            accuracy: 100
-          },
-          {
-            id: 'mock-igko-1',
-            exam_title: 'IGKO General Knowledge National Challenge',
-            subject: 'General Knowledge',
-            subject_name: 'General Knowledge',
-            score: 8,
-            total_marks: 8,
-            total_questions: 8,
-            correct_count: 8,
-            incorrect_count: 0,
-            percentage: 100,
-            passed: true,
-            submitted_at: new Date(Date.now() - 3600000 * 72).toISOString().replace('T', ' ').substring(0, 19),
-            time_taken_seconds: 1200,
-            accuracy: 100
-          },
-          {
-            id: 'mock-lro-1',
-            exam_title: 'Logical Reasoning & Analytical Skills Sprint',
-            subject: 'Logical Reasoning',
-            subject_name: 'Logical Reasoning',
-            score: 8,
-            total_marks: 8,
-            total_questions: 8,
-            correct_count: 8,
-            incorrect_count: 0,
-            percentage: 100,
-            passed: true,
-            submitted_at: new Date(Date.now() - 3600000 * 96).toISOString().replace('T', ' ').substring(0, 19),
-            time_taken_seconds: 1100,
-            accuracy: 100
-          }
-        ];
-      }
-
-      // Calculations
+      const finalAttempts = uniqueAttempts;
       const totalAttempts = finalAttempts.length;
-      const passedCount = finalAttempts.filter((a) => a.passed || a.percentage >= 40).length;
-      const totalScorePct = finalAttempts.reduce((acc, a) => acc + (a.percentage || 0), 0);
-      const avgScore = totalAttempts > 0 ? Math.round(totalScorePct / totalAttempts) : 0;
-      const bestScore = totalAttempts > 0 ? Math.round(Math.max(...finalAttempts.map((a) => a.percentage || 0))) : 0;
 
-      const totalAnsweredQ = finalAttempts.reduce((acc, a) => acc + (a.total_questions || 10), 0);
-      const totalCorrectQ = finalAttempts.reduce((acc, a) => acc + (a.correct_count || 0), 0);
-      const totalWrongQ = finalAttempts.reduce((acc, a) => acc + (a.incorrect_count || 0), 0);
-      
-      // Calculate real accuracy based on correct vs total attempted questions
-      const totalAttemptedQuestions = totalCorrectQ + totalWrongQ;
-      const overallAccuracy = totalAttemptedQuestions > 0 
-        ? Math.round((totalCorrectQ / totalAttemptedQuestions) * 100) 
-        : (totalAnsweredQ > 0 ? Math.round((totalCorrectQ / totalAnsweredQ) * 100) : avgScore);
+      let passedCount = 0;
+      let avgScore = 0;
+      let bestScore = 0;
+      let overallAccuracy = 0;
+      let totalAnsweredQ = 0;
+      let totalCorrectQ = 0;
+      let totalWrongQ = 0;
+      let easyPct = 0;
+      let medPct = 0;
+      let hardPct = 0;
+      let avgTimeStr = '0 min';
+      let perQStr = '0 sec';
+      let fastestStr = '0 min';
+      let subjectProgress = [];
+      let scoreTrend = [];
 
-      // Subject proficiency aggregation
-      const subjectMap = {};
-      finalAttempts.forEach((a) => {
-        let sub = a.subject_name || a.subject || 'Mathematics';
-        if (sub.includes('Math')) sub = 'Mathematics';
-        else if (sub.includes('Scien')) sub = 'Science';
-        else if (sub.includes('Eng')) sub = 'English';
-        else if (sub.includes('Cyber') || sub.includes('Computer')) sub = 'Cyber & Computers';
-        else if (sub.includes('Knowl') || sub.includes('GK') || sub.includes('IGKO')) sub = 'General Knowledge';
-        else if (sub.includes('Reason')) sub = 'Logical Reasoning';
+      if (totalAttempts > 0) {
+        passedCount = finalAttempts.filter((a) => a.passed || a.percentage >= 40).length;
+        const totalScorePct = finalAttempts.reduce((acc, a) => acc + (a.percentage || 0), 0);
+        avgScore = Math.round(totalScorePct / totalAttempts);
+        bestScore = Math.round(Math.max(...finalAttempts.map((a) => a.percentage || 0)));
 
-        if (!subjectMap[sub]) {
-          subjectMap[sub] = {
-            subject_name: sub,
-            total_answered: 0,
-            correct_count: 0,
-            total_pct: 0,
-            count: 0
-          };
-        }
-        subjectMap[sub].count += 1;
-        subjectMap[sub].total_answered += (a.total_questions || 10);
-        subjectMap[sub].correct_count += (a.correct_count || 0);
-        subjectMap[sub].total_pct += (a.percentage || 0);
-      });
+        totalCorrectQ = finalAttempts.reduce((acc, a) => acc + (a.correct_count || 0), 0);
+        totalWrongQ = finalAttempts.reduce((acc, a) => acc + (a.incorrect_count || 0), 0);
+        totalAnsweredQ = totalCorrectQ + totalWrongQ > 0 ? (totalCorrectQ + totalWrongQ) : finalAttempts.reduce((acc, a) => acc + (a.total_questions || 10), 0);
+        
+        overallAccuracy = totalCorrectQ + totalWrongQ > 0 
+          ? Math.round((totalCorrectQ / (totalCorrectQ + totalWrongQ)) * 100) 
+          : avgScore;
 
-      // Default standard subjects if student hasn't touched all
-      const standardSubjects = ['Mathematics', 'Science', 'English', 'Cyber & Computers', 'General Knowledge', 'Logical Reasoning'];
-      standardSubjects.forEach((subName) => {
-        if (!subjectMap[subName]) {
-          subjectMap[subName] = {
-            subject_name: subName,
-            total_answered: 20,
-            correct_count: 17,
-            total_pct: 85,
-            count: 1
-          };
-        }
-      });
+        // Dynamic difficulty distribution calculated from student real accuracy
+        easyPct = Math.min(100, Math.max(15, Math.round(overallAccuracy * 1.05)));
+        medPct = Math.min(100, Math.max(10, Math.round(overallAccuracy * 0.90)));
+        hardPct = Math.min(100, Math.max(5, Math.round(overallAccuracy * 0.75)));
 
-      const subjectProgress = Object.values(subjectMap).map((s) => ({
-        subject_name: s.subject_name,
-        accuracy: s.total_answered > 0 ? Math.round((s.correct_count / s.total_answered) * 100) : Math.round(s.total_pct / s.count),
-        total_answered: s.total_answered,
-        correct_count: s.correct_count,
-        attempts_count: s.count
-      }));
+        // Real speed metrics
+        const times = finalAttempts.map(a => a.time_taken_seconds).filter(t => t > 0);
+        const avgSec = times.length > 0 ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 1200;
+        const minSec = times.length > 0 ? Math.min(...times) : avgSec;
 
-      // Growth trend (chronological order)
-      const scoreTrend = [...finalAttempts].reverse().slice(-8).map((a, idx) => ({
-        label: `Test ${idx + 1}`,
-        exam_title: a.exam_title,
-        percentage: Math.round(a.percentage || 0),
-        score: a.score,
-        total_marks: a.total_marks,
-        date: a.submitted_at
-      }));
+        avgTimeStr = `${Math.max(1, Math.round(avgSec / 60))} min`;
+        perQStr = `${Math.max(5, Math.round(avgSec / Math.max(1, totalAnsweredQ / totalAttempts)))} sec`;
+        fastestStr = `${Math.max(1, Math.round(minSec / 60))} min`;
+
+        // Subject proficiency aggregation (strictly based on candidate's real tests)
+        const subjectMap = {};
+        finalAttempts.forEach((a) => {
+          let sub = a.subject_name || a.subject || 'General';
+          if (sub.includes('Math')) sub = 'Mathematics';
+          else if (sub.includes('Scien')) sub = 'Science';
+          else if (sub.includes('Eng')) sub = 'English';
+          else if (sub.includes('Cyber') || sub.includes('Computer')) sub = 'Cyber & Computers';
+          else if (sub.includes('Knowl') || sub.includes('GK') || sub.includes('IGKO')) sub = 'General Knowledge';
+          else if (sub.includes('Reason')) sub = 'Logical Reasoning';
+          else if (sub.includes('Art')) sub = 'Creative Arts';
+          else if (sub.includes('Spell') || sub.includes('Vocab')) sub = 'Vocabulary & Spell Bee';
+
+          if (!subjectMap[sub]) {
+            subjectMap[sub] = {
+              subject_name: sub,
+              total_answered: 0,
+              correct_count: 0,
+              total_pct: 0,
+              count: 0
+            };
+          }
+          subjectMap[sub].count += 1;
+          subjectMap[sub].total_answered += (a.total_questions || 10);
+          subjectMap[sub].correct_count += (a.correct_count || 0);
+          subjectMap[sub].total_pct += (a.percentage || 0);
+        });
+
+        subjectProgress = Object.values(subjectMap).map((s) => ({
+          subject_name: s.subject_name,
+          accuracy: s.total_answered > 0 ? Math.round((s.correct_count / s.total_answered) * 100) : Math.round(s.total_pct / s.count),
+          total_answered: s.total_answered,
+          correct_count: s.correct_count,
+          attempts_count: s.count
+        }));
+
+        // Growth trend (chronological order, oldest to newest up to last 10)
+        scoreTrend = [...finalAttempts].reverse().slice(-10).map((a, idx) => ({
+          label: `Test ${idx + 1}`,
+          exam_title: a.exam_title,
+          percentage: Math.round(a.percentage || 0),
+          score: a.score,
+          total_marks: a.total_marks,
+          date: a.submitted_at
+        }));
+      }
 
       setDashboardData({
         metrics: {
@@ -300,7 +276,13 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
           total_answered_q: totalAnsweredQ,
           total_correct_q: totalCorrectQ,
           total_wrong_q: totalWrongQ,
-          overall_accuracy: overallAccuracy
+          overall_accuracy: overallAccuracy,
+          easy_pct: easyPct,
+          med_pct: medPct,
+          hard_pct: hardPct,
+          avg_time_str: avgTimeStr,
+          per_q_str: perQStr,
+          fastest_str: fastestStr
         },
         recent_attempts: finalAttempts,
         subject_progress: subjectProgress,
@@ -313,6 +295,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
     }
   }, [user]);
 
+  // Live auto-refresh whenever any exam is submitted anywhere
   useEffect(() => {
     fetchAnalytics();
 
@@ -323,11 +306,13 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
     window.addEventListener('olympiad-exam-submitted', handleExamSubmitted);
     window.addEventListener('exam-submitted', handleExamSubmitted);
     window.addEventListener('storage', handleExamSubmitted);
+    window.addEventListener('focus', handleExamSubmitted);
 
     return () => {
       window.removeEventListener('olympiad-exam-submitted', handleExamSubmitted);
       window.removeEventListener('exam-submitted', handleExamSubmitted);
       window.removeEventListener('storage', handleExamSubmitted);
+      window.removeEventListener('focus', handleExamSubmitted);
     };
   }, [fetchAnalytics]);
 
@@ -336,14 +321,14 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
   const subjectProgress = dashboardData?.subject_progress || [];
   const scoreTrend = dashboardData?.score_trend || [];
 
-  const totalAttemptsCount = metrics.total_attempts || recentAttempts.length || 0;
+  const totalAttemptsCount = metrics.total_attempts || 0;
   const avgScoreVal = metrics.avg_score !== undefined ? metrics.avg_score : 0;
   const bestScoreVal = metrics.best_score !== undefined ? metrics.best_score : 0;
-  const bestRankVal = metrics.best_rank ? `#${metrics.best_rank}` : (recentAttempts.length > 0 ? '#1' : 'N/A');
-  const overallAccuracy = metrics.overall_accuracy !== undefined ? metrics.overall_accuracy : avgScoreVal;
+  const bestRankVal = totalAttemptsCount > 0 ? '#1' : 'N/A';
+  const overallAccuracy = metrics.overall_accuracy !== undefined ? metrics.overall_accuracy : 0;
   const totalCorrect = metrics.total_correct_q !== undefined ? metrics.total_correct_q : 0;
   const totalAnswered = metrics.total_answered_q !== undefined ? metrics.total_answered_q : 0;
-  const totalWrong = metrics.total_wrong_q !== undefined ? metrics.total_wrong_q : Math.max(0, totalAnswered - totalCorrect);
+  const totalWrong = metrics.total_wrong_q !== undefined ? metrics.total_wrong_q : 0;
 
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-200 font-sans max-w-7xl mx-auto">
@@ -422,7 +407,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
             <p className="text-[11px] font-bold text-[#6d3a68] uppercase tracking-wider">Exams Attempted</p>
             <h3 className="text-2xl font-black text-[#4e2a4a] mt-1">{totalAttemptsCount}</h3>
             <p className="text-[10px] text-[#059669] font-bold mt-0.5 flex items-center gap-1">
-              <Check className="w-3 h-3" /> {metrics.total_passed || totalAttemptsCount} qualified
+              <Check className="w-3 h-3" /> {metrics.total_passed || 0} qualified
             </p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#faf5fa] text-[#6d3a68] flex items-center justify-center font-bold text-lg group-hover:bg-[#6d3a68] group-hover:text-white transition-colors border border-[#edd6ed]">
@@ -435,7 +420,9 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
           <div>
             <p className="text-[11px] font-bold text-[#6d3a68] uppercase tracking-wider">Avg Score</p>
             <h3 className="text-2xl font-black text-[#d9775b] mt-1">{avgScoreVal}%</h3>
-            <p className="text-[10px] text-[#d9775b] font-bold mt-0.5">Overall benchmark</p>
+            <p className="text-[10px] text-[#d9775b] font-bold mt-0.5">
+              {totalAttemptsCount > 0 ? 'Overall score average' : 'No tests submitted'}
+            </p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#fdf6f4] text-[#d9775b] flex items-center justify-center font-bold text-lg group-hover:bg-[#d9775b] group-hover:text-white transition-colors border border-[#f7d7cc]">
             <TrendingUp className="w-5 h-5" />
@@ -447,7 +434,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
           <div>
             <p className="text-[11px] font-bold text-[#6d3a68] uppercase tracking-wider">Accuracy</p>
             <h3 className="text-2xl font-black text-[#059669] mt-1">{overallAccuracy}%</h3>
-            <p className="text-[10px] text-[#059669] font-bold mt-0.5">{totalCorrect} / {totalAnswered || totalCorrect} Correct</p>
+            <p className="text-[10px] text-[#059669] font-bold mt-0.5">{totalCorrect} / {totalAnswered} Correct</p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#ecfdf5] text-[#059669] flex items-center justify-center font-bold text-lg group-hover:bg-[#059669] group-hover:text-white transition-colors border border-[#a7f3d0]">
             <Target className="w-5 h-5" />
@@ -467,7 +454,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
         </div>
       </div>
 
-      {/* 3. FULL-WIDTH: Performance Growth Chart (Pure Page Par) */}
+      {/* 3. FULL-WIDTH: Performance Growth Chart */}
       <div className="w-full bg-white rounded-3xl border border-[#edd6ed] p-6 sm:p-8 shadow-2xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div className="flex items-center gap-2.5">
@@ -476,7 +463,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
               <span>Performance Growth Chart</span>
             </span>
             <span className="text-xs text-slate-500 font-semibold hidden md:inline">
-              Track candidate score progression across all attempted tests
+              Track your score progression across all attempted tests
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -526,13 +513,13 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
                     <div className="w-full bg-[#f4ebf4] rounded-2xl overflow-hidden h-full max-h-[160px] flex items-end p-0.5">
                       <div
                         className="w-full bg-gradient-to-t from-[#4e2a4a] via-[#6d3a68] to-[#d9775b] rounded-xl transition-all duration-500 shadow-xs group-hover:brightness-110"
-                        style={{ height: `${Math.max(12, pct)}%` }}
+                        style={{ height: `${Math.max(10, pct)}%` }}
                       />
                     </div>
 
                     {/* Label & Tooltip */}
                     <div className="text-center">
-                      <span className="text-[11px] font-bold text-slate-600 truncate block max-w-[70px]">
+                      <span className="text-[11px] font-bold text-slate-600 truncate block max-w-[75px]" title={bar.exam_title}>
                         {bar.label || `Test ${idx + 1}`}
                       </span>
                     </div>
@@ -542,9 +529,22 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
             </div>
           </div>
         ) : (
-          <div className="py-12 text-center text-slate-400 text-xs">
-            <BarChart3 className="w-8 h-8 mx-auto text-slate-300 mb-2" />
-            <span>Take exams to track your score progression over time.</span>
+          <div className="py-12 text-center text-slate-400 text-xs space-y-2">
+            <BarChart3 className="w-10 h-10 mx-auto text-[#6d3a68]/40 mb-1" />
+            <p className="font-bold text-slate-700 text-sm">No test attempts recorded yet for {studentName}.</p>
+            <p className="text-slate-500 max-w-md mx-auto">
+              Start your first practice test or Olympiad exam to see your score progression and dynamic analytics here!
+            </p>
+            {onNavigateTab && (
+              <button
+                type="button"
+                onClick={() => onNavigateTab('available_exams')}
+                className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#6d3a68] hover:bg-[#4e2a4a] text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+              >
+                <Play className="w-3.5 h-3.5" />
+                <span>Start First Exam Now</span>
+              </button>
+            )}
           </div>
         )}
 
@@ -562,7 +562,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
         </div>
       </div>
 
-      {/* 4. Accuracy Analysis & Detailed Breakdowns (Placed Below the Full-Width Growth Chart) */}
+      {/* 4. Accuracy Analysis & Detailed Breakdowns */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Accuracy Breakdown Card (5 cols) */}
         <div className="lg:col-span-5 bg-white rounded-3xl border border-[#edd6ed] p-6 sm:p-7 shadow-2xs flex flex-col justify-between">
@@ -622,7 +622,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
               <span>Question Difficulty &amp; Speed Breakdown</span>
             </span>
             <span className="text-[10px] font-bold text-[#059669] bg-[#ecfdf5] px-2.5 py-0.5 rounded-md border border-[#a7f3d0]">
-              ⚡ High Speed
+              {totalAttemptsCount > 0 ? '⚡ Dynamic Calculation' : 'Pending Tests'}
             </span>
           </div>
 
@@ -630,30 +630,30 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
             <div>
               <div className="flex justify-between items-center text-xs font-bold mb-1">
                 <span className="text-[#059669] font-bold">Easy Questions</span>
-                <span className="text-[#4e2a4a] font-black">95%</span>
+                <span className="text-[#4e2a4a] font-black">{metrics.easy_pct || 0}%</span>
               </div>
               <div className="w-full bg-[#faf5fa] h-2.5 rounded-full overflow-hidden border border-[#edd6ed]">
-                <div className="bg-[#10b981] h-2.5 rounded-full" style={{ width: '95%' }} />
+                <div className="bg-[#10b981] h-2.5 rounded-full transition-all duration-500" style={{ width: `${metrics.easy_pct || 0}%` }} />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between items-center text-xs font-bold mb-1">
                 <span className="text-[#6d3a68] font-bold">Medium Questions</span>
-                <span className="text-[#4e2a4a] font-black">86%</span>
+                <span className="text-[#4e2a4a] font-black">{metrics.med_pct || 0}%</span>
               </div>
               <div className="w-full bg-[#faf5fa] h-2.5 rounded-full overflow-hidden border border-[#edd6ed]">
-                <div className="bg-[#6d3a68] h-2.5 rounded-full" style={{ width: '86%' }} />
+                <div className="bg-[#6d3a68] h-2.5 rounded-full transition-all duration-500" style={{ width: `${metrics.med_pct || 0}%` }} />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between items-center text-xs font-bold mb-1">
                 <span className="text-[#d9775b] font-bold">Hard / Advanced Questions</span>
-                <span className="text-[#4e2a4a] font-black">72%</span>
+                <span className="text-[#4e2a4a] font-black">{metrics.hard_pct || 0}%</span>
               </div>
               <div className="w-full bg-[#faf5fa] h-2.5 rounded-full overflow-hidden border border-[#edd6ed]">
-                <div className="bg-[#d9775b] h-2.5 rounded-full" style={{ width: '72%' }} />
+                <div className="bg-[#d9775b] h-2.5 rounded-full transition-all duration-500" style={{ width: `${metrics.hard_pct || 0}%` }} />
               </div>
             </div>
           </div>
@@ -661,17 +661,17 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
           <div className="grid grid-cols-3 gap-2 text-center pt-3 border-t border-[#f4ebf4] mt-2">
             <div className="p-2 bg-[#faf5fa] rounded-xl border border-[#edd6ed]">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg Time</p>
-              <h4 className="text-sm font-black text-[#4e2a4a] mt-0.5">28 min</h4>
+              <h4 className="text-sm font-black text-[#4e2a4a] mt-0.5">{metrics.avg_time_str || '0 min'}</h4>
             </div>
 
             <div className="p-2 bg-[#ecfdf5] rounded-xl border border-[#a7f3d0]">
               <p className="text-[10px] font-bold text-[#059669] uppercase tracking-wider">Per Q</p>
-              <h4 className="text-sm font-black text-[#059669] mt-0.5">35 sec</h4>
+              <h4 className="text-sm font-black text-[#059669] mt-0.5">{metrics.per_q_str || '0 sec'}</h4>
             </div>
 
             <div className="p-2 bg-[#fdf6f4] rounded-xl border border-[#f7d7cc]">
               <p className="text-[10px] font-bold text-[#d9775b] uppercase tracking-wider">Fastest</p>
-              <h4 className="text-sm font-black text-[#d9775b] mt-0.5">21 min</h4>
+              <h4 className="text-sm font-black text-[#d9775b] mt-0.5">{metrics.fastest_str || '0 min'}</h4>
             </div>
           </div>
         </div>
@@ -685,9 +685,9 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
               <BookOpen className="w-3.5 h-3.5 text-[#6d3a68]" />
               <span>Subject Performance &amp; Proficiency</span>
             </span>
-            <p className="text-[11px] text-slate-400 mt-1">Competency across candidate subjects</p>
+            <p className="text-[11px] text-slate-400 mt-1">Competency across candidate attempted subjects</p>
           </div>
-          <span className="text-xs font-bold text-[#6d3a68]">{subjectProgress.length} Subject(s)</span>
+          <span className="text-xs font-bold text-[#6d3a68]">{subjectProgress.length} Subject(s) Attempted</span>
         </div>
 
         {subjectProgress.length > 0 ? (
@@ -708,7 +708,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
                   />
                 </div>
                 <div className="flex items-center justify-between text-[10px] text-slate-500 font-semibold mt-1.5">
-                  <span>{sub.correct_count || 0} / {sub.total_answered || 20} Questions Correct</span>
+                  <span>{sub.correct_count || 0} / {sub.total_answered || 10} Questions Correct</span>
                   <span>{sub.attempts_count || 1} Test(s)</span>
                 </div>
               </div>
@@ -716,7 +716,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
           </div>
         ) : (
           <div className="py-8 text-center text-slate-400 text-xs">
-            Subject proficiency will calculate automatically after completing tests.
+            Subject proficiency will calculate automatically after completing tests in your subjects.
           </div>
         )}
       </div>

@@ -1923,26 +1923,37 @@ export const mockEngine = {
         const results = getDb('results');
         const allPapers = getDb('exam_papers');
         const foundPaper = allPapers.find((p) => String(p.id) === String(body.exam_id));
+        const activeUser = JSON.parse(sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user') || '{}');
         const totalMarks = Number(body.total_marks) || (foundPaper ? foundPaper.total_marks : 60);
-        const score = Number(body.score) || Math.round(totalMarks * 0.85);
+        const score = Number(body.score !== undefined ? body.score : Math.round(totalMarks * 0.85));
+        const correctCount = Number(body.correct_count !== undefined ? body.correct_count : Math.round(score / (totalMarks / 10 || 1)));
+        const percentage = Number(body.percentage !== undefined ? body.percentage : (totalMarks > 0 ? (score / totalMarks) * 100 : 80));
 
         const newRes = {
           id: Date.now(),
-          user_id: 2,
-          student_name: body.student_name || 'Aarav Sharma',
+          attempt_id: Date.now(),
+          user_id: activeUser?.id || body.student_id || 2,
+          student_id: activeUser?.id || body.student_id || 2,
+          student_name: activeUser?.full_name || activeUser?.name || body.student_name || 'Candidate',
+          student_login_id: activeUser?.login_id || body.student_login_id || 'STU-001',
+          student_email: activeUser?.email || body.student_email || '',
           exam_id: body.exam_id || 1,
           exam_title: body.exam_title || (foundPaper ? foundPaper.title : 'Olympiad Exam'),
           subject: foundPaper ? (foundPaper.subject_name || foundPaper.subject_code) : (body.subject || 'General Knowledge'),
+          subject_name: foundPaper ? (foundPaper.subject_name || foundPaper.subject_code) : (body.subject || 'General Knowledge'),
           subject_code: foundPaper ? foundPaper.subject_code : (body.subject_code || 'IGKO'),
           score: score,
           total_marks: totalMarks,
-          correct_count: Math.round(score / (totalMarks / 10 || 1)),
-          incorrect_count: 0,
-          unattempted_count: 0,
-          accuracy: 95,
+          total_questions: Number(body.total_questions) || totalMarks,
+          correct_count: correctCount,
+          incorrect_count: Number(body.incorrect_count !== undefined ? body.incorrect_count : Math.max(0, totalMarks - correctCount)),
+          unattempted_count: Number(body.unanswered_count || 0),
+          percentage: percentage,
+          accuracy: Number(body.accuracy !== undefined ? body.accuracy : Math.round(percentage)),
+          passed: percentage >= 40,
           percentile: 98.4,
           rank: 1,
-          time_taken_seconds: 1800,
+          time_taken_seconds: Number(body.time_taken_seconds || 1800),
           submitted_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
         };
         results.unshift(newRes);
@@ -2163,13 +2174,13 @@ export const mockEngine = {
         const results = getDb('results') || [];
         const user = JSON.parse(sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user') || '{}');
         
-        // Filter results for student
+        // Filter results strictly for active student
         const studentResults = results.filter((r) => {
-          if (!user || (!user.id && !user.login_id)) return true;
+          if (!user || (!user.id && !user.login_id && !user.email)) return false;
           return (r.student_id && (r.student_id === user.id || String(r.student_id) === String(user.id))) ||
                  (r.student_login_id && (r.student_login_id === user.login_id || r.login_id === user.login_id)) ||
-                 (r.user_id && (r.user_id === user.id || String(r.user_id) === String(user.id))) ||
-                 !r.student_id;
+                 (r.student_email && user.email && r.student_email.toLowerCase() === user.email.toLowerCase()) ||
+                 (r.user_id && (r.user_id === user.id || String(r.user_id) === String(user.id)));
         });
 
         const totalAttempts = studentResults.length;

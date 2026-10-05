@@ -290,6 +290,8 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
         attempt_id: sessionData.attempt_id
       });
       setShowSubmitModal(false);
+      window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: res }));
+      window.dispatchEvent(new Event('exam-submitted'));
       onExamCompleted(sessionData.attempt_id);
     } catch (err) {
       alert(err.message || 'Failed to submit test.');
