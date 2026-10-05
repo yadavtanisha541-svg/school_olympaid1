@@ -81,18 +81,21 @@ import { NotificationsPage } from './pages/common/NotificationsPage';
 const parseRouteFromUrl = () => {
   try {
     const rawHash = window.location.hash.replace(/^#\/?/, '');
+    const saved = localStorage.getItem('olympiadhub_route_state') || sessionStorage.getItem('olympiadhub_route_state');
+    const savedTab = localStorage.getItem('olympiadhub_current_tab');
+    let savedState = null;
+    try {
+      if (saved) savedState = JSON.parse(saved);
+    } catch {}
+
     if (!rawHash) {
-      const saved = sessionStorage.getItem('olympiadhub_route_state');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === 'object') return parsed;
-      }
+      if (savedState && typeof savedState === 'object') return savedState;
       return {
         viewMode: 'public',
         activePublicPage: 'home',
         activeOlympiadId: 'english',
         activeClassLevel: 'Class 1',
-        currentTab: 'overview',
+        currentTab: savedTab || 'overview',
         activeResultAttemptId: null,
         activeSolutionAttemptId: null
       };
@@ -103,21 +106,21 @@ const parseRouteFromUrl = () => {
 
     if (routePath.startsWith('dashboard')) {
       const parts = routePath.split('/');
-      const tab = parts[1] || 'overview';
+      const tab = parts[1] || savedTab || savedState?.currentTab || 'overview';
       return {
         viewMode: 'dashboard',
         currentTab: tab,
         activePublicPage: 'home',
-        activeOlympiadId: params.get('id') || params.get('olympiad') || 'english',
-        activeClassLevel: params.get('class') || 'Class 1',
-        activeResultAttemptId: params.get('resultAttempt') || null,
-        activeSolutionAttemptId: params.get('solutionAttempt') || null
+        activeOlympiadId: params.get('id') || params.get('olympiad') || savedState?.activeOlympiadId || 'english',
+        activeClassLevel: params.get('class') || savedState?.activeClassLevel || 'Class 1',
+        activeResultAttemptId: params.get('resultAttempt') || savedState?.activeResultAttemptId || null,
+        activeSolutionAttemptId: params.get('solutionAttempt') || savedState?.activeSolutionAttemptId || null
       };
     } else if (routePath === 'login') {
       return {
         viewMode: 'login',
         activePublicPage: 'home',
-        currentTab: 'overview',
+        currentTab: savedTab || savedState?.currentTab || 'overview',
         activeOlympiadId: 'english',
         activeClassLevel: 'Class 1',
         activeResultAttemptId: null,
@@ -130,7 +133,7 @@ const parseRouteFromUrl = () => {
         activePublicPage: page,
         activeOlympiadId: params.get('id') || params.get('olympiad') || 'english',
         activeClassLevel: params.get('class') || 'Class 1',
-        currentTab: 'overview',
+        currentTab: savedTab || 'overview',
         activeResultAttemptId: null,
         activeSolutionAttemptId: null
       };
@@ -178,7 +181,10 @@ const updateUrlAndStorage = (state) => {
       window.history.replaceState(null, '', `#/${hash}`);
     }
     sessionStorage.setItem('olympiadhub_route_state', JSON.stringify(state));
-    localStorage.removeItem('olympiadhub_route_state'); // cleanup legacy
+    localStorage.setItem('olympiadhub_route_state', JSON.stringify(state));
+    if (state.currentTab) {
+      localStorage.setItem('olympiadhub_current_tab', state.currentTab);
+    }
   } catch (e) {
     // ignore storage errors
   }
@@ -197,8 +203,10 @@ export const App = () => {
   const [activeOlympiadId, setActiveOlympiadId] = useState(initialRoute.activeOlympiadId);
   const [activeClassLevel, setActiveClassLevel] = useState(initialRoute.activeClassLevel);
 
-  // Dashboard Tab Routing
-  const [currentTab, setCurrentTab] = useState(initialRoute.currentTab);
+  // Dashboard Tab Routing (Preserve exact tab on refresh!)
+  const [currentTab, setCurrentTab] = useState(() => {
+    return initialRoute.currentTab || localStorage.getItem('olympiadhub_current_tab') || 'overview';
+  });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Active Exam state
@@ -218,7 +226,8 @@ export const App = () => {
         setViewMode('dashboard');
       }
     } else if (!loading) {
-      if (viewMode === 'dashboard') {
+      const cached = localStorage.getItem('olympiadhub_user') || sessionStorage.getItem('olympiadhub_user');
+      if (!cached && viewMode === 'dashboard') {
         setViewMode('login');
         setActiveExamId(null);
         setActiveResultAttemptId(null);

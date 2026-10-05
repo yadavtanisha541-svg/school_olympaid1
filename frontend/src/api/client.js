@@ -61,13 +61,6 @@ export const apiClient = {
         return data;
       }
 
-      // If backend responded with 401 on expired session
-      if (response.status === 401 && !endpoint.includes('/auth/login')) {
-        this.setToken(null);
-        sessionStorage.removeItem('olympiadhub_user');
-        localStorage.removeItem('olympiadhub_user');
-      }
-
       // Fallback to client mock engine if API returned error/HTML
       return mockEngine.handleRequest(method, endpoint, body);
     } catch (networkError) {

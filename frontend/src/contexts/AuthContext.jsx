@@ -6,18 +6,24 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
-      const saved = sessionStorage.getItem('olympiadhub_user');
+      const saved = localStorage.getItem('olympiadhub_user') || sessionStorage.getItem('olympiadhub_user');
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
     }
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
       const token = apiClient.getToken();
-      if (!token) {
+      const savedUserStr = localStorage.getItem('olympiadhub_user') || sessionStorage.getItem('olympiadhub_user');
+      let savedUser = null;
+      try {
+        if (savedUserStr) savedUser = JSON.parse(savedUserStr);
+      } catch {}
+
+      if (!token && !savedUser) {
         setUser(null);
         setLoading(false);
         return;
@@ -28,13 +34,15 @@ export const AuthProvider = ({ children }) => {
         if (res.success && res.data) {
           setUser(res.data);
           sessionStorage.setItem('olympiadhub_user', JSON.stringify(res.data));
-          localStorage.removeItem('olympiadhub_user'); // cleanup legacy
+          localStorage.setItem('olympiadhub_user', JSON.stringify(res.data));
+        } else if (savedUser) {
+          setUser(savedUser);
         }
       } catch (err) {
-        apiClient.setToken(null);
-        sessionStorage.removeItem('olympiadhub_user');
-        localStorage.removeItem('olympiadhub_user');
-        setUser(null);
+        // If network error or backend offline, keep cached user session active
+        if (savedUser) {
+          setUser(savedUser);
+        }
       } finally {
         setLoading(false);
       }
@@ -53,7 +61,7 @@ export const AuthProvider = ({ children }) => {
       apiClient.setToken(res.data.token);
       setUser(res.data.user);
       sessionStorage.setItem('olympiadhub_user', JSON.stringify(res.data.user));
-      localStorage.removeItem('olympiadhub_user'); // cleanup legacy
+      localStorage.setItem('olympiadhub_user', JSON.stringify(res.data.user));
       return res.data.user;
     }
     throw new Error(res.message || 'Login failed');
@@ -93,10 +101,11 @@ export const AuthProvider = ({ children }) => {
       const next = typeof updater === 'function' ? updater(prev) : { ...prev, ...updater };
       if (next) {
         sessionStorage.setItem('olympiadhub_user', JSON.stringify(next));
+        localStorage.setItem('olympiadhub_user', JSON.stringify(next));
       } else {
         sessionStorage.removeItem('olympiadhub_user');
+        localStorage.removeItem('olympiadhub_user');
       }
-      localStorage.removeItem('olympiadhub_user');
       return next;
     });
   };
