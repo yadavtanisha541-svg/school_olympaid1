@@ -784,68 +784,86 @@ export const PublicHomePage = ({
           </p>
         </div>
 
-        {/* 5 Preparation Cards Grid with Rich Colorful Tints - Compact Sizing */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 max-w-5xl mx-auto">
+        {/* 7 Preparation Cards Grid with Rich Colorful Tints */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-3.5 max-w-6xl mx-auto">
           {[
             {
-              id: 'workbooks',
-              title: 'Workbooks',
-              type: 'workbooks',
+              id: 'sample-paper',
+              title: 'Sample Paper',
+              type: 'sample-paper',
               bgGradient: 'bg-gradient-to-b from-[#fdeae6] to-[#f8cec5]',
               borderColor: 'border-[#f2a898]',
               textColor: 'text-[#8a2e1c]',
-              action: () => onNavigatePublic('workbooks')
+              action: () => onNavigatePublic('sample-papers')
             },
             {
-              id: 'papers',
-              title: 'Additional Practice Papers',
-              type: 'papers',
+              id: 'previous-paper',
+              title: 'Previous Paper',
+              type: 'previous-paper',
               bgGradient: 'bg-gradient-to-b from-[#f6e9f6] to-[#e6d0e6]',
               borderColor: 'border-[#d4aed5]',
               textColor: 'text-[#582155]',
               action: () => onNavigatePublic('sample-papers')
             },
             {
-              id: 'ask',
-              title: 'Ask and Answer',
-              type: 'ask',
+              id: 'test-generator',
+              title: 'Test Generator',
+              type: 'test-generator',
               bgGradient: 'bg-gradient-to-b from-[#fef2d0] to-[#fce098]',
               borderColor: 'border-[#f6c75c]',
               textColor: 'text-[#7a5108]',
-              action: () => onNavigatePublic('faqs')
+              action: () => onNavigatePublic('practice-hub')
             },
             {
-              id: 'previous',
-              title: 'Previous Year Papers',
-              type: 'previous',
-              bgGradient: 'bg-gradient-to-b from-[#fceae6] to-[#f7ccc3]',
-              borderColor: 'border-[#eda89a]',
+              id: 'mock-test',
+              title: 'Mock Test',
+              type: 'mock-test',
+              bgGradient: 'bg-gradient-to-b from-[#fdeae6] to-[#f8d0c8]',
+              borderColor: 'border-[#f0a99c]',
               textColor: 'text-[#8a2e1c]',
-              action: () => onNavigatePublic('sample-papers')
+              action: () => onNavigatePublic('practice-hub')
             },
             {
-              id: 'live',
-              title: 'Live Classes',
-              type: 'live',
+              id: 'live-class',
+              title: 'Live Online Class',
+              type: 'live-class',
               bgGradient: 'bg-gradient-to-b from-[#f7eaf7] to-[#e8d0e8]',
               borderColor: 'border-[#d6abd8]',
               textColor: 'text-[#582155]',
               action: () => onNavigatePublic('practice-hub')
+            },
+            {
+              id: 'revision',
+              title: 'Revision',
+              type: 'revision',
+              bgGradient: 'bg-gradient-to-b from-[#fdf5db] to-[#fae6b2]',
+              borderColor: 'border-[#f2ce79]',
+              textColor: 'text-[#7a5108]',
+              action: () => onNavigatePublic('workbooks')
+            },
+            {
+              id: 'free-quiz',
+              title: 'Free Quiz',
+              type: 'free-quiz',
+              bgGradient: 'bg-gradient-to-b from-[#faeafa] to-[#ebd0eb]',
+              borderColor: 'border-[#d9aed9]',
+              textColor: 'text-[#582155]',
+              action: () => onNavigatePublic('free-trial')
             }
           ].map((item) => (
             <div
               key={item.id}
               onClick={item.action}
-              className={`${item.bgGradient} rounded-md border-2 ${item.borderColor} shadow-2xs hover:shadow-md transition-all duration-300 p-2.5 sm:p-3 flex flex-col justify-between items-center text-center cursor-pointer group select-none hover:-translate-y-1`}
+              className={`${item.bgGradient} rounded-md border-2 ${item.borderColor} shadow-2xs hover:shadow-md transition-all duration-300 p-2 sm:p-2.5 flex flex-col justify-between items-center text-center cursor-pointer group select-none hover:-translate-y-1`}
             >
               {/* Card Title on Top */}
-              <h3 className={`text-[11px] sm:text-xs font-black ${item.textColor} leading-snug h-6 sm:h-7 flex items-center justify-center`}>
+              <h3 className={`text-[11px] sm:text-xs font-black ${item.textColor} leading-snug h-7 flex items-center justify-center`}>
                 {item.title}
               </h3>
 
               {/* Graphic Illustration */}
               <div className="w-full my-1 flex items-center justify-center">
-                <PrepResourceGraphic type={item.type} className="w-full h-20 sm:h-24 group-hover:scale-105 transition-transform duration-300" />
+                <PrepResourceGraphic type={item.type} className="w-full h-18 sm:h-20 group-hover:scale-105 transition-transform duration-300" />
               </div>
             </div>
           ))}
