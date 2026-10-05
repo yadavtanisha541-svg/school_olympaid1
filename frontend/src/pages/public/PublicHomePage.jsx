@@ -309,43 +309,19 @@ export const PublicHomePage = ({
             <div className="lg:col-span-5 flex flex-col">
               <div className="bg-white rounded-md border border-[#edd6ed] shadow-md p-6 sm:p-7 flex flex-col justify-between flex-1 relative">
                 
-                {/* Form Navigation Tabs */}
+                {/* Form Header */}
                 <div>
-                  <div className="flex items-center border-b border-[#edd6ed] pb-2 mb-5">
-                    <button
-                      type="button"
-                      onClick={() => setFormTab('applicant')}
-                      className={`flex-1 text-center py-2 text-xs font-black uppercase tracking-wider transition-all cursor-pointer relative ${
-                        formTab === 'applicant'
-                          ? 'text-[#6d3a68]'
-                          : 'text-slate-400 hover:text-slate-600'
-                      }`}
-                    >
-                      <span>New Applicant</span>
-                      {formTab === 'applicant' && (
-                        <div className="absolute bottom-[-9px] left-0 right-0 h-0.5 bg-[#6d3a68]" />
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setFormTab('school')}
-                      className={`flex-1 text-center py-2 text-xs font-black uppercase tracking-wider transition-all cursor-pointer relative ${
-                        formTab === 'school'
-                          ? 'text-[#6d3a68]'
-                          : 'text-slate-400 hover:text-slate-600'
-                      }`}
-                    >
-                      <span>School Registration</span>
-                      {formTab === 'school' && (
-                        <div className="absolute bottom-[-9px] left-0 right-0 h-0.5 bg-[#6d3a68]" />
-                      )}
-                    </button>
+                  <div className="border-b border-[#edd6ed] pb-2.5 mb-5 flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-[#6d3a68]">
+                      New Applicant Registration
+                    </span>
+                    <span className="text-[10px] font-bold text-[#d9775b] bg-[#faf4e0] px-2 py-0.5 rounded-sm">
+                      Online 2026-27
+                    </span>
                   </div>
 
                   {/* 1. NEW APPLICANT FORM */}
-                  {formTab === 'applicant' && (
-                    <form onSubmit={handleApplicantSubmit} className="space-y-3.5">
+                  <form onSubmit={handleApplicantSubmit} className="space-y-3.5">
                       {/* Country Field */}
                       <div className="relative">
                         <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
@@ -443,108 +419,6 @@ export const PublicHomePage = ({
                         <ArrowRight className="w-4 h-4 text-[#e7b84b]" />
                       </button>
                     </form>
-                  )}
-
-                  {/* 2. SCHOOL REGISTRATION FORM */}
-                  {formTab === 'school' && (
-                    <form onSubmit={handleSchoolSubmit} className="space-y-3.5">
-                      {/* Country Field */}
-                      <div className="relative">
-                        <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                        <select
-                          value={schoolData.country}
-                          onChange={(e) => setSchoolData({ ...schoolData, country: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-md text-xs font-bold text-[#4e2a4a] focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
-                        >
-                          <option value="India">Select Country (India)</option>
-                          <option value="UAE">United Arab Emirates</option>
-                          <option value="Singapore">Singapore</option>
-                          <option value="Other">Other Country</option>
-                        </select>
-                      </div>
-
-                      {/* School Name */}
-                      <div className="relative">
-                        <Building className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                        <input
-                          type="text"
-                          required
-                          placeholder="Official School Name *"
-                          value={schoolData.schoolName}
-                          onChange={(e) => setSchoolData({ ...schoolData, schoolName: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-md text-xs font-semibold text-[#4e2a4a] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
-                        />
-                      </div>
-
-                      {/* Coordinator Name */}
-                      <div className="relative">
-                        <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                        <input
-                          type="text"
-                          required
-                          placeholder="Olympiad Coordinator Name *"
-                          value={schoolData.coordinatorName}
-                          onChange={(e) => setSchoolData({ ...schoolData, coordinatorName: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-md text-xs font-semibold text-[#4e2a4a] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
-                        />
-                      </div>
-
-                      {/* Coordinator Email */}
-                      <div className="relative">
-                        <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                        <input
-                          type="email"
-                          required
-                          placeholder="Official School Email *"
-                          value={schoolData.email}
-                          onChange={(e) => setSchoolData({ ...schoolData, email: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-md text-xs font-semibold text-[#4e2a4a] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
-                        />
-                      </div>
-
-                      {/* Phone Number */}
-                      <div className="relative">
-                        <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                        <input
-                          type="tel"
-                          inputMode="numeric"
-                          maxLength={10}
-                          required
-                          placeholder="Contact Phone Number *"
-                          value={schoolData.phone}
-                          onChange={(e) => {
-                            const val = e.target.value.replace(/\D/g, '').slice(0, 10);
-                            setSchoolData({ ...schoolData, phone: val });
-                          }}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-md text-xs font-semibold text-[#4e2a4a] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
-                        />
-                      </div>
-
-                      {/* Number of Students */}
-                      <div className="relative">
-                        <Users className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                        <select
-                          value={schoolData.studentsCount}
-                          onChange={(e) => setSchoolData({ ...schoolData, studentsCount: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-md text-xs font-bold text-[#4e2a4a] focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
-                        >
-                          <option>50 - 100 Students</option>
-                          <option>100 - 500 Students</option>
-                          <option>500 - 1000 Students</option>
-                          <option>1000+ Students</option>
-                        </select>
-                      </div>
-
-                      {/* Submit CTA */}
-                      <button
-                        type="submit"
-                        className="w-full py-3 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-md text-xs font-black shadow-sm cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2"
-                      >
-                        <span>Register School Institution</span>
-                        <ArrowRight className="w-4 h-4 text-[#e7b84b]" />
-                      </button>
-                    </form>
-                  )}
                 </div>
 
                 {/* Bottom Already Registered Link */}
