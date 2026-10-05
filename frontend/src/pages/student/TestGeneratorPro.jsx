@@ -866,9 +866,9 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     const totalMarked = Object.values(markedForReview).filter(Boolean).length;
 
     return (
-      <div className="space-y-4 font-sans animate-in fade-in duration-150 max-w-7xl mx-auto pb-12">
-        {/* Top Sticky Test Bar */}
-        <div className="bg-white rounded-2xl border border-[#edd6ed] p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 sticky top-20 z-20">
+      <div className="space-y-5 font-sans animate-in fade-in duration-150 max-w-7xl mx-auto pb-12">
+        {/* Top Clean Test Bar (Properly spaced without overlapping) */}
+        <div className="bg-white rounded-3xl border border-[#edd6ed] p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[#f4ebf4] text-[#6d3a68] flex items-center justify-center font-black text-sm">
               Q{currentIndex + 1}
