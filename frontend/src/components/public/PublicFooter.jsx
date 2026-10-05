@@ -147,11 +147,7 @@ export const PublicFooter = ({ onNavigatePublic, onOpenLogin, onOpenRegister }) 
                   Verify Certificates
                 </button>
               </li>
-              <li>
-                <button type="button" onClick={() => handleNav('schools')} className="hover:text-white transition-colors cursor-pointer">
-                  School Registration
-                </button>
-              </li>
+
               <li>
                 <button type="button" onClick={() => handleNav('coordinator')} className="hover:text-white transition-colors cursor-pointer">
                   Become a Coordinator
