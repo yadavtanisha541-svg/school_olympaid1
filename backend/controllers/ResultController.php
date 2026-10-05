@@ -171,7 +171,8 @@ class ResultController {
         $db = Database::getConnection();
 
         $stmt = $db->prepare("
-            SELECT ea.id, ea.student_id, ea.status, e.solution_visibility
+            SELECT ea.*, e.title as exam_title, e.total_marks as exam_total_marks,
+                   e.passing_percentage, e.solution_visibility, e.duration_minutes
             FROM exam_attempts ea
             JOIN exams e ON ea.exam_id = e.id
             WHERE ea.id = ?
@@ -190,28 +191,96 @@ class ResultController {
             if ($attempt['solution_visibility'] === 'never') {
                 Response::error('Solutions are disabled for this exam.', 403);
             }
-            if ($attempt['status'] !== 'submitted' && $attempt['status'] !== 'timed_out') {
-                Response::error('Solutions are only available after submission.', 403);
-            }
         }
 
-        // Fetch detailed question-by-question solution
+        // Fetch detailed question-by-question solution from student_answers
         $solStmt = $db->prepare("
             SELECT sa.id as answer_id, sa.selected_option, sa.is_correct, sa.marks_awarded, sa.is_marked_for_review,
-                   q.id as question_id, q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
+                   q.id as question_id, q.id as id, q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
                    q.correct_option, q.explanation, q.difficulty, q.marks, q.negative_marks, q.question_image,
                    s.name as subject_name, ch.name as chapter_name
             FROM student_answers sa
             JOIN questions q ON sa.question_id = q.id
-            JOIN subjects s ON q.subject_id = s.id
+            LEFT JOIN subjects s ON q.subject_id = s.id
             LEFT JOIN chapters ch ON q.chapter_id = ch.id
             WHERE sa.attempt_id = ?
             ORDER BY sa.id ASC
         ");
         $solStmt->execute([$attemptId]);
-        $solutions = $solStmt->fetchAll();
+        $solutions = $solStmt->fetchAll(PDO::FETCH_ASSOC);
 
-        Response::success($solutions, 'Detailed solutions retrieved.');
+        // Fallback: If student_answers had no rows, fetch from exam_questions
+        if (empty($solutions) && !empty($attempt['exam_id'])) {
+            $eqStmt = $db->prepare("
+                SELECT q.id as question_id, q.id as id, q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
+                       q.correct_option, q.explanation, q.difficulty, q.marks, q.negative_marks, q.question_image,
+                       s.name as subject_name, ch.name as chapter_name,
+                       NULL as selected_option, 0 as is_correct, 0 as marks_awarded
+                FROM exam_questions eq
+                JOIN questions q ON eq.question_id = q.id
+                LEFT JOIN subjects s ON q.subject_id = s.id
+                LEFT JOIN chapters ch ON q.chapter_id = ch.id
+                WHERE eq.exam_id = ?
+                ORDER BY eq.question_order ASC
+            ");
+            $eqStmt->execute([$attempt['exam_id']]);
+            $solutions = $eqStmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        $formattedSolutions = array_map(function ($q) {
+            $optA = $q['option_a'] ?? '';
+            $optB = $q['option_b'] ?? '';
+            $optC = $q['option_c'] ?? '';
+            $optD = $q['option_d'] ?? '';
+            $options = [$optA, $optB, $optC, $optD];
+
+            $sel = $q['selected_option'] !== null && $q['selected_option'] !== '' ? strtoupper(trim($q['selected_option'])) : null;
+            $corr = strtoupper(trim($q['correct_option'] ?? 'A'));
+            $isCorrect = ($sel !== null && $sel === $corr);
+            $isAttempted = ($sel !== null);
+
+            return array_merge($q, [
+                'options' => $options,
+                'selected_option' => $sel,
+                'correct_option' => $corr,
+                'is_correct' => $isCorrect ? 1 : 0,
+                'is_attempted' => $isAttempted,
+                'is_unattempted' => !$isAttempted,
+                'is_wrong' => ($isAttempted && !$isCorrect)
+            ]);
+        }, $solutions);
+
+        $totQ = count($formattedSolutions);
+        $correctCount = (int)($attempt['correct_count'] ?? count(array_filter($formattedSolutions, fn($s) => !empty($s['is_correct']))));
+        $wrongCount = (int)($attempt['wrong_count'] ?? count(array_filter($formattedSolutions, fn($s) => !empty($s['is_wrong']))));
+        $unattemptedCount = (int)($attempt['unanswered_count'] ?? count(array_filter($formattedSolutions, fn($s) => !empty($s['is_unattempted']))));
+        $totalMarks = (float)($attempt['total_marks'] ?? $attempt['exam_total_marks'] ?? ($totQ > 0 ? $totQ : 10));
+        $score = (float)($attempt['score'] ?? $correctCount);
+
+        $attemptMeta = [
+            'id' => (int)$attempt['id'],
+            'attempt_id' => (int)$attempt['id'],
+            'exam_id' => (int)$attempt['exam_id'],
+            'exam_title' => $attempt['exam_title'] ?: 'Olympiad Exam',
+            'title' => $attempt['exam_title'] ?: 'Olympiad Exam',
+            'score' => $score,
+            'total_marks' => $totalMarks,
+            'cutoff_marks' => round($totalMarks * 0.4, 1),
+            'percentage' => (float)($attempt['percentage'] ?? ($totQ > 0 ? round(($score / $totalMarks) * 100, 1) : 0)),
+            'total_questions' => $totQ,
+            'correct_count' => $correctCount,
+            'wrong_count' => $wrongCount,
+            'unanswered_count' => $unattemptedCount,
+            'time_spent_seconds' => (int)($attempt['time_spent_seconds'] ?? 1800),
+            'time_taken_seconds' => (int)($attempt['time_spent_seconds'] ?? 1800),
+            'duration_minutes' => (int)($attempt['duration_minutes'] ?: 60)
+        ];
+
+        Response::success([
+            'attempt' => $attemptMeta,
+            'solutions' => $formattedSolutions,
+            'questions' => $formattedSolutions
+        ], 'Detailed solutions retrieved.');
     }
 
     public function getStudentHistory(): void {

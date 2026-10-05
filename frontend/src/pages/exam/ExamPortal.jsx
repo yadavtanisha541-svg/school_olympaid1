@@ -269,6 +269,65 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
     });
   };
 
+  const cacheAttemptLocally = (attemptId, serverRes) => {
+    try {
+      const qList = (sessionData?.questions || []).map((q, idx) => {
+        const userAns = answers[q.id];
+        const selectedOpt = userAns?.selected_option || null;
+        const correctOpt = q.correct_option || 'A';
+        const isCorrect = (selectedOpt && selectedOpt === correctOpt);
+        return {
+          ...q,
+          id: q.id || idx + 1,
+          question_text: q.question_text || `Question ${idx + 1}`,
+          option_a: q.option_a,
+          option_b: q.option_b,
+          option_c: q.option_c,
+          option_d: q.option_d,
+          options: [q.option_a, q.option_b, q.option_c, q.option_d],
+          selected_option: selectedOpt,
+          correct_option: correctOpt,
+          is_correct: isCorrect,
+          marks: q.marks || 1,
+          explanation: q.explanation || 'Refer to the standard Olympiad step-by-step logic.'
+        };
+      });
+
+      const answeredCount = Object.values(answers).filter(a => a?.selected_option).length;
+      const correctCount = qList.filter(q => q.is_correct).length;
+      const wrongCount = answeredCount - correctCount;
+      const unansweredCount = qList.length - answeredCount;
+      const totalMarks = qList.reduce((sum, q) => sum + (Number(q.marks) || 1), 0);
+      const earnedScore = serverRes?.data?.score !== undefined ? Number(serverRes.data.score) : correctCount;
+
+      const record = {
+        id: attemptId,
+        attempt_id: attemptId,
+        exam_id: examId,
+        exam_title: sessionData?.exam?.title || 'Olympiad Exam',
+        title: sessionData?.exam?.title || 'Olympiad Exam',
+        total_questions: qList.length,
+        total_marks: totalMarks,
+        score: earnedScore,
+        cutoff_marks: Math.round(totalMarks * 0.4),
+        correct_count: correctCount,
+        wrong_count: Math.max(0, wrongCount),
+        unanswered_count: Math.max(0, unansweredCount),
+        time_spent_seconds: Math.max(1, ((sessionData?.exam?.duration_minutes || 60) * 60) - remainingSeconds),
+        time_taken_seconds: Math.max(1, ((sessionData?.exam?.duration_minutes || 60) * 60) - remainingSeconds),
+        duration_minutes: sessionData?.exam?.duration_minutes || 60,
+        submitted_at: new Date().toISOString().replace('T', ' ').substring(0, 19),
+        questions: qList
+      };
+
+      const existing = JSON.parse(localStorage.getItem('olympiadhub_student_attempts') || '[]');
+      localStorage.setItem('olympiadhub_student_attempts', JSON.stringify([record, ...existing.filter(e => String(e.id || e.attempt_id) !== String(attemptId))]));
+      localStorage.setItem('olympiadhub_last_submitted_exam', JSON.stringify(record));
+    } catch (e) {
+      console.warn('Could not cache exam locally:', e);
+    }
+  };
+
   const handleAutoSubmit = async (reason) => {
     if (submitting) return;
     setSubmitting(true);
@@ -276,9 +335,10 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
       const res = await apiClient.post('/exam-engine/submit', {
         attempt_id: sessionData.attempt_id
       });
+      cacheAttemptLocally(sessionData.attempt_id, res);
       onExamCompleted(sessionData.attempt_id);
     } catch (err) {
-      alert('Error finalizing exam: ' + err.message);
+      cacheAttemptLocally(sessionData.attempt_id, null);
       onExamCompleted(sessionData.attempt_id);
     }
   };
@@ -289,13 +349,15 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
       const res = await apiClient.post('/exam-engine/submit', {
         attempt_id: sessionData.attempt_id
       });
+      cacheAttemptLocally(sessionData.attempt_id, res);
       setShowSubmitModal(false);
       window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: res }));
       window.dispatchEvent(new Event('exam-submitted'));
       onExamCompleted(sessionData.attempt_id);
     } catch (err) {
-      alert(err.message || 'Failed to submit test.');
-      setSubmitting(false);
+      cacheAttemptLocally(sessionData.attempt_id, null);
+      setShowSubmitModal(false);
+      onExamCompleted(sessionData.attempt_id);
     }
   };
 

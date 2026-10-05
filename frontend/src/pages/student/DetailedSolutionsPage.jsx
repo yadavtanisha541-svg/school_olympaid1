@@ -20,135 +20,99 @@ import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
 
 export const DetailedSolutionsPage = ({ attemptId, onBack, initialSolutions, initialAttemptMeta }) => {
-  const [solutions, setSolutions] = useState([]);
-  const [attemptMeta, setAttemptMeta] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [solutions, setSolutions] = useState(initialSolutions || []);
+  const [attemptMeta, setAttemptMeta] = useState(initialAttemptMeta || null);
+  const [loading, setLoading] = useState(!initialSolutions || initialSolutions.length === 0);
   const [filterType, setFilterType] = useState('all'); // 'all' | 'correct' | 'wrong' | 'unattempted'
-
-  // Default fallback sample solutions
-  const defaultSampleSolutions = useMemo(() => [
-    {
-      id: 1,
-      question_text: 'What is the sum of the first 5 prime numbers?',
-      options: ['28', '26', '18', '24'],
-      option_a: '28',
-      option_b: '26',
-      option_c: '18',
-      option_d: '24',
-      selected_option: 'A',
-      correct_option: 'A',
-      is_correct: true,
-      marks: 1,
-      explanation: 'The first 5 prime numbers are 2, 3, 5, 7, and 11. Sum = 2 + 3 + 5 + 7 + 11 = 28.'
-    },
-    {
-      id: 2,
-      question_text: 'If a triangle has angles measuring 45°, 45°, and 90°, what type of triangle is it?',
-      options: ['Equilateral Triangle', 'Right-Angled Isosceles Triangle', 'Scalene Triangle', 'Obtuse Triangle'],
-      option_a: 'Equilateral Triangle',
-      option_b: 'Right-Angled Isosceles Triangle',
-      option_c: 'Scalene Triangle',
-      option_d: 'Obtuse Triangle',
-      selected_option: 'B',
-      correct_option: 'B',
-      is_correct: true,
-      marks: 1,
-      explanation: 'Since two angles are equal (45°) and one angle is 90°, it is a Right-Angled Isosceles Triangle.'
-    },
-    {
-      id: 3,
-      question_text: 'Find the Highest Common Factor (HCF) of 84 and 126.',
-      options: ['42', '21', '14', '28'],
-      option_a: '42',
-      option_b: '21',
-      option_c: '14',
-      option_d: '28',
-      selected_option: null,
-      correct_option: 'A',
-      is_correct: false,
-      marks: 1,
-      explanation: '84 = 2^2 × 3 × 7 and 126 = 2 × 3^2 × 7. Common factors = 2 × 3 × 7 = 42.'
-    }
-  ], []);
 
   const fetchSolutions = async () => {
     if (initialSolutions && initialSolutions.length > 0) {
+      setSolutions(initialSolutions);
+      if (initialAttemptMeta) setAttemptMeta(initialAttemptMeta);
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      let loadedFromLocal = false;
+      let loaded = false;
 
-      // 1. Check if we have attemptId or read recent attempt from localStorage
-      const localKeys = [
-        'olympiadhub_student_attempts',
-        'student_test_attempts',
-        'test_generator_attempts',
-        'olympiadhub_db_results'
-      ];
-
-      let foundAttempt = null;
-      for (const key of localKeys) {
+      // 1. If attemptId is present, fetch from API first
+      if (attemptId) {
         try {
-          const raw = localStorage.getItem(key);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              if (attemptId) {
-                foundAttempt = parsed.find((a) => String(a.id || a.attempt_id) === String(attemptId));
-              }
-              if (!foundAttempt && !attemptId) {
-                foundAttempt = parsed[0];
-              }
+          const res = await apiClient.get(`/results/${attemptId}/solutions`);
+          if (res.success && res.data) {
+            let qs = [];
+            let meta = null;
+            if (Array.isArray(res.data)) {
+              qs = res.data;
+            } else if (Array.isArray(res.data.solutions)) {
+              qs = res.data.solutions;
+              meta = res.data.attempt;
+            } else if (Array.isArray(res.data.questions)) {
+              qs = res.data.questions;
+              meta = res.data.attempt;
+            }
+            if (res.attempt) meta = res.attempt;
+
+            if (qs.length > 0) {
+              setSolutions(qs);
+              if (meta) setAttemptMeta(meta);
+              loaded = true;
             }
           }
-          if (foundAttempt) break;
-        } catch (e) {}
-      }
-
-      if (foundAttempt && Array.isArray(foundAttempt.questions) && foundAttempt.questions.length > 0) {
-        setSolutions(foundAttempt.questions);
-        setAttemptMeta(foundAttempt);
-        loadedFromLocal = true;
-      }
-
-      // 2. If not found locally, try API
-      if (!loadedFromLocal && attemptId) {
-        const res = await apiClient.get(`/results/${attemptId}/solutions`);
-        if (res.success) {
-          if (Array.isArray(res.data) && res.data.length > 0) {
-            setSolutions(res.data);
-            loadedFromLocal = true;
-          } else if (res.data?.questions && res.data.questions.length > 0) {
-            setSolutions(res.data.questions);
-            loadedFromLocal = true;
-          }
-          if (res.attempt || res.data?.attempt) {
-            setAttemptMeta(res.attempt || res.data.attempt);
-          }
+        } catch (apiErr) {
+          console.warn('Could not fetch solutions from API:', apiErr);
         }
       }
 
-      // 3. Fallback to sample solutions
-      if (!loadedFromLocal && solutions.length === 0) {
-        setSolutions(defaultSampleSolutions);
-        setAttemptMeta({
-          exam_title: 'Olympiad Exam',
-          title: 'Olympiad Exam',
-          score: 51,
-          total_marks: 60,
-          cutoff_marks: 42,
-          time_taken_seconds: 1800,
-          duration_minutes: 60
-        });
+      // 2. If not loaded from API, check localStorage for matching or recent attempt
+      if (!loaded) {
+        const localKeys = [
+          'olympiadhub_last_submitted_exam',
+          'olympiadhub_student_attempts',
+          'student_test_attempts',
+          'test_generator_attempts',
+          'olympiadhub_db_results'
+        ];
+
+        let foundAttempt = null;
+        for (const key of localKeys) {
+          try {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                if (attemptId) {
+                  foundAttempt = parsed.find((a) => String(a.id || a.attempt_id) === String(attemptId));
+                }
+                if (!foundAttempt && !attemptId) {
+                  foundAttempt = parsed[0];
+                }
+              } else if (parsed && typeof parsed === 'object') {
+                if (attemptId) {
+                  if (String(parsed.id || parsed.attempt_id) === String(attemptId)) {
+                    foundAttempt = parsed;
+                  }
+                } else {
+                  foundAttempt = parsed;
+                }
+              }
+            }
+            if (foundAttempt && Array.isArray(foundAttempt.questions) && foundAttempt.questions.length > 0) {
+              break;
+            }
+          } catch (e) {}
+        }
+
+        if (foundAttempt && Array.isArray(foundAttempt.questions) && foundAttempt.questions.length > 0) {
+          setSolutions(foundAttempt.questions);
+          setAttemptMeta(foundAttempt);
+          loaded = true;
+        }
       }
     } catch (err) {
       console.error('Error in fetching solutions:', err);
-      if (solutions.length === 0) {
-        setSolutions(defaultSampleSolutions);
-      }
     } finally {
       setLoading(false);
     }

@@ -1964,13 +1964,85 @@ export const mockEngine = {
 
     // RESULTS & LEADERBOARD
     if (root === 'results') {
-      const results = getDb('results');
+      const results = getDb('results') || [];
       if (sub && cleanEndpoint.includes('/solutions')) {
+        const attemptId = String(sub).replace('/solutions', '');
+        let targetAttempt = null;
+
+        // Check local storage for the matching attempt
+        const localKeys = [
+          'olympiadhub_last_submitted_exam',
+          'olympiadhub_student_attempts',
+          'olympiadhub_db_results',
+          'test_generator_attempts',
+          'student_test_attempts'
+        ];
+
+        for (const k of localKeys) {
+          try {
+            const raw = localStorage.getItem(k);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) {
+                targetAttempt = parsed.find(a => String(a.id || a.attempt_id) === String(attemptId));
+                if (!targetAttempt && !attemptId) targetAttempt = parsed[0];
+              } else if (parsed && typeof parsed === 'object') {
+                if (String(parsed.id || parsed.attempt_id) === String(attemptId) || !attemptId) {
+                  targetAttempt = parsed;
+                }
+              }
+            }
+            if (targetAttempt && Array.isArray(targetAttempt.questions) && targetAttempt.questions.length > 0) break;
+          } catch (e) {}
+        }
+
+        if (!targetAttempt) {
+          targetAttempt = results.find(r => String(r.id || r.attempt_id) === String(attemptId)) || results[0];
+        }
+
+        let questionsList = [];
+        if (targetAttempt && Array.isArray(targetAttempt.questions) && targetAttempt.questions.length > 0) {
+          questionsList = targetAttempt.questions;
+        } else if (targetAttempt?.exam_id) {
+          const allPapers = getDb('exam_papers') || [];
+          const matchedPaper = allPapers.find(p => String(p.id) === String(targetAttempt.exam_id));
+          if (matchedPaper && Array.isArray(matchedPaper.questions)) {
+            questionsList = matchedPaper.questions;
+          }
+        }
+
+        const totalQ = questionsList.length;
+        const correctCount = targetAttempt?.correct_count !== undefined
+          ? targetAttempt.correct_count
+          : questionsList.filter(q => q.is_correct || (q.userSelected !== undefined && q.userSelected === q.correct)).length;
+        const totalMarks = targetAttempt?.total_marks || totalQ || 10;
+        const score = targetAttempt?.score !== undefined ? targetAttempt.score : correctCount;
+
+        const attemptMeta = {
+          id: targetAttempt?.id || attemptId,
+          attempt_id: targetAttempt?.attempt_id || attemptId,
+          exam_id: targetAttempt?.exam_id || 1,
+          exam_title: targetAttempt?.exam_title || targetAttempt?.title || 'Olympiad Exam',
+          title: targetAttempt?.exam_title || targetAttempt?.title || 'Olympiad Exam',
+          total_questions: totalQ,
+          total_marks: totalMarks,
+          score: score,
+          cutoff_marks: targetAttempt?.cutoff_marks || Math.round(totalMarks * 0.4),
+          correct_count: correctCount,
+          wrong_count: targetAttempt?.wrong_count !== undefined ? targetAttempt.wrong_count : Math.max(0, totalQ - correctCount),
+          unanswered_count: targetAttempt?.unanswered_count || 0,
+          time_spent_seconds: targetAttempt?.time_spent_seconds || targetAttempt?.time_taken_seconds || 1800,
+          time_taken_seconds: targetAttempt?.time_taken_seconds || targetAttempt?.time_spent_seconds || 1800,
+          duration_minutes: targetAttempt?.duration_minutes || 60,
+          submitted_at: targetAttempt?.submitted_at || new Date().toISOString().replace('T', ' ').substring(0, 19)
+        };
+
         return {
           success: true,
           data: {
-            attempt: results[0] || initialStore.results[0],
-            questions: (getDb('exams')[0] || initialStore.exams[0]).questions || []
+            attempt: attemptMeta,
+            solutions: questionsList,
+            questions: questionsList
           }
         };
       }
