@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { OlympiadHubLogo } from './OlympiadHubLogo';
 import {
   LayoutDashboard,
@@ -41,11 +42,14 @@ import {
   Sparkles,
   Palette,
   Video,
-  ShieldCheck
+  ShieldCheck,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic }) => {
   const { user, logout, hasPermission } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef(null);
 
@@ -666,6 +670,27 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
               >
                 <User className="w-4.5 h-4.5 text-[#80497D]" />
                 <span>My Profile</span>
+              </button>
+
+              {/* Dark/Light Theme Switch Option */}
+              <button
+                type="button"
+                onClick={() => {
+                  toggleTheme();
+                }}
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-[#faf6fa] hover:text-[#80497D] transition-all cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5">
+                  {isDark ? (
+                    <Sun className="w-4.5 h-4.5 text-amber-400" />
+                  ) : (
+                    <Moon className="w-4.5 h-4.5 text-slate-700" />
+                  )}
+                  <span>{isDark ? 'Light Theme' : 'Dark Theme'}</span>
+                </div>
+                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-bold">
+                  {isDark ? 'ON' : 'OFF'}
+                </span>
               </button>
 
               {/* Logout Option */}
