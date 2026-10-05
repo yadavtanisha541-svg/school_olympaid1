@@ -690,23 +690,7 @@ export const PublicNavbar = ({
                           <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#6d3a68] group-hover:translate-x-0.5 transition-all" />
                         </button>
 
-                        <button
-                          type="button"
-                          onClick={() => handleLinkClick('schools')}
-                          className="w-full text-left px-4 py-2.5 text-xs font-bold text-[#4e2a4a] hover:bg-[#f4ebf4] hover:text-[#6d3a68] transition-colors flex items-center justify-between group cursor-pointer"
-                        >
-                          <span>Teacher Registration</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#6d3a68] group-hover:translate-x-0.5 transition-all" />
-                        </button>
 
-                        <button
-                          type="button"
-                          onClick={() => handleLinkClick('schools')}
-                          className="w-full text-left px-4 py-2.5 text-xs font-bold text-[#4e2a4a] hover:bg-[#f4ebf4] hover:text-[#6d3a68] transition-colors flex items-center justify-between group cursor-pointer"
-                        >
-                          <span>School Registration</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#6d3a68] group-hover:translate-x-0.5 transition-all" />
-                        </button>
 
                         <button
                           type="button"
@@ -848,20 +832,7 @@ export const PublicNavbar = ({
               >
                 Student Registration
               </button>
-              <button
-                type="button"
-                onClick={() => handleLinkClick('schools')}
-                className="w-full text-left px-3 py-2 rounded-sm text-xs font-bold text-[#4e2a4a] hover:bg-[#f4ebf4]"
-              >
-                Teacher Registration
-              </button>
-              <button
-                type="button"
-                onClick={() => handleLinkClick('schools')}
-                className="w-full text-left px-3 py-2 rounded-sm text-xs font-bold text-[#4e2a4a] hover:bg-[#f4ebf4]"
-              >
-                School Registration
-              </button>
+
               <button
                 type="button"
                 onClick={() => handleLinkClick('coordinator')}
