@@ -96,7 +96,7 @@ const DEFAULT_PERMISSIONS_CATALOG = [
     key: 'grade_subjective_papers',
     module: 'Exam & Test Engine',
     name: 'Evaluate & Grade Submissions',
-    description: 'Grade subjective questions, award bonus marks, and record faculty evaluator remarks.',
+    description: 'Grade subjective questions, award bonus marks, and record evaluator remarks.',
     adminDefault: true,
     studentDefault: false,
     level: 'Critical'
@@ -116,7 +116,7 @@ const DEFAULT_PERMISSIONS_CATALOG = [
     key: 'access_revision_vault',
     module: 'Curriculum & Notes',
     name: 'Access My Revision Vault & Bookmarks',
-    description: 'Review bookmarked tricky questions, hints, and faculty explanations for own grade.',
+    description: 'Review bookmarked tricky questions, hints, and step-by-step explanations for own grade.',
     adminDefault: true,
     studentDefault: true,
     level: 'Standard'
@@ -143,7 +143,7 @@ const DEFAULT_PERMISSIONS_CATALOG = [
     key: 'manage_online_classes',
     module: 'Curriculum & Notes',
     name: 'Manage Online Classes Studio',
-    description: 'Schedule batches, assign faculty instructors, manage stream links and video assets.',
+    description: 'Schedule batches, assign instructors, manage stream links and video assets.',
     adminDefault: true,
     studentDefault: false,
     level: 'Advanced'
@@ -266,7 +266,7 @@ const DEFAULT_PERMISSIONS_CATALOG = [
     key: 'post_doubts_in_forum',
     module: 'Community & Forum',
     name: 'Post Doubts in Student Forum',
-    description: 'Create new doubt discussion threads and ask questions to verified faculty mentors.',
+    description: 'Create new doubt discussion threads and ask questions to verified mentors.',
     adminDefault: true,
     studentDefault: true,
     level: 'Standard'
@@ -551,12 +551,12 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
                 <Shield className="w-5 h-5" />
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800">
-                Staff / Faculty
+                Admin
               </span>
             </div>
-            <h3 className="text-base font-black text-[#4e2a4a]">Administrator / Faculty</h3>
+            <h3 className="text-base font-black text-[#4e2a4a]">Administrator</h3>
             <p className="text-xs text-slate-500 mt-1">
-              Examination managers, teachers, question evaluators, and content authors.
+              Examination managers, question evaluators, and content authors.
             </p>
           </div>
 
@@ -727,7 +727,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
           <h3 className="text-sm font-black text-[#4e2a4a] flex items-center gap-2">
             <Key className="w-4 h-4 text-[#d9775b]" />
             <span>
-              Capabilities Matrix: {activeRole === 'admin' ? 'Administrator / Faculty' : activeRole === 'student' ? 'Student / Candidate' : 'Super Administrator'}
+              Capabilities Matrix: {activeRole === 'admin' ? 'Administrator' : activeRole === 'student' ? 'Student / Candidate' : 'Super Administrator'}
             </span>
           </h3>
           <span className="text-xs font-bold text-[#6d3a68] bg-[#faf5fa] px-3 py-1 rounded-full border border-[#edd6ed]">
