@@ -8,7 +8,7 @@ use PDO;
 
 class ResultController {
     public function getResults(): void {
-        $user = Auth::authenticate();
+        $user = Auth::getOptionalUser();
         $db = Database::getConnection();
 
         $examId = isset($_GET['exam_id']) && $_GET['exam_id'] !== '' ? (int)$_GET['exam_id'] : null;
@@ -22,10 +22,10 @@ class ResultController {
         $where = ["ea.status IN ('submitted', 'timed_out', 'terminated')"];
         $params = [];
 
-        if ($user['role'] === 'student' && in_array($scope, ['my', 'self', 'me'])) {
+        if ($user && $user['role'] === 'student' && in_array($scope, ['my', 'self', 'me'])) {
             $where[] = "ea.student_id = ?";
             $params[] = $user['id'];
-        } elseif ($user['role'] === 'teacher' && in_array($scope, ['my', 'self', 'me'])) {
+        } elseif ($user && $user['role'] === 'teacher' && in_array($scope, ['my', 'self', 'me'])) {
             $where[] = "(e.created_by = ? OR e.created_by = 1 OR e.created_by IS NULL OR e.exam_type IN ('practice', 'mock', 'generated'))";
             $params[] = $user['id'];
         }
@@ -86,7 +86,7 @@ class ResultController {
                    COALESCE(NULLIF(u.city, ''), '') as city,
                    e.title as exam_title, e.exam_code, e.exam_type, e.total_marks as exam_total_marks, e.total_marks, e.passing_percentage,
                    e.created_by as exam_created_by, tu.full_name as teacher_author_name,
-                   COALESCE(ac_user.name, ac_exam.name, 'Class 6') as class_name,
+                   COALESCE(ac_exam.name, ac_user.name, 'Class 6') as class_name,
                    s.name as subject_name, s.code as subject_code,
                    c.certificate_number, c.id as certificate_id
             FROM exam_attempts ea

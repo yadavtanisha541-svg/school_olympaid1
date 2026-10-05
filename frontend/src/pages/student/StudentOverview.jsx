@@ -257,7 +257,17 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
 
   const myTestResults = useMemo(() => {
     if (!user) return [];
-    return allStudentResults.filter(r => r.student_id === user.id || (r.student_login_id && r.student_login_id === user.login_id));
+    return allStudentResults.filter(r => {
+      const uId = user.id;
+      const uLogin = (user.login_id || '').toLowerCase();
+      const uEmail = (user.email || '').toLowerCase();
+      return (
+        (r.student_id && (r.student_id === uId || String(r.student_id) === String(uId))) ||
+        (r.user_id && (r.user_id === uId || String(r.user_id) === String(uId))) ||
+        (r.student_login_id && uLogin && r.student_login_id.toLowerCase() === uLogin) ||
+        (r.student_email && uEmail && r.student_email.toLowerCase() === uEmail)
+      );
+    });
   }, [allStudentResults, user]);
 
   const studentClass = user?.class || user?.grade || 'Class 6';
@@ -1144,7 +1154,13 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                       filteredStudentResults.map((r, idx) => {
                         const pct = parseFloat(r.percentage || 0).toFixed(1);
                         const isPassed = Number(r.passed) === 1 || parseFloat(pct) >= 50;
-                        const isMyRecord = user && (r.student_id === user.id || r.student_login_id === user.login_id);
+                        const isMyRecord = user && (
+                          r.student_id === user.id ||
+                          String(r.student_id) === String(user.id) ||
+                          (r.user_id && (r.user_id === user.id || String(r.user_id) === String(user.id))) ||
+                          (r.student_login_id && user.login_id && r.student_login_id.toLowerCase() === user.login_id.toLowerCase()) ||
+                          (r.student_email && user.email && r.student_email.toLowerCase() === user.email.toLowerCase())
+                        );
 
                         return (
                           <tr
