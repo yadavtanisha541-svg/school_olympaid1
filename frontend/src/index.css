@@ -11,13 +11,6 @@
   body {
     @apply bg-[#fff9f2] text-[#4e2a4a] font-sans antialiased min-h-screen text-[15px] leading-relaxed selection:bg-[#deb8de] selection:text-[#321630];
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-    transition: background-color 0.25s ease, color 0.25s ease;
-  }
-
-  html.dark body {
-    @apply bg-[#0b0f19] text-[#f1f5f9] selection:bg-[#7c3aed] selection:text-white;
-    background-color: #0b0f19 !important;
-    color: #f1f5f9 !important;
   }
 }
 
@@ -40,25 +33,9 @@
   background: #a868a7;
 }
 
-html.dark ::-webkit-scrollbar-track {
-  background: #0b0f19;
-}
-
-html.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
-}
-
-html.dark ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-
 /* Exam interface utility classes */
 .exam-option-active {
   @apply border-[#6d3a68] bg-[#f4ebf4] ring-2 ring-[#6d3a68]/25 text-[#4e2a4a] font-medium;
-}
-
-html.dark .exam-option-active {
-  @apply border-[#a855f7] bg-[#2e1065]/40 ring-2 ring-[#a855f7]/40 text-[#f3e8ff] font-medium;
 }
 
 /* Theme Pill Badges */
@@ -78,124 +55,6 @@ html.dark .exam-option-active {
   @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#f3f0fb] text-[#594774] font-extrabold text-xs tracking-tight border border-[#e8e2f7];
 }
 
-/* Dark Theme Overrides for Components, Surfaces & Cards */
-html.dark .bg-white {
-  background-color: #131b2e !important;
-}
-
-html.dark .bg-white\/95,
-html.dark .bg-white\/90,
-html.dark .bg-white\/80 {
-  background-color: rgba(19, 27, 46, 0.95) !important;
-}
-
-html.dark .bg-\[\#fff9f2\],
-html.dark .bg-\[\#fff9f2\]\/95,
-html.dark .bg-\[\#fffdfa\],
-html.dark .bg-\[\#faf6fa\],
-html.dark .bg-\[\#faf6fa\]\/95 {
-  background-color: #0b0f19 !important;
-}
-
-html.dark .bg-\[\#faf5fa\],
-html.dark .bg-\[\#f4ebf4\],
-html.dark .bg-\[\#f4eaf4\],
-html.dark .bg-\[\#faf4f9\],
-html.dark .bg-\[\#fdf2f8\],
-html.dark .bg-slate-50,
-html.dark .bg-slate-100 {
-  background-color: #182238 !important;
-}
-
-html.dark .bg-slate-50\/70,
-html.dark .bg-slate-50\/80,
-html.dark .bg-slate-50\/50,
-html.dark .bg-slate-100\/80 {
-  background-color: rgba(24, 34, 56, 0.75) !important;
-}
-
-html.dark .border-slate-200,
-html.dark .border-slate-100,
-html.dark .border-\[\#edd6ed\],
-html.dark .border-\[\#ebd7eb\],
-html.dark .border-\[\#f4ebf4\],
-html.dark .border-\[\#f4eaf4\],
-html.dark .border-\[\#fdf2f8\] {
-  border-color: #222f48 !important;
-}
-
-html.dark .border-slate-300 {
-  border-color: #334155 !important;
-}
-
-html.dark .text-slate-900,
-html.dark .text-slate-800,
-html.dark .text-\[\#4e2a4a\],
-html.dark .text-\[\#321630\],
-html.dark .text-\[\#422240\] {
-  color: #f8fafc !important;
-}
-
-html.dark .text-slate-700,
-html.dark .text-slate-600,
-html.dark .text-\[\#6d3a68\],
-html.dark .text-\[\#5c3158\],
-html.dark .text-\[\#80497D\] {
-  color: #cbd5e1 !important;
-}
-
-html.dark .text-slate-500,
-html.dark .text-slate-400 {
-  color: #94a3b8 !important;
-}
-
-html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
-html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]),
-html.dark .divide-\[\#edd6ed\] > :not([hidden]) ~ :not([hidden]),
-html.dark .divide-\[\#ebd7eb\] > :not([hidden]) ~ :not([hidden]),
-html.dark .divide-\[\#f4ebf4\] > :not([hidden]) ~ :not([hidden]),
-html.dark .divide-\[\#fdf2f8\] > :not([hidden]) ~ :not([hidden]) {
-  border-color: #222f48 !important;
-}
-
-html.dark input,
-html.dark select,
-html.dark textarea {
-  background-color: #182238 !important;
-  color: #f8fafc !important;
-  border-color: #334155 !important;
-}
-
-html.dark input::placeholder,
-html.dark textarea::placeholder {
-  color: #64748b !important;
-}
-
-html.dark .theme-pill-header {
-  background-color: #2a1628 !important;
-  border-color: #4a2747 !important;
-  color: #e9b3e6 !important;
-}
-
-html.dark .theme-pill-coral {
-  background-color: #311812 !important;
-  border-color: #55251a !important;
-  color: #fca5a5 !important;
-}
-
-html.dark .theme-pill-gold {
-  background-color: #2b220d !important;
-  border-color: #4a3a14 !important;
-  color: #fde047 !important;
-}
-
-html.dark .theme-pill-lavender {
-  background-color: #1e1b36 !important;
-  border-color: #383161 !important;
-  color: #c4b5fd !important;
-}
-
-/* Animations */
 @keyframes pulse-subtle {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
@@ -205,6 +64,7 @@ html.dark .theme-pill-lavender {
   animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Subtle gradient animations */
 .gradient-plum-coral {
   background: linear-gradient(135deg, #6d3a68 0%, #a868a7 50%, #d9775b 100%);
 }
@@ -217,6 +77,3 @@ html.dark .theme-pill-lavender {
   background: linear-gradient(180deg, #ffffff 0%, #fff9f2 100%);
 }
 
-html.dark .gradient-warm-surface {
-  background: linear-gradient(180deg, #131b2e 0%, #0b0f19 100%) !important;
-}

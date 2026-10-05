@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { OlympiadHubLogo } from '../OlympiadHubLogo';
-import { useTheme } from '../../contexts/ThemeContext';
 import {
   ChevronDown,
   Menu,
@@ -18,9 +17,7 @@ import {
   CheckCircle2,
   Download,
   HelpCircle,
-  LogIn,
-  Sun,
-  Moon
+  LogIn
 } from 'lucide-react';
 import { apiClient } from '../../api/client';
 import { OLYMPIAD_CATEGORIES } from '../../data/olympiadHubData';
@@ -34,7 +31,6 @@ export const PublicNavbar = ({
   onGoToDashboard,
   onOpenRegister
 }) => {
-  const { isDark, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileFaqsOpen, setMobileFaqsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -627,20 +623,6 @@ export const PublicNavbar = ({
 
           {/* Right Action Buttons */}
           <div className="hidden lg:flex items-center gap-3">
-            {/* Theme Switcher Button */}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="p-2.5 rounded-md bg-[#f4ebf4] hover:bg-[#edd6ed] text-[#6d3a68] border border-[#edd6ed] transition-all cursor-pointer flex items-center justify-center"
-              title={isDark ? "Switch to Light Theme" : "Switch to Dark Theme"}
-            >
-              {isDark ? (
-                <Sun className="w-4 h-4 text-amber-400 hover:rotate-45 transition-transform" />
-              ) : (
-                <Moon className="w-4 h-4 text-slate-700 hover:-rotate-12 transition-transform" />
-              )}
-            </button>
-
             {user ? (
               <div className="flex items-center gap-2">
                 <button
@@ -744,19 +726,6 @@ export const PublicNavbar = ({
 
           {/* Mobile Menu Button */}
           <div className="lg:hidden flex items-center gap-2">
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="p-1.5 rounded-md bg-[#f4ebf4] hover:bg-[#edd6ed] text-[#6d3a68] border border-[#edd6ed] transition-all cursor-pointer flex items-center justify-center"
-              title={isDark ? "Switch to Light Theme" : "Switch to Dark Theme"}
-            >
-              {isDark ? (
-                <Sun className="w-4 h-4 text-amber-400" />
-              ) : (
-                <Moon className="w-4 h-4 text-slate-700" />
-              )}
-            </button>
-
             {user ? (
               <button
                 type="button"

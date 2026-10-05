@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
-import { useTheme } from '../contexts/ThemeContext';
 import {
   Search,
   Bell,
@@ -27,15 +26,12 @@ import {
   Sparkles,
   ArrowRight,
   CornerDownLeft,
-  HelpCircle,
-  Sun,
-  Moon
+  HelpCircle
 } from 'lucide-react';
 
 export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) => {
   const { user, logout } = useAuth();
   const { totalItems, openCart } = useCart();
-  const { isDark, toggleTheme } = useTheme();
 
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -604,20 +600,6 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
 
         {/* Right: Quick actions, notifications, user pill, logout */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Dark / Light Theme Switcher */}
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="p-2 rounded-xl text-[#80497D] hover:text-[#422240] hover:bg-[#f4eaf4] transition-all cursor-pointer flex items-center justify-center"
-            title={isDark ? "Switch to Light Theme" : "Switch to Dark Theme"}
-          >
-            {isDark ? (
-              <Sun className="w-4 h-4 text-amber-400 hover:rotate-45 transition-transform" />
-            ) : (
-              <Moon className="w-4 h-4 text-slate-700 hover:-rotate-12 transition-transform" />
-            )}
-          </button>
-
           {/* Shopping Cart Button */}
           <button
             type="button"
