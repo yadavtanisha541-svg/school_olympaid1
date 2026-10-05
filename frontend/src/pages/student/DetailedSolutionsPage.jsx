@@ -3,81 +3,69 @@ import { apiClient } from '../../api/client';
 import {
   CheckCircle2,
   XCircle,
-  ArrowLeft,
-  BookOpen,
-  Check,
-  Award,
   Clock,
-  FileText,
-  Globe,
-  ListOrdered,
-  Filter,
-  CheckCircle,
+  Award,
+  ArrowLeft,
+  ChevronRight,
+  Download,
+  Printer,
+  Sparkles,
   RotateCcw,
-  Target
+  Check,
+  X,
+  HelpCircle,
+  FileText
 } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
 
-export const DetailedSolutionsPage = ({
-  attemptId,
-  initialSolutions = null,
-  initialAttemptMeta = null,
-  onBack,
-  onViewAnalysis,
-  onNavigateTab
-}) => {
-  const [solutions, setSolutions] = useState(initialSolutions || []);
-  const [attemptMeta, setAttemptMeta] = useState(initialAttemptMeta || null);
-  const [loading, setLoading] = useState(initialSolutions ? false : true);
+export const DetailedSolutionsPage = ({ attemptId, onBack, initialSolutions, initialAttemptMeta }) => {
+  const [solutions, setSolutions] = useState([]);
+  const [attemptMeta, setAttemptMeta] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('all'); // 'all' | 'correct' | 'wrong' | 'unattempted'
 
+  // Default fallback sample solutions
   const defaultSampleSolutions = useMemo(() => [
     {
       id: 1,
-      q: 'Find the sum of all prime numbers between 20 and 35.',
-      question_text: 'Find the sum of all prime numbers between 20 and 35.',
-      question: 'Find the sum of all prime numbers between 20 and 35.',
-      options: ['83', '87', '79', '89'],
-      option_a: '83',
-      option_b: '87',
-      option_c: '79',
-      option_d: '89',
-      correct_option: 'A',
+      question_text: 'What is the sum of the first 5 prime numbers?',
+      options: ['28', '26', '18', '24'],
+      option_a: '28',
+      option_b: '26',
+      option_c: '18',
+      option_d: '24',
       selected_option: 'A',
+      correct_option: 'A',
       is_correct: true,
       marks: 1,
-      explanation: 'The prime numbers between 20 and 35 are 23, 29, and 31. Therefore, Sum = 23 + 29 + 31 = 83.'
+      explanation: 'The first 5 prime numbers are 2, 3, 5, 7, and 11. Sum = 2 + 3 + 5 + 7 + 11 = 28.'
     },
     {
       id: 2,
-      q: 'What is the value of Roman numeral CLXVIII in standard Hindu-Arabic numeral system?',
-      question_text: 'What is the value of Roman numeral CLXVIII in standard Hindu-Arabic numeral system?',
-      question: 'What is the value of Roman numeral CLXVIII in standard Hindu-Arabic numeral system?',
-      options: ['168', '148', '178', '158'],
-      option_a: '168',
-      option_b: '148',
-      option_c: '178',
-      option_d: '158',
-      correct_option: 'A',
-      selected_option: 'A',
+      question_text: 'If a triangle has angles measuring 45°, 45°, and 90°, what type of triangle is it?',
+      options: ['Equilateral Triangle', 'Right-Angled Isosceles Triangle', 'Scalene Triangle', 'Obtuse Triangle'],
+      option_a: 'Equilateral Triangle',
+      option_b: 'Right-Angled Isosceles Triangle',
+      option_c: 'Scalene Triangle',
+      option_d: 'Obtuse Triangle',
+      selected_option: 'B',
+      correct_option: 'B',
       is_correct: true,
       marks: 1,
-      explanation: 'C (100) + L (50) + X (10) + V (5) + III (3) = 168.'
+      explanation: 'Since two angles are equal (45°) and one angle is 90°, it is a Right-Angled Isosceles Triangle.'
     },
     {
       id: 3,
-      q: 'Find the greatest common divisor (HCF) of 84 and 126.',
-      question_text: 'Find the greatest common divisor (HCF) of 84 and 126.',
-      question: 'Find the greatest common divisor (HCF) of 84 and 126.',
+      question_text: 'Find the Highest Common Factor (HCF) of 84 and 126.',
       options: ['42', '21', '14', '28'],
       option_a: '42',
       option_b: '21',
       option_c: '14',
       option_d: '28',
+      selected_option: null,
       correct_option: 'A',
-      selected_option: 'A',
-      is_correct: true,
+      is_correct: false,
       marks: 1,
       explanation: '84 = 2^2 × 3 × 7 and 126 = 2 × 3^2 × 7. Common factors = 2 × 3 × 7 = 42.'
     }
@@ -143,7 +131,7 @@ export const DetailedSolutionsPage = ({
         }
       }
 
-      // 3. Fallback to standard high-quality Olympiad solutions matching the mockup
+      // 3. Fallback to sample solutions
       if (!loadedFromLocal && solutions.length === 0) {
         setSolutions(defaultSampleSolutions);
         setAttemptMeta({
@@ -176,19 +164,92 @@ export const DetailedSolutionsPage = ({
     }
   }, [attemptId, initialSolutions, initialAttemptMeta]);
 
-  // Derived stats
-  const totalQuestions = solutions.length || 3;
-  const correctQuestions = solutions.filter((s) => s.is_correct || s.selected_option === s.correct_option);
-  const wrongQuestions = solutions.filter((s) => s.selected_option && s.selected_option !== s.correct_option);
-  const unattemptedQuestions = solutions.filter((s) => !s.selected_option);
+  // Normalize each solution question item reliably
+  const normalizedSolutions = useMemo(() => {
+    const letters = ['A', 'B', 'C', 'D'];
 
+    return (solutions || []).map((item, idx) => {
+      if (!item) return null;
+
+      // 1. Resolve User Selection ('A', 'B', 'C', 'D' or null)
+      let userOpt = null;
+      if (item.selected_option !== undefined && item.selected_option !== null && item.selected_option !== '') {
+        userOpt = typeof item.selected_option === 'number' ? letters[item.selected_option] : String(item.selected_option).trim().toUpperCase();
+      } else if (item.userSelected !== undefined && item.userSelected !== null && item.userSelected !== '') {
+        userOpt = typeof item.userSelected === 'number' ? letters[item.userSelected] : String(item.userSelected).trim().toUpperCase();
+      } else if (item.user_answer !== undefined && item.user_answer !== null && item.user_answer !== '') {
+        userOpt = typeof item.user_answer === 'number' ? letters[item.user_answer] : String(item.user_answer).trim().toUpperCase();
+      }
+
+      // 2. Resolve Correct Option ('A', 'B', 'C', 'D')
+      let correctOpt = 'A';
+      if (item.correct_option !== undefined && item.correct_option !== null && item.correct_option !== '') {
+        correctOpt = typeof item.correct_option === 'number' ? letters[item.correct_option] : String(item.correct_option).trim().toUpperCase();
+      } else if (item.correct !== undefined && item.correct !== null && item.correct !== '') {
+        correctOpt = typeof item.correct === 'number' ? letters[item.correct] : String(item.correct).trim().toUpperCase();
+      } else if (item.answer !== undefined && item.answer !== null && item.answer !== '') {
+        correctOpt = typeof item.answer === 'number' ? letters[item.answer] : String(item.answer).trim().toUpperCase();
+      }
+
+      // 3. Determine status
+      const isAttempted = userOpt !== null && userOpt !== '' && userOpt !== 'NULL' && userOpt !== 'UNDEFINED';
+      let isCorrect = false;
+
+      if (item.is_correct !== undefined && item.is_correct !== null) {
+        isCorrect = item.is_correct === true || item.is_correct === 1 || String(item.is_correct) === '1';
+      } else if (isAttempted) {
+        isCorrect = userOpt === correctOpt;
+      }
+
+      const isWrong = isAttempted && !isCorrect;
+      const isUnattempted = !isAttempted;
+
+      // 4. Resolve Options Array
+      let optionsArray = [];
+      if (Array.isArray(item.options)) {
+        optionsArray = item.options;
+      } else {
+        optionsArray = [
+          item.option_a || item.optionA || item.A || 'Option A',
+          item.option_b || item.optionB || item.B || 'Option B',
+          item.option_c || item.optionC || item.C || 'Option C',
+          item.option_d || item.optionD || item.D || 'Option D'
+        ];
+      }
+
+      return {
+        ...item,
+        id: item.id || idx + 1,
+        question_text: item.question_text || item.q || item.question || item.title || `Question ${idx + 1}`,
+        options: optionsArray,
+        option_a: optionsArray[0] || 'Option A',
+        option_b: optionsArray[1] || 'Option B',
+        option_c: optionsArray[2] || 'Option C',
+        option_d: optionsArray[3] || 'Option D',
+        selected_option: userOpt,
+        correct_option: correctOpt,
+        is_attempted: isAttempted,
+        is_correct: isCorrect,
+        is_wrong: isWrong,
+        is_unattempted: isUnattempted,
+        explanation: item.explanation || item.solution || item.step_by_step_explanation || 'Refer to the official Olympiad conceptual steps.'
+      };
+    }).filter(Boolean);
+  }, [solutions]);
+
+  // Derived filtered lists
+  const correctQuestions = useMemo(() => normalizedSolutions.filter((s) => s.is_correct), [normalizedSolutions]);
+  const wrongQuestions = useMemo(() => normalizedSolutions.filter((s) => s.is_wrong), [normalizedSolutions]);
+  const unattemptedQuestions = useMemo(() => normalizedSolutions.filter((s) => s.is_unattempted), [normalizedSolutions]);
+
+  const totalQuestionsCount = normalizedSolutions.length;
   const correctCount = correctQuestions.length;
   const wrongCount = wrongQuestions.length;
   const unattemptedCount = unattemptedQuestions.length;
 
-  const totalMarks = attemptMeta?.total_marks || attemptMeta?.exam_total_marks || 60;
-  const scoreObtained = attemptMeta?.score !== undefined ? attemptMeta.score : 51;
-  const cutoffMarks = attemptMeta?.cutoff_marks || 42;
+  const totalMarks = attemptMeta?.total_marks || attemptMeta?.exam_total_marks || (totalQuestionsCount > 0 ? totalQuestionsCount : 60);
+  const scoreObtained = attemptMeta?.score !== undefined ? attemptMeta.score : correctCount;
+  const cutoffMarks = attemptMeta?.cutoff_marks || Math.round(totalMarks * 0.7);
   const timeTakenSecs = attemptMeta?.time_taken_seconds || attemptMeta?.time_spent_seconds || 1800;
   const totalDurationSecs = (attemptMeta?.duration_minutes || 60) * 60;
 
@@ -204,13 +265,13 @@ export const DetailedSolutionsPage = ({
   const timeFormatted = `${formatTimeFull(timeTakenSecs)} / ${formatTimeFull(totalDurationSecs)}`;
   const examTitle = attemptMeta?.exam_title || attemptMeta?.title || 'Olympiad Exam';
 
-  // Filtered solutions
+  // Filtered solutions to render based on current radio selection
   const filteredSolutions = useMemo(() => {
     if (filterType === 'correct') return correctQuestions;
     if (filterType === 'wrong') return wrongQuestions;
     if (filterType === 'unattempted') return unattemptedQuestions;
-    return solutions;
-  }, [filterType, solutions, correctQuestions, wrongQuestions, unattemptedQuestions]);
+    return normalizedSolutions;
+  }, [filterType, normalizedSolutions, correctQuestions, wrongQuestions, unattemptedQuestions]);
 
   if (loading) {
     return (
@@ -238,84 +299,67 @@ export const DetailedSolutionsPage = ({
         </div>
 
         <div className="flex items-center gap-2.5">
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-all cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back</span>
+            </button>
+          )}
           <button
             type="button"
-            onClick={() => {
-              if (onViewAnalysis) onViewAnalysis(attemptId);
-              else if (onNavigateTab) onNavigateTab('performance');
-            }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold transition-colors cursor-pointer shadow-2xs"
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#6d3a68] hover:bg-[#582e54] text-white font-bold text-xs shadow-2xs transition-all cursor-pointer"
           >
-            <Globe className="w-3.5 h-3.5" />
-            <span>View Analysis</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              if (onNavigateTab) onNavigateTab('my_content');
-              else if (onBack) onBack();
-            }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#edd6ed] bg-[#faf5fa] hover:bg-[#f4ebf4] text-[#6d3a68] text-xs font-bold transition-colors cursor-pointer shadow-2xs"
-          >
-            <ListOrdered className="w-3.5 h-3.5" />
-            <span>Go to Test List</span>
+            <Printer className="w-3.5 h-3.5" />
+            <span>Print Solutions</span>
           </button>
         </div>
       </div>
 
-      {/* 2. STATS & FILTER BAR (MATCHING USER'S IMAGE 2) */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-          {/* Metric 1: Time Taken */}
-          <div className="flex items-center gap-3.5 pt-2 sm:pt-0 sm:px-3 first:px-0">
-            <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center shrink-0">
-              <Clock className="w-5 h-5" />
+      {/* 2. SUMMARY METRICS CARD WITH 4 FILTER RADIOS */}
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+          {/* Metric 1: Total Marks & Score */}
+          <div className="pb-3 sm:pb-0 sm:pr-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Marks Scored</p>
+            <div className="flex items-baseline gap-1.5 mt-1">
+              <span className="text-2xl sm:text-3xl font-black text-[#6d3a68]">{scoreObtained}</span>
+              <span className="text-xs font-bold text-slate-400">/ {totalMarks}</span>
             </div>
-            <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                TIME TAKEN
-              </span>
-              <p className="text-sm font-black text-slate-800 font-mono mt-0.5">
-                {timeFormatted}
-              </p>
-            </div>
+            <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">
+              {correctCount} of {totalQuestionsCount} questions correct
+            </p>
           </div>
 
-          {/* Metric 2: Marks Obtained */}
-          <div className="flex items-center gap-3.5 pt-2 sm:pt-0 sm:px-3">
-            <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center shrink-0">
-              <FileText className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                MARKS OBTAINED
-              </span>
-              <p className="text-sm font-black text-blue-700 font-mono mt-0.5">
-                {scoreObtained} / {totalMarks}
-              </p>
-            </div>
+          {/* Metric 2: Time Taken / Total Duration */}
+          <div className="pt-3 sm:pt-0 sm:px-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Time Taken / Total</p>
+            <p className="text-lg sm:text-xl font-black text-slate-800 font-mono mt-1">
+              {timeFormatted}
+            </p>
+            <p className="text-[10px] text-slate-400 font-medium mt-0.5">Automated timer recording</p>
           </div>
 
-          {/* Metric 3: Last Year Cutoff Marks */}
-          <div className="flex items-center gap-3.5 pt-2 sm:pt-0 sm:px-3">
-            <div className="w-10 h-10 rounded-full bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center shrink-0">
-              <Target className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                LAST YEAR CUTOFF MARKS
-              </span>
-              <p className="text-sm font-black text-slate-800 font-mono mt-0.5">
-                {cutoffMarks} / {totalMarks}
-              </p>
-            </div>
+          {/* Metric 3: Cutoff / Total Marks */}
+          <div className="pt-3 sm:pt-0 sm:px-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Cutoff / Total Marks</p>
+            <p className="text-lg sm:text-xl font-black text-slate-800 font-mono mt-1">
+              {cutoffMarks} / {totalMarks}
+            </p>
+            <p className="text-[10px] text-purple-700 font-semibold mt-0.5">
+              {scoreObtained >= cutoffMarks ? '✓ Qualified Merit Benchmark' : 'Practice Target Benchmark'}
+            </p>
           </div>
 
           {/* Metric 4: Filter Radios (All, Correct, Wrong, Unattempted) */}
           <div className="pt-3 sm:pt-0 sm:pl-4 flex flex-col justify-center gap-1.5">
             <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
-              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-800 select-none">
+              {/* All */}
+              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-800 select-none group">
                 <input
                   type="radio"
                   name="solutionFilter"
@@ -324,10 +368,13 @@ export const DetailedSolutionsPage = ({
                   onChange={() => setFilterType('all')}
                   className="w-3.5 h-3.5 text-blue-600 focus:ring-blue-500 cursor-pointer"
                 />
-                <span>All ({totalQuestions})</span>
+                <span className={filterType === 'all' ? 'text-blue-600 font-black' : ''}>
+                  All ({totalQuestionsCount})
+                </span>
               </label>
 
-              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-emerald-700 select-none">
+              {/* Correct */}
+              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-emerald-700 select-none group">
                 <input
                   type="radio"
                   name="solutionFilter"
@@ -336,10 +383,13 @@ export const DetailedSolutionsPage = ({
                   onChange={() => setFilterType('correct')}
                   className="w-3.5 h-3.5 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                 />
-                <span>Correct ({correctCount})</span>
+                <span className={filterType === 'correct' ? 'text-emerald-700 font-black underline' : ''}>
+                  Correct ({correctCount})
+                </span>
               </label>
 
-              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-rose-700 select-none">
+              {/* Wrong */}
+              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-rose-700 select-none group">
                 <input
                   type="radio"
                   name="solutionFilter"
@@ -348,10 +398,13 @@ export const DetailedSolutionsPage = ({
                   onChange={() => setFilterType('wrong')}
                   className="w-3.5 h-3.5 text-rose-600 focus:ring-rose-500 cursor-pointer"
                 />
-                <span>Wrong ({wrongCount})</span>
+                <span className={filterType === 'wrong' ? 'text-rose-700 font-black underline' : ''}>
+                  Wrong ({wrongCount})
+                </span>
               </label>
 
-              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-amber-700 select-none">
+              {/* Unattempted */}
+              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-amber-700 select-none group">
                 <input
                   type="radio"
                   name="solutionFilter"
@@ -360,7 +413,9 @@ export const DetailedSolutionsPage = ({
                   onChange={() => setFilterType('unattempted')}
                   className="w-3.5 h-3.5 text-amber-600 focus:ring-amber-500 cursor-pointer"
                 />
-                <span>Unattempted ({unattemptedCount})</span>
+                <span className={filterType === 'unattempted' ? 'text-amber-700 font-black underline' : ''}>
+                  Unattempted ({unattemptedCount})
+                </span>
               </label>
             </div>
           </div>
@@ -370,28 +425,32 @@ export const DetailedSolutionsPage = ({
       {/* 3. QUESTIONS & SOLUTIONS LIST */}
       <div className="space-y-5 pt-1">
         {filteredSolutions.length === 0 ? (
-          <div className="bg-white rounded-3xl border border-slate-200 p-8 text-center text-slate-500">
-            <p className="text-sm font-bold">No questions found for the selected filter: <span className="uppercase text-blue-600">{filterType}</span></p>
+          <div className="bg-white rounded-3xl border border-slate-200 p-8 text-center text-slate-500 space-y-3">
+            <p className="text-sm font-bold">
+              No questions found for the selected filter: <span className="uppercase text-blue-600">{filterType}</span> ({filterType === 'correct' ? correctCount : (filterType === 'wrong' ? wrongCount : unattemptedCount)})
+            </p>
             <button
               type="button"
               onClick={() => setFilterType('all')}
-              className="mt-3 px-4 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer"
+              className="px-4 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer shadow-2xs transition-colors"
             >
-              Reset to All Questions
+              Show All Questions ({totalQuestionsCount})
             </button>
           </div>
         ) : (
           filteredSolutions.map((item, idx) => {
-            const isCorrect = !!item.is_correct || item.selected_option === item.correct_option;
+            const isCorrect = item.is_correct;
+            const isWrong = item.is_wrong;
+            const isUnattempted = item.is_unattempted;
             const userSelected = item.selected_option;
             const correctOpt = item.correct_option || 'A';
 
             return (
               <div
                 key={item.id || idx}
-                className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-7 shadow-xs space-y-4"
+                className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-7 shadow-xs space-y-4 animate-in fade-in duration-150"
               >
-                {/* Question Header: Question 1 pill on left, CORRECT (+1.0) on right */}
+                {/* Question Header: Question pill on left, STATUS on right */}
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-[#6d3a68] bg-[#faf5fa] px-3 py-1 rounded-lg border border-[#edd6ed]">
@@ -404,38 +463,31 @@ export const DetailedSolutionsPage = ({
                       className={`inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-xs font-bold border ${
                         isCorrect
                           ? 'bg-[#ecfdf5] text-[#059669] border-[#a7f3d0]'
-                          : userSelected
+                          : isWrong
                           ? 'bg-[#fdf2f2] text-[#e02424] border-[#fbd5d5]'
-                          : 'bg-[#f8fafc] text-slate-500 border-slate-200'
+                          : 'bg-[#fffbeb] text-[#b45309] border-[#fde68a]'
                       }`}
                     >
-                      {isCorrect ? 'CORRECT (+1.0)' : userSelected ? 'INCORRECT (0.0)' : 'UNATTEMPTED (0.0)'}
+                      {isCorrect ? '✓ CORRECT (+1.0)' : isWrong ? '✗ INCORRECT (0.0)' : '○ UNATTEMPTED (0.0)'}
                     </span>
                   </div>
                 </div>
 
                 {/* Question Text */}
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
-                  {item.question_text || item.q || item.question || item.title || 'Find the sum of all prime numbers between 20 and 35.'}
+                  {item.question_text}
                 </h3>
 
                 {/* 4 MCQ Options */}
                 <div className="space-y-2.5">
                   {['A', 'B', 'C', 'D'].map((opt, optIdx) => {
-                    const optLower = (opt || '').toString().toLowerCase();
-                    const text = item
-                      ? item[`option_${optLower}`] ||
-                        item[optLower] ||
-                        (Array.isArray(item.options) ? item.options[optIdx] : '') ||
-                        (item.options && item.options[opt]) ||
-                        `Option ${opt}`
-                      : `Option ${opt}`;
+                    const text = item.options?.[optIdx] || item[`option_${opt.toLowerCase()}`] || `Option ${opt}`;
                     const isUserPick = userSelected === opt;
                     const isThisCorrect = correctOpt === opt;
 
                     let cardStyle = 'border-slate-200 bg-white text-slate-800';
                     if (isThisCorrect) {
-                      cardStyle = 'border-emerald-500 bg-emerald-50/50 text-emerald-950 font-bold';
+                      cardStyle = 'border-emerald-500 bg-emerald-50/60 text-emerald-950 font-bold';
                     } else if (isUserPick && !isThisCorrect) {
                       cardStyle = 'border-rose-400 bg-rose-50/70 text-rose-950 font-bold';
                     }
