@@ -334,7 +334,7 @@ export const DetailedSolutionsPage = ({
           <button
             type="button"
             onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold text-xs shadow-md shadow-purple-950/20 border border-purple-400/40 transition-all cursor-pointer active:scale-95"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold text-xs shadow-md shadow-purple-950/20 border border-[#7854d6]/40 transition-all cursor-pointer active:scale-95"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Print Solutions</span>

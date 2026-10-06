@@ -597,7 +597,7 @@ export const StudentMyContentPage = ({
                         <button
                           type="button"
                           onClick={() => setSelectedPaperForInstructions(paper)}
-                          className="inline-flex items-center gap-2 px-5 py-2 rounded-xl border-2 border-purple-500 text-purple-700 hover:bg-purple-600 hover:text-white font-black text-xs sm:text-sm shadow-2xs hover:shadow-md transition-all cursor-pointer active:scale-95"
+                          className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95"
                         >
                           <span>Open Test</span>
                           <ArrowRight className="w-4 h-4" />
@@ -707,7 +707,7 @@ export const StudentMyContentPage = ({
                         setOpenedMockSeries(sub.code);
                         setSelectedSubject(sub.code);
                       }}
-                      className="w-full py-3 rounded-full bg-[#1b7e47] hover:bg-[#136136] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-950/20 active:scale-98 transition-all cursor-pointer"
+                      className="w-full py-3 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-purple-950/20 active:scale-98 transition-all cursor-pointer"
                     >
                       <span>Start Mock Test</span>
                       <ArrowRight className="w-4 h-4" />

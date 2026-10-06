@@ -122,12 +122,12 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-72 bg-gradient-to-b from-[#121c3b] via-[#161d3c] to-[#0f152b] border-r border-[#263560] flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 text-slate-100 shadow-2xl ${
+        className={`fixed top-0 bottom-0 left-0 z-40 w-72 bg-gradient-to-b from-[#0f172a] via-[#1e1b4b] to-[#2e1065] border-r border-[#312e81]/60 flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 text-slate-100 shadow-2xl ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Brand Header */}
-        <div className="h-20 px-5 flex items-center justify-between border-b border-[#263560] shrink-0 bg-[#0f172a]/95">
+        <div className="h-20 px-5 flex items-center justify-between border-b border-[#312e81]/60 shrink-0 bg-[#0f172a]/95">
           <OlympiadHubLogo size="sm" showTagline={false} light={true} />
         </div>
 
@@ -141,9 +141,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                 onGoToPublic();
                 if (onClose) onClose();
               }}
-              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-bold text-blue-200 bg-[#182650] hover:bg-[#20336b] border border-blue-700/50 mb-2 cursor-pointer shadow-md transition-colors"
+              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-bold text-blue-100 bg-gradient-to-r from-[#1e3a8a]/80 via-[#4338ca]/60 to-[#831843]/60 hover:from-[#1e40af] hover:via-[#4f46e5] hover:to-[#9d174d] border border-indigo-500/40 mb-2 cursor-pointer shadow-md transition-all"
             >
-              <Globe className="w-4.5 h-4.5 text-blue-400 shrink-0" />
+              <Globe className="w-4.5 h-4.5 text-blue-300 shrink-0" />
               <span>🌐 View Public Website</span>
             </button>
           )}
@@ -157,11 +157,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
             }}
             className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer ${
               currentTab === 'overview'
-                ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-purple-950/40 border border-purple-400/40'
+                ? 'bg-gradient-to-r from-[#1d4ed8] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
                 : 'text-slate-200 hover:bg-[#1a264e] hover:text-white font-semibold'
             }`}
           >
-            <LayoutDashboard className={`w-5 h-5 shrink-0 ${currentTab === 'overview' ? 'text-white' : 'text-purple-300'}`} />
+            <LayoutDashboard className={`w-5 h-5 shrink-0 ${currentTab === 'overview' ? 'text-white' : 'text-blue-300'}`} />
             <span>Dashboard</span>
           </button>
 
@@ -171,7 +171,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           {user?.role === 'superadmin' && (
             <div className="space-y-1 pt-2.5">
               <div className="px-3 pb-1">
-                <p className="text-xs font-black uppercase tracking-wider text-purple-300">
+                <p className="text-xs font-black uppercase tracking-wider text-pink-300">
                   ADMINISTRATION
                 </p>
               </div>
@@ -189,11 +189,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     }}
                     className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer text-left ${
                       isActive
-                        ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-purple-950/40 border border-purple-400/40'
+                        ? 'bg-gradient-to-r from-[#1d4ed8] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
                         : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                     }`}
                   >
-                    <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-purple-300'}`} />
+                    <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-blue-300'}`} />
                     <span className="truncate">{item.label}</span>
                   </button>
                 );
@@ -207,7 +207,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           {user?.role === 'teacher' && (
             <div className="space-y-1 pt-2.5">
               <div className="px-3 pb-1">
-                <p className="text-xs font-black uppercase tracking-wider text-purple-300">
+                <p className="text-xs font-black uppercase tracking-wider text-pink-300">
                   FACULTY PORTAL
                 </p>
               </div>
@@ -225,11 +225,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     }}
                     className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer text-left ${
                       isActive
-                        ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-purple-950/40 border border-purple-400/40'
+                        ? 'bg-gradient-to-r from-[#1d4ed8] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
                         : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                     }`}
                   >
-                    <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-purple-300'}`} />
+                    <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-blue-300'}`} />
                     <span className="truncate">{item.label}</span>
                   </button>
                 );
@@ -244,7 +244,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
             <div className="space-y-3.5 pt-2">
               {/* SECTION A: OLYMPIADS */}
               <div className="space-y-1.5">
-                <p className="px-3 text-xs font-black uppercase tracking-wider text-purple-300">
+                <p className="px-3 text-xs font-black uppercase tracking-wider text-pink-300">
                   OLYMPIADS
                 </p>
 
@@ -252,7 +252,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                 <div>
                   <div className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold transition-colors ${
                     currentTab === 'my_content' || currentTab.startsWith('content_')
-                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-lg shadow-purple-950/40 border border-purple-400/40'
+                      ? 'bg-gradient-to-r from-[#1d4ed8] via-[#7c3aed] to-[#db2777] text-white shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
                       : 'text-slate-200 hover:bg-[#1a264e] hover:text-white'
                   }`}>
                     <button
@@ -266,7 +266,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                       }}
                       className="flex-1 flex items-center gap-2.5 text-left cursor-pointer"
                     >
-                      <BookOpen className="w-5 h-5 text-purple-300 shrink-0" />
+                      <BookOpen className="w-5 h-5 text-pink-200 shrink-0" />
                       <span>Mock Test</span>
                     </button>
                     <button
@@ -311,11 +311,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                             }}
                             className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
                               isSubActive
-                                ? 'bg-[#241e54] text-purple-200 font-bold border border-purple-600/50 shadow-xs'
+                                ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                                 : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                             }`}
                           >
-                            <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-purple-300' : 'text-blue-300'}`} />
+                            <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-pink-300' : 'text-blue-300'}`} />
                             <span>{sub.label}</span>
                           </button>
                         );
@@ -333,17 +333,17 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   }}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
                     currentTab === 'my_classes'
-                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-purple-950/40 border border-purple-400/40'
+                      ? 'bg-gradient-to-r from-[#1d4ed8] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
                       : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                   }`}
                 >
-                  <Users className="w-5 h-5 text-purple-300 shrink-0" />
+                  <Users className="w-5 h-5 text-blue-300 shrink-0" />
                   <span>My Classes</span>
                 </button>
               </div>
 
               {/* SECTION B: MY PERFORMANCE */}
-              <div className="space-y-1.5 pt-2 border-t border-[#263560]/60">
+              <div className="space-y-1.5 pt-2 border-t border-[#312e81]/60">
                 {/* My Performance Accordion Header */}
                 <div>
                   <button
@@ -373,7 +373,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
                           currentTab === 'performance'
-                            ? 'bg-[#241e54] text-purple-200 font-bold border border-purple-600/50 shadow-xs'
+                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
@@ -388,7 +388,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
                           currentTab === 'analysis' || currentTab === 'exam_solutions'
-                            ? 'bg-[#241e54] text-purple-200 font-bold border border-purple-600/50 shadow-xs'
+                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
@@ -408,18 +408,18 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   }}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
                     currentTab === 'my_revision'
-                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-purple-950/40 border border-purple-400/40'
+                      ? 'bg-gradient-to-r from-[#1d4ed8] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
                       : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                   }`}
                 >
-                  <Bookmark className="w-5 h-5 text-purple-300 shrink-0" />
+                  <Bookmark className="w-5 h-5 text-pink-300 shrink-0" />
                   <span>My Revision</span>
                 </button>
               </div>
 
               {/* SECTION C: MY ACCOUNT */}
-              <div className="space-y-1.5 pt-2 border-t border-[#263560]/60">
-                <p className="px-3 text-xs font-black uppercase tracking-wider text-purple-300">
+              <div className="space-y-1.5 pt-2 border-t border-[#312e81]/60">
+                <p className="px-3 text-xs font-black uppercase tracking-wider text-pink-300">
                   MY ACCOUNT
                 </p>
 
@@ -452,7 +452,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
                           currentTab === 'profile'
-                            ? 'bg-[#241e54] text-purple-200 font-bold border border-purple-600/50 shadow-xs'
+                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
@@ -467,7 +467,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
                           currentTab === 'my_orders'
-                            ? 'bg-[#241e54] text-purple-200 font-bold border border-purple-600/50 shadow-xs'
+                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
@@ -482,7 +482,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
                           currentTab === 'my_wallet'
-                            ? 'bg-[#241e54] text-purple-200 font-bold border border-purple-600/50 shadow-xs'
+                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
@@ -495,8 +495,8 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
               </div>
 
               {/* SECTION D: OTHERS & INFORMATION */}
-              <div className="space-y-1.5 pt-2 border-t border-[#263560]/60">
-                <p className="px-3 text-xs font-black uppercase tracking-wider text-purple-300">
+              <div className="space-y-1.5 pt-2 border-t border-[#312e81]/60">
+                <p className="px-3 text-xs font-black uppercase tracking-wider text-pink-300">
                   INFO &amp; EXTRAS
                 </p>
 
@@ -537,11 +537,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                             }}
                             className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
                               isSubActive
-                                ? 'bg-[#241e54] text-purple-200 font-bold border border-purple-600/50 shadow-xs'
+                                ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                                 : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                             }`}
                           >
-                            <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-purple-300' : 'text-blue-300'}`} />
+                            <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-pink-300' : 'text-blue-300'}`} />
                             <span>{sub.label}</span>
                           </button>
                         );
@@ -579,7 +579,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
                           currentTab === 'free_sample_papers'
-                            ? 'bg-[#241e54] text-purple-200 font-bold border border-purple-600/50 shadow-xs'
+                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
@@ -594,7 +594,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
                           currentTab === 'free_past_papers'
-                            ? 'bg-[#241e54] text-purple-200 font-bold border border-purple-600/50 shadow-xs'
+                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
@@ -614,11 +614,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   }}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
                     currentTab === 'free_quizzes'
-                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-purple-950/40 border border-purple-400/40'
+                      ? 'bg-gradient-to-r from-[#1d4ed8] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
                       : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                   }`}
                 >
-                  <HelpCircle className="w-5 h-5 text-purple-300 shrink-0" />
+                  <HelpCircle className="w-5 h-5 text-blue-300 shrink-0" />
                   <span>FREE Quizzes</span>
                 </button>
               </div>

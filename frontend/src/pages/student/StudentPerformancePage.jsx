@@ -351,7 +351,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
                   className="w-16 h-16 rounded-2xl object-cover ring-4 ring-purple-100 border border-[#ebd7eb] shadow-md"
                 />
               ) : (
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#1e3a8a] via-[#6b21a8] to-[#9d174d] text-white font-black text-2xl flex items-center justify-center shadow-md ring-4 ring-purple-100">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-black text-2xl flex items-center justify-center shadow-md ring-4 ring-purple-100">
                   {studentName.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -396,7 +396,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex items-center gap-2 text-xs font-bold text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be185d] border border-white/20 px-4 py-2 rounded-xl transition-all shadow-md shadow-purple-950/20 cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-2 text-xs font-bold text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] border border-[#7854d6]/40 px-4 py-2 rounded-xl transition-all shadow-md shadow-purple-950/20 cursor-pointer active:scale-95"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Download Report</span>
@@ -518,7 +518,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
                     {/* Bar Pillar */}
                     <div className="w-full bg-slate-100 rounded-2xl overflow-hidden h-full max-h-[160px] flex items-end p-0.5 border border-slate-200 shadow-inner">
                       <div
-                        className="w-full bg-gradient-to-t from-[#1e3a8a] via-[#6b21a8] to-[#9d174d] rounded-xl transition-all duration-500 shadow-md group-hover:brightness-110"
+                        className="w-full bg-gradient-to-t from-[#16327a] via-[#5b3da8] to-[#9333ea] rounded-xl transition-all duration-500 shadow-md group-hover:brightness-110"
                         style={{ height: `${Math.max(10, pct)}%` }}
                       />
                     </div>
@@ -545,7 +545,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
               <button
                 type="button"
                 onClick={() => onNavigateTab('available_exams')}
-                className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be185d] text-white text-xs font-bold transition-all shadow-md cursor-pointer border border-white/20"
+                className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
               >
                 <Play className="w-3.5 h-3.5" />
                 <span>Start First Exam Now</span>
@@ -711,7 +711,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
                 </div>
                 <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
                   <div
-                    className="bg-gradient-to-r from-[#1e3a8a] via-[#6b21a8] to-[#9d174d] h-2.5 rounded-full transition-all duration-500"
+                    className="bg-gradient-to-r from-[#16327a] via-[#5b3da8] to-[#9333ea] h-2.5 rounded-full transition-all duration-500"
                     style={{ width: `${Math.min(100, Math.max(5, sub.accuracy || 0))}%` }}
                   />
                 </div>
