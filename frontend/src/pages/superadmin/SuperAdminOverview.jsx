@@ -98,142 +98,148 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
 
   return (
     <div className="space-y-6 pb-12 font-sans">
-      {/* 1. Brand Greeting Banner with Exact Brand Palette & Live Time */}
-      <div className="bg-gradient-to-r from-[#faf6fa] via-white to-[#fdf7f5] border border-[#ebd7eb] rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-white border border-[#ebd7eb] shadow-xs flex items-center justify-center text-[#80497D] shrink-0">
-            <Trophy className="w-7 h-7 text-[#80497D] fill-[#f4eaf4]" />
+      {/* 1. Hero Greeting Banner (Dark Royal Blue & Purple Gradient Banner matching Student panel) */}
+      <div className="bg-gradient-to-r from-[#122459] via-[#241e54] to-[#5b3da8] border border-[#3e347e] rounded-3xl p-5 sm:p-6 shadow-xl shadow-purple-950/20 relative overflow-hidden text-white">
+        {/* Soft Decorative Glow Blobs */}
+        <div className="absolute top-0 right-1/4 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-10 w-40 h-40 bg-blue-500/20 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-[#1b254b] border border-[#34457e] shadow-md flex items-center justify-center text-amber-300 shrink-0">
+              <Trophy className="w-7 h-7 text-amber-300 fill-amber-300/30" />
+            </div>
+            <div className="min-w-0">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#182650] text-purple-200 font-extrabold text-[11px] tracking-wider uppercase border border-[#2d448c]">
+                WELCOME BACK, SUPER ADMIN
+              </span>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight mt-1 leading-snug truncate">
+                OlympiadHub Performance &amp; Analytics
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-200 font-medium truncate mt-0.5">
+                Monitor candidates, academic metrics, and live examination activities.
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <span className="inline-flex items-center gap-1.5 px-3 py-0.8 rounded-lg bg-[#f4eaf4] text-[#80497D] font-extrabold text-xs tracking-wider uppercase border border-[#ebd7eb]">
-              Welcome Back
-            </span>
-            <h1 className="text-lg sm:text-2xl font-black text-[#422240] tracking-tight mt-1 leading-snug truncate">
-              OlympiadHub Performance &amp; Analytics
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-600 font-medium truncate mt-0.5">
-              Monitor candidates, academic metrics, and live examination activities.
+
+          <div className="text-left sm:text-right shrink-0">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#182650] border border-[#2d448c] rounded-xl text-xs font-bold text-blue-200 shadow-sm">
+              <Calendar className="w-3.5 h-3.5 text-blue-300" />
+              <span>{formattedDateStr}</span>
+            </div>
+            <p className="text-sm sm:text-base font-mono font-black text-purple-300 mt-1">
+              {formattedTimeStr}
             </p>
           </div>
         </div>
-
-        <div className="text-left sm:text-right shrink-0">
-          <p className="text-sm sm:text-base font-bold text-[#80497D] flex items-center gap-1.5 sm:justify-end">
-            <Calendar className="w-4 h-4 text-[#80497D]" />
-            <span>{formattedDateStr}</span>
-          </p>
-          <p className="text-sm sm:text-lg font-mono font-black text-[#80497D] mt-0.5">
-            {formattedTimeStr}
-          </p>
-        </div>
       </div>
 
-      {/* 2. Top Metric Cards (Row 1: 4 Light Purple & Light Green Cards) */}
+      {/* 2. Top Metric Cards (Row 1: 4 Dark Navy/Purple Boxes matching Student panel cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        {/* Total Students (Light Purple) */}
-        <div className="bg-white rounded-2xl border border-[#eee6f8] p-5 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
+        {/* Total Students (Dark Purple/Navy Box) */}
+        <div className="bg-[#121c3b] rounded-3xl border-2 border-[#2a3a68] hover:border-purple-400 p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
           <div className="flex items-center gap-3.5">
-            <div className="w-14 h-14 rounded-2xl bg-[#faf5ff] text-[#7c3aed] flex items-center justify-center border border-[#e9d5ff] shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-purple-950/80 text-purple-300 border border-purple-800/60 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
               <Users className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-xs sm:text-sm font-bold text-slate-500">Total Students</p>
-              <h3 className="text-2xl sm:text-3xl font-black text-[#2e1065] leading-tight mt-0.5 font-mono">
+              <p className="text-xs sm:text-sm font-bold text-slate-300">Total Students</p>
+              <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight mt-0.5 font-mono">
                 {metrics.total_students ?? 2}
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">Enrolled candidates</p>
+              <p className="text-xs text-purple-300 font-semibold mt-0.5">Enrolled candidates</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <svg className="w-14 h-7 text-[#c084fc] stroke-current fill-none" viewBox="0 0 50 20">
+            <svg className="w-14 h-7 text-purple-400 stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 15 Q 15 5 25 10 T 50 3" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-xs font-black text-[#7c3aed] mt-1 bg-[#faf5ff] px-2 py-0.5 rounded border border-[#e9d5ff]">↑ 12%</span>
+            <span className="text-xs font-black text-purple-300 mt-1 bg-purple-950/90 px-2 py-0.5 rounded-lg border border-purple-800/60">↑ 12%</span>
           </div>
         </div>
 
-        {/* Registered Schools (Light Green) */}
-        <div className="bg-white rounded-2xl border border-[#eee6f8] p-5 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
+        {/* Registered Schools (Dark Emerald/Navy Box) */}
+        <div className="bg-[#121c3b] rounded-3xl border-2 border-[#2a3a68] hover:border-emerald-400 p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
           <div className="flex items-center gap-3.5">
-            <div className="w-14 h-14 rounded-2xl bg-[#ecfdf5] text-[#059669] flex items-center justify-center border border-[#a7f3d0] shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
               <Building2 className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-xs sm:text-sm font-bold text-slate-500">Registered Schools</p>
-              <h3 className="text-2xl sm:text-3xl font-black text-[#064e3b] leading-tight mt-0.5 font-mono">
+              <p className="text-xs sm:text-sm font-bold text-slate-300">Registered Schools</p>
+              <h3 className="text-2xl sm:text-3xl font-black text-emerald-300 leading-tight mt-0.5 font-mono">
                 {metrics.total_schools ?? 12}
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">Partner Institutions</p>
+              <p className="text-xs text-emerald-300 font-semibold mt-0.5">Partner Institutions</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <svg className="w-14 h-7 text-[#34d399] stroke-current fill-none" viewBox="0 0 50 20">
+            <svg className="w-14 h-7 text-emerald-400 stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 18 Q 12 12 25 8 T 50 2" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-xs font-black text-[#059669] mt-1 bg-[#ecfdf5] px-2 py-0.5 rounded border border-[#a7f3d0]">↑ 18%</span>
+            <span className="text-xs font-black text-emerald-300 mt-1 bg-emerald-950/90 px-2 py-0.5 rounded-lg border border-emerald-800/60">↑ 18%</span>
           </div>
         </div>
 
-        {/* Total Exams (Light Purple) */}
-        <div className="bg-white rounded-2xl border border-[#eee6f8] p-5 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
+        {/* Total Exams (Dark Blue/Navy Box) */}
+        <div className="bg-[#121c3b] rounded-3xl border-2 border-[#2a3a68] hover:border-blue-400 p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
           <div className="flex items-center gap-3.5">
-            <div className="w-14 h-14 rounded-2xl bg-[#faf5ff] text-[#9333ea] flex items-center justify-center border border-[#e9d5ff] shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-blue-950/80 text-blue-300 border border-blue-800/60 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
               <FileSpreadsheet className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-xs sm:text-sm font-bold text-slate-500">Total Exams</p>
-              <h3 className="text-2xl sm:text-3xl font-black text-[#2e1065] leading-tight mt-0.5 font-mono">
+              <p className="text-xs sm:text-sm font-bold text-slate-300">Total Exams</p>
+              <h3 className="text-2xl sm:text-3xl font-black text-blue-300 leading-tight mt-0.5 font-mono">
                 {metrics.total_exams ?? 2}
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">Live Olympiads</p>
+              <p className="text-xs text-blue-300 font-semibold mt-0.5">Live Olympiads</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <svg className="w-14 h-7 text-[#a855f7] stroke-current fill-none" viewBox="0 0 50 20">
+            <svg className="w-14 h-7 text-blue-400 stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 16 Q 15 14 30 6 T 50 2" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-xs font-black text-[#9333ea] mt-1 bg-[#faf5ff] px-2 py-0.5 rounded border border-[#e9d5ff]">↑ 50%</span>
+            <span className="text-xs font-black text-blue-300 mt-1 bg-blue-950/90 px-2 py-0.5 rounded-lg border border-blue-800/60">↑ 50%</span>
           </div>
         </div>
 
-        {/* Questions in Bank (Light Green) */}
-        <div className="bg-white rounded-2xl border border-[#eee6f8] p-5 shadow-card hover:shadow-card-hover transition-all flex items-center justify-between">
+        {/* Questions in Bank (Dark Amber/Navy Box) */}
+        <div className="bg-[#121c3b] rounded-3xl border-2 border-[#2a3a68] hover:border-amber-400 p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
           <div className="flex items-center gap-3.5">
-            <div className="w-14 h-14 rounded-2xl bg-[#ecfdf5] text-[#047857] flex items-center justify-center border border-[#a7f3d0] shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-amber-950/80 text-amber-300 border border-amber-800/60 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
               <FileText className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-xs sm:text-sm font-bold text-slate-500">Questions in Bank</p>
-              <h3 className="text-2xl sm:text-3xl font-black text-[#064e3b] leading-tight mt-0.5 font-mono">
+              <p className="text-xs sm:text-sm font-bold text-slate-300">Questions in Bank</p>
+              <h3 className="text-2xl sm:text-3xl font-black text-amber-300 leading-tight mt-0.5 font-mono">
                 {metrics.total_questions ?? 3}
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">Across all subjects</p>
+              <p className="text-xs text-amber-300 font-semibold mt-0.5">Across all subjects</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <svg className="w-14 h-7 text-[#6ee7b7] stroke-current fill-none" viewBox="0 0 50 20">
+            <svg className="w-14 h-7 text-amber-400 stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 18 Q 15 10 30 12 T 50 4" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-xs font-black text-[#047857] mt-1 bg-[#ecfdf5] px-2 py-0.5 rounded border border-[#a7f3d0]">↑ 33%</span>
+            <span className="text-xs font-black text-amber-300 mt-1 bg-amber-950/90 px-2 py-0.5 rounded-lg border border-amber-800/60">↑ 33%</span>
           </div>
         </div>
       </div>
 
-      {/* 3. Performance & Analytics Section */}
+      {/* 3. Performance & Analytics Section (Dark Navy & Purple Boxes) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Chart: Assigned vs Completed Participation Trend (7 Cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-[#eee6f8] p-6 shadow-card flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-[#121c3b] rounded-3xl border-2 border-[#2a3a68] p-6 shadow-xl text-white flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="theme-pill-header text-xs sm:text-sm">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#1b254b] text-purple-200 border border-[#34457e] font-bold text-xs uppercase tracking-wider">
                 Participation YoY Growth
               </span>
-              <div className="flex items-center gap-3 text-xs sm:text-sm font-bold text-slate-500">
+              <div className="flex items-center gap-3 text-xs sm:text-sm font-bold text-slate-300">
                 <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-[#a855f7]" /> This Period (Purple)
+                  <span className="w-3 h-3 rounded-full bg-purple-400" /> This Period (Purple)
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-[#10b981]" /> Previous (Green)
+                  <span className="w-3 h-3 rounded-full bg-emerald-400" /> Previous (Green)
                 </span>
               </div>
             </div>
@@ -241,75 +247,75 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             {/* Line Trend SVG */}
             <div className="h-48 w-full mt-4">
               <svg className="w-full h-full overflow-visible" viewBox="0 0 500 130" preserveAspectRatio="none">
-                <line x1="0" y1="10" x2="500" y2="10" stroke="#f1f5f9" strokeDasharray="3" />
-                <line x1="0" y1="50" x2="500" y2="50" stroke="#f1f5f9" strokeDasharray="3" />
-                <line x1="0" y1="90" x2="500" y2="90" stroke="#f1f5f9" strokeDasharray="3" />
-                <line x1="0" y1="130" x2="500" y2="130" stroke="#e2e8f0" />
+                <line x1="0" y1="10" x2="500" y2="10" stroke="#1f2c52" strokeDasharray="3" />
+                <line x1="0" y1="50" x2="500" y2="50" stroke="#1f2c52" strokeDasharray="3" />
+                <line x1="0" y1="90" x2="500" y2="90" stroke="#1f2c52" strokeDasharray="3" />
+                <line x1="0" y1="130" x2="500" y2="130" stroke="#2a3a68" />
 
-                {/* Primary Trend (This Year - Light Purple) */}
+                {/* Primary Trend (This Year - Purple) */}
                 <path
                   d="M 0 85 Q 80 75 160 55 T 320 40 T 500 20"
                   fill="none"
-                  stroke="#a855f7"
+                  stroke="#c084fc"
                   strokeWidth="3.5"
                   strokeLinecap="round"
                 />
-                <circle cx="160" cy="55" r="4" fill="#a855f7" stroke="#fff" strokeWidth="2" />
-                <circle cx="320" cy="40" r="4" fill="#a855f7" stroke="#fff" strokeWidth="2" />
-                <circle cx="500" cy="20" r="4" fill="#a855f7" stroke="#fff" strokeWidth="2" />
+                <circle cx="160" cy="55" r="4" fill="#c084fc" stroke="#121c3b" strokeWidth="2" />
+                <circle cx="320" cy="40" r="4" fill="#c084fc" stroke="#121c3b" strokeWidth="2" />
+                <circle cx="500" cy="20" r="4" fill="#c084fc" stroke="#121c3b" strokeWidth="2" />
 
-                {/* Secondary Trend (Last Year - Light Green) */}
+                {/* Secondary Trend (Last Year - Emerald Green) */}
                 <path
                   d="M 0 105 Q 80 95 160 80 T 320 65 T 500 45"
                   fill="none"
-                  stroke="#10b981"
+                  stroke="#34d399"
                   strokeWidth="3"
                   strokeLinecap="round"
                 />
-                <circle cx="160" cy="80" r="3.5" fill="#10b981" stroke="#fff" strokeWidth="2" />
-                <circle cx="320" cy="65" r="3.5" fill="#10b981" stroke="#fff" strokeWidth="2" />
-                <circle cx="500" cy="45" r="3.5" fill="#10b981" stroke="#fff" strokeWidth="2" />
+                <circle cx="160" cy="80" r="3.5" fill="#34d399" stroke="#121c3b" strokeWidth="2" />
+                <circle cx="320" cy="65" r="3.5" fill="#34d399" stroke="#121c3b" strokeWidth="2" />
+                <circle cx="500" cy="45" r="3.5" fill="#34d399" stroke="#121c3b" strokeWidth="2" />
               </svg>
             </div>
 
-            <div className="flex justify-between text-xs font-bold text-slate-500 mt-3 px-1 font-mono">
+            <div className="flex justify-between text-xs font-bold text-slate-400 mt-3 px-1 font-mono">
               <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
             </div>
           </div>
         </div>
 
-        {/* Right Chart: Subject Accuracy Breakdown (5 Cols) */}
-        <div className="lg:col-span-5 bg-white rounded-3xl border border-[#eee6f8] p-6 shadow-card flex flex-col justify-between">
+        {/* Right Chart: Subject Accuracy Breakdown (5 Cols) (Dark Purple Box) */}
+        <div className="lg:col-span-5 bg-[#231b4a] rounded-3xl border-2 border-[#48378c] p-6 shadow-xl text-white flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="theme-pill-header text-xs sm:text-sm">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#382b6e] text-purple-200 border border-[#5d49a8] font-bold text-xs uppercase tracking-wider">
                 Subject Accuracy
               </span>
               <button
                 type="button"
                 onClick={() => onNavigateTab('results')}
-                className="text-xs sm:text-sm font-bold text-[#7c3aed] hover:underline cursor-pointer"
+                className="text-xs sm:text-sm font-bold text-purple-300 hover:text-white hover:underline cursor-pointer"
               >
                 Details →
               </button>
             </div>
 
-            {/* Horizontal Pastel Progress Bars */}
+            {/* Horizontal Progress Bars */}
             <div className="space-y-4 mt-4">
               {[
-                { name: 'Mathematics', accuracy: 92, color: '#a855f7' },
-                { name: 'Science & Physics', accuracy: 84, color: '#10b981' },
-                { name: 'English & Literature', accuracy: 88, color: '#c084fc' },
-                { name: 'General Knowledge', accuracy: 76, color: '#34d399' }
+                { name: 'Mathematics', accuracy: 92, color: '#c084fc' },
+                { name: 'Science & Physics', accuracy: 84, color: '#34d399' },
+                { name: 'English & Literature', accuracy: 88, color: '#a855f7' },
+                { name: 'General Knowledge', accuracy: 76, color: '#6ee7b7' }
               ].map((sub, i) => (
                 <div key={i}>
                   <div className="flex justify-between text-xs sm:text-sm font-bold mb-1.5">
-                    <span className="text-[#2e1065]">{sub.name}</span>
-                    <span className="font-mono text-slate-800 font-black">{sub.accuracy}%</span>
+                    <span className="text-white font-semibold">{sub.name}</span>
+                    <span className="font-mono text-purple-300 font-black">{sub.accuracy}%</span>
                   </div>
-                  <div className="h-3.5 rounded-full bg-slate-100 overflow-hidden p-0.5">
+                  <div className="h-3 rounded-full bg-[#1a1438] overflow-hidden p-0.5 border border-[#503d96]">
                     <div
-                      className="h-full rounded-full transition-all duration-500"
+                      className="h-full rounded-full transition-all duration-500 shadow-sm"
                       style={{ width: `${sub.accuracy}%`, backgroundColor: sub.color }}
                     />
                   </div>
@@ -318,25 +324,25 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm font-semibold text-slate-600">
+          <div className="mt-6 pt-4 border-t border-[#48378c] flex items-center justify-between text-xs sm:text-sm font-semibold text-slate-300">
             <span>Overall Platform Accuracy</span>
-            <span className="font-black text-[#065f46] font-mono text-base">{metrics.avg_score ?? 85}%</span>
+            <span className="font-black text-emerald-300 font-mono text-base">{metrics.avg_score ?? 85}%</span>
           </div>
         </div>
       </div>
 
-      {/* 4. Bottom Section: Submissions & Activity Logs with Pastel Accents */}
+      {/* 4. Bottom Section: Submissions & Activity Logs (Dark Navy/Purple Boxes) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Recent Submissions (7 Cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-[#eee6f8] p-6 shadow-card">
+        {/* Recent Submissions (7 Cols - Dark Navy Box) */}
+        <div className="lg:col-span-7 bg-[#121c3b] rounded-3xl border-2 border-[#2a3a68] p-6 shadow-xl text-white">
           <div className="flex items-center justify-between mb-4">
-            <span className="theme-pill-header">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#182650] text-purple-200 border border-[#2d448c] font-bold text-xs uppercase tracking-wider">
               Candidate Submissions
             </span>
             <button
               type="button"
               onClick={() => onNavigateTab('results')}
-              className="text-xs font-bold text-[#7c3aed] hover:underline cursor-pointer"
+              className="text-xs font-bold text-purple-300 hover:text-white hover:underline cursor-pointer"
             >
               View All Results →
             </button>
@@ -344,25 +350,25 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
 
           <div className="space-y-2.5 mt-3">
             {candidateSubmissions.map((cand, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 rounded-2xl bg-[#faf5ff] hover:bg-[#f3e8ff] border border-[#e9d5ff] transition-all">
+              <div key={idx} className="flex items-center justify-between p-3 rounded-2xl bg-[#1a2850] hover:bg-[#20336b] border border-[#2d448c] transition-all">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className={`w-9 h-9 rounded-xl bg-gradient-to-tr ${cand.color || 'from-[#a855f7] to-[#7c3aed]'} text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs`}>
+                  <div className={`w-9 h-9 rounded-xl bg-gradient-to-tr ${cand.color || 'from-[#5b3da8] to-[#16327a]'} text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-md`}>
                     {cand.initials || (cand.student_name ? cand.student_name.charAt(0) : 'S')}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-[#2e1065] truncate">
+                    <p className="text-xs font-bold text-white truncate">
                       {cand.name || cand.student_name}
                     </p>
-                    <p className="text-[11px] text-slate-400 truncate">
+                    <p className="text-[11px] text-slate-300 truncate">
                       {cand.exam || cand.exam_title}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2.5 shrink-0 ml-2">
-                  <span className="text-[11px] text-slate-400 font-medium">
+                  <span className="text-[11px] text-slate-300 font-medium">
                     {cand.time || 'Today'}
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-950/80 text-emerald-300 border border-emerald-800/60">
                     PASSED
                   </span>
                 </div>
@@ -371,17 +377,17 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
           </div>
         </div>
 
-        {/* Audit Activity Summary (5 Cols) */}
-        <div className="lg:col-span-5 bg-white rounded-3xl border border-[#eee6f8] p-6 shadow-card flex flex-col justify-between">
+        {/* Audit Activity Summary (5 Cols - Dark Purple Box) */}
+        <div className="lg:col-span-5 bg-[#231b4a] rounded-3xl border-2 border-[#48378c] p-6 shadow-xl text-white flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="theme-pill-header">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#382b6e] text-purple-200 border border-[#5d49a8] font-bold text-xs uppercase tracking-wider">
                 System Audit Trail
               </span>
               <button
                 type="button"
                 onClick={() => onNavigateTab('activity_logs')}
-                className="text-xs font-bold text-[#7c3aed] hover:underline cursor-pointer"
+                className="text-xs font-bold text-purple-300 hover:text-white hover:underline cursor-pointer"
               >
                 Full Logs →
               </button>
@@ -389,12 +395,12 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
 
             <div className="space-y-2.5 mt-3">
               {recentLogs.slice(0, 4).map((log, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-[#faf5ff] border border-[#e9d5ff] text-xs">
+                <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-[#1a1438] border border-[#503d96] text-xs">
                   <div className="min-w-0 flex-1 pr-2">
-                    <p className="font-bold text-[#2e1065] truncate text-xs">{log.action}</p>
-                    <p className="text-[11px] text-slate-400 truncate">{log.user || log.user_name || 'System'}</p>
+                    <p className="font-bold text-white truncate text-xs">{log.action}</p>
+                    <p className="text-[11px] text-slate-300 truncate">{log.user || log.user_name || 'System'}</p>
                   </div>
-                  <span className="text-[10px] font-mono text-[#7c3aed] bg-[#f5f0ff] px-2 py-0.5 rounded-md border border-[#e9d5ff] shrink-0">
+                  <span className="text-[10px] font-mono text-purple-300 bg-[#382b6e] px-2 py-0.5 rounded-md border border-[#5d49a8] shrink-0">
                     {log.module}
                   </span>
                 </div>
