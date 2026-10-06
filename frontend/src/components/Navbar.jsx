@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useTheme } from '../contexts/ThemeContext';
 import {
   Search,
   Bell,
@@ -26,12 +27,15 @@ import {
   Sparkles,
   ArrowRight,
   CornerDownLeft,
-  HelpCircle
+  HelpCircle,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) => {
   const { user, logout } = useAuth();
   const { totalItems, openCart } = useCart();
+  const { theme, toggleTheme } = useTheme();
 
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -451,7 +455,11 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-[#faf6fa]/95 backdrop-blur-md border-b border-[#ebd7eb] h-20 flex items-center px-4 sm:px-6 lg:px-8 lg:pl-72 w-full">
+    <header className={`sticky top-0 z-30 backdrop-blur-md border-b h-20 flex items-center px-4 sm:px-6 lg:px-8 lg:pl-72 w-full transition-colors duration-200 ${
+      theme === 'dark'
+        ? 'bg-[#0f172a]/95 border-slate-800 text-slate-100'
+        : 'bg-[#faf6fa]/95 border-[#ebd7eb] text-slate-800'
+    }`}>
       <div className="w-full flex items-center justify-between gap-4 max-w-7xl mx-auto">
         {/* Left: Mobile Toggle & Global Search Bar */}
         <div className="flex items-center gap-3 flex-1 max-w-xl">
@@ -598,16 +606,41 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
           </div>
         </div>
 
-        {/* Right: Quick actions, notifications, user pill, logout (Larger & More Prominent) */}
-        <div className="flex items-center gap-2.5 sm:gap-3.5">
-          {/* Shopping Cart Button (Enlarged) */}
+        {/* Right: Quick actions, Light/Dark toggle, notifications, cart, logout */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Light / Dark Mode Toggle Button */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className={`p-2.5 sm:p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-center shadow-2xs group active:scale-95 ${
+              theme === 'dark'
+                ? 'bg-slate-800 hover:bg-slate-700 border-slate-750 text-amber-300 hover:text-amber-200 shadow-md shadow-indigo-950/40'
+                : 'bg-white hover:bg-[#faf5fa] border-[#ebd7eb] text-[#80497D] hover:text-[#422240]'
+            }`}
+            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+            aria-label="Toggle Theme"
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-5 h-5 sm:w-5.5 sm:h-5.5 transition-transform group-hover:rotate-45 text-amber-300" />
+            ) : (
+              <Moon className="w-5 h-5 sm:w-5.5 sm:h-5.5 transition-transform group-hover:-rotate-12 text-[#80497D]" />
+            )}
+          </button>
+
+          {/* Shopping Cart Button */}
           <button
             type="button"
             onClick={openCart}
-            className="relative p-2.5 sm:p-3 rounded-2xl bg-white hover:bg-[#faf5fa] border border-[#ebd7eb] text-[#80497D] hover:text-[#422240] transition-all cursor-pointer flex items-center justify-center shadow-2xs group active:scale-95"
+            className={`relative p-2.5 sm:p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-center shadow-2xs group active:scale-95 ${
+              theme === 'dark'
+                ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200 hover:text-white'
+                : 'bg-white hover:bg-[#faf5fa] border-[#ebd7eb] text-[#80497D] hover:text-[#422240]'
+            }`}
             title={`Shopping Cart (${totalItems} items)`}
           >
-            <ShoppingCart className="w-5 h-5 sm:w-5.5 sm:h-5.5 transition-transform group-hover:scale-110 text-[#80497D]" />
+            <ShoppingCart className={`w-5 h-5 sm:w-5.5 sm:h-5.5 transition-transform group-hover:scale-110 ${
+              theme === 'dark' ? 'text-pink-400' : 'text-[#80497D]'
+            }`} />
             {totalItems > 0 ? (
               <span className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#f5b82e] text-slate-950 font-black text-xs flex items-center justify-center ring-2 ring-white animate-in zoom-in shadow-xs">
                 {totalItems}
@@ -617,24 +650,34 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
             )}
           </button>
 
-          {/* Notification Bell (Enlarged) */}
+          {/* Notification Bell */}
           <button
             type="button"
             onClick={onOpenNotifications}
-            className="relative p-2.5 sm:p-3 rounded-2xl bg-white hover:bg-[#faf5fa] border border-[#ebd7eb] text-[#80497D] hover:text-[#422240] transition-all cursor-pointer shadow-2xs group active:scale-95 flex items-center justify-center"
+            className={`relative p-2.5 sm:p-3 rounded-2xl border transition-all cursor-pointer shadow-2xs group active:scale-95 flex items-center justify-center ${
+              theme === 'dark'
+                ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200 hover:text-white'
+                : 'bg-white hover:bg-[#faf5fa] border-[#ebd7eb] text-[#80497D] hover:text-[#422240]'
+            }`}
             title="Open Notification Center"
           >
-            <Bell className="w-5 h-5 sm:w-5.5 sm:h-5.5 transition-transform group-hover:scale-110 text-[#80497D]" />
+            <Bell className={`w-5 h-5 sm:w-5.5 sm:h-5.5 transition-transform group-hover:scale-110 ${
+              theme === 'dark' ? 'text-pink-400' : 'text-[#80497D]'
+            }`} />
             <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#C35B3F] ring-2 ring-white animate-pulse" />
           </button>
 
-          {/* Quick Logout Button (Enlarged & Bold) */}
+          {/* Quick Logout Button */}
           <button
             type="button"
             onClick={async () => {
               await logout();
             }}
-            className="inline-flex items-center gap-2 px-3.5 py-2.5 sm:px-4.5 sm:py-2.5 text-xs sm:text-sm font-extrabold text-[#80497D] hover:text-rose-600 bg-white hover:bg-rose-50 border border-[#ebd7eb] hover:border-rose-200 rounded-2xl transition-all cursor-pointer shadow-2xs active:scale-95"
+            className={`inline-flex items-center gap-2 px-3.5 py-2.5 sm:px-4.5 sm:py-2.5 text-xs sm:text-sm font-extrabold rounded-2xl transition-all cursor-pointer shadow-2xs active:scale-95 ${
+              theme === 'dark'
+                ? 'text-slate-200 hover:text-rose-400 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-rose-500/40'
+                : 'text-[#80497D] hover:text-rose-600 bg-white hover:bg-rose-50 border border-[#ebd7eb] hover:border-rose-200'
+            }`}
             title="Sign Out / Logout"
           >
             <LogOut className="w-4 h-4 sm:w-4.5 sm:h-4.5" />

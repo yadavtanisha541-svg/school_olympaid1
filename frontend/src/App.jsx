@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from './contexts/AuthContext';
+import { useTheme } from './contexts/ThemeContext';
 import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
 import { LoginPage } from './pages/auth/LoginPage';
@@ -193,6 +194,7 @@ const updateUrlAndStorage = (state) => {
 
 export const App = () => {
   const { user, loading } = useAuth();
+  const { theme } = useTheme();
 
   const initialRoute = useMemo(() => parseRouteFromUrl(), []);
 
@@ -850,7 +852,7 @@ export const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf6fa] flex flex-col w-full overflow-x-hidden">
+    <div className={`min-h-screen flex flex-col w-full overflow-x-hidden transition-colors duration-200 ${theme === 'dark' ? 'bg-[#0b1120] text-slate-100' : 'bg-[#faf6fa] text-slate-900'}`}>
       {/* Top Navbar */}
       <Navbar
         isSidebarOpen={isSidebarOpen}
