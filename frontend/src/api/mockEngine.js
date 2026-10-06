@@ -1097,18 +1097,18 @@ export const mockEngine = {
           },
           {
             id: 601,
-            title: 'Olympiads Level-2 Champs Package - ISSO Reasoning Class 6',
+            title: 'Olympiads Level-2 Champs Package - IHO Hindi Class 6',
             class_name: 'Class 6',
-            subject_code: 'ISSO',
-            subject_name: 'International Social Studies & Reasoning Olympiad',
+            subject_code: 'IHO',
+            subject_name: 'International Hindi Olympiad',
             price: 1499,
             original_price: 1999,
-            header_color: '#7c3aed',
+            header_color: '#dc2626',
             status: 'active',
             points: [
-              '8 Full-Length ISSO Social Science & Reasoning Papers',
-              'History, Geography & Civics Quick Revision Notes',
-              'Logical & Analytical Reasoning Master Practice Sets',
+              '8 Full-Length IHO Hindi Vyakaran & Sahitya Papers',
+              'Varn, Shabd, Sandhi & Samas Quick Revision Notes',
+              'Muhavare, Lokoktiyan & Bhasha Bodh Master Practice Sets',
               'Instant Detailed Answers with Expert Explanations'
             ],
             sub_items: []
@@ -1414,28 +1414,28 @@ export const mockEngine = {
           },
           {
             id: 1006,
-            title: 'Class 6 ISSO Reasoning & Social Studies 2019',
-            short_code: 'ISSO - 2019',
-            subject_code: 'ISSO',
-            subject_name: 'ISSO (Social Studies & Reasoning)',
+            title: 'Class 6 IHO Hindi Olympiad 2019',
+            short_code: 'IHO - 2019',
+            subject_code: 'IHO',
+            subject_name: 'IHO (Hindi)',
             class_name: 'Class 6',
             paper_category: 'previous_year',
             exam_year: '2019',
             duration_minutes: 60,
             total_marks: 60,
             status: 'published',
-            header_color: '#7c3aed',
-            accent_color: '#7c3aed',
-            sections: ['Social Studies', 'Aptitude & Reasoning', 'Achievers Section'],
+            header_color: '#dc2626',
+            accent_color: '#dc2626',
+            sections: ['Hindi Vyakaran', 'Bhasha Bodh', 'Achievers Section'],
             questions: [
               {
                 id: 1,
-                section: 'Social Studies',
-                q: 'Which ancient Harappan city had a famous artificial tidal dockyard?',
-                options: ['Lothal', 'Mohenjo-daro', 'Kalibangan', 'Harappa'],
+                section: 'Hindi Vyakaran',
+                q: 'निम्न में से कौन-सा शब्द \'सूर्य\' का पर्यायवाची नहीं है?',
+                options: ['शशि', 'रवि', 'दिनकर', 'भास्कर'],
                 correct: 0,
                 marks: 1,
-                explanation: 'Lothal in Gujarat was a prominent port city with a brick basin dockyard.'
+                explanation: '\'शशि\' चन्द्रमा का पर्यायवाची है, सूर्य का नहीं।'
               },
               {
                 id: 2,
@@ -1863,11 +1863,11 @@ export const mockEngine = {
           // ISSO Reasoning Mock Test Series
           {
             id: 3010,
-            title: 'ISSO Level-1 Mock Test 1 Class 6',
-            short_code: 'ISSO - Mock 1',
-            series_title: 'Class 6 - All India ISSO Mock Test Series',
-            subject_code: 'ISSO',
-            subject_name: 'ISSO (Social Studies & Reasoning)',
+            title: 'IHO Level-1 Mock Test 1 Class 6',
+            short_code: 'IHO - Mock 1',
+            series_title: 'Class 6 - All India IHO Mock Test Series',
+            subject_code: 'IHO',
+            subject_name: 'IHO (Hindi)',
             class_name: 'Class 6',
             paper_category: 'mock_test',
             exam_year: '2026',
@@ -1875,18 +1875,18 @@ export const mockEngine = {
             total_marks: 60,
             cutoff_marks: 42,
             status: 'published',
-            header_color: '#809926',
-            accent_color: '#809926',
-            sections: ['Social Science', 'Logical Reasoning', 'Achievers Section'],
+            header_color: '#dc2626',
+            accent_color: '#dc2626',
+            sections: ['Hindi Vyakaran', 'Bhasha Bodh', 'Achievers Section'],
             questions: [
               {
                 id: 1,
-                section: 'Logical Reasoning',
-                q: 'Find the odd one out: 27, 64, 125, 144, 216',
-                options: ['144', '27', '64', '125'],
+                section: 'Hindi Vyakaran',
+                q: 'निम्न में से कौन-सा शब्द \'सूर्य\' का पर्यायवाची नहीं है?',
+                options: ['शशि', 'रवि', 'दिनकर', 'भास्कर'],
                 correct: 0,
                 marks: 1,
-                explanation: '27=3^3, 64=4^3, 125=5^3, 216=6^3 are perfect cubes. 144 is 12^2 (square, not a cube).'
+                explanation: '\'शशि\' चन्द्रमा का पर्यायवाची है, सूर्य का नहीं।'
               }
             ]
           }

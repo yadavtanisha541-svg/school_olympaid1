@@ -27,12 +27,10 @@ import { apiClient } from '../../api/client';
 const ALL_SUBJECTS = [
   'Mathematics',
   'Science',
+  'Digital Literacy',
   'English',
-  'Computer Science',
-  'Reasoning',
-  'Mental Maths',
   'General Knowledge',
-  'Vocabulary'
+  'Hindi'
 ];
 
 const ALL_CLASSES = [

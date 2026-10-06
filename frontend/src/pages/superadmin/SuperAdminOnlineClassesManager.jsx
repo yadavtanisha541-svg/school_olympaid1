@@ -45,13 +45,12 @@ const CLASSES_LIST = [
 
 const SUBJECTS_LIST = [
   'All Subjects',
-  'Reasoning (ISSO)',
   'Mathematics (IMO)',
   'Science (ISO/NSO)',
+  'Digital Literacy (IDLO)',
   'English (IEO)',
-  'Cyber (ICSO)',
   'General Knowledge (IGKO)',
-  'All-in-One Combo'
+  'Hindi (IHO)'
 ];
 
 export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {

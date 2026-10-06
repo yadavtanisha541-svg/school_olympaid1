@@ -41,19 +41,19 @@ import {
 } from 'lucide-react';
 
 const SUBJECT_CONFIGS = {
-  icso: {
-    code: 'ICSO',
-    name: 'International Cyber Olympiad',
-    shortTitle: 'ICSO (Cyber)',
-    badgeColor: 'bg-sky-600',
-    borderColor: 'border-sky-500',
-    lightBg: 'bg-sky-50',
-    icon: Laptop,
-    accent: '#0284c7',
-    logoLetters: ['I', 'C', 'S', 'O'],
-    subjectsIncluded: 'ICSO, IMO & ISO',
-    synopsisSubjects: 'ICSO, IMO & ISO',
-    worksheetsSubjects: 'ICSO & ISO'
+  imo: {
+    code: 'IMO',
+    name: 'International Mathematics Olympiad',
+    shortTitle: 'IMO (Maths)',
+    badgeColor: 'bg-amber-500',
+    borderColor: 'border-amber-400',
+    lightBg: 'bg-amber-50',
+    icon: Calculator,
+    accent: '#d97706',
+    logoLetters: ['I', 'M', 'O'],
+    subjectsIncluded: 'IMO, ISO & IEO',
+    synopsisSubjects: 'IMO, ISO & IDLO',
+    worksheetsSubjects: 'IMO & ISO'
   },
   iso: {
     code: 'ISO',
@@ -66,22 +66,22 @@ const SUBJECT_CONFIGS = {
     accent: '#059669',
     logoLetters: ['I', 'S', 'O'],
     subjectsIncluded: 'ISO, IMO & IEO',
-    synopsisSubjects: 'ISO, IMO & ICSO',
+    synopsisSubjects: 'ISO, IMO & IDLO',
     worksheetsSubjects: 'ISO & IMO'
   },
-  imo: {
-    code: 'IMO',
-    name: 'International Mathematics Olympiad',
-    shortTitle: 'IMO (Maths)',
-    badgeColor: 'bg-amber-500',
-    borderColor: 'border-amber-400',
-    lightBg: 'bg-amber-50',
-    icon: Calculator,
-    accent: '#d97706',
-    logoLetters: ['I', 'M', 'O'],
-    subjectsIncluded: 'IMO, ISO & IEO',
-    synopsisSubjects: 'IMO, ISO & ICSO',
-    worksheetsSubjects: 'IMO & ISO'
+  idlo: {
+    code: 'IDLO',
+    name: 'International Digital Literacy Olympiad',
+    shortTitle: 'IDLO (Digital)',
+    badgeColor: 'bg-sky-600',
+    borderColor: 'border-sky-500',
+    lightBg: 'bg-sky-50',
+    icon: Laptop,
+    accent: '#0284c7',
+    logoLetters: ['I', 'D', 'L', 'O'],
+    subjectsIncluded: 'IDLO, IMO & ISO',
+    synopsisSubjects: 'IDLO, IMO & ISO',
+    worksheetsSubjects: 'IDLO & ISO'
   },
   ieo: {
     code: 'IEO',
@@ -111,19 +111,19 @@ const SUBJECT_CONFIGS = {
     synopsisSubjects: 'IGKO, IMO & IEO',
     worksheetsSubjects: 'IGKO & IMO'
   },
-  isso: {
-    code: 'ISSO',
-    name: 'International Social Studies & Reasoning Olympiad',
-    shortTitle: 'ISSO (Reasoning)',
-    badgeColor: 'bg-purple-600',
-    borderColor: 'border-purple-500',
-    lightBg: 'bg-purple-50',
-    icon: Brain,
-    accent: '#7c3aed',
-    logoLetters: ['I', 'S', 'S', 'O'],
-    subjectsIncluded: 'ISSO, IMO & ISO',
-    synopsisSubjects: 'ISSO, IMO & ISO',
-    worksheetsSubjects: 'ISSO & IMO'
+  iho: {
+    code: 'IHO',
+    name: 'International Hindi Olympiad',
+    shortTitle: 'IHO (Hindi)',
+    badgeColor: 'bg-rose-600',
+    borderColor: 'border-rose-500',
+    lightBg: 'bg-rose-50',
+    icon: BookOpen,
+    accent: '#dc2626',
+    logoLetters: ['I', 'H', 'O'],
+    subjectsIncluded: 'IHO, IMO & ISO',
+    synopsisSubjects: 'IHO, IMO & IEO',
+    worksheetsSubjects: 'IHO & IMO'
   }
 };
 

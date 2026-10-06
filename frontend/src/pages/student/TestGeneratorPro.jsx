@@ -35,22 +35,6 @@ import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfM
 import { DetailedSolutionsPage } from './DetailedSolutionsPage';
 
 const CHAPTERS_BY_SUBJECT = {
-  reasoning: [
-    'Mirror and Water Images',
-    'Cubes and Dice',
-    'Dot Situation',
-    'Blood Relations',
-    'Mathematical Operations',
-    'Embedded Figures & Grouping',
-    'Analogy and Classification',
-    'Paper Folding and Paper Cutting',
-    'Logical Venn Diagrams',
-    'Clock and Calendar',
-    'Series Completion and Missing Character',
-    'Alpha-Numeric & Logical Sequence',
-    'Analytical Reasoning',
-    'Coding - Decoding & Direction Sense'
-  ],
   math: [
     'Number Sense and Numeration',
     'Computation Operations (Add, Sub, Mul, Div)',
@@ -75,6 +59,15 @@ const CHAPTERS_BY_SUBJECT = {
     'Earth, Universe and Space Sciences',
     'Scientific Inquiry & HOTS'
   ],
+  digital: [
+    'Fundamentals of Computer & OS',
+    'Hardware, Storage & Memory Devices',
+    'Software & Application Tools',
+    'Internet, Networking & Cyber Safety',
+    'MS Office Tools (Word, Excel, PowerPoint)',
+    'Algorithms, Flowcharts & AI Basics',
+    'Achievers Section (Advanced Computing)'
+  ],
   english: [
     'Nouns, Pronouns and Determiners',
     'Verbs, Tenses and Modal Auxiliaries',
@@ -87,16 +80,6 @@ const CHAPTERS_BY_SUBJECT = {
     'Reading Comprehension Passages',
     'Spoken and Written Expression'
   ],
-  cyber: [
-    'Computers and Information Technology Basics',
-    'Hardware, Memory and Storage Devices',
-    'Operating Systems & Application Software',
-    'MS Office (Word, PowerPoint, Excel)',
-    'Internet, Networking & Cyber Security',
-    'Algorithms and Flowcharts',
-    'Latest IT Developments & AI',
-    'Achievers Section (Advanced Computing)'
-  ],
   gk: [
     'Our Body and Health',
     'Plants, Animals & Environment',
@@ -106,16 +89,25 @@ const CHAPTERS_BY_SUBJECT = {
     'Current National & International Affairs',
     'Sports, Games & Awards',
     'Life Skills & Quantitative Aptitude'
+  ],
+  hindi: [
+    'वर्ण विचार एवं वर्तनी शुद्धि',
+    'शब्द विचार (संज्ञा, सर्वनाम, विशेषण)',
+    'क्रिया, काल एवं कारक',
+    'संधि, समास, उपसर्ग एवं प्रत्यय',
+    'पर्यायवाची एवं विलोम शब्द',
+    'मुहावरे, लोकोक्तियाँ एवं वाक्य शुद्धि',
+    'अपठित गद्यांश एवं भाषा बोध'
   ]
 };
 
 const subjectsMap = {
-  english: { name: 'IEO (English)', code: 'IEO', color: '#ea580c', letter: 'E' },
   math: { name: 'IMO (Maths)', code: 'IMO', color: '#eab308', letter: 'M' },
   science: { name: 'ISO (Science)', code: 'ISO', color: '#16a34a', letter: 'S' },
-  cyber: { name: 'ICSO (Cyber)', code: 'ICSO', color: '#0284c7', letter: 'C' },
+  digital: { name: 'IDLO (Digital Literacy)', code: 'IDLO', color: '#0284c7', letter: 'D' },
+  english: { name: 'IEO (English)', code: 'IEO', color: '#ea580c', letter: 'E' },
   gk: { name: 'IGKO (GK)', code: 'IGKO', color: '#e7b84b', letter: 'G' },
-  reasoning: { name: 'ISSO (Reasoning)', code: 'ISSO', color: '#7c3aed', letter: 'R' }
+  hindi: { name: 'IHO (Hindi)', code: 'IHO', color: '#dc2626', letter: 'H' }
 };
 
 export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {

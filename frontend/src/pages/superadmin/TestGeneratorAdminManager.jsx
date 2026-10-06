@@ -40,10 +40,10 @@ import { useAuth } from '../../contexts/AuthContext';
 const SUBJECT_OPTIONS = [
   { id: 'math', name: 'IMO (Mathematics)', code: 'IMO', color: '#d97706', icon: '📐' },
   { id: 'science', name: 'ISO (Science)', code: 'ISO', color: '#059669', icon: '🔬' },
-  { id: 'cyber', name: 'ICSO (Cyber)', code: 'ICSO', color: '#0284c7', icon: '💻' },
+  { id: 'digital', name: 'IDLO (Digital Literacy)', code: 'IDLO', color: '#0284c7', icon: '💻' },
   { id: 'english', name: 'IEO (English)', code: 'IEO', color: '#ea580c', icon: '📖' },
   { id: 'gk', name: 'IGKO (General Knowledge)', code: 'IGKO', color: '#e7b84b', icon: '🌍' },
-  { id: 'reasoning', name: 'ISSO (Reasoning & Social Studies)', code: 'ISSO', color: '#9333ea', icon: '🧠' }
+  { id: 'hindi', name: 'IHO (Hindi)', code: 'IHO', color: '#dc2626', icon: '🇮🇳' }
 ];
 
 const GRADE_OPTIONS = [

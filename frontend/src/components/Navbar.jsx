@@ -132,12 +132,12 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
         },
         {
           id: 'admin_exam_cs_live',
-          title: 'Class 1 Computer Science Live Olympiad 2026',
+          title: 'Class 1 Digital Literacy Live Olympiad 2026',
           description: 'Live test paper with 10 questions for Class 1',
           category: 'Olympiads',
           tab: 'exams',
           icon: BookOpen,
-          keywords: 'computer science live olympiad 2026 class 1 test paper exam'
+          keywords: 'digital literacy live olympiad 2026 class 1 test paper exam'
         },
         {
           id: 'admin_exam_math',
@@ -288,12 +288,12 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
       },
       {
         id: 'student_exam_cs_live',
-        title: 'Class 1 Computer Science Live Olympiad 2026',
+        title: 'Class 1 Digital Literacy Live Olympiad 2026',
         description: 'Live test paper with 10 questions for Class 1',
         category: 'Olympiads',
         tab: 'available_exams',
         icon: BookOpen,
-        keywords: 'computer science live olympiad 2026 class 1 start test live test'
+        keywords: 'digital literacy live olympiad 2026 class 1 start test live test'
       },
       {
         id: 'student_exam_math',

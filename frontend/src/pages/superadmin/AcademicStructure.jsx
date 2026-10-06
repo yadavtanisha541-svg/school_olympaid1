@@ -656,7 +656,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Category</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Category / Discipline</label>
                 <select
                   value={subjectForm.category || 'Mathematics'}
                   onChange={(e) => setSubjectForm({ ...subjectForm, category: e.target.value })}
@@ -664,12 +664,10 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                 >
                   <option value="Mathematics">Mathematics</option>
                   <option value="Science">Science</option>
-                  <option value="Languages">Languages &amp; English</option>
-                  <option value="Reasoning">Logical Reasoning</option>
-                  <option value="Computer Science">Computer Science &amp; AI</option>
+                  <option value="Digital Literacy">Digital Literacy</option>
+                  <option value="English">English</option>
                   <option value="General Knowledge">General Knowledge</option>
-                  <option value="Social Studies">Social Studies</option>
-                  <option value="Arts">Creative Arts</option>
+                  <option value="Hindi">Hindi</option>
                 </select>
               </div>
 
@@ -1081,15 +1079,12 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                   onChange={(e) => setEditorSubjectSlug(e.target.value)}
                   className="px-3.5 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-xl text-xs font-black text-[#4e2a4a] focus:outline-none focus:border-[#6d3a68] cursor-pointer min-w-[230px]"
                 >
-                  <option value="math">Mathematics Olympiad (IMO)</option>
-                  <option value="science">Science Olympiad (NSO)</option>
-                  <option value="english">English Olympiad (IEO)</option>
-                  <option value="reasoning">Reasoning Olympiad (LRO / IRO)</option>
-                  <option value="cyber">Cyber &amp; AI Olympiad (ICO)</option>
-                  <option value="vocab">Vocabulary Championship (VC)</option>
-                  <option value="environment">Environment Olympiad (EGO)</option>
-                  <option value="arts">Creative Arts Olympiad (CAO)</option>
-                  <option value="gk">General Knowledge Olympiad (IGKO)</option>
+                  <option value="math">Mathematics (IMO)</option>
+                  <option value="science">Science (ISO / NSO)</option>
+                  <option value="digital_literacy">Digital Literacy (IDLO)</option>
+                  <option value="english">English (IEO)</option>
+                  <option value="gk">General Knowledge (IGKO)</option>
+                  <option value="hindi">Hindi (IHO)</option>
                 </select>
               </div>
 

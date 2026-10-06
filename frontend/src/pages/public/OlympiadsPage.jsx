@@ -56,7 +56,7 @@ export const OlympiadsPage = ({ onNavigatePublic, onOpenRegister }) => {
             Discover National &amp; Global Olympiad Disciplines
           </h1>
           <p className="text-xs sm:text-sm text-[#deb8de] leading-relaxed">
-            Choose from 9 rigorous competitive disciplines across STEM, linguistics, and creative arts designed to inspire young thinkers from Nursery to Class 12.
+            Choose from 6 rigorous competitive disciplines: Mathematics, Science, Digital Literacy, English, General Knowledge, and Hindi designed to inspire young thinkers from Nursery to Class 12.
           </p>
         </div>
       </div>

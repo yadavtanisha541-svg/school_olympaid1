@@ -59,12 +59,12 @@ const CLASSES_OPTIONS = [
 ];
 
 const SUBJECTS_CONFIG = {
-  english: { name: 'IEO (English)', code: 'IEO', color: '#ea580c', letter: 'E', icon: BookOpen },
   math: { name: 'IMO (Maths)', code: 'IMO', color: '#eab308', letter: 'M', icon: Calculator },
   science: { name: 'ISO (Science)', code: 'ISO', color: '#16a34a', letter: 'S', icon: Rocket },
-  cyber: { name: 'ICSO (Cyber)', code: 'ICSO', color: '#0284c7', letter: 'C', icon: Laptop },
+  digital: { name: 'IDLO (Digital Literacy)', code: 'IDLO', color: '#0284c7', letter: 'D', icon: Laptop },
+  english: { name: 'IEO (English)', code: 'IEO', color: '#ea580c', letter: 'E', icon: BookOpen },
   gk: { name: 'IGKO (GK)', code: 'IGKO', color: '#e7b84b', letter: 'G', icon: Globe },
-  reasoning: { name: 'ISSO (Reasoning)', code: 'ISSO', color: '#7c3aed', letter: 'R', icon: Brain }
+  hindi: { name: 'IHO (Hindi)', code: 'IHO', color: '#dc2626', letter: 'H', icon: BookOpen }
 };
 
 export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab, onStartExam, onExitToDashboard }) => {

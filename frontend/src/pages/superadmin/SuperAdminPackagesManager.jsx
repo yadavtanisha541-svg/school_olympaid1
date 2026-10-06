@@ -73,15 +73,12 @@ const CLASSES_LIST = [
 
 const SUBJECTS_LIST = [
   { code: 'ALL', label: 'All Subjects', name: 'All Olympiads Combined', color: '#6d3a68', icon: Sparkles },
-  { code: 'IGKO', label: 'IGKO (General Knowledge)', name: 'International General Knowledge Olympiad', color: '#906223', icon: Globe },
-  { code: 'ISO', label: 'NSO / ISO (Science)', name: 'National Science Olympiad', color: '#059669', icon: Atom },
-  { code: 'IMO', label: 'IMO (Mathematics)', name: 'International Mathematics Olympiad', color: '#4e2a4a', icon: Calculator },
-  { code: 'IEO', label: 'IEO (English)', name: 'International English Olympiad', color: '#6d3a68', icon: BookOpen },
-  { code: 'ICSO', label: 'ICO / ICSO (Cyber & AI)', name: 'International Cyber & AI Olympiad', color: '#0284c7', icon: Cpu },
-  { code: 'ISSO', label: 'LRO / ISSO (Reasoning)', name: 'Logical Reasoning Olympiad', color: '#6c568d', icon: Brain },
-  { code: 'VC', label: 'VC (Vocabulary)', name: 'Vocabulary Champions Olympiad', color: '#d9775b', icon: Sparkles },
-  { code: 'EGO', label: 'EGO (Environment)', name: 'Environment & Green Olympiad', color: '#059669', icon: Atom },
-  { code: 'CAO', label: 'CAO (Creative Arts)', name: 'Creative Arts Olympiad', color: '#80497D', icon: Palette }
+  { code: 'IMO', label: 'IMO (Mathematics)', name: 'International Mathematics Olympiad', color: '#ec4899', icon: Calculator },
+  { code: 'ISO', label: 'ISO / NSO (Science)', name: 'International Science Olympiad', color: '#8b5cf6', icon: Atom },
+  { code: 'IDLO', label: 'IDLO (Digital Literacy)', name: 'International Digital Literacy Olympiad', color: '#3b82f6', icon: Cpu },
+  { code: 'IEO', label: 'IEO (English)', name: 'International English Olympiad', color: '#06b6d4', icon: BookOpen },
+  { code: 'IGKO', label: 'IGKO (General Knowledge)', name: 'International General Knowledge Olympiad', color: '#f59e0b', icon: Globe },
+  { code: 'IHO', label: 'IHO (Hindi)', name: 'International Hindi Olympiad', color: '#10b981', icon: Languages }
 ];
 
 const PAPER_CATEGORIES = [

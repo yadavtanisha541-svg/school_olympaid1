@@ -120,14 +120,14 @@ export const StudentMyContentPage = ({
 
   const ALL_SUBJECT_COVERS = useMemo(() => [
     {
-      code: 'IGKO',
-      title: 'IGKO (General Knowledge)',
-      subtitle: 'General Knowledge & Current Affairs',
-      description: 'Build your general knowledge, stay updated with current affairs and improve your reasoning skills.',
-      icon: Globe,
-      color: '#859900',
+      code: 'IMO',
+      title: 'IMO (Mathematics)',
+      subtitle: 'Mathematics & Logical Analysis',
+      description: 'Sharpen mathematical problem-solving, arithmetic speed, geometry, number systems and analytical reasoning.',
+      icon: Calculator,
+      color: '#d97706',
       iconBg: 'bg-amber-50 border-amber-200 text-amber-600',
-      seriesTitle: `${studentClass}-All India IGKO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IMO Mock Test Series`
     },
     {
       code: 'ISO',
@@ -141,14 +141,15 @@ export const StudentMyContentPage = ({
       seriesTitle: `${studentClass}-All India ISO Mock Test Series`
     },
     {
-      code: 'IMO',
-      title: 'IMO (Mathematics)',
-      subtitle: 'Mathematics & Logical Analysis',
-      description: 'Sharpen mathematical problem-solving, arithmetic speed, geometry, number systems and analytical reasoning.',
-      icon: Calculator,
-      color: '#d97706',
-      iconBg: 'bg-blue-50 border-blue-200 text-blue-600',
-      seriesTitle: `${studentClass}-All India IMO Mock Test Series`
+      code: 'IDLO',
+      altCode: 'ICSO',
+      title: 'IDLO (Digital Literacy)',
+      subtitle: 'Digital Tools, Computing & Safety',
+      description: 'Learn computer fundamentals, internet safety, software tools, digital citizenship and technology foundations.',
+      icon: Laptop,
+      color: '#0284c7',
+      iconBg: 'bg-sky-50 border-sky-200 text-sky-600',
+      seriesTitle: `${studentClass}-All India IDLO Mock Test Series`
     },
     {
       code: 'IEO',
@@ -157,60 +158,28 @@ export const StudentMyContentPage = ({
       description: 'Enhance English grammar proficiency, comprehension reading, vocabulary power and verbal communication.',
       icon: BookOpen,
       color: '#ea580c',
-      iconBg: 'bg-purple-50 border-purple-200 text-purple-600',
+      iconBg: 'bg-orange-50 border-orange-200 text-orange-600',
       seriesTitle: `${studentClass}-All India IEO Mock Test Series`
     },
     {
-      code: 'ICSO',
-      altCode: 'ICO',
-      title: 'ICSO (Cyber & AI)',
-      subtitle: 'Cyber Safety, Coding & IT',
-      description: 'Learn cyber safety, algorithms, coding fundamentals, artificial intelligence basics and digital logic.',
-      icon: Laptop,
-      color: '#0284c7',
-      iconBg: 'bg-sky-50 border-sky-200 text-sky-600',
-      seriesTitle: `${studentClass}-All India ICSO Mock Test Series`
+      code: 'IGKO',
+      title: 'IGKO (General Knowledge)',
+      subtitle: 'General Knowledge & Current Affairs',
+      description: 'Build your general knowledge, stay updated with current affairs and improve your reasoning skills.',
+      icon: Globe,
+      color: '#859900',
+      iconBg: 'bg-yellow-50 border-yellow-200 text-yellow-600',
+      seriesTitle: `${studentClass}-All India IGKO Mock Test Series`
     },
     {
-      code: 'ISSO',
-      altCode: 'LRO',
-      title: 'ISSO / LRO (Reasoning)',
-      subtitle: 'Logical Reasoning & Social Aptitude',
-      description: 'Boost pattern identification, analogies, analytical reasoning, series completion and social aptitude.',
-      icon: Brain,
-      color: '#7c3aed',
+      code: 'IHO',
+      title: 'IHO (Hindi)',
+      subtitle: 'Hindi Vyakaran & Sahitya',
+      description: 'हिंदी व्याकरण, वर्तनी शुद्धि, मुहावरे, भाषा बोध और शब्द ज्ञान का संपूर्ण अभ्यास करें।',
+      icon: BookOpen,
+      color: '#dc2626',
       iconBg: 'bg-rose-50 border-rose-200 text-rose-600',
-      seriesTitle: `${studentClass}-All India ISSO Mock Test Series`
-    },
-    {
-      code: 'VC',
-      title: 'VC (Vocabulary)',
-      subtitle: 'Vocabulary Champions Olympiad',
-      description: 'Master word roots, synonyms, antonyms, idioms, phrases and advance vocabulary championship skills.',
-      icon: Sparkles,
-      color: '#6d3a68',
-      iconBg: 'bg-pink-50 border-pink-200 text-pink-600',
-      seriesTitle: `${studentClass}-All India VC Mock Test Series`
-    },
-    {
-      code: 'EGO',
-      title: 'EGO (Environment)',
-      subtitle: 'Environment & Green Olympiad',
-      description: 'Understand ecosystems, biodiversity, natural resource management, climate conservation and green sciences.',
-      icon: Atom,
-      color: '#059669',
-      iconBg: 'bg-teal-50 border-teal-200 text-teal-600',
-      seriesTitle: `${studentClass}-All India EGO Mock Test Series`
-    },
-    {
-      code: 'CAO',
-      title: 'CAO (Creative Arts)',
-      subtitle: 'Creative Arts & Aesthetic Design',
-      description: 'Explore creative design thinking, visual perspectives, color theory, aesthetic sense and artistic expression.',
-      icon: Palette,
-      color: '#80497D',
-      iconBg: 'bg-violet-50 border-violet-200 text-violet-600',
-      seriesTitle: `${studentClass}-All India CAO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IHO Mock Test Series`
     }
   ], [studentClass]);
 

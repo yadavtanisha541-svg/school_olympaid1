@@ -1146,12 +1146,14 @@ export const StudentManagement = () => {
                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
                   Select Registered Olympiads
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {[
                     'Mathematics Olympiad',
                     'Science Olympiad',
+                    'Digital Literacy Olympiad',
                     'English Olympiad',
-                    'Reasoning Olympiad'
+                    'General Knowledge Olympiad',
+                    'Hindi Olympiad'
                   ].map((oly) => {
                     const isChecked = formData.registered_olympiads.includes(oly);
                     return (

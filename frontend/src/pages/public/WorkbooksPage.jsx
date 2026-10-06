@@ -141,6 +141,14 @@ export const WorkbooksPage = ({ onNavigatePublic, onOpenRegister }) => {
           chapters: ['Investigative Lab Experiments', 'Physics & Chemistry Concept Models', 'Life Sciences & Ecology', 'Mock Papers']
         },
         {
+          id: 'tch-digital',
+          subject: 'Digital Literacy',
+          title: `SkillRise Teacher Digital Literacy Olympiad - ${formData.teacherStage}`,
+          coverBg: 'from-[#0284c7] to-[#0369a1]',
+          price: workbookFormat === 'digital' ? 250 : 300,
+          chapters: ['Computational Logic Pedagogy', 'Cyber Security Frameworks', 'AI & Digital Tools Integration', 'Master Assessments']
+        },
+        {
           id: 'tch-eng',
           subject: 'English',
           title: `SkillRise Teacher English Olympiad - ${formData.teacherStage}`,
@@ -149,26 +157,26 @@ export const WorkbooksPage = ({ onNavigatePublic, onOpenRegister }) => {
           chapters: ['Syntactical Mastery', 'Lexical Depth & Etymology', 'Comprehension Pedagogy', 'Diagnostic Rubrics']
         },
         {
-          id: 'tch-reas',
-          subject: 'Reasoning',
-          title: `SkillRise Teacher Reasoning Olympiad - ${formData.teacherStage}`,
-          coverBg: 'from-[#6c568d] to-[#4e2a4a]',
+          id: 'tch-gk',
+          subject: 'General Knowledge',
+          title: `SkillRise Teacher GK Olympiad - ${formData.teacherStage}`,
+          coverBg: 'from-[#e7b84b] to-[#d9775b]',
           price: workbookFormat === 'digital' ? 250 : 300,
-          chapters: ['Non-Verbal Spatial Logic', 'Verbal Deductions & Syllogisms', 'Pattern Matrices', 'Master Puzzles']
+          chapters: ['Global Affairs & Heritage', 'Scientific Milestones', 'Civics & Environmental Dynamics', 'Master Quizzes']
+        },
+        {
+          id: 'tch-hindi',
+          subject: 'Hindi',
+          title: `SkillRise Teacher Hindi Olympiad - ${formData.teacherStage}`,
+          coverBg: 'from-[#dc2626] to-[#991b1b]',
+          price: workbookFormat === 'digital' ? 250 : 300,
+          chapters: ['हिंदी व्याकरण शिक्षण', 'साहित्य एवं भाषा बोध', 'वर्तनी एवं वाक्य विश्लेषण', 'अभ्यास प्रश्न पत्र']
         }
       ];
     }
 
     if (isEarly) {
       return [
-        {
-          id: 'early-eng',
-          subject: 'English',
-          title: `SkillRise English Olympiad Workbook - ${formData.classLevel}`,
-          coverBg: 'from-[#6d3a68] to-[#8c4e8b]',
-          price: workbookFormat === 'digital' ? 200 : 250,
-          chapters: ['Alphabet & Phonic Sounds', 'Picture Vocabulary & Everyday Items', 'Rhyming Words & Sound Patterns', 'Opposites & Story Sequences']
-        },
         {
           id: 'early-math',
           subject: 'Mathematics',
@@ -186,12 +194,36 @@ export const WorkbooksPage = ({ onNavigatePublic, onOpenRegister }) => {
           chapters: ['Living & Non-Living Things', 'Our Natural Environment', 'Good Habits & Safety Rules', 'Animals, Birds & Homes']
         },
         {
-          id: 'early-vocab',
-          subject: 'Vocabulary',
-          title: `SkillRise Spell Bee & Vocabulary Workbook - ${formData.classLevel}`,
+          id: 'early-digital',
+          subject: 'Digital Literacy',
+          title: `SkillRise Digital Literacy Workbook - ${formData.classLevel}`,
+          coverBg: 'from-[#0284c7] to-[#0369a1]',
+          price: workbookFormat === 'digital' ? 200 : 250,
+          chapters: ['Computer Parts & Screen Interaction', 'Keyboard & Mouse Basics', 'Safe Internet Habits', 'Fun Tech Activity Puzzles']
+        },
+        {
+          id: 'early-eng',
+          subject: 'English',
+          title: `SkillRise English Olympiad Workbook - ${formData.classLevel}`,
+          coverBg: 'from-[#6d3a68] to-[#8c4e8b]',
+          price: workbookFormat === 'digital' ? 200 : 250,
+          chapters: ['Alphabet & Phonic Sounds', 'Picture Vocabulary & Everyday Items', 'Rhyming Words & Sound Patterns', 'Opposites & Story Sequences']
+        },
+        {
+          id: 'early-gk',
+          subject: 'General Knowledge',
+          title: `SkillRise GK Olympiad Workbook - ${formData.classLevel}`,
           coverBg: 'from-[#e7b84b] to-[#d9775b]',
           price: workbookFormat === 'digital' ? 200 : 250,
-          chapters: ['3-Letter CVC Words', 'Sight Words & Visual Match', 'Missing Letters in Pictures', 'Fun Word Puzzles']
+          chapters: ['Our Body & Senses', 'Incredible India & Festivals', 'Animals & Plants Around Us', 'Good Manners & Safety']
+        },
+        {
+          id: 'early-hindi',
+          subject: 'Hindi',
+          title: `SkillRise Hindi Olympiad Workbook - ${formData.classLevel}`,
+          coverBg: 'from-[#dc2626] to-[#991b1b]',
+          price: workbookFormat === 'digital' ? 200 : 250,
+          chapters: ['स्वर एवं व्यंजन पहचान', 'सरल शब्द एवं चित्र मिलान', 'कविता एवं बाल कहानियाँ', 'सरल अभ्यास']
         }
       ];
     }
@@ -214,6 +246,14 @@ export const WorkbooksPage = ({ onNavigatePublic, onOpenRegister }) => {
         chapters: ['Plants & Animals Kingdom', 'Human Body Systems & Nutrition', 'Matter, Force & Simple Machines', 'Environment & Pollution', 'Achievers Science Hotspot']
       },
       {
+        id: 'std-digital',
+        subject: 'Digital Literacy',
+        title: `SkillRise Digital Literacy Olympiad Workbook - ${formData.classLevel}`,
+        coverBg: 'from-[#0284c7] to-[#0369a1]',
+        price: workbookFormat === 'digital' ? 250 : 300,
+        chapters: ['Computer Hardware & OS Fundamentals', 'Software, Cloud & Office Tools', 'Cyber Safety & Digital Etiquette', 'AI Literacy & Coding Concepts']
+      },
+      {
         id: 'std-eng',
         subject: 'English',
         title: `SkillRise English Olympiad Workbook - ${formData.classLevel}`,
@@ -222,28 +262,20 @@ export const WorkbooksPage = ({ onNavigatePublic, onOpenRegister }) => {
         chapters: ['Word and Structure Knowledge (Grammar)', 'Reading Comprehension & Critical Inference', 'Lexical Depth & Synonyms/Antonyms', 'Achievers Verbal Aptitude']
       },
       {
-        id: 'std-reas',
-        subject: 'Reasoning',
-        title: `SkillRise Logical Reasoning Workbook - ${formData.classLevel}`,
-        coverBg: 'from-[#6c568d] to-[#4e2a4a]',
-        price: workbookFormat === 'digital' ? 250 : 300,
-        chapters: ['Verbal Reasoning & Coding-Decoding', 'Spatial Logic & Mirror Images', 'Pattern Matrices & Cube Folding', 'Analytical Grids & Puzzles']
-      },
-      {
-        id: 'std-cyber',
-        subject: 'Cyber & AI',
-        title: `SkillRise Cyber & AI Olympiad Workbook - ${formData.classLevel}`,
-        coverBg: 'from-[#b17b25] to-[#6d3a68]',
-        price: workbookFormat === 'digital' ? 250 : 300,
-        chapters: ['Computer Hardware & OS Fundamentals', 'Algorithmic Thinking & Scratch / Logic', 'Cyber Safety & Digital Etiquette', 'AI Literacy & Future Tech']
-      },
-      {
-        id: 'std-vocab',
-        subject: 'Spell Bee / Vocabulary',
-        title: `SkillRise Vocabulary Championship Workbook - ${formData.classLevel}`,
+        id: 'std-gk',
+        subject: 'General Knowledge',
+        title: `SkillRise General Knowledge Workbook - ${formData.classLevel}`,
         coverBg: 'from-[#e7b84b] to-[#d9775b]',
         price: workbookFormat === 'digital' ? 250 : 300,
-        chapters: ['Orthography & Silent Letters', 'Homophones, Homonyms & Collocations', 'Root Words (Greek & Latin)', 'High-Frequency Idioms & Phrases']
+        chapters: ['India & The World Geography', 'Science, Discovery & Space', 'Current Affairs & Global Summits', 'Sports, Awards & Civics']
+      },
+      {
+        id: 'std-hindi',
+        subject: 'Hindi',
+        title: `SkillRise Hindi Olympiad Workbook - ${formData.classLevel}`,
+        coverBg: 'from-[#dc2626] to-[#991b1b]',
+        price: workbookFormat === 'digital' ? 250 : 300,
+        chapters: ['वर्ण विचार एवं वर्तनी शुद्धि', 'शब्द विचार एवं व्याकरण', 'पर्यायवाची, विलोम एवं मुहावरे', 'अपठित गद्यांश एवं भाषा बोध']
       }
     ];
   }, [userType, formData.classLevel, formData.teacherStage, workbookFormat]);

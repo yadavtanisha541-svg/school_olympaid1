@@ -313,7 +313,7 @@ export const ExamManagementPage = () => {
                   required
                   value={examForm.title}
                   onChange={(e) => setExamForm({ ...examForm, title: e.target.value })}
-                  placeholder="e.g. National Computer Science Olympiad 2026"
+                  placeholder="e.g. National Mathematics Olympiad 2026"
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>

@@ -480,13 +480,11 @@ export const PublicNavbar = ({
                             <div className="divide-y divide-[#fdf2f8] max-h-[340px] overflow-y-auto">
                               {[
                                 { id: 'math', name: 'Mathematics Olympiad (IMO)' },
-                                { id: 'science', name: 'Science Olympiad (NSO)' },
+                                { id: 'science', name: 'Science Olympiad (ISO)' },
+                                { id: 'digital', name: 'Digital Literacy Olympiad (IDLO)' },
                                 { id: 'english', name: 'English Olympiad (IEO)' },
-                                { id: 'spell-bee', name: 'Vocabulary Championship (VC)' },
-                                { id: 'reasoning', name: 'Reasoning Olympiad (IRO)' },
-                                { id: 'cyber', name: 'Cyber & AI Olympiad (ICO)' },
-                                { id: 'mental-maths', name: 'Mental Mathematics (IMMO)' },
-                                { id: 'gk', name: 'General Knowledge (IGKO)' }
+                                { id: 'gk', name: 'General Knowledge (IGKO)' },
+                                { id: 'hindi', name: 'Hindi Olympiad (IHO)' }
                               ].map((guide) => (
                                 <button
                                   key={guide.id}
@@ -508,10 +506,11 @@ export const PublicNavbar = ({
                             <div className="divide-y divide-[#fdf2f8] max-h-[340px] overflow-y-auto">
                               {[
                                 { id: 'math', name: 'Mathematics Olympiad (IMO)' },
-                                { id: 'science', name: 'Science Olympiad (NSO)' },
+                                { id: 'science', name: 'Science Olympiad (ISO)' },
+                                { id: 'digital', name: 'Digital Literacy Olympiad (IDLO)' },
                                 { id: 'english', name: 'English Olympiad (IEO)' },
-                                { id: 'reasoning', name: 'Reasoning Olympiad (IRO)' },
-                                { id: 'mental-maths', name: 'Mental Mathematics (IMMO)' }
+                                { id: 'gk', name: 'General Knowledge (IGKO)' },
+                                { id: 'hindi', name: 'Hindi Olympiad (IHO)' }
                               ].map((ws) => (
                                 <button
                                   key={ws.id}

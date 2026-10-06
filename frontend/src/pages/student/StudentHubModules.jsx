@@ -153,9 +153,10 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
     const programsData = {
       'MSDP': { title: 'Maths Skill Development Program (MSDP)', code: 'MSDP', subject: 'Mathematics', icon: Calculator, color: '#6d3a68', levels: ['Foundational Number Logic', 'Speed Arithmetic & Mental Maths', 'Spatial Geometry & Spatial Logic', 'Advanced Problem Solving'] },
       'SSDP': { title: 'Science Skill Development Program (SSDP)', code: 'SSDP', subject: 'Science', icon: Rocket, color: '#059669', levels: ['Observational Science & Nature', 'Experimental Methodology & Logic', 'Physical Systems & Forces', 'Environmental Ecology & Life Sciences'] },
+      'DLSDP': { title: 'Digital Literacy Skill Program (DLSDP)', code: 'DLSDP', subject: 'Digital Literacy', icon: Laptop, color: '#0284c7', levels: ['Digital Tools & Computer Basics', 'Internet & Cyber Safety', 'Productivity & Office Tools', 'Algorithmic Thinking & AI Basics'] },
       'ESDP': { title: 'English Skill Development Program (ESDP)', code: 'ESDP', subject: 'English', icon: BookOpen, color: '#d9775b', levels: ['Phonics & Orthography', 'Syntax & Grammatical Fluency', 'Lexical Depth & Vocabulary', 'Critical Reading & Comprehension'] },
-      'RSDP': { title: 'Reasoning Skill Development Program (RSDP)', code: 'RSDP', subject: 'Logical Reasoning', icon: Brain, color: '#7c3aed', levels: ['Visual & Pattern Recognition', 'Deductive & Inductive Logic', 'Coding, Ciphers & Matrices', 'Analytical & Critical Thinking'] },
-      'GKSDP': { title: 'General Knowledge Skill Development Program (GK-SDP)', code: 'GK-SDP', subject: 'General Knowledge', icon: Globe, color: '#e7b84b', levels: ['Global Geography & Heritage', 'Scientific Inventions & Breakthroughs', 'Current Affairs & Global Leaders', 'Sports, Awards & Civics'] }
+      'GKSDP': { title: 'General Knowledge Skill Development Program (GK-SDP)', code: 'GK-SDP', subject: 'General Knowledge', icon: Globe, color: '#e7b84b', levels: ['Global Geography & Heritage', 'Scientific Inventions & Breakthroughs', 'Current Affairs & Global Leaders', 'Sports, Awards & Civics'] },
+      'HSDP': { title: 'Hindi Skill Development Program (HSDP)', code: 'HSDP', subject: 'Hindi', icon: BookOpen, color: '#dc2626', levels: ['वर्ण विचार एवं वर्तनी', 'शब्द एवं वाक्य रचना', 'व्याकरण एवं मुहावरे', 'अपठित बोध एवं साहित्य'] }
     };
 
     const cur = programsData[pCode] || programsData['MSDP'];
@@ -491,12 +492,12 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
   if (activeModule.startsWith('content_')) {
     const code = activeModule.replace('content_', '').toUpperCase();
     const subjectMap = {
-      'ICSO': { title: 'International Cyber & AI Olympiad (ICSO)', code: 'ICSO', icon: Laptop, color: '#0284c7', chapters: ['Hardware & Peripherals', 'Operating Systems', 'Algorithms & Logic', 'MS Office & Tools', 'Cyber Safety & AI Basics', 'HOTS Coding Concepts'] },
-      'ISO': { title: 'National / International Science Olympiad (ISO/NSO)', code: 'ISO', icon: Rocket, color: '#059669', chapters: ['Living & Non-Living World', 'Human Body & Health', 'Matter & Materials', 'Force, Work & Energy', 'Our Environment', 'Scientific HOTS Section'] },
       'IMO': { title: 'International Mathematics Olympiad (IMO)', code: 'IMO', icon: Calculator, color: '#6d3a68', chapters: ['Number Sense & Numeration', 'Arithmetic Operations', 'Fractions & Decimals', 'Geometry & Shapes', 'Data Handling & Graphs', 'Achievers Mathematical HOTS'] },
+      'ISO': { title: 'National / International Science Olympiad (ISO/NSO)', code: 'ISO', icon: Rocket, color: '#059669', chapters: ['Living & Non-Living World', 'Human Body & Health', 'Matter & Materials', 'Force, Work & Energy', 'Our Environment', 'Scientific HOTS Section'] },
+      'IDLO': { title: 'International Digital Literacy Olympiad (IDLO)', code: 'IDLO', icon: Laptop, color: '#0284c7', chapters: ['Hardware & Peripherals', 'Operating Systems', 'Algorithms & Logic', 'MS Office & Tools', 'Cyber Safety & AI Basics', 'HOTS Digital Concepts'] },
       'IEO': { title: 'International English Olympiad (IEO)', code: 'IEO', icon: BookOpen, color: '#d9775b', chapters: ['Nouns, Pronouns & Verbs', 'Tenses & Prepositions', 'Vocabulary & Synonyms', 'Reading Comprehension', 'Spoken & Written Expressions', 'Achievers Verbal HOTS'] },
       'IGKO': { title: 'International General Knowledge Olympiad (IGKO)', code: 'IGKO', icon: Globe, color: '#e7b84b', chapters: ['Our Surroundings & Flora/Fauna', 'India and the World', 'Science & Technology', 'Sports & Awards', 'Current Affairs & Civics', 'Life Skills & Quantitative Aptitude'] },
-      'ISSO': { title: 'International Social Studies & Reasoning Olympiad (ISSO/IRO)', code: 'ISSO', icon: Brain, color: '#7c3aed', chapters: ['Patterns & Sequences', 'Analogy & Classification', 'Coding-Decoding', 'Blood Relations & Direction', 'Spatial & Embedded Figures', 'Logical Reasoning HOTS'] }
+      'IHO': { title: 'International Hindi Olympiad (IHO)', code: 'IHO', icon: BookOpen, color: '#dc2626', chapters: ['वर्ण विचार एवं वर्तनी', 'संज्ञा, सर्वनाम एवं क्रिया', 'पर्यायवाची एवं विलोम', 'मुहावरे एवं लोकोक्तियाँ', 'अपठित गद्यांश', 'भाषा बोध'] }
     };
 
     const cur = subjectMap[code] || subjectMap['IMO'];

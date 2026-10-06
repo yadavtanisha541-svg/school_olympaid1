@@ -52,13 +52,11 @@ const BOARDS = [
 
 const OLYMPIAD_SUBJECTS = [
   { id: 'math', name: 'Mathematics Olympiad (IMO)', code: 'IMO' },
-  { id: 'science', name: 'Science Olympiad (NSO)', code: 'NSO' },
+  { id: 'science', name: 'Science Olympiad (ISO)', code: 'ISO' },
+  { id: 'digital', name: 'Digital Literacy Olympiad (IDLO)', code: 'IDLO' },
   { id: 'english', name: 'English Olympiad (IEO)', code: 'IEO' },
-  { id: 'vocabulary', name: 'Vocabulary Championship (VC)', code: 'VC' },
-  { id: 'cyber', name: 'Cyber & AI Olympiad (ICO)', code: 'ICO' },
-  { id: 'reasoning', name: 'Reasoning Olympiad (IRO)', code: 'IRO' },
-  { id: 'mental-maths', name: 'Mental Mathematics Olympiad (IMMO)', code: 'IMMO' },
-  { id: 'gk', name: 'General Knowledge Olympiad (IGKO)', code: 'IGKO' }
+  { id: 'gk', name: 'General Knowledge Olympiad (IGKO)', code: 'IGKO' },
+  { id: 'hindi', name: 'Hindi Olympiad (IHO)', code: 'IHO' }
 ];
 
 export const SchoolRegistrationPage = ({ onNavigatePublic, onOpenRegister, onOpenLogin }) => {
@@ -206,13 +204,11 @@ export const SchoolRegistrationPage = ({ onNavigatePublic, onOpenRegister, onOpe
 (2. PARTICIPATING OLYMPIAD DISCIPLINES) Tj
 0 -16 Td
 /F2 9.5 Tf
-([  ] International Mathematics Olympiad (IMO)       [  ] International Science Olympiad (NSO)) Tj
+([  ] International Mathematics Olympiad (IMO)       [  ] International Science Olympiad (ISO)) Tj
 0 -14 Td
-([  ] International English Olympiad (IEO)           [  ] Vocabulary Championship (VC)) Tj
+([  ] Digital Literacy Olympiad (IDLO)                 [  ] International English Olympiad (IEO)) Tj
 0 -14 Td
-([  ] Cyber & AI Olympiad (ICO)                      [  ] Reasoning Olympiad (IRO)) Tj
-0 -14 Td
-([  ] Mental Mathematics Olympiad (IMMO)             [  ] General Knowledge Olympiad (IGKO)) Tj
+([  ] General Knowledge Olympiad (IGKO)                [  ] International Hindi Olympiad (IHO)) Tj
 0 -24 Td
 /F1 11 Tf
 (3. INSTITUTIONAL FEE & BANK DETAILS) Tj

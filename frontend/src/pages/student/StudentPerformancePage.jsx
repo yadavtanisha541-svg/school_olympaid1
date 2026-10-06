@@ -229,14 +229,12 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
         const subjectMap = {};
         finalAttempts.forEach((a) => {
           let sub = a.subject_name || a.subject || 'General';
-          if (sub.includes('Math')) sub = 'Mathematics';
-          else if (sub.includes('Scien')) sub = 'Science';
-          else if (sub.includes('Eng')) sub = 'English';
-          else if (sub.includes('Cyber') || sub.includes('Computer')) sub = 'Cyber & Computers';
+          if (sub.includes('Math') || sub.includes('IMO')) sub = 'Mathematics';
+          else if (sub.includes('Scien') || sub.includes('ISO') || sub.includes('NSO')) sub = 'Science';
+          else if (sub.includes('Digit') || sub.includes('Cyber') || sub.includes('IDLO') || sub.includes('ICSO')) sub = 'Digital Literacy';
+          else if (sub.includes('Eng') || sub.includes('IEO')) sub = 'English';
           else if (sub.includes('Knowl') || sub.includes('GK') || sub.includes('IGKO')) sub = 'General Knowledge';
-          else if (sub.includes('Reason')) sub = 'Logical Reasoning';
-          else if (sub.includes('Art')) sub = 'Creative Arts';
-          else if (sub.includes('Spell') || sub.includes('Vocab')) sub = 'Vocabulary & Spell Bee';
+          else if (sub.includes('Hindi') || sub.includes('IHO')) sub = 'Hindi';
 
           if (!subjectMap[sub]) {
             subjectMap[sub] = {
