@@ -126,8 +126,11 @@ export const StudentMyContentPage = ({
       subtitle: 'Mathematics & Logical Analysis',
       description: 'Sharpen mathematical problem-solving, arithmetic speed, geometry, number systems and analytical reasoning.',
       icon: Calculator,
-      color: '#d97706',
-      iconBg: 'bg-amber-50 border-amber-200 text-amber-600',
+      cardBg: 'bg-gradient-to-br from-pink-50 via-rose-50 to-amber-50 border-2 border-pink-200/80 hover:border-pink-300',
+      iconBg: 'bg-gradient-to-tr from-pink-500 via-rose-500 to-amber-500 text-white shadow-pink-200 shadow-md',
+      tagBg: 'bg-pink-100 text-pink-700 border border-pink-200',
+      countBg: 'bg-rose-100 text-rose-800 border border-rose-200',
+      btnBg: 'bg-gradient-to-r from-pink-500 via-rose-500 to-amber-500 hover:from-pink-600 hover:via-rose-600 hover:to-amber-600 text-white shadow-sm border border-pink-500',
       seriesTitle: `${studentClass}-All India IEOM Mock Test Series`
     },
     {
@@ -137,8 +140,11 @@ export const StudentMyContentPage = ({
       subtitle: 'Science & Practical Discovery',
       description: 'Master scientific principles, experimental observation, physics, chemistry, biology concepts and logic.',
       icon: Atom,
-      color: '#059669',
-      iconBg: 'bg-emerald-50 border-emerald-200 text-emerald-600',
+      cardBg: 'bg-gradient-to-br from-purple-50 via-indigo-50 to-sky-50 border-2 border-purple-200/80 hover:border-purple-300',
+      iconBg: 'bg-gradient-to-tr from-purple-500 via-indigo-500 to-sky-500 text-white shadow-purple-200 shadow-md',
+      tagBg: 'bg-purple-100 text-purple-700 border border-purple-200',
+      countBg: 'bg-indigo-100 text-indigo-800 border border-indigo-200',
+      btnBg: 'bg-gradient-to-r from-purple-600 via-indigo-600 to-sky-500 hover:from-purple-700 hover:via-indigo-700 hover:to-sky-600 text-white shadow-sm border border-purple-600',
       seriesTitle: `${studentClass}-All India IEOS Mock Test Series`
     },
     {
@@ -148,8 +154,11 @@ export const StudentMyContentPage = ({
       subtitle: 'Digital Tools, Computing & Safety',
       description: 'Learn computer fundamentals, internet safety, software tools, digital citizenship and technology foundations.',
       icon: Laptop,
-      color: '#0284c7',
-      iconBg: 'bg-sky-50 border-sky-200 text-sky-600',
+      cardBg: 'bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 border-2 border-blue-200/80 hover:border-blue-300',
+      iconBg: 'bg-gradient-to-tr from-cyan-500 via-blue-500 to-indigo-500 text-white shadow-blue-200 shadow-md',
+      tagBg: 'bg-blue-100 text-blue-700 border border-blue-200',
+      countBg: 'bg-cyan-100 text-cyan-800 border border-cyan-200',
+      btnBg: 'bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 text-white shadow-sm border border-blue-600',
       seriesTitle: `${studentClass}-All India IEOD Mock Test Series`
     },
     {
@@ -159,8 +168,11 @@ export const StudentMyContentPage = ({
       subtitle: 'English Grammar & Vocabulary',
       description: 'Enhance English grammar proficiency, comprehension reading, vocabulary power and verbal communication.',
       icon: BookOpen,
-      color: '#ea580c',
-      iconBg: 'bg-orange-50 border-orange-200 text-orange-600',
+      cardBg: 'bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 border-2 border-teal-200/80 hover:border-teal-300',
+      iconBg: 'bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-teal-200 shadow-md',
+      tagBg: 'bg-teal-100 text-teal-700 border border-teal-200',
+      countBg: 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+      btnBg: 'bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:via-teal-700 hover:to-cyan-700 text-white shadow-sm border border-teal-600',
       seriesTitle: `${studentClass}-All India IEOE Mock Test Series`
     },
     {
@@ -170,8 +182,11 @@ export const StudentMyContentPage = ({
       subtitle: 'General Knowledge & Current Affairs',
       description: 'Build your general knowledge, stay updated with current affairs and improve your reasoning skills.',
       icon: Globe,
-      color: '#859900',
-      iconBg: 'bg-yellow-50 border-yellow-200 text-yellow-600',
+      cardBg: 'bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 border-2 border-amber-200/80 hover:border-amber-300',
+      iconBg: 'bg-gradient-to-tr from-amber-500 via-orange-500 to-rose-500 text-white shadow-amber-200 shadow-md',
+      tagBg: 'bg-amber-100 text-amber-700 border border-amber-200',
+      countBg: 'bg-orange-100 text-orange-800 border border-orange-200',
+      btnBg: 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:via-orange-600 hover:to-rose-600 text-white shadow-sm border border-amber-500',
       seriesTitle: `${studentClass}-All India IEOG Mock Test Series`
     },
     {
@@ -181,8 +196,11 @@ export const StudentMyContentPage = ({
       subtitle: 'Hindi Vyakaran & Sahitya',
       description: 'हिंदी व्याकरण, वर्तनी शुद्धि, मुहावरे, भाषा बोध और शब्द ज्ञान का संपूर्ण अभ्यास करें।',
       icon: BookOpen,
-      color: '#dc2626',
-      iconBg: 'bg-rose-50 border-rose-200 text-rose-600',
+      cardBg: 'bg-gradient-to-br from-lime-50 via-emerald-50 to-teal-50 border-2 border-emerald-200/80 hover:border-emerald-300',
+      iconBg: 'bg-gradient-to-tr from-lime-500 via-emerald-500 to-teal-600 text-white shadow-emerald-200 shadow-md',
+      tagBg: 'bg-emerald-100 text-emerald-700 border border-emerald-200',
+      countBg: 'bg-lime-100 text-lime-800 border border-lime-200',
+      btnBg: 'bg-gradient-to-r from-lime-600 via-emerald-600 to-teal-600 hover:from-lime-700 hover:via-emerald-700 hover:to-teal-700 text-white shadow-sm border border-emerald-600',
       seriesTitle: `${studentClass}-All India IEOH Mock Test Series`
     }
   ], [studentClass]);
@@ -498,7 +516,7 @@ export const StudentMyContentPage = ({
                 </div>
               </div>
 
-              {/* Mock Tests Cards Grid (Exact modern design from Image 1) */}
+              {/* Mock Tests Cards Grid (Colorful 2-3 Mix Pastel Theme) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {subjectPapers.map((paper) => {
                   const result = myTestResults.find(
@@ -510,19 +528,19 @@ export const StudentMyContentPage = ({
                   return (
                     <div
                       key={paper.id}
-                      className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 hover:border-pink-400 p-6 shadow-lg hover:shadow-2xl transition-all duration-200 flex flex-col justify-between space-y-5 group relative overflow-hidden text-white"
+                      className={`${currentSub.cardBg || 'bg-gradient-to-br from-purple-50 via-indigo-50 to-sky-50 border-2 border-purple-200'} rounded-3xl p-6 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between space-y-5 group relative overflow-hidden text-slate-900`}
                     >
                       {/* Top: Icon + Title + Class */}
                       <div className="space-y-3">
-                        <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 text-pink-300 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
+                        <div className={`w-12 h-12 rounded-2xl ${currentSub.iconBg || 'bg-gradient-to-tr from-purple-500 via-indigo-500 to-sky-500 text-white'} flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0 border border-white/40`}>
                           <FileText className="w-6 h-6 stroke-[2.2]" />
                         </div>
 
                         <div>
-                          <h4 className="font-black text-white text-base sm:text-lg tracking-tight leading-snug group-hover:text-pink-300 transition-colors">
+                          <h4 className="font-black text-slate-900 text-base sm:text-lg tracking-tight leading-snug">
                             {paper.title}
                           </h4>
-                          <p className="text-xs sm:text-sm font-bold text-pink-200/80 mt-0.5">
+                          <p className="text-xs sm:text-sm font-bold text-slate-500 mt-0.5">
                             {paper.class_name || studentClass}
                           </p>
                         </div>
@@ -531,34 +549,34 @@ export const StudentMyContentPage = ({
                       {/* Middle: Status & Score Containers */}
                       <div className="space-y-2.5">
                         {/* Row 1: Status Box */}
-                        <div className="bg-white/10 border border-white/20 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs backdrop-blur-xs">
+                        <div className="bg-white/85 border border-black/5 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs backdrop-blur-xs">
                           <div className="flex items-center gap-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-pink-400 shrink-0" />
-                            <span className="text-xs font-bold text-slate-200">Status:</span>
+                            <span className="w-2.5 h-2.5 rounded-full bg-pink-500 shrink-0" />
+                            <span className="text-xs font-bold text-slate-700">Status:</span>
                           </div>
                           {isCompleted ? (
-                            <span className="px-3 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 text-[11px] font-black uppercase tracking-wider">
+                            <span className="px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-black uppercase tracking-wider">
                               COMPLETED
                             </span>
                           ) : (
-                            <span className="px-3 py-0.5 rounded-full bg-rose-950/80 text-rose-300 border border-rose-800/60 text-[11px] font-black uppercase tracking-wider">
+                            <span className="px-3 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200 text-[11px] font-black uppercase tracking-wider">
                               UNATTEMPTED
                             </span>
                           )}
                         </div>
 
                         {/* Row 2: Last Score Box */}
-                        <div className="bg-white/10 border border-white/20 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs backdrop-blur-xs">
+                        <div className="bg-white/85 border border-black/5 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs backdrop-blur-xs">
                           <div className="flex items-center gap-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0" />
-                            <span className="text-xs font-bold text-slate-200">Last Score:</span>
+                            <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 shrink-0" />
+                            <span className="text-xs font-bold text-slate-700">Last Score:</span>
                           </div>
                           {isCompleted ? (
-                            <span className="px-3 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 text-[11px] font-black">
+                            <span className="px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-black">
                               {result.score} / {result.total_marks || paper.total_marks || 60} ({Math.round(result.percentage || 0)}%)
                             </span>
                           ) : (
-                            <span className="px-3 py-0.5 rounded-full bg-blue-950/80 text-blue-300 border border-blue-800/60 text-[11px] font-black">
+                            <span className="px-3 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[11px] font-black">
                               none
                             </span>
                           )}
@@ -570,7 +588,7 @@ export const StudentMyContentPage = ({
                         <button
                           type="button"
                           onClick={() => setSelectedPaperForInstructions(paper)}
-                          className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95"
+                          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl ${currentSub.btnBg || 'bg-gradient-to-r from-purple-600 via-indigo-600 to-sky-500 text-white'} font-black text-xs sm:text-sm shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95`}
                         >
                           <span>Open Test</span>
                           <ArrowRight className="w-4 h-4" />
@@ -591,7 +609,7 @@ export const StudentMyContentPage = ({
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                <BookOpen className="w-6 h-6 text-[#859900]" />
+                <BookOpen className="w-6 h-6 text-indigo-600" />
                 <span>
                   {selectedSubject !== 'ALL'
                     ? `${selectedSubject} Subject Cover & Mock Test Series`
@@ -600,7 +618,7 @@ export const StudentMyContentPage = ({
               </h2>
               <p className="text-xs text-slate-500 font-semibold mt-0.5">
                 {selectedSubject !== 'ALL'
-                  ? `Click "Open ${selectedSubject} Mock Tests" below to view all official mock test papers.`
+                  ? `Click "Start Mock Test" below to view all official mock test papers for ${selectedSubject}.`
                   : 'Select any Olympiad subject cover below to view all official mock tests, previous year papers & sample tests.'}
               </p>
             </div>
@@ -612,18 +630,18 @@ export const StudentMyContentPage = ({
                   setSelectedSubject('ALL');
                   if (onNavigateTab) onNavigateTab('my_content');
                 }}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#859900] px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-indigo-600 px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
               >
-                <Layers className="w-4 h-4 text-[#859900]" />
-                <span>View All 9 Subject Covers</span>
+                <Layers className="w-4 h-4 text-indigo-600" />
+                <span>View All Subject Covers</span>
               </button>
             )}
           </div>
 
-          {/* Grid of Subject Covers (Square Box Shape) */}
+          {/* Grid of Subject Covers (Vibrant 2-3 Mix Pastel Gradient Cards) */}
           <div className={`grid gap-6 w-full ${
             visibleCovers.length === 1
-              ? 'grid-cols-1 max-w-[420px]'
+              ? 'grid-cols-1 max-w-[440px]'
               : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
           }`}>
             {visibleCovers.map((sub) => {
@@ -633,76 +651,76 @@ export const StudentMyContentPage = ({
               return (
                 <div
                   key={sub.code}
-                  className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 hover:border-pink-400 p-6 sm:p-7 shadow-lg hover:shadow-2xl transition-all duration-200 flex flex-col justify-between group relative overflow-hidden aspect-square min-h-[380px] sm:min-h-[400px] w-full text-white"
+                  className={`${sub.cardBg} rounded-3xl p-6 sm:p-7 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group relative overflow-hidden aspect-square min-h-[380px] sm:min-h-[400px] w-full text-slate-900 hover:-translate-y-1`}
                 >
                   <div className="space-y-3.5">
                     {/* Top Header Row */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2.5">
-                        <div className={`w-12 h-12 rounded-2xl border ${sub.iconBg} flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0`}>
+                        <div className={`w-12 h-12 rounded-2xl ${sub.iconBg} flex items-center justify-center border border-white/40 group-hover:scale-105 transition-transform shrink-0`}>
                           <SubIcon className="w-6 h-6" />
                         </div>
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-300 border border-white/20 text-[11px] font-extrabold uppercase tracking-wide">
+                          <span className={`px-2.5 py-0.5 rounded-full ${sub.tagBg} text-[11px] font-extrabold uppercase tracking-wide`}>
                             {studentClass}
                           </span>
-                          <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-pink-200 border border-white/20 text-[11px] font-bold">
+                          <span className={`px-2.5 py-0.5 rounded-full ${sub.tagBg} text-[11px] font-bold`}>
                             {sub.code}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-300 border border-white/20 text-xs font-bold shrink-0">
+                      <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full ${sub.countBg} text-xs font-bold shrink-0`}>
                         <FileText className="w-3.5 h-3.5" />
                         <span>{subPapers.length} Mock Tests</span>
                       </div>
                     </div>
 
                     {/* Title, Subtitle & Description */}
-                    <div className="space-y-1">
-                      <h3 className="font-black text-white text-lg sm:text-xl tracking-tight leading-snug group-hover:text-pink-300 transition-colors">
+                    <div className="space-y-1 pt-1">
+                      <h3 className="font-black text-slate-900 text-lg sm:text-xl tracking-tight leading-snug">
                         {sub.title}
                       </h3>
-                      <p className="text-xs text-pink-200 font-bold">
+                      <p className="text-xs font-bold text-slate-600">
                         {sub.subtitle}
                       </p>
-                      <p className="text-xs text-slate-300 font-normal leading-relaxed pt-1.5 line-clamp-3">
+                      <p className="text-xs text-slate-600 font-normal leading-relaxed pt-1.5 line-clamp-3">
                         {sub.description || 'Practice authentic Olympiad questions, improve speed and accuracy, and boost your rank.'}
                       </p>
                     </div>
                   </div>
 
-                  {/* Bottom Action Bar & Highlights (Square Box Layout) */}
-                  <div className="pt-4 border-t border-indigo-900/60 space-y-3">
+                  {/* Bottom Action Bar & Highlights (Colorful Pill Tags) */}
+                  <div className="pt-4 border-t border-black/5 space-y-3">
                     <button
                       type="button"
                       onClick={() => {
                         setOpenedMockSeries(sub.code);
                         setSelectedSubject(sub.code);
                       }}
-                      className="w-full py-3 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-purple-950/20 active:scale-98 transition-all cursor-pointer"
+                      className={`w-full py-3 rounded-xl ${sub.btnBg} font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs active:scale-98 transition-all cursor-pointer`}
                     >
                       <span>Start Mock Test</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
 
                     <div className="flex items-center justify-between gap-1.5 flex-wrap">
-                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-300 bg-white/10 border border-white/20 px-2 py-0.5 rounded-full shadow-2xs">
-                        <div className="w-3.5 h-3.5 rounded-full bg-emerald-950/80 text-emerald-300 flex items-center justify-center shrink-0">
+                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 bg-white/90 border border-black/5 px-2 py-0.5 rounded-full shadow-2xs">
+                        <div className="w-3.5 h-3.5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
                           <Check className="w-2 h-2 stroke-[3]" />
                         </div>
                         <span>Updated Syllabus</span>
                       </div>
 
-                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-300 bg-white/10 border border-white/20 px-2 py-0.5 rounded-full shadow-2xs">
-                        <div className="w-3.5 h-3.5 rounded-full bg-blue-950/80 text-blue-300 flex items-center justify-center shrink-0">
+                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 bg-white/90 border border-black/5 px-2 py-0.5 rounded-full shadow-2xs">
+                        <div className="w-3.5 h-3.5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
                           <BarChart2 className="w-2 h-2" />
                         </div>
                         <span>Real Exam Pattern</span>
                       </div>
 
-                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-300 bg-white/10 border border-white/20 px-2 py-0.5 rounded-full shadow-2xs">
-                        <div className="w-3.5 h-3.5 rounded-full bg-amber-950/80 text-amber-300 flex items-center justify-center shrink-0">
+                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 bg-white/90 border border-black/5 px-2 py-0.5 rounded-full shadow-2xs">
+                        <div className="w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
                           <Trophy className="w-2 h-2" />
                         </div>
                         <span>Improve Score</span>
