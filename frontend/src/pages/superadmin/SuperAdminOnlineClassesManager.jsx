@@ -556,15 +556,15 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
                 isActive
-                  ? 'bg-[#80497D] text-white shadow-md shadow-[#80497D]/20'
-                  : 'bg-white text-slate-600 border border-[#ebd7eb] hover:bg-[#faf6fa] hover:text-[#80497D]'
+                  ? 'bg-gradient-to-r from-[#5b3da8] to-[#16327a] text-white shadow-md shadow-blue-950/20 border border-[#7854d6]/30'
+                  : 'bg-white text-slate-600 border border-[#ebd7eb] hover:bg-slate-50 hover:text-[#16327a]'
               }`}
             >
               <Icon className="w-4 h-4" />
               <span>{tab.label}</span>
               {tab.count !== undefined && (
                 <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-[#f4eaf4] text-[#80497D]'
+                  isActive ? 'bg-white/20 text-white' : 'bg-blue-50 text-[#16327a]'
                 }`}>
                   {tab.count}
                 </span>
@@ -826,7 +826,7 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
 
                 <button
                   type="button"
-                  className="px-6 py-3 rounded-2xl bg-[#80497D] hover:bg-[#6c3b69] text-white text-xs font-black tracking-wide shrink-0 transition-all shadow-md shadow-[#80497D]/20 cursor-pointer"
+                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#5b3da8] to-[#16327a] hover:from-[#4d3291] hover:to-[#122459] text-white text-xs font-black tracking-wide shrink-0 transition-all shadow-md shadow-blue-950/20 cursor-pointer border border-[#7854d6]/30"
                 >
                   {heroBanner.button_text || 'ENROLL NOW →'}
                 </button>

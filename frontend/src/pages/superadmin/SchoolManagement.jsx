@@ -153,7 +153,7 @@ export const SchoolManagement = () => {
             type="button"
             onClick={exportCsv}
             disabled={schools.length === 0}
-            className="px-5 py-2.5 bg-[#80497D] hover:bg-[#6c3b69] text-white rounded-xl text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-md disabled:opacity-50"
+            className="px-5 py-2.5 bg-gradient-to-r from-[#5b3da8] to-[#16327a] hover:from-[#4d3291] hover:to-[#122459] text-white rounded-xl text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-md shadow-blue-950/20 disabled:opacity-50 border border-[#7854d6]/30"
           >
             <Download className="w-4 h-4 text-[#e7b84b]" />
             <span>Export CSV</span>

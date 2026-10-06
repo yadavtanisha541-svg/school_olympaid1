@@ -514,8 +514,8 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
           {/* 1. Header Banner */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-1">
             <div className="flex items-center gap-3.5 min-w-0">
-              <div className="w-12 h-12 rounded-xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-2xs">
-                <Zap className="w-6 h-6 text-[#80497D]" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#16327a]/15 to-[#5b3da8]/15 text-[#16327a] flex items-center justify-center font-bold border border-blue-100 shrink-0 shadow-2xs">
+                <Zap className="w-6 h-6 text-[#16327a]" />
               </div>
               <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#422240] tracking-tight truncate">
@@ -531,16 +531,16 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
               <button
                 type="button"
                 onClick={handleResetDefaults}
-                className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#faf6fa] text-slate-700 font-bold text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#ebd7eb] shadow-2xs"
+                className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
                 title="Reset Defaults"
               >
-                <RotateCcw className="w-4 h-4 text-[#80497D]" />
+                <RotateCcw className="w-4 h-4 text-[#16327a]" />
                 <span>Reset Defaults</span>
               </button>
               <button
                 type="button"
                 onClick={handleOpenNew}
-                className="px-5 py-2.5 rounded-xl bg-[#80497D] hover:bg-[#6b3a69] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-[#80497D]/20 active:scale-95 cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#5b3da8] to-[#16327a] hover:from-[#4d3291] hover:to-[#122459] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30"
               >
                 <Plus className="w-4 h-4" />
                 <span>Create New Program</span>
@@ -759,8 +759,8 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                   onClick={() => setEditorTab(tab.id)}
                   className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5 cursor-pointer whitespace-nowrap ${
                     isActive
-                      ? 'bg-[#80497D] text-white shadow-md shadow-[#80497D]/20'
-                      : 'bg-white text-slate-600 border border-[#ebd7eb] hover:bg-[#faf6fa] hover:text-[#80497D]'
+                      ? 'bg-gradient-to-r from-[#5b3da8] to-[#16327a] text-white shadow-md shadow-blue-950/20 border border-[#7854d6]/30'
+                      : 'bg-white text-slate-600 border border-[#ebd7eb] hover:bg-slate-50 hover:text-[#16327a]'
                   }`}
                 >
                   <Icon className={`w-4 h-4 ${isActive ? 'text-[#e7b84b]' : 'text-slate-400'}`} />
@@ -919,7 +919,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                       <button
                         type="button"
                         onClick={handleAddIntroParagraph}
-                        className="px-3.5 py-1.5 bg-[#6d3a68] text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
+                        className="px-3.5 py-1.5 bg-gradient-to-r from-[#5b3da8] to-[#16327a] hover:from-[#4d3291] hover:to-[#122459] text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer shadow-xs border border-[#7854d6]/30"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Add Paragraph</span>
@@ -958,7 +958,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                       <button
                         type="button"
                         onClick={handleAddWhyReason}
-                        className="px-3.5 py-1.5 bg-[#6d3a68] text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer"
+                        className="px-3.5 py-1.5 bg-gradient-to-r from-[#5b3da8] to-[#16327a] hover:from-[#4d3291] hover:to-[#122459] text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer shadow-xs border border-[#7854d6]/30"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Add Bullet Point</span>
@@ -1003,7 +1003,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                     <button
                       type="button"
                       onClick={handleAddSkillClass}
-                      className="px-4 py-2 bg-[#6d3a68] text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                      className="px-4 py-2 bg-gradient-to-r from-[#5b3da8] to-[#16327a] hover:from-[#4d3291] hover:to-[#122459] text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer shadow-xs border border-[#7854d6]/30"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add Another Grade</span>

@@ -279,16 +279,16 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
           <button
             type="button"
             onClick={handleResetDefaults}
-            className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#faf6fa] text-slate-700 font-bold text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#ebd7eb] shadow-2xs"
+            className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
             title="Reset Default Questions"
           >
-            <RotateCcw className="w-4 h-4 text-[#80497D]" />
+            <RotateCcw className="w-4 h-4 text-[#16327a]" />
             <span>Reset Defaults</span>
           </button>
           <button
             type="button"
             onClick={handleOpenCreateModal}
-            className="px-5 py-2.5 rounded-xl bg-[#80497D] hover:bg-[#6b3a69] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-[#80497D]/20 active:scale-95 cursor-pointer"
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#5b3da8] to-[#16327a] hover:from-[#4d3291] hover:to-[#122459] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30"
           >
             <Plus className="w-4 h-4" />
             <span>Add Revision Question</span>
@@ -731,7 +731,7 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2 rounded-xl bg-[#6d3a68] hover:bg-[#5c3158] text-white font-bold transition-all shadow-sm cursor-pointer disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#5b3da8] to-[#16327a] hover:from-[#4d3291] hover:to-[#122459] text-white font-bold transition-all shadow-md cursor-pointer disabled:opacity-50 border border-[#7854d6]/30"
                 >
                   {saving ? 'Saving...' : modalMode === 'create' ? 'Create Question' : 'Save Changes'}
                 </button>
