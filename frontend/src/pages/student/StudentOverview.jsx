@@ -660,9 +660,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
     <div className="space-y-6 pb-14 font-sans w-full max-w-full overflow-x-hidden">
       
       {/* ========================================================================= */}
-      {/* 1. HERO GREETING BANNER (3-Mix Pastel Gradient Card - 10% Richer)         */}
+      {/* 1. HERO GREETING BANNER (3-Mix Pastel Gradient Card - 20% Richer)         */}
       {/* ========================================================================= */}
-      <div className="bg-gradient-to-r from-blue-100/90 via-indigo-100/80 to-pink-100/90 border-2 border-indigo-200/90 rounded-3xl p-5 sm:p-6 md:p-7 shadow-xs relative overflow-hidden text-slate-900">
+      <div className="bg-gradient-to-r from-blue-200/90 via-indigo-200/80 to-pink-200/90 border-2 border-indigo-300 rounded-3xl p-5 sm:p-6 md:p-7 shadow-sm relative overflow-hidden text-slate-900">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           {/* Left Content */}
           <div className="space-y-3 max-w-2xl">
@@ -784,7 +784,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </button>
         </div>
 
-        {/* 6 Colorful 2-3 Mix Pastel Gradient Subject Cards (10% Richer) */}
+        {/* 6 Colorful 2-3 Mix Pastel Gradient Subject Cards (20% Richer) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5 w-full">
           {[
             {
@@ -792,60 +792,60 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               title: 'IEOM (Maths)',
               subtitle: 'Mathematics & Logic',
               icon: Calculator,
-              cardBg: 'bg-gradient-to-br from-pink-100/90 via-rose-100/80 to-amber-100/80 border-2 border-pink-300/80 hover:border-pink-400',
-              iconBg: 'bg-gradient-to-tr from-pink-500 via-rose-500 to-amber-500 text-white shadow-pink-200 shadow-sm',
-              linkText: 'text-pink-700 group-hover:text-pink-800'
+              cardBg: 'bg-gradient-to-br from-pink-200/95 via-rose-200/85 to-amber-200/85 border-2 border-pink-400/90 hover:border-pink-500 shadow-sm',
+              iconBg: 'bg-gradient-to-tr from-pink-500 via-rose-500 to-amber-500 text-white shadow-pink-300 shadow-sm',
+              linkText: 'text-pink-800 group-hover:text-pink-900'
             },
             {
               key: 'iso',
               title: 'IEOS (Science)',
               subtitle: 'Science & Discovery',
               icon: Rocket,
-              cardBg: 'bg-gradient-to-br from-purple-100/90 via-indigo-100/80 to-sky-100/80 border-2 border-purple-300/80 hover:border-purple-400',
-              iconBg: 'bg-gradient-to-tr from-purple-500 via-indigo-500 to-sky-500 text-white shadow-purple-200 shadow-sm',
-              linkText: 'text-purple-700 group-hover:text-purple-800'
+              cardBg: 'bg-gradient-to-br from-purple-200/95 via-indigo-200/85 to-sky-200/85 border-2 border-purple-400/90 hover:border-purple-500 shadow-sm',
+              iconBg: 'bg-gradient-to-tr from-purple-500 via-indigo-500 to-sky-500 text-white shadow-purple-300 shadow-sm',
+              linkText: 'text-purple-800 group-hover:text-purple-900'
             },
             {
               key: 'idlo',
               title: 'IEOD (Digital)',
               subtitle: 'Digital Literacy & AI',
               icon: Laptop,
-              cardBg: 'bg-gradient-to-br from-cyan-100/90 via-blue-100/80 to-indigo-100/80 border-2 border-blue-300/80 hover:border-blue-400',
-              iconBg: 'bg-gradient-to-tr from-cyan-500 via-blue-500 to-indigo-500 text-white shadow-blue-200 shadow-sm',
-              linkText: 'text-blue-700 group-hover:text-blue-800'
+              cardBg: 'bg-gradient-to-br from-cyan-200/95 via-blue-200/85 to-indigo-200/85 border-2 border-blue-400/90 hover:border-blue-500 shadow-sm',
+              iconBg: 'bg-gradient-to-tr from-cyan-500 via-blue-500 to-indigo-500 text-white shadow-blue-300 shadow-sm',
+              linkText: 'text-blue-800 group-hover:text-blue-900'
             },
             {
               key: 'ieo',
               title: 'IEOE (English)',
               subtitle: 'English & Grammar',
               icon: BookOpen,
-              cardBg: 'bg-gradient-to-br from-emerald-100/90 via-teal-100/80 to-cyan-100/80 border-2 border-teal-300/80 hover:border-teal-400',
-              iconBg: 'bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-teal-200 shadow-sm',
-              linkText: 'text-teal-800 group-hover:text-teal-900'
+              cardBg: 'bg-gradient-to-br from-emerald-200/95 via-teal-200/85 to-cyan-200/85 border-2 border-teal-400/90 hover:border-teal-500 shadow-sm',
+              iconBg: 'bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-teal-300 shadow-sm',
+              linkText: 'text-teal-900 group-hover:text-teal-950'
             },
             {
               key: 'igko',
               title: 'IEOG (GK)',
               subtitle: 'General Knowledge',
               icon: Globe,
-              cardBg: 'bg-gradient-to-br from-amber-100/90 via-orange-100/80 to-rose-100/80 border-2 border-amber-300/80 hover:border-amber-400',
-              iconBg: 'bg-gradient-to-tr from-amber-500 via-orange-500 to-rose-500 text-white shadow-amber-200 shadow-sm',
-              linkText: 'text-amber-800 group-hover:text-amber-900'
+              cardBg: 'bg-gradient-to-br from-amber-200/95 via-orange-200/85 to-rose-200/85 border-2 border-amber-400/90 hover:border-amber-500 shadow-sm',
+              iconBg: 'bg-gradient-to-tr from-amber-500 via-orange-500 to-rose-500 text-white shadow-amber-300 shadow-sm',
+              linkText: 'text-amber-900 group-hover:text-amber-950'
             },
             {
               key: 'iho',
               title: 'IEOH (Hindi)',
               subtitle: 'हिंदी व्याकरण एवं बोध',
               icon: Languages,
-              cardBg: 'bg-gradient-to-br from-lime-100/90 via-emerald-100/80 to-teal-100/80 border-2 border-emerald-300/80 hover:border-emerald-400',
-              iconBg: 'bg-gradient-to-tr from-lime-500 via-emerald-500 to-teal-600 text-white shadow-emerald-200 shadow-sm',
-              linkText: 'text-emerald-800 group-hover:text-emerald-900'
+              cardBg: 'bg-gradient-to-br from-lime-200/95 via-emerald-200/85 to-teal-200/85 border-2 border-emerald-400/90 hover:border-emerald-500 shadow-sm',
+              iconBg: 'bg-gradient-to-tr from-lime-500 via-emerald-500 to-teal-600 text-white shadow-emerald-300 shadow-sm',
+              linkText: 'text-emerald-900 group-hover:text-emerald-950'
             }
           ].map((sub) => (
             <div
               key={sub.key}
               onClick={() => onNavigateTab && onNavigateTab(`content_${sub.key}`)}
-              className={`${sub.cardBg} rounded-3xl p-5 sm:p-6 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1 text-slate-900`}
+              className={`${sub.cardBg} rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1 text-slate-900`}
             >
               {/* Square Icon Container */}
               <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${sub.iconBg} flex items-center justify-center border border-white/40 group-hover:scale-105 transition-transform shrink-0`}>
@@ -857,13 +857,13 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                 <h3 className="font-bold text-slate-900 text-sm sm:text-base tracking-tight leading-snug">
                   {sub.title}
                 </h3>
-                <p className="text-xs text-slate-500 font-medium truncate">
+                <p className="text-xs text-slate-700 font-semibold truncate">
                   {sub.subtitle}
                 </p>
               </div>
 
               {/* Bottom Action Indicator */}
-              <div className={`w-full pt-2.5 border-t border-black/5 flex items-center justify-between text-xs font-bold ${sub.linkText} transition-colors`}>
+              <div className={`w-full pt-2.5 border-t border-black/10 flex items-center justify-between text-xs font-bold ${sub.linkText} transition-colors`}>
                 <span>Explore Series</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </div>
@@ -878,9 +878,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2">
         
         {/* Left Banner: Online Classes */}
-        <div className="bg-gradient-to-r from-blue-100/95 via-indigo-100/90 to-purple-100/95 rounded-3xl border-2 border-indigo-300/90 hover:border-indigo-400 p-6 sm:p-7 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-slate-900">
+        <div className="bg-gradient-to-r from-blue-200/95 via-indigo-200/90 to-purple-200/95 rounded-3xl border-2 border-indigo-400 hover:border-indigo-500 p-6 sm:p-7 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-slate-900">
           <div className="flex items-center gap-4 min-w-0">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-indigo-200 shadow-sm shrink-0 text-white border border-white/30">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-indigo-300 shadow-sm shrink-0 text-white border border-white/30">
               <div className="relative">
                 <BookOpen className="w-8 h-8 text-white" />
                 <Lightbulb className="w-4 h-4 text-amber-300 fill-amber-300 absolute -top-1 -right-1" />
@@ -888,13 +888,13 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             </div>
 
             <div className="min-w-0 space-y-1.5">
-              <span className="inline-block px-3 py-1 rounded-lg bg-indigo-200/90 text-indigo-800 text-[10px] font-black uppercase tracking-wider border border-indigo-300">
+              <span className="inline-block px-3 py-1 rounded-lg bg-indigo-300/90 text-indigo-900 text-[10px] font-black uppercase tracking-wider border border-indigo-400">
                 FEATURED
               </span>
               <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
                 Online Classes for Mathematics, Science &amp; Digital Literacy
               </h3>
-              <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-700 font-semibold leading-relaxed">
                 Get expert guidance and master competitive Olympiad problem-solving.
               </p>
             </div>
@@ -911,9 +911,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
         </div>
 
         {/* Right Banner: Olympiad Intelligent Test Generator Pro */}
-        <div className="bg-gradient-to-r from-pink-100/95 via-purple-100/90 to-blue-100/95 rounded-3xl border-2 border-pink-300/90 hover:border-pink-400 p-6 sm:p-7 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-slate-900">
+        <div className="bg-gradient-to-r from-pink-200/95 via-purple-200/90 to-blue-200/95 rounded-3xl border-2 border-pink-400 hover:border-pink-500 p-6 sm:p-7 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-slate-900">
           <div className="flex items-center gap-4 min-w-0">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 flex items-center justify-center shadow-pink-200 shadow-sm shrink-0 text-white border border-white/30">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 flex items-center justify-center shadow-pink-300 shadow-sm shrink-0 text-white border border-white/30">
               <div className="relative">
                 <FileSpreadsheet className="w-8 h-8 text-white" />
                 <Target className="w-4 h-4 text-yellow-300 absolute -top-1 -right-1" />
@@ -921,13 +921,13 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             </div>
 
             <div className="min-w-0 space-y-1.5">
-              <span className="inline-block px-3 py-1 rounded-lg bg-pink-200/90 text-pink-800 text-[10px] font-black uppercase tracking-wider border border-pink-300">
+              <span className="inline-block px-3 py-1 rounded-lg bg-pink-300/90 text-pink-900 text-[10px] font-black uppercase tracking-wider border border-pink-400">
                 PRO TOOL
               </span>
               <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
                 Olympiad Intelligent Test Generator Pro
               </h3>
-              <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-700 font-semibold leading-relaxed">
                 Create customized Olympiad mock tests in seconds.
               </p>
             </div>
@@ -946,13 +946,13 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. SECTION: FREE SAMPLE PAPERS & PREVIOUS YEAR PAPERS (10% Richer)        */}
+      {/* 4. SECTION: FREE SAMPLE PAPERS & PREVIOUS YEAR PAPERS (20% Richer)        */}
       {/* ========================================================================= */}
       <div className="pt-2">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           
           {/* Card 1: Spotlight: IGKO Quiz */}
-          <div className="bg-gradient-to-br from-amber-100/90 via-orange-100/80 to-rose-100/80 rounded-2xl border-2 border-amber-300/80 hover:border-amber-400 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 text-slate-900">
+          <div className="bg-gradient-to-br from-amber-200/95 via-orange-200/85 to-rose-200/85 rounded-2xl border-2 border-amber-400/90 hover:border-amber-500 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all flex items-center justify-between gap-3 text-slate-900">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center shrink-0 shadow-2xs border border-white/30">
                 <FileText className="w-5 h-5" />
@@ -961,7 +961,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                 <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
                   Spotlight: IGKO Quiz
                 </h4>
-                <p className="text-[10px] text-slate-600 font-semibold truncate mt-0.5">
+                <p className="text-[10px] text-slate-700 font-semibold truncate mt-0.5">
                   Test your knowledge with latest questions.
                 </p>
               </div>
@@ -978,7 +978,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </div>
 
           {/* Card 2: Free Sample Papers */}
-          <div className="bg-gradient-to-br from-sky-100/90 via-blue-100/80 to-indigo-100/80 rounded-2xl border-2 border-sky-300/80 hover:border-sky-400 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 text-slate-900">
+          <div className="bg-gradient-to-br from-sky-200/95 via-blue-200/85 to-indigo-200/85 rounded-2xl border-2 border-sky-400/90 hover:border-sky-500 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all flex items-center justify-between gap-3 text-slate-900">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-2xs border border-white/30">
                 <FileSpreadsheet className="w-5 h-5" />
@@ -987,7 +987,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                 <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
                   Free Sample Papers
                 </h4>
-                <p className="text-[10px] text-slate-600 font-semibold truncate mt-0.5">
+                <p className="text-[10px] text-slate-700 font-semibold truncate mt-0.5">
                   Download and practice sample papers.
                 </p>
               </div>
@@ -1004,7 +1004,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </div>
 
           {/* Card 3: Free Previous Year Papers */}
-          <div className="bg-gradient-to-br from-emerald-100/90 via-teal-100/80 to-cyan-100/80 rounded-2xl border-2 border-emerald-300/80 hover:border-emerald-400 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 text-slate-900">
+          <div className="bg-gradient-to-br from-emerald-200/95 via-teal-200/85 to-cyan-200/85 rounded-2xl border-2 border-emerald-400/90 hover:border-emerald-500 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all flex items-center justify-between gap-3 text-slate-900">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-2xs border border-white/30">
                 <Award className="w-5 h-5" />
@@ -1013,7 +1013,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                 <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
                   Free Previous Year Papers
                 </h4>
-                <p className="text-[10px] text-slate-600 font-semibold truncate mt-0.5">
+                <p className="text-[10px] text-slate-700 font-semibold truncate mt-0.5">
                   Get past year papers with solutions.
                 </p>
               </div>
@@ -1058,8 +1058,8 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               id: 'prog_rsdp',
               title: 'Reasoning Skill Development',
               subtitle: 'Build a strong foundation with essential skills.',
-              cardBg: 'bg-gradient-to-br from-purple-100/90 via-indigo-100/80 to-pink-100/80 border-2 border-purple-300/80 hover:border-purple-400',
-              iconBg: 'bg-gradient-to-br from-purple-500 via-indigo-500 to-pink-500 text-white shadow-purple-200 shadow-sm',
+              cardBg: 'bg-gradient-to-br from-purple-200/95 via-indigo-200/85 to-pink-200/85 border-2 border-purple-400/90 hover:border-purple-500 shadow-sm',
+              iconBg: 'bg-gradient-to-br from-purple-500 via-indigo-500 to-pink-500 text-white shadow-purple-300 shadow-sm',
               btnBg: 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-purple-600',
               icon: Brain
             },
@@ -1067,8 +1067,8 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               id: 'prog_gksdp',
               title: 'GK Skill Development',
               subtitle: 'Improve your general knowledge and current affairs.',
-              cardBg: 'bg-gradient-to-br from-amber-100/90 via-orange-100/80 to-yellow-100/80 border-2 border-amber-300/80 hover:border-amber-400',
-              iconBg: 'bg-gradient-to-br from-amber-500 via-orange-500 to-yellow-500 text-white shadow-amber-200 shadow-sm',
+              cardBg: 'bg-gradient-to-br from-amber-200/95 via-orange-200/85 to-yellow-200/85 border-2 border-amber-400/90 hover:border-amber-500 shadow-sm',
+              iconBg: 'bg-gradient-to-br from-amber-500 via-orange-500 to-yellow-500 text-white shadow-amber-300 shadow-sm',
               btnBg: 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-amber-500',
               icon: Globe
             },
@@ -1076,8 +1076,8 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               id: 'prog_msdp',
               title: 'Maths Skill Development',
               subtitle: 'Sharpen your math skills with practice and theory.',
-              cardBg: 'bg-gradient-to-br from-pink-100/90 via-rose-100/80 to-red-100/80 border-2 border-pink-300/80 hover:border-pink-400',
-              iconBg: 'bg-gradient-to-br from-pink-500 via-rose-500 to-red-500 text-white shadow-pink-200 shadow-sm',
+              cardBg: 'bg-gradient-to-br from-pink-200/95 via-rose-200/85 to-red-200/85 border-2 border-pink-400/90 hover:border-pink-500 shadow-sm',
+              iconBg: 'bg-gradient-to-br from-pink-500 via-rose-500 to-red-500 text-white shadow-pink-300 shadow-sm',
               btnBg: 'bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white border-pink-600',
               isMath: true
             },
@@ -1085,8 +1085,8 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               id: 'prog_esdp',
               title: 'English Skill Development',
               subtitle: 'Enhance your communication and language skills.',
-              cardBg: 'bg-gradient-to-br from-blue-100/90 via-sky-100/80 to-indigo-100/80 border-2 border-blue-300/80 hover:border-blue-400',
-              iconBg: 'bg-gradient-to-br from-blue-500 via-sky-500 to-indigo-500 text-white shadow-blue-200 shadow-sm',
+              cardBg: 'bg-gradient-to-br from-blue-200/95 via-sky-200/85 to-indigo-200/85 border-2 border-blue-400/90 hover:border-blue-500 shadow-sm',
+              iconBg: 'bg-gradient-to-br from-blue-500 via-sky-500 to-indigo-500 text-white shadow-blue-300 shadow-sm',
               btnBg: 'bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white border-blue-600',
               isLang: true
             },
@@ -1094,8 +1094,8 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               id: 'prog_ssdp',
               title: 'Science Skill Development',
               subtitle: 'Explore science concepts with easy learning.',
-              cardBg: 'bg-gradient-to-br from-emerald-100/90 via-teal-100/80 to-lime-100/80 border-2 border-emerald-300/80 hover:border-emerald-400',
-              iconBg: 'bg-gradient-to-br from-emerald-500 via-teal-500 to-lime-500 text-white shadow-emerald-200 shadow-sm',
+              cardBg: 'bg-gradient-to-br from-emerald-200/95 via-teal-200/85 to-lime-200/85 border-2 border-emerald-400/90 hover:border-emerald-500 shadow-sm',
+              iconBg: 'bg-gradient-to-br from-emerald-500 via-teal-500 to-lime-500 text-white shadow-emerald-300 shadow-sm',
               btnBg: 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white border-emerald-600',
               icon: Rocket
             }
@@ -1105,7 +1105,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               <div
                 key={prog.id}
                 onClick={() => onNavigateTab(prog.id)}
-                className={`rounded-3xl p-5 flex flex-col justify-between text-slate-900 shadow-xs hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 min-h-[210px] relative overflow-hidden ${prog.cardBg} cursor-pointer group border`}
+                className={`rounded-3xl p-5 flex flex-col justify-between text-slate-900 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 min-h-[210px] relative overflow-hidden ${prog.cardBg} cursor-pointer group border`}
               >
                 <div className="space-y-2.5 relative z-10">
                   {/* Top Circular Icon Container */}
