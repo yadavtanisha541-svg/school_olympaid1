@@ -634,7 +634,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       {/* ========================================================================= */}
       {/* 1. HERO GREETING BANNER (Mixed Blue + Purple + Pink Gradient Banner)       */}
       {/* ========================================================================= */}
-      <div className="bg-gradient-to-r from-[#1e3a8a] via-[#5b21b6] to-[#9d174d] border border-indigo-300/40 rounded-3xl p-5 sm:p-6 md:p-7 shadow-xl shadow-indigo-950/20 relative overflow-hidden text-white">
+      <div className="bg-gradient-to-r from-[#2b27cf] via-[#7e2dbf] to-[#e0469b] border border-white/30 rounded-3xl p-5 sm:p-6 md:p-7 shadow-xl shadow-indigo-950/20 relative overflow-hidden text-white">
         {/* Soft Decorative Glow Circles */}
         <div className="absolute top-0 right-1/4 w-48 h-48 bg-pink-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-10 w-40 h-40 bg-blue-500/30 rounded-full blur-2xl pointer-events-none" />
@@ -775,62 +775,62 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5 w-full">
           {[
             {
-              key: 'igko',
-              title: 'IGKO (GK)',
-              subtitle: 'General Knowledge',
-              icon: Globe,
-              iconColor: 'text-amber-300',
-              iconBg: 'bg-amber-950/80 border-amber-800/60'
-            },
-            {
-              key: 'iso',
-              title: 'ISO (NSO)',
-              subtitle: 'Science & Discovery',
-              icon: Rocket,
-              iconColor: 'text-emerald-300',
-              iconBg: 'bg-emerald-950/80 border-emerald-800/60'
-            },
-            {
               key: 'imo',
               title: 'IMO (Maths)',
               subtitle: 'Mathematics & Logic',
               icon: Calculator,
-              iconColor: 'text-blue-300',
-              iconBg: 'bg-blue-950/80 border-blue-800/60'
+              iconColor: 'text-[#ec4899]',
+              iconBg: 'bg-[#24124a] border-[#441f7e]'
+            },
+            {
+              key: 'iso',
+              title: 'ISO / NSO',
+              subtitle: 'Science & Discovery',
+              icon: Rocket,
+              iconColor: 'text-[#8b5cf6]',
+              iconBg: 'bg-[#24124a] border-[#441f7e]'
+            },
+            {
+              key: 'idlo',
+              title: 'IDLO (Digital)',
+              subtitle: 'Digital Literacy & AI',
+              icon: Laptop,
+              iconColor: 'text-[#3b82f6]',
+              iconBg: 'bg-[#24124a] border-[#441f7e]'
             },
             {
               key: 'ieo',
               title: 'IEO (English)',
               subtitle: 'English & Grammar',
               icon: BookOpen,
-              iconColor: 'text-pink-300',
-              iconBg: 'bg-purple-950/80 border-purple-800/60'
+              iconColor: 'text-[#06b6d4]',
+              iconBg: 'bg-[#24124a] border-[#441f7e]'
             },
             {
-              key: 'icso',
-              title: 'ICSO (Cyber)',
-              subtitle: 'Cyber & Computer',
-              icon: Laptop,
-              iconColor: 'text-sky-300',
-              iconBg: 'bg-sky-950/80 border-sky-800/60'
+              key: 'igko',
+              title: 'IGKO (GK)',
+              subtitle: 'General Knowledge',
+              icon: Globe,
+              iconColor: 'text-[#f59e0b]',
+              iconBg: 'bg-[#24124a] border-[#441f7e]'
             },
             {
-              key: 'isso',
-              title: 'ISSO (Reasoning)',
-              subtitle: 'Logical Reasoning',
-              icon: Brain,
-              iconColor: 'text-rose-300',
-              iconBg: 'bg-rose-950/80 border-rose-800/60'
+              key: 'iho',
+              title: 'IHO (Hindi)',
+              subtitle: 'हिंदी व्याकरण एवं बोध',
+              icon: Languages,
+              iconColor: 'text-[#10b981]',
+              iconBg: 'bg-[#24124a] border-[#441f7e]'
             }
           ].map((sub) => (
             <div
               key={sub.key}
               onClick={() => onNavigateTab && onNavigateTab(`content_${sub.key}`)}
-              className="bg-gradient-to-br from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] rounded-3xl border border-white/25 p-5 sm:p-6 shadow-xl hover:shadow-2xl transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1.5 text-white"
+              className="bg-[#13092c] rounded-3xl border border-[#2e1659] p-5 sm:p-6 shadow-xl hover:border-[#7e2dbf]/80 hover:shadow-2xl transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1.5 text-white"
             >
               {/* Square Icon Container */}
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/20 border border-white/30 text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
-                <sub.icon className="w-7 h-7 sm:w-8 sm:h-8" />
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#24124a] border border-[#441f7e] text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
+                <sub.icon className={`w-7 h-7 sm:w-8 sm:h-8 ${sub.iconColor}`} />
               </div>
 
               {/* Subject Title & Subtitle */}
@@ -838,13 +838,13 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                 <h3 className="font-black text-white text-sm sm:text-base tracking-tight leading-snug">
                   {sub.title}
                 </h3>
-                <p className="text-xs text-pink-100 font-semibold truncate">
+                <p className="text-xs text-slate-400 font-medium truncate">
                   {sub.subtitle}
                 </p>
               </div>
 
               {/* Bottom Action Indicator */}
-              <div className="w-full pt-2.5 border-t border-white/20 flex items-center justify-between text-xs font-black text-white group-hover:text-pink-100 transition-colors">
+              <div className="w-full pt-2.5 border-t border-[#2e1659] flex items-center justify-between text-xs font-black text-pink-300 group-hover:text-white transition-colors">
                 <span>Explore Series</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -854,14 +854,13 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. SECTION: TWO FEATURED BANNERS (Pink -> Purple -> Blue Gradient Boxes)   */}
+      {/* 3. SECTION: TWO FEATURED BANNERS (Blue -> Purple -> Pink Gradient Boxes)   */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2">
         
-        {/* Left Banner: Reasoning Online Classes */}
-        <div className="bg-gradient-to-br from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] rounded-3xl border border-white/30 p-6 sm:p-7 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-white">
+        {/* Left Banner: Online Classes */}
+        <div className="bg-gradient-to-r from-[#2b27cf] via-[#7e2dbf] to-[#e0469b] rounded-3xl border border-white/30 p-6 sm:p-7 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-white">
           <div className="flex items-center gap-4 min-w-0">
-            {/* Open Book with Bulb Vector Illustration */}
             <div className="w-16 h-16 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center shadow-md shrink-0 text-white backdrop-blur-xs">
               <div className="relative">
                 <BookOpen className="w-8 h-8 text-white" />
@@ -874,10 +873,10 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                 FEATURED
               </span>
               <h3 className="text-sm sm:text-base font-black text-white leading-snug">
-                Reasoning Online Classes for IMO, ISO(NSO) &amp; IEO
+                Online Classes for Mathematics, Science &amp; Digital Literacy
               </h3>
               <p className="text-xs sm:text-sm text-pink-100 font-medium leading-relaxed">
-                Get expert guidance and improve your problem-solving skills.
+                Get expert guidance and master competitive Olympiad problem-solving.
               </p>
             </div>
           </div>
@@ -893,9 +892,8 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
         </div>
 
         {/* Right Banner: Olympiad Intelligent Test Generator Pro */}
-        <div className="bg-gradient-to-br from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] rounded-3xl border border-white/30 p-6 sm:p-7 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-white">
+        <div className="bg-gradient-to-r from-[#2b27cf] via-[#7e2dbf] to-[#e0469b] rounded-3xl border border-white/30 p-6 sm:p-7 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-white">
           <div className="flex items-center gap-4 min-w-0">
-            {/* Target & Checklist Illustration */}
             <div className="w-16 h-16 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center shadow-md shrink-0 text-white backdrop-blur-xs">
               <div className="relative">
                 <FileSpreadsheet className="w-8 h-8 text-white" />
@@ -911,7 +909,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                 Olympiad Intelligent Test Generator Pro
               </h3>
               <p className="text-xs sm:text-sm text-pink-100 font-medium leading-relaxed">
-                Create your own Olympiad tests in seconds.
+                Create customized Olympiad mock tests in seconds.
               </p>
             </div>
           </div>
@@ -935,16 +933,16 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           
           {/* Card 1: Spotlight: IGKO Quiz */}
-          <div className="bg-gradient-to-br from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] rounded-2xl border border-white/25 p-4 sm:p-5 shadow-lg flex items-center justify-between gap-3 text-white">
+          <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-4 sm:p-5 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between gap-3 text-white">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-white/20 text-white border border-white/30 flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-[#24124a] text-[#e0469b] border border-[#441f7e] flex items-center justify-center shrink-0 shadow-xs">
                 <FileText className="w-5 h-5" />
               </div>
               <div className="min-w-0">
                 <h4 className="font-bold text-white text-xs sm:text-sm truncate">
                   Spotlight: IGKO Quiz
                 </h4>
-                <p className="text-[10px] text-pink-100 font-medium truncate mt-0.5">
+                <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
                   Test your knowledge with latest questions.
                 </p>
               </div>
@@ -953,24 +951,24 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             <button
               type="button"
               onClick={() => onNavigateTab('free_quizzes')}
-              className="px-4 py-1.5 bg-white text-purple-900 hover:bg-slate-100 rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-white/30"
+              className="px-4 py-1.5 bg-gradient-to-r from-[#2b27cf] to-[#e0469b] text-white hover:opacity-90 rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-white/20"
             >
               <span>Open</span>
-              <ArrowRight className="w-3 h-3 text-purple-900" />
+              <ArrowRight className="w-3 h-3 text-white" />
             </button>
           </div>
 
           {/* Card 2: Free Sample Papers */}
-          <div className="bg-gradient-to-br from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] rounded-2xl border border-white/25 p-4 sm:p-5 shadow-lg flex items-center justify-between gap-3 text-white">
+          <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-4 sm:p-5 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between gap-3 text-white">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-white/20 text-white border border-white/30 flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-[#24124a] text-[#38bdf8] border border-[#441f7e] flex items-center justify-center shrink-0 shadow-xs">
                 <FileSpreadsheet className="w-5 h-5" />
               </div>
               <div className="min-w-0">
                 <h4 className="font-bold text-white text-xs sm:text-sm truncate">
                   Free Sample Papers
                 </h4>
-                <p className="text-[10px] text-pink-100 font-medium truncate mt-0.5">
+                <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
                   Download and practice sample papers.
                 </p>
               </div>
@@ -979,24 +977,24 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             <button
               type="button"
               onClick={() => onNavigateTab('free_sample_papers')}
-              className="px-4 py-1.5 bg-white text-purple-900 hover:bg-slate-100 rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-white/30"
+              className="px-4 py-1.5 bg-gradient-to-r from-[#2b27cf] to-[#e0469b] text-white hover:opacity-90 rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-white/20"
             >
               <span>Open</span>
-              <ArrowRight className="w-3 h-3 text-purple-900" />
+              <ArrowRight className="w-3 h-3 text-white" />
             </button>
           </div>
 
           {/* Card 3: Free Previous Year Papers */}
-          <div className="bg-gradient-to-br from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] rounded-2xl border border-white/25 p-4 sm:p-5 shadow-lg flex items-center justify-between gap-3 text-white">
+          <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-4 sm:p-5 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between gap-3 text-white">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-white/20 text-white border border-white/30 flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-[#24124a] text-[#10b981] border border-[#441f7e] flex items-center justify-center shrink-0 shadow-xs">
                 <Award className="w-5 h-5" />
               </div>
               <div className="min-w-0">
                 <h4 className="font-bold text-white text-xs sm:text-sm truncate">
                   Free Previous Year Papers
                 </h4>
-                <p className="text-[10px] text-pink-100 font-medium truncate mt-0.5">
+                <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
                   Get past year papers with solutions.
                 </p>
               </div>
@@ -1005,10 +1003,10 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             <button
               type="button"
               onClick={() => onNavigateTab('free_past_papers')}
-              className="px-4 py-1.5 bg-white text-purple-900 hover:bg-slate-100 rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-white/30"
+              className="px-4 py-1.5 bg-gradient-to-r from-[#2b27cf] to-[#e0469b] text-white hover:opacity-90 rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-white/20"
             >
               <span>Open</span>
-              <ArrowRight className="w-3 h-3 text-purple-900" />
+              <ArrowRight className="w-3 h-3 text-white" />
             </button>
           </div>
 
