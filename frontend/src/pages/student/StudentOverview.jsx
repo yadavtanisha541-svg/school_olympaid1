@@ -806,54 +806,54 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               title: 'IGKO (GK)',
               subtitle: 'General Knowledge',
               icon: Globe,
-              iconColor: 'text-amber-300',
-              iconBg: 'bg-amber-950/80 border-amber-800/60'
+              iconColor: 'text-amber-600',
+              iconBg: 'bg-amber-50 border-amber-200'
             },
             {
               key: 'iso',
               title: 'ISO (NSO)',
               subtitle: 'Science & Discovery',
               icon: Rocket,
-              iconColor: 'text-emerald-300',
-              iconBg: 'bg-emerald-950/80 border-emerald-800/60'
+              iconColor: 'text-emerald-600',
+              iconBg: 'bg-emerald-50 border-emerald-200'
             },
             {
               key: 'imo',
               title: 'IMO (Maths)',
               subtitle: 'Mathematics & Logic',
               icon: Calculator,
-              iconColor: 'text-blue-300',
-              iconBg: 'bg-blue-950/80 border-blue-800/60'
+              iconColor: 'text-blue-600',
+              iconBg: 'bg-blue-50 border-blue-200'
             },
             {
               key: 'ieo',
               title: 'IEO (English)',
               subtitle: 'English & Grammar',
               icon: BookOpen,
-              iconColor: 'text-pink-300',
-              iconBg: 'bg-purple-950/80 border-purple-800/60'
+              iconColor: 'text-purple-600',
+              iconBg: 'bg-purple-50 border-purple-200'
             },
             {
               key: 'icso',
               title: 'ICSO (Cyber)',
               subtitle: 'Cyber & Computer',
               icon: Laptop,
-              iconColor: 'text-sky-300',
-              iconBg: 'bg-sky-950/80 border-sky-800/60'
+              iconColor: 'text-sky-600',
+              iconBg: 'bg-sky-50 border-sky-200'
             },
             {
               key: 'isso',
               title: 'ISSO (Reasoning)',
               subtitle: 'Logical Reasoning',
               icon: Brain,
-              iconColor: 'text-rose-300',
-              iconBg: 'bg-rose-950/80 border-rose-800/60'
+              iconColor: 'text-rose-600',
+              iconBg: 'bg-rose-50 border-rose-200'
             }
           ].map((sub) => (
             <div
               key={sub.key}
               onClick={() => onNavigateTab && onNavigateTab(`content_${sub.key}`)}
-              className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 hover:border-pink-400 p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1.5 text-white"
+              className="bg-gradient-to-br from-blue-50/90 via-purple-50/80 to-pink-50/90 rounded-3xl border-2 border-indigo-200/80 hover:border-pink-400 p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1.5 text-slate-900"
             >
               {/* Square Icon Container */}
               <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border ${sub.iconBg} ${sub.iconColor} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0`}>
@@ -862,16 +862,16 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
 
               {/* Subject Title & Subtitle */}
               <div className="space-y-1 my-auto pt-2">
-                <h3 className="font-black text-white text-sm sm:text-base tracking-tight group-hover:text-pink-300 transition-colors leading-snug">
+                <h3 className="font-black text-slate-900 text-sm sm:text-base tracking-tight group-hover:text-purple-700 transition-colors leading-snug">
                   {sub.title}
                 </h3>
-                <p className="text-xs text-slate-300 font-semibold truncate">
+                <p className="text-xs text-slate-500 font-semibold truncate">
                   {sub.subtitle}
                 </p>
               </div>
 
               {/* Bottom Action Indicator */}
-              <div className="w-full pt-2.5 border-t border-indigo-800/60 flex items-center justify-between text-xs font-black text-pink-300 group-hover:text-pink-200 transition-colors">
+              <div className="w-full pt-2.5 border-t border-indigo-200/60 flex items-center justify-between text-xs font-black text-purple-700 group-hover:text-pink-600 transition-colors">
                 <span>Explore Series</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -881,29 +881,29 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. SECTION: TWO FEATURED BANNERS (Mixed Gradient Theme Boxes)               */}
+      {/* 3. SECTION: TWO FEATURED BANNERS (Light Mixed Gradient Boxes)              */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2">
         
-        {/* Left Banner: Reasoning Online Classes (Mixed Gradient Box) */}
-        <div className="bg-gradient-to-br from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] rounded-3xl border-2 border-indigo-400/40 p-6 sm:p-7 shadow-xl shadow-indigo-950/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-white">
+        {/* Left Banner: Reasoning Online Classes (Light Mixed Gradient Box) */}
+        <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-3xl border-2 border-indigo-200 p-6 sm:p-7 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-slate-800">
           <div className="flex items-center gap-4 min-w-0">
             {/* Open Book with Bulb Vector Illustration */}
-            <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shadow-md shrink-0 text-pink-300 backdrop-blur-xs">
+            <div className="w-16 h-16 rounded-2xl bg-white border border-purple-200 flex items-center justify-center shadow-md shrink-0 text-purple-600">
               <div className="relative">
-                <BookOpen className="w-8 h-8 text-pink-200" />
-                <Lightbulb className="w-4 h-4 text-amber-300 fill-amber-300 absolute -top-1 -right-1" />
+                <BookOpen className="w-8 h-8 text-purple-600" />
+                <Lightbulb className="w-4 h-4 text-amber-500 fill-amber-400 absolute -top-1 -right-1" />
               </div>
             </div>
 
             <div className="min-w-0 space-y-1.5">
-              <span className="inline-block px-3 py-1 rounded-lg bg-white/10 text-pink-200 text-[10px] font-black uppercase tracking-wider border border-white/20">
+              <span className="inline-block px-3 py-1 rounded-lg bg-pink-100 text-pink-700 text-[10px] font-black uppercase tracking-wider border border-pink-200">
                 FEATURED
               </span>
-              <h3 className="text-sm sm:text-base font-black text-white leading-snug">
+              <h3 className="text-sm sm:text-base font-black text-slate-900 leading-snug">
                 Reasoning Online Classes for IMO, ISO(NSO) &amp; IEO
               </h3>
-              <p className="text-xs sm:text-sm text-blue-100 font-medium leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
                 Get expert guidance and improve your problem-solving skills.
               </p>
             </div>
@@ -912,32 +912,32 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           <button
             type="button"
             onClick={() => onNavigateTab('my_classes')}
-            className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-lg shadow-indigo-950/40 active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-white/20"
+            className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-white/20"
           >
             <span>ENROLL NOW</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Right Banner: Olympiad Intelligent Test Generator Pro (Mixed Gradient Box) */}
-        <div className="bg-gradient-to-br from-[#1e3a8a] via-[#1e1b4b] to-[#4c0519] rounded-3xl border-2 border-blue-400/40 p-6 sm:p-7 shadow-xl shadow-blue-950/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-white">
+        {/* Right Banner: Olympiad Intelligent Test Generator Pro (Light Mixed Gradient Box) */}
+        <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-3xl border-2 border-blue-200 p-6 sm:p-7 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-slate-800">
           <div className="flex items-center gap-4 min-w-0">
             {/* Target & Checklist Illustration */}
-            <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shadow-md shrink-0 text-blue-200 backdrop-blur-xs">
+            <div className="w-16 h-16 rounded-2xl bg-white border border-blue-200 flex items-center justify-center shadow-md shrink-0 text-blue-600">
               <div className="relative">
-                <FileSpreadsheet className="w-8 h-8 text-blue-200" />
-                <Target className="w-4 h-4 text-pink-400 absolute -top-1 -right-1" />
+                <FileSpreadsheet className="w-8 h-8 text-blue-600" />
+                <Target className="w-4 h-4 text-pink-500 absolute -top-1 -right-1" />
               </div>
             </div>
 
             <div className="min-w-0 space-y-1.5">
-              <span className="inline-block px-3 py-1 rounded-lg bg-white/10 text-blue-200 text-[10px] font-black uppercase tracking-wider border border-white/20">
+              <span className="inline-block px-3 py-1 rounded-lg bg-blue-100 text-blue-700 text-[10px] font-black uppercase tracking-wider border border-blue-200">
                 PRO TOOL
               </span>
-              <h3 className="text-sm sm:text-base font-black text-white leading-snug">
+              <h3 className="text-sm sm:text-base font-black text-slate-900 leading-snug">
                 Olympiad Intelligent Test Generator Pro
               </h3>
-              <p className="text-xs sm:text-sm text-pink-100 font-medium leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
                 Create your own Olympiad tests in seconds.
               </p>
             </div>
@@ -946,7 +946,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           <button
             type="button"
             onClick={() => onNavigateTab('test_generator')}
-            className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-lg shadow-blue-950/40 active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-white/20"
+            className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-white/20"
           >
             <span>TRY NOW</span>
             <ArrowRight className="w-4 h-4" />
@@ -956,22 +956,22 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. SECTION: FREE SAMPLE PAPERS & PREVIOUS YEAR PAPERS (Mixed Gradient Boxes)*/}
+      {/* 4. SECTION: FREE SAMPLE PAPERS & PREVIOUS YEAR PAPERS (Light Mixed Boxes)  */}
       {/* ========================================================================= */}
       <div className="pt-2">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           
           {/* Card 1: Spotlight: IGKO Quiz */}
-          <div className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-2xl border border-indigo-500/40 p-4 sm:p-5 shadow-lg flex items-center justify-between gap-3 text-white">
+          <div className="bg-gradient-to-br from-blue-50/90 via-purple-50/80 to-pink-50/90 rounded-2xl border-2 border-indigo-200/80 p-4 sm:p-5 shadow-md flex items-center justify-between gap-3 text-slate-800">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-white/10 text-pink-300 border border-white/20 flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-white text-pink-600 border border-pink-200 flex items-center justify-center shrink-0 shadow-2xs">
                 <FileText className="w-5 h-5" />
               </div>
               <div className="min-w-0">
-                <h4 className="font-bold text-white text-xs sm:text-sm truncate">
+                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
                   Spotlight: IGKO Quiz
                 </h4>
-                <p className="text-[10px] text-pink-200 font-medium truncate mt-0.5">
+                <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
                   Test your knowledge with latest questions.
                 </p>
               </div>
@@ -988,16 +988,16 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </div>
 
           {/* Card 2: Free Sample Papers */}
-          <div className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-2xl border border-indigo-500/40 p-4 sm:p-5 shadow-lg flex items-center justify-between gap-3 text-white">
+          <div className="bg-gradient-to-br from-blue-50/90 via-purple-50/80 to-pink-50/90 rounded-2xl border-2 border-indigo-200/80 p-4 sm:p-5 shadow-md flex items-center justify-between gap-3 text-slate-800">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-white/10 text-blue-300 border border-white/20 flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-white text-blue-600 border border-blue-200 flex items-center justify-center shrink-0 shadow-2xs">
                 <FileSpreadsheet className="w-5 h-5" />
               </div>
               <div className="min-w-0">
-                <h4 className="font-bold text-white text-xs sm:text-sm truncate">
+                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
                   Free Sample Papers
                 </h4>
-                <p className="text-[10px] text-blue-200 font-medium truncate mt-0.5">
+                <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
                   Download and practice sample papers.
                 </p>
               </div>
@@ -1014,16 +1014,16 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </div>
 
           {/* Card 3: Free Previous Year Papers */}
-          <div className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-2xl border border-indigo-500/40 p-4 sm:p-5 shadow-lg flex items-center justify-between gap-3 text-white">
+          <div className="bg-gradient-to-br from-blue-50/90 via-purple-50/80 to-pink-50/90 rounded-2xl border-2 border-indigo-200/80 p-4 sm:p-5 shadow-md flex items-center justify-between gap-3 text-slate-800">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-white/10 text-pink-300 border border-white/20 flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-white text-purple-600 border border-purple-200 flex items-center justify-center shrink-0 shadow-2xs">
                 <Award className="w-5 h-5" />
               </div>
               <div className="min-w-0">
-                <h4 className="font-bold text-white text-xs sm:text-sm truncate">
+                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
                   Free Previous Year Papers
                 </h4>
-                <p className="text-[10px] text-pink-200 font-medium truncate mt-0.5">
+                <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
                   Get past year papers with solutions.
                 </p>
               </div>
@@ -1068,36 +1068,46 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               id: 'prog_rsdp',
               title: 'Reasoning Skill Development',
               subtitle: 'Build a strong foundation with essential skills.',
-              gradient: 'from-[#1e1b4b] via-[#311042] to-[#831843]',
-              icon: Brain
+              gradient: 'from-blue-50/90 via-purple-50/80 to-pink-50/90',
+              icon: Brain,
+              iconColor: 'text-purple-600',
+              iconBg: 'bg-purple-100/80 border-purple-200'
             },
             {
               id: 'prog_gksdp',
               title: 'GK Skill Development',
               subtitle: 'Improve your general knowledge and current affairs.',
-              gradient: 'from-[#0f172a] via-[#1e1b4b] to-[#4c0519]',
-              icon: Globe
+              gradient: 'from-sky-50/90 via-blue-50/80 to-purple-50/90',
+              icon: Globe,
+              iconColor: 'text-blue-600',
+              iconBg: 'bg-blue-100/80 border-blue-200'
             },
             {
               id: 'prog_msdp',
               title: 'Maths Skill Development',
               subtitle: 'Sharpen your math skills with practice and theory.',
-              gradient: 'from-[#2e1065] via-[#4a044e] to-[#831843]',
-              isMath: true
+              gradient: 'from-purple-50/90 via-indigo-50/80 to-pink-50/90',
+              isMath: true,
+              iconColor: 'text-indigo-600',
+              iconBg: 'bg-indigo-100/80 border-indigo-200'
             },
             {
               id: 'prog_esdp',
               title: 'English Skill Development',
               subtitle: 'Enhance your communication and language skills.',
-              gradient: 'from-[#172554] via-[#1e1b4b] to-[#701a75]',
-              isLang: true
+              gradient: 'from-indigo-50/90 via-purple-50/80 to-rose-50/90',
+              isLang: true,
+              iconColor: 'text-pink-600',
+              iconBg: 'bg-pink-100/80 border-pink-200'
             },
             {
               id: 'prog_ssdp',
               title: 'Science Skill Development',
               subtitle: 'Explore science concepts with easy learning.',
-              gradient: 'from-[#1e1b4b] via-[#3b0764] to-[#9d174d]',
-              icon: Rocket
+              gradient: 'from-blue-50/90 via-purple-50/80 to-pink-50/90',
+              icon: Rocket,
+              iconColor: 'text-emerald-600',
+              iconBg: 'bg-emerald-100/80 border-emerald-200'
             }
           ].map((prog) => {
             const Icon = prog.icon;
@@ -1105,45 +1115,42 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               <div
                 key={prog.id}
                 onClick={() => onNavigateTab(prog.id)}
-                className={`rounded-3xl p-5 flex flex-col justify-between text-white shadow-xl hover:shadow-2xl transition-all duration-200 transform hover:-translate-y-1.5 min-h-[220px] relative overflow-hidden bg-gradient-to-b ${prog.gradient} cursor-pointer group border-2 border-indigo-900/60 hover:border-pink-400`}
+                className={`rounded-3xl p-5 flex flex-col justify-between text-slate-800 shadow-md hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1.5 min-h-[220px] relative overflow-hidden bg-gradient-to-b ${prog.gradient} cursor-pointer group border-2 border-indigo-200/80 hover:border-pink-400`}
               >
-                {/* Frosted subtle geometric glow */}
-                <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none" />
-
                 <div className="space-y-2.5 relative z-10">
-                  {/* Top Frosted Circular Icon Container */}
-                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                  {/* Top Circular Icon Container */}
+                  <div className={`w-10 h-10 rounded-full ${prog.iconBg} ${prog.iconColor} flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform`}>
                     {prog.isMath ? (
-                      <span className="font-black text-sm text-white font-mono leading-none">
+                      <span className="font-black text-sm font-mono leading-none">
                         x²
                       </span>
                     ) : prog.isLang ? (
-                      <span className="font-black text-xs text-white leading-none">
+                      <span className="font-black text-xs leading-none">
                         文A
                       </span>
                     ) : (
-                      <Icon className="w-5 h-5 text-white" />
+                      <Icon className="w-5 h-5" />
                     )}
                   </div>
 
                   <div>
-                    <h3 className="font-black text-sm text-white leading-snug">
+                    <h3 className="font-black text-sm text-slate-900 leading-snug group-hover:text-purple-700 transition-colors">
                       {prog.title}
                     </h3>
-                    <p className="text-[11px] text-white/90 font-medium leading-relaxed mt-1">
+                    <p className="text-[11px] text-slate-600 font-medium leading-relaxed mt-1">
                       {prog.subtitle}
                     </p>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-white/20 mt-auto relative z-10">
+                <div className="pt-3 border-t border-indigo-200/60 mt-auto relative z-10">
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       onNavigateTab(prog.id);
                     }}
-                    className="w-full py-2.5 px-3 bg-gradient-to-r from-[#2563eb]/60 via-[#7c3aed]/70 to-[#db2777]/80 hover:from-[#2563eb] hover:via-[#7c3aed] hover:to-[#db2777] text-white rounded-full text-xs font-bold transition-all backdrop-blur-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-md border border-white/20"
+                    className="w-full py-2.5 px-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-full text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-md border border-white/20"
                   >
                     <span>Start Learning</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -1156,13 +1163,13 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 6. SECTION: LIVE STUDENT TEST RESULTS, SCORES & LEADERBOARD (Dark Box)    */}
+      {/* 6. SECTION: LIVE STUDENT TEST RESULTS, SCORES & LEADERBOARD (Light Box)   */}
       {/* ========================================================================= */}
       <div className="pt-2 space-y-4">
         {/* Section Header */}
         <div className="space-y-0.5">
           <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-[#5b3da8]" />
+            <Trophy className="w-5 h-5 text-[#7c3aed]" />
             <span>Live Student Exam Results &amp; Percentages</span>
           </h2>
           <p className="text-[11px] text-slate-500 font-medium">
@@ -1170,12 +1177,12 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </p>
         </div>
 
-        {/* LIVE STUDENTS RESULTS TABLE (Mixed Gradient Dark Box) */}
+        {/* LIVE STUDENTS RESULTS TABLE (Light Mixed Gradient Box) */}
         <div className="space-y-3">
-          <div className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 shadow-xl overflow-hidden text-white">
+          <div className="bg-gradient-to-br from-blue-50/70 via-purple-50/60 to-pink-50/70 rounded-3xl border-2 border-indigo-200/80 shadow-md overflow-hidden text-slate-800">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-[#1e1b4b]/90 border-b border-indigo-900/60 text-pink-200 text-[10px] uppercase font-bold tracking-wider">
+                <thead className="bg-gradient-to-r from-blue-100/90 via-indigo-100/90 to-pink-100/90 border-b border-indigo-200 text-indigo-950 text-[10px] uppercase font-black tracking-wider">
                   <tr>
                     <th className="py-3.5 px-3 w-10 text-center">#</th>
                     <th className="py-3.5 px-4">Student</th>
@@ -1186,12 +1193,12 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                     <th className="py-3.5 px-4 text-right">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-indigo-950/60 font-medium text-slate-200">
+                <tbody className="divide-y divide-indigo-100 bg-white/70 font-semibold text-slate-800">
                   {resultsLoading ? (
                     <tr>
                       <td colSpan={7} className="py-10 text-center text-slate-400">
                         <div className="flex items-center justify-center gap-2">
-                          <RotateCcw className="w-4 h-4 animate-spin text-pink-400" />
+                          <RotateCcw className="w-4 h-4 animate-spin text-pink-500" />
                           <span>Loading live student exam results...</span>
                         </div>
                       </td>
@@ -1217,31 +1224,31 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                       return (
                         <tr
                           key={r.id || idx}
-                          className={`hover:bg-purple-950/40 transition-colors ${
-                            isMyRecord ? 'bg-purple-950/60 font-semibold' : ''
+                          className={`hover:bg-purple-50/80 transition-colors ${
+                            isMyRecord ? 'bg-purple-100/60 font-bold' : ''
                           }`}
                         >
-                          <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-400 text-xs">
+                          <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-500 text-xs">
                             {idx + 1}
                           </td>
 
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-2.5">
-                              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-md">
+                              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
                                 {r.student_name ? r.student_name.charAt(0).toUpperCase() : 'S'}
                               </div>
                               <div className="min-w-0">
                                 <div className="flex items-center gap-1.5">
-                                  <p className="font-bold text-white truncate">
+                                  <p className="font-bold text-slate-900 truncate">
                                     {r.student_name || 'Student'}
                                   </p>
                                   {isMyRecord && (
-                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-purple-900 text-purple-200 border border-purple-700">
+                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-purple-100 text-purple-800 border border-purple-300">
                                       YOU
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-[10px] font-mono text-purple-300 truncate uppercase">
+                                <p className="text-[10px] font-mono text-purple-700 truncate uppercase">
                                   {r.student_login_id || 'ID'}
                                 </p>
                               </div>
@@ -1249,32 +1256,32 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                           </td>
 
                           <td className="py-3.5 px-3 whitespace-nowrap">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-[#1e2246] text-purple-300 border border-purple-800/60">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-purple-50 text-purple-800 border border-purple-200">
                               {r.class_name || 'Class 6'}
                             </span>
                           </td>
 
                           <td className="py-3.5 px-4">
-                            <p className="font-bold text-white line-clamp-1">
+                            <p className="font-bold text-slate-900 line-clamp-1">
                               {r.exam_title || 'Olympiad Test Paper'}
                             </p>
-                            <div className="flex items-center gap-1.5 text-[10px] text-slate-300 font-medium mt-0.5">
+                            <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-medium mt-0.5">
                               {r.subject_name ? (
-                                <span className="text-emerald-300 font-bold bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/60">
+                                <span className="text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                                   {r.subject_name}
                                 </span>
                               ) : (
-                                <span className="text-purple-300 font-bold bg-purple-950/80 px-2 py-0.5 rounded border border-purple-800/60">
+                                <span className="text-purple-800 font-bold bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
                                   Olympiad
                                 </span>
                               )}
                             </div>
                           </td>
 
-                          <td className="py-3.5 px-4 font-semibold text-slate-300 whitespace-nowrap">
+                          <td className="py-3.5 px-4 font-semibold text-slate-700 whitespace-nowrap">
                             <div className="flex items-center gap-1.5">
-                              <Building2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                              <span className="font-bold text-slate-200 truncate max-w-[220px]" title={r.school_name || 'Independent Candidate'}>
+                              <Building2 className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                              <span className="font-bold text-slate-800 truncate max-w-[220px]" title={r.school_name || 'Independent Candidate'}>
                                 {r.school_name || 'Independent Candidate'}
                               </span>
                             </div>
@@ -1284,10 +1291,10 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                             <span
                               className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-black font-mono ${
                                 parseFloat(pct) >= 80
-                                  ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/60'
+                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                                   : parseFloat(pct) >= 50
-                                  ? 'bg-blue-950/80 text-blue-300 border border-blue-800/60'
-                                  : 'bg-rose-950/80 text-rose-300 border border-rose-800/60'
+                                  ? 'bg-blue-100 text-blue-800 border border-blue-300'
+                                  : 'bg-rose-100 text-rose-800 border border-rose-300'
                               }`}
                             >
                               {pct}%
@@ -1298,11 +1305,11 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                             <span
                               className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
                                 isPassed
-                                  ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/60'
-                                  : 'bg-rose-950/80 text-rose-300 border border-rose-800/60'
+                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                  : 'bg-rose-100 text-rose-800 border border-rose-200'
                               }`}
                             >
-                              <span className={`w-1.5 h-1.5 rounded-full ${isPassed ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+                              <span className={`w-1.5 h-1.5 rounded-full ${isPassed ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                               <span>{isPassed ? 'Passed' : 'Completed'}</span>
                             </span>
                           </td>
