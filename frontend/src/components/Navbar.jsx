@@ -464,10 +464,10 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
             <Menu className="w-5 h-5" />
           </button>
 
-          {/* Search Bar Container */}
-          <div className="relative w-full max-w-md">
+          {/* Search Bar Container (Enlarged) */}
+          <div className="relative w-full max-w-lg">
             <div className="relative flex items-center">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 ref={inputRef}
                 type="text"
@@ -481,11 +481,11 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
                 }}
                 onKeyDown={handleKeyDown}
                 placeholder="Search anything... (e.g. math, exams, student, results)"
-                className="w-full pl-10 pr-16 py-2 bg-white hover:bg-white focus:bg-white border border-[#ebd7eb] focus:border-[#80497D] focus:ring-4 focus:ring-[#80497D]/10 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+                className="w-full pl-11 pr-20 py-2.5 sm:py-3 bg-white hover:bg-white focus:bg-white border border-[#ebd7eb] focus:border-[#80497D] focus:ring-4 focus:ring-[#80497D]/10 rounded-2xl text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none transition-all shadow-xs"
               />
 
               {/* Right indicators in input */}
-              <div className="absolute right-2.5 flex items-center gap-1">
+              <div className="absolute right-3 flex items-center gap-1.5">
                 {query ? (
                   <button
                     type="button"
@@ -496,10 +496,10 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
                     }}
                     className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-4 h-4" />
                   </button>
                 ) : (
-                  <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-mono font-bold text-slate-400 bg-slate-100 border border-slate-200 rounded">
+                  <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-1 text-[10px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200 rounded-lg shadow-2xs">
                     Ctrl K
                   </kbd>
                 )}
@@ -598,18 +598,18 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
           </div>
         </div>
 
-        {/* Right: Quick actions, notifications, user pill, logout */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Shopping Cart Button */}
+        {/* Right: Quick actions, notifications, user pill, logout (Larger & More Prominent) */}
+        <div className="flex items-center gap-2.5 sm:gap-3.5">
+          {/* Shopping Cart Button (Enlarged) */}
           <button
             type="button"
             onClick={openCart}
-            className="relative p-2 rounded-xl text-[#80497D] hover:text-[#422240] hover:bg-[#f4eaf4] transition-all cursor-pointer flex items-center justify-center group"
+            className="relative p-2.5 sm:p-3 rounded-2xl bg-white hover:bg-[#faf5fa] border border-[#ebd7eb] text-[#80497D] hover:text-[#422240] transition-all cursor-pointer flex items-center justify-center shadow-2xs group active:scale-95"
             title={`Shopping Cart (${totalItems} items)`}
           >
-            <ShoppingCart className="w-4 h-4 transition-transform group-hover:scale-110" />
+            <ShoppingCart className="w-5 h-5 sm:w-5.5 sm:h-5.5 transition-transform group-hover:scale-110 text-[#80497D]" />
             {totalItems > 0 ? (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#f5b82e] text-slate-950 font-black text-[10px] flex items-center justify-center ring-2 ring-white animate-in zoom-in shadow-xs">
+              <span className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#f5b82e] text-slate-950 font-black text-xs flex items-center justify-center ring-2 ring-white animate-in zoom-in shadow-xs">
                 {totalItems}
               </span>
             ) : (
@@ -617,28 +617,28 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
             )}
           </button>
 
-          {/* Notification Bell (Available for Super Admin, Teacher, and Student) */}
+          {/* Notification Bell (Enlarged) */}
           <button
             type="button"
             onClick={onOpenNotifications}
-            className="relative p-2 rounded-xl text-[#80497D] hover:text-[#422240] hover:bg-[#f4eaf4] transition-all cursor-pointer"
+            className="relative p-2.5 sm:p-3 rounded-2xl bg-white hover:bg-[#faf5fa] border border-[#ebd7eb] text-[#80497D] hover:text-[#422240] transition-all cursor-pointer shadow-2xs group active:scale-95 flex items-center justify-center"
             title="Open Notification Center"
           >
-            <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#C35B3F] ring-2 ring-white animate-pulse" />
+            <Bell className="w-5 h-5 sm:w-5.5 sm:h-5.5 transition-transform group-hover:scale-110 text-[#80497D]" />
+            <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#C35B3F] ring-2 ring-white animate-pulse" />
           </button>
 
-          {/* Quick Logout Button */}
+          {/* Quick Logout Button (Enlarged & Bold) */}
           <button
             type="button"
             onClick={async () => {
               await logout();
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#80497D] hover:text-rose-600 hover:bg-rose-50 border border-[#ebd7eb] hover:border-rose-200 rounded-xl transition-all cursor-pointer shadow-2xs active:scale-95"
+            className="inline-flex items-center gap-2 px-3.5 py-2.5 sm:px-4.5 sm:py-2.5 text-xs sm:text-sm font-extrabold text-[#80497D] hover:text-rose-600 bg-white hover:bg-rose-50 border border-[#ebd7eb] hover:border-rose-200 rounded-2xl transition-all cursor-pointer shadow-2xs active:scale-95"
             title="Sign Out / Logout"
           >
-            <LogOut className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Logout</span>
+            <LogOut className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <span>Logout</span>
           </button>
         </div>
       </div>
