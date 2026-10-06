@@ -31,329 +31,351 @@ import {
   Check,
   X,
   HelpCircle,
-  UserCheck
+  UserCheck,
+  Layers,
+  LayoutDashboard,
+  FileSpreadsheet,
+  Settings,
+  Bookmark,
+  FileCheck2,
+  Rocket,
+  Globe,
+  Brain,
+  Laptop
 } from 'lucide-react';
 import { apiClient } from '../../api/client';
 
-// Master list of all system permissions grouped by module
+// Master list of all system permissions strictly aligned with Super Admin and Student Sidebar Modules
 const DEFAULT_PERMISSIONS_CATALOG = [
-  // 1. Examination & Test Engine
+  // =========================================================================
+  // 1. SUPER ADMIN SIDEBAR MODULES
+  // =========================================================================
   {
-    key: 'take_live_exams',
-    module: 'Exam & Test Engine',
-    name: 'Attempt Live Official Exams',
-    description: 'Allows candidates to launch and submit scheduled Level 1 & Level 2 live Olympiad exams.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
-  },
-  {
-    key: 'manage_exams',
-    module: 'Exam & Test Engine',
-    name: 'Create & Schedule Exams',
-    description: 'Create, schedule, edit time windows, publish and delete online examinations.',
-    adminDefault: true,
+    key: 'manage_payments_qr',
+    module: 'Super Admin: Payment, QR & Orders',
+    name: 'Payment, QR & Orders Studio',
+    description: 'Manage UPI QR setup, payment gateway, transaction logs, and approve payment slips.',
     studentDefault: false,
-    level: 'Advanced'
-  },
-  {
-    key: 'manage_question_bank',
-    module: 'Exam & Test Engine',
-    name: 'Manage Olympiad Question Bank',
-    description: 'Add, update, bulk import MCQs, HOTS questions, diagrams and step-by-step solutions.',
-    adminDefault: true,
-    studentDefault: false,
-    level: 'Advanced'
-  },
-  {
-    key: 'create_custom_tests',
-    module: 'Exam & Test Engine',
-    name: 'Generate Custom Mock Tests',
-    description: 'Use the AI Test Generator to create customized chapter-wise diagnostic tests.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
-  },
-  {
-    key: 'take_daily_quizzes',
-    module: 'Exam & Test Engine',
-    name: 'Attempt Daily Speed Quizzes',
-    description: 'Participate in 5-minute daily speed quizzes and Olympiad riddles to earn Scholar XP.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
-  },
-  {
-    key: 'download_paper_pdfs',
-    module: 'Exam & Test Engine',
-    name: 'Download Question Paper PDFs',
-    description: 'Download offline question paper PDFs and syllabus sheets with watermarked candidate details.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
-  },
-  {
-    key: 'grade_subjective_papers',
-    module: 'Exam & Test Engine',
-    name: 'Evaluate & Grade Submissions',
-    description: 'Grade subjective questions, award bonus marks, and record evaluator remarks.',
-    adminDefault: true,
-    studentDefault: false,
-    level: 'Critical'
-  },
-
-  // 2. Curriculum, Notes & Revision Studio
-  {
-    key: 'access_enrolled_curriculum',
-    module: 'Curriculum & Notes',
-    name: 'View Class Subject Curriculum',
-    description: 'Access chapter-wise notes, conceptual summaries, and achievers question bank.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
-  },
-  {
-    key: 'access_revision_vault',
-    module: 'Curriculum & Notes',
-    name: 'Access My Revision Vault & Bookmarks',
-    description: 'Review bookmarked tricky questions, hints, and step-by-step explanations for own grade.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
-  },
-  {
-    key: 'manage_revision_vault',
-    module: 'Curriculum & Notes',
-    name: 'Curate Super Admin Revision Vault',
-    description: 'Curate, add new revision questions with verified 4 options, and publish to student vaults.',
-    adminDefault: true,
-    studentDefault: false,
-    level: 'Advanced'
-  },
-  {
-    key: 'attend_online_classes',
-    module: 'Curriculum & Notes',
-    name: 'Attend Live Classes & Watch Recordings',
-    description: 'Join live interactive lecture sessions and access digital library video recordings.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
+    level: 'Critical',
+    icon: CreditCard
   },
   {
     key: 'manage_online_classes',
-    module: 'Curriculum & Notes',
-    name: 'Manage Online Classes Studio',
-    description: 'Schedule batches, assign instructors, manage stream links and video assets.',
-    adminDefault: true,
+    module: 'Super Admin: Online Classes Studio',
+    name: 'Online Classes Studio',
+    description: 'Schedule live class batches, manage instructors, stream links and video archives.',
     studentDefault: false,
-    level: 'Advanced'
-  },
-  {
-    key: 'access_skill_programs',
-    module: 'Curriculum & Notes',
-    name: 'Enroll in Skill Programs (MSDP/SSDP)',
-    description: 'Progress through 4-stage structured skill development pathways and earn badges.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
+    level: 'Advanced',
+    icon: Video
   },
   {
     key: 'manage_skill_programs',
-    module: 'Curriculum & Notes',
-    name: 'Configure Skill Curriculum & Milestones',
-    description: 'Design skill development stages, XP rewards, milestone assessments and certifications.',
-    adminDefault: true,
+    module: 'Super Admin: Skill Programs Studio',
+    name: 'Skill Programs Studio',
+    description: 'Configure Reasoning, GK, Maths, English & Science skill pathways and milestones.',
     studentDefault: false,
-    level: 'Advanced'
-  },
-
-  // 3. Performance, Scorecards & Results
-  {
-    key: 'view_detailed_solutions',
-    module: 'Performance & Results',
-    name: 'View Step-by-Step Solutions',
-    description: 'Inspect comprehensive solution walkthroughs and correct answer keys after exam submission.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
+    level: 'Advanced',
+    icon: Rocket
   },
   {
-    key: 'view_scorecard_analysis',
-    module: 'Performance & Results',
-    name: 'View Performance Growth & Analytics',
-    description: 'Access 98% accuracy donut charts, subject growth trajectories, and percentile insights.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
-  },
-  {
-    key: 'publish_exam_results',
-    module: 'Performance & Results',
-    name: 'Publish Official Exam Results & Ranks',
-    description: 'Compute cutoffs, generate national/zonal ranks and publish scorecards to candidate portals.',
-    adminDefault: true,
+    key: 'manage_superadmin_packages',
+    module: 'Super Admin: Subject Model Tests & Packages',
+    name: 'Subject Model Tests & Packages',
+    description: 'Create and curate mock test bundles, subject pricing, and package options.',
     studentDefault: false,
-    level: 'Critical'
+    level: 'Advanced',
+    icon: BookOpen
   },
   {
-    key: 'view_leaderboards',
-    module: 'Performance & Results',
-    name: 'View Rankings & Leaderboards',
-    description: 'Inspect school, state, and international leaderboards and top rankers.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
-  },
-  {
-    key: 'download_merit_certificates',
-    module: 'Performance & Results',
-    name: 'Download Merit Certificates',
-    description: 'Download digitally verified PDF merit certificates with official seal and QR code.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
-  },
-  {
-    key: 'manage_certificates',
-    module: 'Performance & Results',
-    name: 'Generate & Sign Certificates',
-    description: 'Template designer, batch certificate generation, and authorized signature control.',
-    adminDefault: true,
+    key: 'manage_applicant_leads',
+    module: 'Super Admin: Applicant Leads',
+    name: 'New Applicant Leads',
+    description: 'Review and manage prospective candidate registrations and application submissions.',
     studentDefault: false,
-    level: 'Advanced'
+    level: 'Critical',
+    icon: UserCheck
   },
-
-  // 4. Store, Workbook Orders & Wallet
   {
-    key: 'order_workbooks',
-    module: 'Orders & Payments',
-    name: 'Purchase Workbooks & Digital Kits',
-    description: 'Order physical Olympiad preparation workbook packs and register for mock sets.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
+    key: 'manage_coordinators',
+    module: 'Super Admin: Coordinator Management',
+    name: 'Coordinator Applicants',
+    description: 'Approve, assign, and verify school coordinator profiles and credentials.',
+    studentDefault: false,
+    level: 'Critical',
+    icon: UserCheck
   },
   {
     key: 'manage_workbook_orders',
-    module: 'Orders & Payments',
-    name: 'Manage Orders & Dispatch Tracking',
-    description: 'Process workbook shipments, update courier tracking numbers, and manage invoices.',
-    adminDefault: true,
+    module: 'Super Admin: Workbook Orders',
+    name: 'Workbook Orders Management',
+    description: 'Track and process physical workbook pack orders, invoices, and shipping details.',
     studentDefault: false,
-    level: 'Advanced'
+    level: 'Advanced',
+    icon: ShoppingBag
   },
   {
-    key: 'access_student_wallet',
-    module: 'Orders & Payments',
-    name: 'Redeem Coins & Wallet Credits',
-    description: 'Redeem reward scholar coins, view wallet balance, and use test tokens.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
-  },
-  {
-    key: 'manage_payments_qr',
-    module: 'Orders & Payments',
-    name: 'Manage Payment Gateways & QR Codes',
-    description: 'Configure UPI payment QR codes, bank accounts, and approve pending payment slips.',
-    adminDefault: true,
+    key: 'manage_students',
+    module: 'Super Admin: Student Management',
+    name: 'Student Management',
+    description: 'Create, update, class assignment, and reset passwords for enrolled students.',
     studentDefault: false,
-    level: 'Critical'
-  },
-
-  // 5. Community, Forum & Helpdesk
-  {
-    key: 'post_doubts_in_forum',
-    module: 'Community & Forum',
-    name: 'Post Doubts in Student Forum',
-    description: 'Create new doubt discussion threads and ask questions to verified mentors.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
+    level: 'Critical',
+    icon: Users
   },
   {
-    key: 'manage_forum_moderation',
-    module: 'Community & Forum',
-    name: 'Moderate Forum & Provide Official Answers',
-    description: 'Pin helpful answers, moderate inappropriate discussions, and answer candidate queries.',
-    adminDefault: true,
+    key: 'manage_roles_permissions',
+    module: 'Super Admin: Roles & Permissions',
+    name: 'Roles & Permissions Manager',
+    description: 'Configure capability matrix, authorization levels, and feature controls for roles.',
     studentDefault: false,
-    level: 'Standard'
+    level: 'Critical',
+    icon: ShieldCheck
   },
   {
-    key: 'view_datesheet_faqs',
-    module: 'Community & Forum',
-    name: 'View Official Date Sheet & FAQs',
-    description: 'Inspect synchronized exam calendar, timing slots, webcam rules, and guidelines.',
-    adminDefault: true,
-    studentDefault: true,
-    level: 'Standard'
+    key: 'manage_academic_structure',
+    module: 'Super Admin: Disciplines & Subjects',
+    name: 'Disciplines & Subjects',
+    description: 'Define Olympiad disciplines, classes (Nursery to 12), and subject curriculum.',
+    studentDefault: false,
+    level: 'Advanced',
+    icon: Layers
+  },
+  {
+    key: 'manage_subject_content',
+    module: 'Super Admin: Subject & Class Content',
+    name: 'Subject & Class Content',
+    description: 'Author subject covers, chapter summaries, syllabus guides, and sample resources.',
+    studentDefault: false,
+    level: 'Advanced',
+    icon: BookOpen
+  },
+  {
+    key: 'manage_revision_vault',
+    module: 'Super Admin: Revision Vault',
+    name: 'Revision Vault & Bookmarks',
+    description: 'Curate high-yield tricky questions, answer hints, and step-by-step explanations.',
+    studentDefault: false,
+    level: 'Advanced',
+    icon: Bookmark
+  },
+  {
+    key: 'manage_free_quizzes',
+    module: 'Super Admin: Free Quizzes',
+    name: 'FREE Quizzes Manager',
+    description: 'Create 5-minute daily speed quizzes, riddles, and free diagnostic tests.',
+    studentDefault: false,
+    level: 'Standard',
+    icon: HelpCircle
   },
   {
     key: 'manage_faqs_keyinfo',
-    module: 'Community & Forum',
-    name: 'Manage FAQs & Discipline Metadata',
-    description: 'Edit examination dates, guidelines, syllabus chapters, and eligibility criteria.',
-    adminDefault: true,
+    module: 'Super Admin: FAQs & Key Info',
+    name: 'FAQs & Key Info Manager',
+    description: 'Manage Olympiad exam dates, rules, guidelines, eligibility criteria, and FAQs.',
     studentDefault: false,
-    level: 'Advanced'
-  },
-
-  // 6. User Management & Security
-  {
-    key: 'manage_student_accounts',
-    module: 'User & Security Management',
-    name: 'Manage Student Profiles & Credentials',
-    description: 'Create student accounts, assign classes, reset passwords, and toggle active status.',
-    adminDefault: true,
-    studentDefault: false,
-    level: 'Critical'
+    level: 'Advanced',
+    icon: HelpCircle
   },
   {
-    key: 'manage_school_affiliations',
-    module: 'User & Security Management',
-    name: 'Manage School & Coordinator Applications',
-    description: 'Review institutional registrations, approve coordinator roles, and bulk enrollments.',
-    adminDefault: true,
+    key: 'manage_test_generator',
+    module: 'Super Admin: Sample & Past Papers',
+    name: 'Sample & Past Papers Generator',
+    description: 'Manage and publish official sample papers, previous year question sets (PYQs).',
     studentDefault: false,
-    level: 'Critical'
+    level: 'Advanced',
+    icon: Sparkles
+  },
+  {
+    key: 'publish_exam_results',
+    module: 'Super Admin: Exam Results & Reports',
+    name: 'Exam Results & Reports',
+    description: 'Compute percentiles, cutoffs, generate national rank lists and publish scorecards.',
+    studentDefault: false,
+    level: 'Critical',
+    icon: FileCheck2
+  },
+  {
+    key: 'manage_leaderboard',
+    module: 'Super Admin: Rankings & Leaderboard',
+    name: 'Rankings & Leaderboard',
+    description: 'Inspect international, national, and school-level student leaderboard rankings.',
+    studentDefault: false,
+    level: 'Standard',
+    icon: Trophy
+  },
+  {
+    key: 'manage_certificates',
+    module: 'Super Admin: Certificates Manager',
+    name: 'Certificates Manager',
+    description: 'Batch generate digitally verified PDF merit certificates with official QR seals.',
+    studentDefault: false,
+    level: 'Advanced',
+    icon: Award
   },
   {
     key: 'audit_activity_logs',
-    module: 'User & Security Management',
-    name: 'View Audit Logs & System Trails',
-    description: 'Inspect login timestamps, IP addresses, exam attempts, and administrative modifications.',
-    adminDefault: true,
+    module: 'Super Admin: Audit Activity Logs',
+    name: 'Audit Activity Logs',
+    description: 'Inspect audit trail logs, login timestamps, IP records, and admin actions.',
     studentDefault: false,
-    level: 'Critical'
+    level: 'Critical',
+    icon: Activity
+  },
+  {
+    key: 'manage_system_settings',
+    module: 'Super Admin: System Settings',
+    name: 'System Settings',
+    description: 'Configure portal settings, maintenance mode, notification banners, and security.',
+    studentDefault: false,
+    level: 'Critical',
+    icon: Settings
+  },
+
+  // =========================================================================
+  // 2. STUDENT PORTAL SIDEBAR MODULES
+  // =========================================================================
+  {
+    key: 'access_student_dashboard',
+    module: 'Student: Dashboard',
+    name: 'Student Dashboard & Overview',
+    description: 'View enrolled Olympiad subjects, test greeting, scholar star tier and live metrics.',
+    studentDefault: true,
+    level: 'Standard',
+    icon: LayoutDashboard
+  },
+  {
+    key: 'access_mock_tests',
+    module: 'Student: Mock Tests',
+    name: 'Mock Test Series & 9 Subject Covers',
+    description: 'Attempt official mock test series across IGKO, ISO, IMO, IEO, ICSO, ISSO, etc.',
+    studentDefault: true,
+    level: 'Standard',
+    icon: BookOpen
+  },
+  {
+    key: 'access_online_classes',
+    module: 'Student: Online Classes',
+    name: 'My Online Classes & Video Library',
+    description: 'Attend live lecture batches, interactive mentoring, and watch video recordings.',
+    studentDefault: true,
+    level: 'Standard',
+    icon: Video
+  },
+  {
+    key: 'access_skill_programs',
+    module: 'Student: Skill Programs',
+    name: 'Skill Development Programs',
+    description: 'Progress through Reasoning, GK, Maths, English & Science learning pathways.',
+    studentDefault: true,
+    level: 'Standard',
+    icon: Rocket
+  },
+  {
+    key: 'view_performance_analytics',
+    module: 'Student: Performance',
+    name: 'My Performance & Analytics',
+    description: 'Access 98% accuracy donut charts, subject percentiles, and growth trajectories.',
+    studentDefault: true,
+    level: 'Standard',
+    icon: Activity
+  },
+  {
+    key: 'view_detailed_solutions',
+    module: 'Student: Solutions',
+    name: 'Detailed Step-by-Step Solutions',
+    description: 'Inspect step explanations and correct answer keys after test completion.',
+    studentDefault: true,
+    level: 'Standard',
+    icon: FileText
+  },
+  {
+    key: 'view_exam_history',
+    module: 'Student: Exam History',
+    name: 'Exam History & Past Scorecards',
+    description: 'Review historical test attempts, scores, answer keys, and timing analysis.',
+    studentDefault: true,
+    level: 'Standard',
+    icon: FileCheck2
+  },
+  {
+    key: 'download_merit_certificates',
+    module: 'Student: Certificates',
+    name: 'My Merit Certificates',
+    description: 'Download digitally verified PDF merit certificates with official QR validation.',
+    studentDefault: true,
+    level: 'Standard',
+    icon: Award
+  },
+  {
+    key: 'use_test_generator',
+    module: 'Student: Test Generator',
+    name: 'Olympiad Test Generator Pro',
+    description: 'Generate custom chapter-wise practice tests with targeted question counts.',
+    studentDefault: true,
+    level: 'Standard',
+    icon: Sparkles
+  },
+  {
+    key: 'access_previous_year_papers',
+    module: 'Student: Past Papers',
+    name: 'Free Previous Year Papers (PYQ)',
+    description: 'Practice authentic previous year Olympiad examination papers with live scoring.',
+    studentDefault: true,
+    level: 'Standard',
+    icon: FileSpreadsheet
+  },
+  {
+    key: 'access_sample_papers',
+    module: 'Student: Sample Papers',
+    name: 'Free Sample Papers',
+    description: 'Download and practice official sample question papers matching exam pattern.',
+    studentDefault: true,
+    level: 'Standard',
+    icon: FileText
+  },
+  {
+    key: 'take_daily_quizzes',
+    module: 'Student: Daily Quizzes',
+    name: 'Daily Speed Quizzes & Free Zone',
+    description: 'Attempt 5-minute speed quizzes and Olympiad brain teasers to earn Scholar XP.',
+    studentDefault: true,
+    level: 'Standard',
+    icon: HelpCircle
+  },
+  {
+    key: 'view_student_profile',
+    module: 'Student: Account',
+    name: 'Student Profile & Settings',
+    description: 'View enrolled class grade, school affiliation, and account preferences.',
+    studentDefault: true,
+    level: 'Standard',
+    icon: Users
   }
 ];
 
 export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
-  const [activeRole, setActiveRole] = useState('admin'); // 'admin' | 'student' | 'superadmin'
+  const [activeRole, setActiveRole] = useState('student'); // 'student' | 'superadmin'
   const [catalog, setCatalog] = useState(() => {
     try {
-      const saved = localStorage.getItem('olympiadhub_permissions_catalog');
+      const saved = localStorage.getItem('olympiadhub_permissions_catalog_v2');
       return saved ? JSON.parse(saved) : DEFAULT_PERMISSIONS_CATALOG;
     } catch {
       return DEFAULT_PERMISSIONS_CATALOG;
     }
   });
 
-  // Role permissions map: { admin: { [key]: boolean }, student: { [key]: boolean } }
+  // Role permissions map: { student: { [key]: boolean } }
   const [rolePerms, setRolePerms] = useState(() => {
     try {
-      const saved = localStorage.getItem('olympiadhub_role_permissions_map');
+      const saved = localStorage.getItem('olympiadhub_role_permissions_map_v2');
       if (saved) return JSON.parse(saved);
     } catch {}
 
-    const adminMap = {};
     const studentMap = {};
     DEFAULT_PERMISSIONS_CATALOG.forEach(p => {
-      adminMap[p.key] = p.adminDefault;
       studentMap[p.key] = p.studentDefault;
     });
-    return { admin: adminMap, student: studentMap };
+    return { student: studentMap };
   });
 
   const [selectedModule, setSelectedModule] = useState('All');
@@ -367,10 +389,9 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
     key: '',
     name: '',
     description: '',
-    module: 'Exam & Test Engine',
+    module: 'Student: Custom Module',
     level: 'Standard',
-    adminDefault: true,
-    studentDefault: false
+    studentDefault: true
   });
 
   // Unique Modules
@@ -380,8 +401,8 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
   const handleSavePermissions = () => {
     setIsSaving(true);
     try {
-      localStorage.setItem('olympiadhub_role_permissions_map', JSON.stringify(rolePerms));
-      localStorage.setItem('olympiadhub_permissions_catalog', JSON.stringify(catalog));
+      localStorage.setItem('olympiadhub_role_permissions_map_v2', JSON.stringify(rolePerms));
+      localStorage.setItem('olympiadhub_permissions_catalog_v2', JSON.stringify(catalog));
       
       // Dispatch sync event
       window.dispatchEvent(new CustomEvent('role-permissions-updated', {
@@ -400,7 +421,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
 
   // Toggle single permission for active role
   const handleTogglePermission = (permKey) => {
-    if (activeRole === 'superadmin') return; // Superadmin always has full access
+    if (activeRole === 'superadmin') return; // Superadmin always has full root access
     setRolePerms(prev => ({
       ...prev,
       [activeRole]: {
@@ -424,7 +445,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
         } else if (presetType === 'standard_only') {
           updated[p.key] = p.level === 'Standard';
         } else if (presetType === 'default') {
-          updated[p.key] = activeRole === 'admin' ? p.adminDefault : p.studentDefault;
+          updated[p.key] = p.studentDefault;
         }
       });
       return { ...prev, [activeRole]: updated };
@@ -447,7 +468,6 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
     setCatalog(prev => [...prev, item]);
     setRolePerms(prev => ({
       ...prev,
-      admin: { ...prev.admin, [cleanKey]: newPerm.adminDefault },
       student: { ...prev.student, [cleanKey]: newPerm.studentDefault }
     }));
 
@@ -456,51 +476,51 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
       key: '',
       name: '',
       description: '',
-      module: 'Exam & Test Engine',
+      module: 'Student: Custom Module',
       level: 'Standard',
-      adminDefault: true,
-      studentDefault: false
+      studentDefault: true
     });
   };
 
-  // Filtered Permissions
-  const filteredCatalog = catalog.filter(p => {
+  // Filter Catalog
+  const filteredCatalog = catalog.filter((p) => {
     const matchesModule = selectedModule === 'All' || p.module === selectedModule;
     const matchesSearch =
+      searchQuery === '' ||
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.key.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.description.toLowerCase().includes(searchQuery.toLowerCase());
+      p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.module.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesModule && matchesSearch;
   });
 
   // Calculate active counts
-  const adminActiveCount = catalog.filter(p => rolePerms.admin?.[p.key]).length;
-  const studentActiveCount = catalog.filter(p => rolePerms.student?.[p.key]).length;
+  const studentActiveCount = catalog.filter(p => !!rolePerms.student?.[p.key]).length;
 
   return (
-    <div className="space-y-6 font-sans animate-in fade-in duration-150 pb-16">
-      {/* 1. Header on Page Background (No dark box) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed] mb-2 shadow-2xs">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#6d3a68]" />
-            <span>Role-Based Access Control (RBAC)</span>
+    <div className="space-y-6 pb-20 font-sans">
+      {/* 1. Top Header Banner */}
+      <div className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl p-6 sm:p-8 text-white shadow-xl border-2 border-indigo-900/60 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+        <div className="space-y-2 relative z-10 max-w-2xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-pink-200 text-xs font-bold border border-white/20">
+            <ShieldCheck className="w-4 h-4 text-pink-300" />
+            <span>Role-Based Access Control (RBAC) Studio</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">
-            Role &amp; Permission Management
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+            Roles &amp; Permissions Matrix
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-            Configure system capabilities, module permissions, and operational access for Admin &amp; Student roles.
+          <p className="text-xs sm:text-sm text-blue-100 font-medium leading-relaxed">
+            Manage granular access capabilities strictly aligned with Super Admin and Student Panel sidebar modules.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-3 relative z-10 flex-wrap">
           <button
             type="button"
             onClick={() => setShowAddModal(true)}
-            className="px-4 py-2.5 rounded-xl border border-[#edd6ed] bg-white hover:bg-[#faf5fa] text-[#6d3a68] font-bold text-xs shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-2.5 rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-xs"
           >
-            <Plus className="w-4 h-4 text-[#6d3a68]" />
+            <Plus className="w-4 h-4 text-pink-300" />
             <span>Add Capability</span>
           </button>
 
@@ -508,7 +528,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
             type="button"
             disabled={isSaving}
             onClick={handleSavePermissions}
-            className={`px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer ${
+            className={`px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer border border-white/20 ${
               saveSuccess
                 ? 'bg-emerald-600 text-white'
                 : 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white'
@@ -534,40 +554,46 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
         </div>
       </div>
 
-      {/* 2. Top Role Selection Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Admin Role Card */}
+      {/* 2. Top Role Selection Cards (ONLY Super Admin and Student Panel) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Super Admin Master Overview */}
         <div
-          onClick={() => setActiveRole('admin')}
-          className={`p-5 rounded-3xl border-2 transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
-            activeRole === 'admin'
-              ? 'bg-white border-[#6d3a68] shadow-md ring-2 ring-[#6d3a68]/20'
-              : 'bg-white border-[#edd6ed] hover:border-[#6d3a68]/50 shadow-2xs opacity-80 hover:opacity-100'
+          onClick={() => setActiveRole('superadmin')}
+          className={`p-6 rounded-3xl border-2 transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
+            activeRole === 'superadmin'
+              ? 'bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] border-pink-400 text-white shadow-xl ring-2 ring-pink-400/40'
+              : 'bg-white border-slate-200 hover:border-indigo-400 shadow-xs opacity-90 hover:opacity-100'
           }`}
         >
           <div>
             <div className="flex items-center justify-between gap-2 mb-3">
-              <span className="w-10 h-10 rounded-2xl bg-[#faf5fa] text-[#6d3a68] flex items-center justify-center font-bold border border-[#edd6ed] shadow-2xs">
-                <Shield className="w-5 h-5" />
+              <span className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold shadow-md ${
+                activeRole === 'superadmin' ? 'bg-white/10 text-pink-300 border border-white/20' : 'bg-purple-50 text-purple-700 border border-purple-200'
+              }`}>
+                <Sparkles className="w-6 h-6" />
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800">
-                Admin
+              <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-400/40 font-mono">
+                ROOT SYSTEM
               </span>
             </div>
-            <h3 className="text-base font-black text-[#4e2a4a]">Administrator</h3>
-            <p className="text-xs text-slate-500 mt-1">
-              Examination managers, question evaluators, and content authors.
+            <h3 className={`text-lg font-black ${activeRole === 'superadmin' ? 'text-white' : 'text-slate-900'}`}>
+              Super Administrator
+            </h3>
+            <p className={`text-xs mt-1.5 leading-relaxed ${activeRole === 'superadmin' ? 'text-blue-100' : 'text-slate-500'}`}>
+              Full master control across all 20 Super Admin management modules and student panels. (Unrestricted root access).
             </p>
           </div>
 
-          <div className="pt-4 mt-4 border-t border-[#f4ebf4] flex items-center justify-between text-xs">
-            <span className="font-black text-[#6d3a68]">
-              {adminActiveCount} / {catalog.length} Permissions
+          <div className={`pt-4 mt-5 border-t flex items-center justify-between text-xs ${
+            activeRole === 'superadmin' ? 'border-white/20' : 'border-slate-100'
+          }`}>
+            <span className={`font-black ${activeRole === 'superadmin' ? 'text-pink-300' : 'text-purple-700'}`}>
+              {catalog.length} / {catalog.length} Permissions (Unrestricted)
             </span>
-            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-              activeRole === 'admin' ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white' : 'bg-slate-100 text-slate-600'
+            <span className={`px-3 py-1 rounded-full text-[11px] font-bold ${
+              activeRole === 'superadmin' ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-md' : 'bg-slate-100 text-slate-600'
             }`}>
-              {activeRole === 'admin' ? '● Editing Now' : 'Select'}
+              {activeRole === 'superadmin' ? '● Active View' : 'Select'}
             </span>
           </div>
         </div>
@@ -575,78 +601,48 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
         {/* Student Role Card */}
         <div
           onClick={() => setActiveRole('student')}
-          className={`p-5 rounded-3xl border-2 transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
+          className={`p-6 rounded-3xl border-2 transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
             activeRole === 'student'
-              ? 'bg-white border-[#d9775b] shadow-md ring-2 ring-[#d9775b]/20'
-              : 'bg-white border-[#edd6ed] hover:border-[#d9775b]/50 shadow-2xs opacity-80 hover:opacity-100'
+              ? 'bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] border-pink-400 text-white shadow-xl ring-2 ring-pink-400/40'
+              : 'bg-white border-slate-200 hover:border-indigo-400 shadow-xs opacity-90 hover:opacity-100'
           }`}
         >
           <div>
             <div className="flex items-center justify-between gap-2 mb-3">
-              <span className="w-10 h-10 rounded-2xl bg-[#fff9f2] text-[#d9775b] flex items-center justify-center font-bold border border-[#f5e3d7] shadow-2xs">
-                <GraduationCap className="w-5 h-5" />
+              <span className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold shadow-md ${
+                activeRole === 'student' ? 'bg-white/10 text-pink-300 border border-white/20' : 'bg-pink-50 text-pink-700 border border-pink-200'
+              }`}>
+                <GraduationCap className="w-6 h-6" />
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-orange-100 text-orange-800">
-                Candidate / Learner
+              <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-400/40 font-mono">
+                CANDIDATE / LEARNER
               </span>
             </div>
-            <h3 className="text-base font-black text-[#4e2a4a]">Student / Candidate</h3>
-            <p className="text-xs text-slate-500 mt-1">
-              Enrolled students (Classes 1-12) taking tests, viewing solutions and practicing.
+            <h3 className={`text-lg font-black ${activeRole === 'student' ? 'text-white' : 'text-slate-900'}`}>
+              Student / Candidate
+            </h3>
+            <p className={`text-xs mt-1.5 leading-relaxed ${activeRole === 'student' ? 'text-blue-100' : 'text-slate-500'}`}>
+              Enrolled students (Classes 1-12) accessing mock tests, online classes, skill programs, scorecards, and certificates.
             </p>
           </div>
 
-          <div className="pt-4 mt-4 border-t border-[#f4ebf4] flex items-center justify-between text-xs">
-            <span className="font-black text-[#d9775b]">
-              {studentActiveCount} / {catalog.length} Permissions
+          <div className={`pt-4 mt-5 border-t flex items-center justify-between text-xs ${
+            activeRole === 'student' ? 'border-white/20' : 'border-slate-100'
+          }`}>
+            <span className={`font-black ${activeRole === 'student' ? 'text-pink-300' : 'text-pink-700'}`}>
+              {studentActiveCount} / {catalog.length} Permissions Enabled
             </span>
-            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-              activeRole === 'student' ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white' : 'bg-slate-100 text-slate-600'
+            <span className={`px-3 py-1 rounded-full text-[11px] font-bold ${
+              activeRole === 'student' ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-md' : 'bg-slate-100 text-slate-600'
             }`}>
               {activeRole === 'student' ? '● Editing Now' : 'Select'}
             </span>
           </div>
         </div>
-
-        {/* Super Admin Master Overview */}
-        <div
-          onClick={() => setActiveRole('superadmin')}
-          className={`p-5 rounded-3xl border-2 transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
-            activeRole === 'superadmin'
-              ? 'bg-white border-[#e7b84b] shadow-md ring-2 ring-[#e7b84b]/20'
-              : 'bg-white border-[#edd6ed] hover:border-[#e7b84b]/50 shadow-2xs opacity-80 hover:opacity-100'
-          }`}
-        >
-          <div>
-            <div className="flex items-center justify-between gap-2 mb-3">
-              <span className="w-10 h-10 rounded-2xl bg-[#faf4e0] text-[#e7b84b] flex items-center justify-center font-bold border border-[#f5e7bf] shadow-2xs">
-                <Sparkles className="w-5 h-5 text-amber-600" />
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 font-mono">
-                Root System
-              </span>
-            </div>
-            <h3 className="text-base font-black text-[#4e2a4a]">Super Administrator</h3>
-            <p className="text-xs text-slate-500 mt-1">
-              Master control with immutable global root bypass (All capabilities unlocked).
-            </p>
-          </div>
-
-          <div className="pt-4 mt-4 border-t border-[#f4ebf4] flex items-center justify-between text-xs">
-            <span className="font-black text-amber-700">
-              {catalog.length} / {catalog.length} (Unrestricted)
-            </span>
-            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-              activeRole === 'superadmin' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600'
-            }`}>
-              {activeRole === 'superadmin' ? '● Root View' : 'Select'}
-            </span>
-          </div>
-        </div>
       </div>
 
-      {/* 3. Toolbar & Preset Actions */}
-      <div className="bg-white rounded-3xl p-5 border border-[#edd6ed] shadow-sm space-y-4">
+      {/* 3. Toolbar & Module Filters */}
+      <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           {/* Module Filter Pills */}
           <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1 lg:pb-0">
@@ -655,10 +651,10 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
                 key={mod}
                 type="button"
                 onClick={() => setSelectedModule(mod)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                   selectedModule === mod
                     ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
-                    : 'bg-[#faf5fa] text-[#6d3a68] hover:bg-[#f4eaf4] border border-[#edd6ed]'
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
                 }`}
               >
                 {mod}
@@ -668,47 +664,40 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
 
           {/* Search Box */}
           <div className="relative w-full sm:w-72 shrink-0">
-            <Search className="w-4 h-4 text-[#6d3a68] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search capability or key..."
+              placeholder="Search capability or sidebar module..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-[#edd6ed] text-xs font-medium text-[#4e2a4a] focus:outline-none focus:ring-2 focus:ring-[#6d3a68] bg-[#faf5fa] placeholder:text-slate-400"
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 placeholder:text-slate-400"
             />
           </div>
         </div>
 
         {/* Quick Preset Action Bar */}
-        {activeRole !== 'superadmin' && (
-          <div className="pt-3 border-t border-[#f4ebf4] flex flex-wrap items-center justify-between gap-2 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-500">Quick Presets for {activeRole === 'admin' ? 'Admin' : 'Student'}:</span>
+        {activeRole === 'student' && (
+          <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-bold text-slate-600">Quick Presets for Student Role:</span>
               <button
                 type="button"
                 onClick={() => handleApplyPreset('default')}
-                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer"
+                className="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer"
               >
-                Standard Default
+                Standard Student Default
               </button>
               <button
                 type="button"
                 onClick={() => handleApplyPreset('all')}
-                className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold border border-emerald-200 transition-colors cursor-pointer"
+                className="px-3 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold border border-emerald-200 transition-colors cursor-pointer"
               >
                 Enable All
               </button>
               <button
                 type="button"
-                onClick={() => handleApplyPreset('standard_only')}
-                className="px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold border border-purple-200 transition-colors cursor-pointer"
-              >
-                Standard Only
-              </button>
-              <button
-                type="button"
                 onClick={() => handleApplyPreset('none')}
-                className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold border border-rose-200 transition-colors cursor-pointer"
+                className="px-3 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold border border-rose-200 transition-colors cursor-pointer"
               >
                 Revoke All
               </button>
@@ -722,62 +711,68 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
       </div>
 
       {/* 4. Permissions Matrix List */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#edd6ed] shadow-sm space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-[#f4ebf4]">
-          <h3 className="text-sm font-black text-[#4e2a4a] flex items-center gap-2">
-            <Key className="w-4 h-4 text-[#d9775b]" />
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+            <Key className="w-4 h-4 text-pink-500" />
             <span>
-              Capabilities Matrix: {activeRole === 'admin' ? 'Administrator' : activeRole === 'student' ? 'Student / Candidate' : 'Super Administrator'}
+              Capabilities Matrix: {activeRole === 'superadmin' ? 'Super Administrator (Root Access)' : 'Student / Candidate'}
             </span>
           </h3>
-          <span className="text-xs font-bold text-[#6d3a68] bg-[#faf5fa] px-3 py-1 rounded-full border border-[#edd6ed]">
-            {activeRole === 'admin' ? `${adminActiveCount} Enabled` : activeRole === 'student' ? `${studentActiveCount} Enabled` : 'All Active'}
+          <span className="text-xs font-bold text-purple-700 bg-purple-50 px-3 py-1 rounded-full border border-purple-200">
+            {activeRole === 'superadmin' ? 'All Unrestricted' : `${studentActiveCount} Enabled`}
           </span>
         </div>
 
         {activeRole === 'superadmin' ? (
-          <div className="p-6 rounded-2xl bg-amber-50/70 border border-amber-200 text-xs space-y-2">
+          <div className="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-xs space-y-2">
             <div className="flex items-center gap-2 font-black text-amber-900 text-sm">
               <Sparkles className="w-4 h-4 text-amber-600" />
-              <span>Root Administrator Permissions (Immutable)</span>
+              <span>Root Super Administrator Access (Immutable)</span>
             </div>
             <p className="text-slate-700 leading-relaxed">
-              The Super Administrator holds global root capabilities across all database modules, system settings, payment gateways, and security configurations. These permissions cannot be restricted to prevent platform lockouts.
+              The Super Administrator holds full root capabilities across all Super Admin management modules, payment configurations, student rosters, question banks, and system settings.
             </p>
           </div>
         ) : null}
 
-        <div className="divide-y divide-[#f4ebf4]">
+        <div className="divide-y divide-slate-100">
           {filteredCatalog.map((perm) => {
-            const isGranted = activeRole === 'superadmin' ? true : !!rolePerms[activeRole]?.[perm.key];
+            const isGranted = activeRole === 'superadmin' ? true : !!rolePerms.student?.[perm.key];
+            const Icon = perm.icon || Shield;
 
             return (
               <div
                 key={perm.key}
-                className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#fffdfa] rounded-2xl px-2 transition-colors"
+                className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50/80 rounded-2xl px-3 transition-colors"
               >
-                <div className="space-y-1 max-w-2xl">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h4 className="text-xs sm:text-sm font-black text-[#4e2a4a]">
-                      {perm.name}
-                    </h4>
-                    <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">
-                      {perm.key}
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#faf5fa] text-[#6d3a68] border border-[#edd6ed]">
-                      {perm.module}
-                    </span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      perm.level === 'Critical' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
-                      perm.level === 'Advanced' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                      'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                    }`}>
-                      {perm.level}
-                    </span>
+                <div className="space-y-1.5 max-w-2xl flex items-start gap-3.5">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-50 to-pink-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                    <Icon className="w-4.5 h-4.5" />
                   </div>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    {perm.description}
-                  </p>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="text-xs sm:text-sm font-black text-slate-900">
+                        {perm.name}
+                      </h4>
+                      <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">
+                        {perm.key}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        {perm.module}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        perm.level === 'Critical' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                        perm.level === 'Advanced' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                        'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      }`}>
+                        {perm.level}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      {perm.description}
+                    </p>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0 self-start sm:self-center">
@@ -786,7 +781,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
                     disabled={activeRole === 'superadmin'}
                     onClick={() => handleTogglePermission(perm.key)}
                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                      isGranted ? 'bg-[#00b074]' : 'bg-slate-300'
+                      isGranted ? 'bg-gradient-to-r from-[#2563eb] to-[#db2777]' : 'bg-slate-300'
                     } ${activeRole === 'superadmin' ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     <span
@@ -799,7 +794,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
                   <span className={`text-xs font-bold w-20 text-center py-1 rounded-lg ${
                     isGranted ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-slate-400 bg-slate-100'
                   }`}>
-                    {isGranted ? 'Granted ✓' : 'Denied ✕'}
+                    {isGranted ? 'Granted' : 'Disabled'}
                   </span>
                 </div>
               </div>
@@ -808,113 +803,105 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
         </div>
       </div>
 
-      {/* 5. Add Custom Permission Modal */}
+      {/* 5. Modal: Add Custom Capability */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-[#edd6ed] shadow-2xl space-y-5 animate-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-[#f4ebf4]">
-              <div className="flex items-center gap-2">
-                <span className="w-8 h-8 rounded-xl bg-[#faf5fa] text-[#6d3a68] flex items-center justify-center font-black">
-                  <Plus className="w-4 h-4" />
-                </span>
-                <h3 className="text-base font-black text-[#4e2a4a]">Add New Custom Capability</h3>
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">Add Sidebar Capability</h3>
+                  <p className="text-xs text-slate-500">Define a new permission key and access rule</p>
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-700 flex items-center justify-center cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
               >
-                ✕
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateCustomPerm} className="space-y-4">
+            <form onSubmit={handleCreateCustomPerm} className="space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-bold text-[#4e2a4a] mb-1">Capability Display Name</label>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Capability Name *
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Access Live Olympiad Webinars"
+                  placeholder="e.g. Access Premium Video Masterclasses"
                   value={newPerm.name}
-                  onChange={(e) => setNewPerm({ ...newPerm, name: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-[#edd6ed] bg-[#faf5fa] text-xs font-semibold text-[#4e2a4a] focus:ring-2 focus:ring-[#6d3a68] focus:outline-none"
+                  onChange={(e) => {
+                    const nameVal = e.target.value;
+                    const autoKey = nameVal.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 32);
+                    setNewPerm(prev => ({ ...prev, name: nameVal, key: prev.key || autoKey }));
+                  }}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium text-slate-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#4e2a4a] mb-1">Unique Permission Key (code identifier)</label>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Permission Key (Unique Identifier) *
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. access_live_webinars"
+                  placeholder="e.g. access_premium_videos"
                   value={newPerm.key}
-                  onChange={(e) => setNewPerm({ ...newPerm, key: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-[#edd6ed] bg-[#faf5fa] text-xs font-mono font-bold text-[#6d3a68] focus:ring-2 focus:ring-[#6d3a68] focus:outline-none"
+                  onChange={(e) => setNewPerm(prev => ({ ...prev, key: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-slate-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#4e2a4a] mb-1">Module Category</label>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Sidebar Module Category *
+                </label>
                 <select
                   value={newPerm.module}
-                  onChange={(e) => setNewPerm({ ...newPerm, module: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-[#edd6ed] bg-[#faf5fa] text-xs font-semibold text-[#4e2a4a] focus:ring-2 focus:ring-[#6d3a68] focus:outline-none"
+                  onChange={(e) => setNewPerm(prev => ({ ...prev, module: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium text-slate-900 bg-white"
                 >
-                  <option value="Exam & Test Engine">Exam &amp; Test Engine</option>
-                  <option value="Curriculum & Notes">Curriculum &amp; Notes</option>
-                  <option value="Performance & Results">Performance &amp; Results</option>
-                  <option value="Orders & Payments">Orders &amp; Payments</option>
-                  <option value="Community & Forum">Community &amp; Forum</option>
-                  <option value="User & Security Management">User &amp; Security Management</option>
+                  <option value="Super Admin: Custom Studio">Super Admin: Custom Studio</option>
+                  <option value="Student: Custom Module">Student: Custom Module</option>
+                  {modulesList.filter(m => m !== 'All').map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#4e2a4a] mb-1">Description</label>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Description
+                </label>
                 <textarea
                   rows={2}
-                  placeholder="Describe what this permission enables or restricts..."
+                  placeholder="Explain what this sidebar capability enables..."
                   value={newPerm.description}
-                  onChange={(e) => setNewPerm({ ...newPerm, description: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-[#edd6ed] bg-[#faf5fa] text-xs text-[#4e2a4a] focus:ring-2 focus:ring-[#6d3a68] focus:outline-none"
+                  onChange={(e) => setNewPerm(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium text-slate-900 resize-none"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <label className="flex items-center gap-2 p-3 rounded-xl bg-[#faf5fa] border border-[#edd6ed] text-xs font-bold text-[#4e2a4a] cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={newPerm.adminDefault}
-                    onChange={(e) => setNewPerm({ ...newPerm, adminDefault: e.target.checked })}
-                    className="accent-[#6d3a68] w-4 h-4 rounded"
-                  />
-                  <span>Enable for Admin</span>
-                </label>
-
-                <label className="flex items-center gap-2 p-3 rounded-xl bg-[#faf5fa] border border-[#edd6ed] text-xs font-bold text-[#4e2a4a] cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={newPerm.studentDefault}
-                    onChange={(e) => setNewPerm({ ...newPerm, studentDefault: e.target.checked })}
-                    className="accent-[#d9775b] w-4 h-4 rounded"
-                  />
-                  <span>Enable for Student</span>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-[#f4ebf4]">
+              <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 cursor-pointer"
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] transition-colors cursor-pointer shadow-sm"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold cursor-pointer shadow-md active:scale-95"
                 >
-                  Save Capability 🚀
+                  Save Capability
                 </button>
               </div>
             </form>
