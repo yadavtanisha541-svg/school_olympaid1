@@ -378,8 +378,6 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
     return { student: studentMap };
   });
 
-  const [selectedModule, setSelectedModule] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -393,9 +391,6 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
     level: 'Standard',
     studentDefault: true
   });
-
-  // Unique Modules
-  const modulesList = ['All', ...Array.from(new Set(catalog.map(p => p.module)))];
 
   // Save to DB / LocalStorage
   const handleSavePermissions = () => {
@@ -481,19 +476,6 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
       studentDefault: true
     });
   };
-
-  // Filter Catalog
-  const filteredCatalog = catalog.filter((p) => {
-    const matchesModule = selectedModule === 'All' || p.module === selectedModule;
-    const matchesSearch =
-      searchQuery === '' ||
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.key.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.module.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesModule && matchesSearch;
-  });
-
   // Calculate active counts
   const studentActiveCount = catalog.filter(p => !!rolePerms.student?.[p.key]).length;
 
@@ -631,87 +613,45 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
         </div>
       </div>
 
-      {/* 3. Toolbar & Module Filters */}
-      <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          {/* Module Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1 lg:pb-0">
-            {modulesList.map((mod) => (
-              <button
-                key={mod}
-                type="button"
-                onClick={() => setSelectedModule(mod)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
-                  selectedModule === mod
-                    ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-xs'
-                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
-                }`}
-              >
-                {mod}
-              </button>
-            ))}
+      {/* 3. Permissions Matrix List */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <Key className="w-4 h-4 text-pink-500" />
+            <h3 className="text-sm font-black text-slate-900">
+              Capabilities Matrix: {activeRole === 'superadmin' ? 'Super Administrator (Root Access)' : 'Student / Candidate'}
+            </h3>
+            <span className="text-xs font-bold text-purple-700 bg-purple-50 px-3 py-0.5 rounded-full border border-purple-200">
+              {activeRole === 'superadmin' ? 'All Unrestricted' : `${studentActiveCount} / ${catalog.length} Enabled`}
+            </span>
           </div>
 
-          {/* Search Box */}
-          <div className="relative w-full sm:w-72 shrink-0">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search capability or sidebar module..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 placeholder:text-slate-400"
-            />
-          </div>
-        </div>
-
-        {/* Quick Preset Action Bar */}
-        {activeRole === 'student' && (
-          <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-bold text-slate-600">Quick Presets for Student Role:</span>
+          {activeRole === 'student' && (
+            <div className="flex items-center gap-2 flex-wrap text-xs">
+              <span className="text-slate-400 font-semibold text-[11px]">Quick:</span>
               <button
                 type="button"
                 onClick={() => handleApplyPreset('default')}
-                className="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer"
+                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer text-[11px]"
               >
-                Standard Student Default
+                Default
               </button>
               <button
                 type="button"
                 onClick={() => handleApplyPreset('all')}
-                className="px-3 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold border border-emerald-200 transition-colors cursor-pointer"
+                className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold border border-emerald-200 transition-colors cursor-pointer text-[11px]"
               >
                 Enable All
               </button>
               <button
                 type="button"
                 onClick={() => handleApplyPreset('none')}
-                className="px-3 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold border border-rose-200 transition-colors cursor-pointer"
+                className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold border border-rose-200 transition-colors cursor-pointer text-[11px]"
               >
                 Revoke All
               </button>
             </div>
-
-            <span className="text-slate-400 text-[11px] font-semibold">
-              Showing {filteredCatalog.length} capabilities
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* 4. Permissions Matrix List */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-          <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
-            <Key className="w-4 h-4 text-pink-500" />
-            <span>
-              Capabilities Matrix: {activeRole === 'superadmin' ? 'Super Administrator (Root Access)' : 'Student / Candidate'}
-            </span>
-          </h3>
-          <span className="text-xs font-bold text-purple-700 bg-purple-50 px-3 py-1 rounded-full border border-purple-200">
-            {activeRole === 'superadmin' ? 'All Unrestricted' : `${studentActiveCount} Enabled`}
-          </span>
+          )}
         </div>
 
         {activeRole === 'superadmin' ? (
@@ -727,7 +667,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
         ) : null}
 
         <div className="divide-y divide-slate-100">
-          {filteredCatalog.map((perm) => {
+          {catalog.map((perm) => {
             const isGranted = activeRole === 'superadmin' ? true : !!rolePerms.student?.[perm.key];
             const Icon = perm.icon || Shield;
 
