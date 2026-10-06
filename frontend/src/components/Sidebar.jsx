@@ -248,7 +248,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   OLYMPIADS
                 </p>
 
-                {/* My Content Accordion Header */}
+                {/* Mock Test Accordion Header */}
                 <div>
                   <div className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold transition-colors ${
                     currentTab === 'my_content' || currentTab.startsWith('content_')
@@ -267,7 +267,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                       className="flex-1 flex items-center gap-2.5 text-left cursor-pointer"
                     >
                       <BookOpen className="w-5 h-5 text-purple-300 shrink-0" />
-                      <span>My Content</span>
+                      <span>Mock Test</span>
                     </button>
                     <button
                       type="button"
