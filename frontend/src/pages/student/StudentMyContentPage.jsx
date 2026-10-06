@@ -537,19 +537,19 @@ export const StudentMyContentPage = ({
                   return (
                     <div
                       key={paper.id}
-                      className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 hover:border-pink-400 p-6 shadow-lg hover:shadow-2xl transition-all duration-200 flex flex-col justify-between space-y-5 group relative overflow-hidden text-white"
+                      className="bg-gradient-to-br from-blue-50/90 via-indigo-50/70 to-pink-50/90 rounded-3xl border-2 border-indigo-200/90 hover:border-pink-400 p-6 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col justify-between space-y-5 group relative overflow-hidden text-slate-900"
                     >
                       {/* Top: Icon + Title + Class */}
                       <div className="space-y-3">
-                        <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 text-pink-300 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
+                        <div className="w-12 h-12 rounded-2xl bg-white border border-indigo-200 text-indigo-700 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform shrink-0">
                           <FileText className="w-6 h-6 stroke-[2.2]" />
                         </div>
 
                         <div>
-                          <h4 className="font-black text-white text-base sm:text-lg tracking-tight leading-snug group-hover:text-pink-300 transition-colors">
+                          <h4 className="font-black text-slate-900 text-base sm:text-lg tracking-tight leading-snug group-hover:text-indigo-700 transition-colors">
                             {paper.title}
                           </h4>
-                          <p className="text-xs sm:text-sm font-bold text-pink-200/80 mt-0.5">
+                          <p className="text-xs sm:text-sm font-bold text-slate-500 mt-0.5">
                             {paper.class_name || studentClass}
                           </p>
                         </div>
@@ -558,34 +558,34 @@ export const StudentMyContentPage = ({
                       {/* Middle: Status & Score Containers */}
                       <div className="space-y-2.5">
                         {/* Row 1: Status Box */}
-                        <div className="bg-white/10 border border-white/20 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs backdrop-blur-xs">
+                        <div className="bg-white border border-indigo-100 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs">
                           <div className="flex items-center gap-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-pink-400 shrink-0" />
-                            <span className="text-xs font-bold text-slate-200">Status:</span>
+                            <span className="w-2.5 h-2.5 rounded-full bg-pink-500 shrink-0" />
+                            <span className="text-xs font-bold text-slate-700">Status:</span>
                           </div>
                           {isCompleted ? (
-                            <span className="px-3 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 text-[11px] font-black uppercase tracking-wider">
+                            <span className="px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-black uppercase tracking-wider">
                               COMPLETED
                             </span>
                           ) : (
-                            <span className="px-3 py-0.5 rounded-full bg-rose-950/80 text-rose-300 border border-rose-800/60 text-[11px] font-black uppercase tracking-wider">
+                            <span className="px-3 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200 text-[11px] font-black uppercase tracking-wider">
                               UNATTEMPTED
                             </span>
                           )}
                         </div>
 
                         {/* Row 2: Last Score Box */}
-                        <div className="bg-white/10 border border-white/20 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs backdrop-blur-xs">
+                        <div className="bg-white border border-indigo-100 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs">
                           <div className="flex items-center gap-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0" />
-                            <span className="text-xs font-bold text-slate-200">Last Score:</span>
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                            <span className="text-xs font-bold text-slate-700">Last Score:</span>
                           </div>
                           {isCompleted ? (
-                            <span className="px-3 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 text-[11px] font-black">
+                            <span className="px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-black">
                               {result.score} / {result.total_marks || paper.total_marks || 60} ({Math.round(result.percentage || 0)}%)
                             </span>
                           ) : (
-                            <span className="px-3 py-0.5 rounded-full bg-blue-950/80 text-blue-300 border border-blue-800/60 text-[11px] font-black">
+                            <span className="px-3 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200 text-[11px] font-black">
                               none
                             </span>
                           )}
@@ -660,26 +660,26 @@ export const StudentMyContentPage = ({
               return (
                 <div
                   key={sub.code}
-                  className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 hover:border-pink-400 p-6 sm:p-7 shadow-lg hover:shadow-2xl transition-all duration-200 flex flex-col justify-between group relative overflow-hidden aspect-square min-h-[380px] sm:min-h-[400px] w-full text-white"
+                  className="bg-gradient-to-br from-blue-50/90 via-indigo-50/70 to-pink-50/90 rounded-3xl border-2 border-indigo-200/90 hover:border-pink-400 p-6 sm:p-7 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col justify-between group relative overflow-hidden aspect-square min-h-[380px] sm:min-h-[400px] w-full text-slate-900"
                 >
                   <div className="space-y-3.5">
                     {/* Top Header Row */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2.5">
-                        <div className={`w-12 h-12 rounded-2xl border ${sub.iconBg} flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0`}>
+                        <div className={`w-12 h-12 rounded-2xl border ${sub.iconBg} flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform shrink-0`}>
                           <SubIcon className="w-6 h-6" />
                         </div>
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-300 border border-white/20 text-[11px] font-extrabold uppercase tracking-wide">
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-extrabold uppercase tracking-wide">
                             {studentClass}
                           </span>
-                          <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-pink-200 border border-white/20 text-[11px] font-bold">
+                          <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200 text-[11px] font-bold">
                             {sub.code}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-300 border border-white/20 text-xs font-bold shrink-0">
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-indigo-700 border border-indigo-200 text-xs font-bold shrink-0 shadow-2xs">
                         <FileText className="w-3.5 h-3.5" />
                         <span>{subPapers.length} Mock Tests</span>
                       </div>
@@ -687,49 +687,49 @@ export const StudentMyContentPage = ({
 
                     {/* Title, Subtitle & Description */}
                     <div className="space-y-1">
-                      <h3 className="font-black text-white text-lg sm:text-xl tracking-tight leading-snug group-hover:text-pink-300 transition-colors">
+                      <h3 className="font-black text-slate-900 text-lg sm:text-xl tracking-tight leading-snug group-hover:text-indigo-700 transition-colors">
                         {sub.title}
                       </h3>
-                      <p className="text-xs text-pink-200 font-bold">
+                      <p className="text-xs text-indigo-700 font-bold">
                         {sub.subtitle}
                       </p>
-                      <p className="text-xs text-slate-300 font-normal leading-relaxed pt-1.5 line-clamp-3">
+                      <p className="text-xs text-slate-600 font-normal leading-relaxed pt-1.5 line-clamp-3">
                         {sub.description || 'Practice authentic Olympiad questions, improve speed and accuracy, and boost your rank.'}
                       </p>
                     </div>
                   </div>
 
                   {/* Bottom Action Bar & Highlights (Square Box Layout) */}
-                  <div className="pt-4 border-t border-indigo-900/60 space-y-3">
+                  <div className="pt-4 border-t border-indigo-100 space-y-3">
                     <button
                       type="button"
                       onClick={() => {
                         setOpenedMockSeries(sub.code);
                         setSelectedSubject(sub.code);
                       }}
-                      className="w-full py-3 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-purple-950/20 active:scale-98 transition-all cursor-pointer"
+                      className="w-full py-3 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-indigo-950/20 active:scale-98 transition-all cursor-pointer"
                     >
                       <span>Start Mock Test</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
 
                     <div className="flex items-center justify-between gap-1.5 flex-wrap">
-                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-300 bg-white/10 border border-white/20 px-2 py-0.5 rounded-full shadow-2xs">
-                        <div className="w-3.5 h-3.5 rounded-full bg-emerald-950/80 text-emerald-300 flex items-center justify-center shrink-0">
+                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 bg-white border border-indigo-100 px-2 py-0.5 rounded-full shadow-2xs">
+                        <div className="w-3.5 h-3.5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
                           <Check className="w-2 h-2 stroke-[3]" />
                         </div>
                         <span>Updated Syllabus</span>
                       </div>
 
-                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-300 bg-white/10 border border-white/20 px-2 py-0.5 rounded-full shadow-2xs">
-                        <div className="w-3.5 h-3.5 rounded-full bg-blue-950/80 text-blue-300 flex items-center justify-center shrink-0">
+                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 bg-white border border-indigo-100 px-2 py-0.5 rounded-full shadow-2xs">
+                        <div className="w-3.5 h-3.5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
                           <BarChart2 className="w-2 h-2" />
                         </div>
                         <span>Real Exam Pattern</span>
                       </div>
 
-                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-300 bg-white/10 border border-white/20 px-2 py-0.5 rounded-full shadow-2xs">
-                        <div className="w-3.5 h-3.5 rounded-full bg-amber-950/80 text-amber-300 flex items-center justify-center shrink-0">
+                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 bg-white border border-indigo-100 px-2 py-0.5 rounded-full shadow-2xs">
+                        <div className="w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
                           <Trophy className="w-2 h-2" />
                         </div>
                         <span>Improve Score</span>
