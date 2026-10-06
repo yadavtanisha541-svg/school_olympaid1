@@ -121,65 +121,69 @@ export const StudentMyContentPage = ({
   const ALL_SUBJECT_COVERS = useMemo(() => [
     {
       code: 'IMO',
-      title: 'IMO (Mathematics)',
+      altCode: 'IEOM',
+      title: 'IEOM (Mathematics)',
       subtitle: 'Mathematics & Logical Analysis',
       description: 'Sharpen mathematical problem-solving, arithmetic speed, geometry, number systems and analytical reasoning.',
       icon: Calculator,
       color: '#d97706',
       iconBg: 'bg-amber-50 border-amber-200 text-amber-600',
-      seriesTitle: `${studentClass}-All India IMO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IEOM Mock Test Series`
     },
     {
       code: 'ISO',
-      altCode: 'NSO',
-      title: 'ISO / NSO (Science)',
+      altCode: 'IEOS',
+      title: 'IEOS (Science)',
       subtitle: 'Science & Practical Discovery',
       description: 'Master scientific principles, experimental observation, physics, chemistry, biology concepts and logic.',
       icon: Atom,
       color: '#059669',
       iconBg: 'bg-emerald-50 border-emerald-200 text-emerald-600',
-      seriesTitle: `${studentClass}-All India ISO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IEOS Mock Test Series`
     },
     {
       code: 'IDLO',
-      altCode: 'ICSO',
-      title: 'IDLO (Digital Literacy)',
+      altCode: 'IEOD',
+      title: 'IEOD (Digital Literacy)',
       subtitle: 'Digital Tools, Computing & Safety',
       description: 'Learn computer fundamentals, internet safety, software tools, digital citizenship and technology foundations.',
       icon: Laptop,
       color: '#0284c7',
       iconBg: 'bg-sky-50 border-sky-200 text-sky-600',
-      seriesTitle: `${studentClass}-All India IDLO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IEOD Mock Test Series`
     },
     {
       code: 'IEO',
-      title: 'IEO (English)',
+      altCode: 'IEOE',
+      title: 'IEOE (English)',
       subtitle: 'English Grammar & Vocabulary',
       description: 'Enhance English grammar proficiency, comprehension reading, vocabulary power and verbal communication.',
       icon: BookOpen,
       color: '#ea580c',
       iconBg: 'bg-orange-50 border-orange-200 text-orange-600',
-      seriesTitle: `${studentClass}-All India IEO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IEOE Mock Test Series`
     },
     {
       code: 'IGKO',
-      title: 'IGKO (General Knowledge)',
+      altCode: 'IEOG',
+      title: 'IEOG (General Knowledge)',
       subtitle: 'General Knowledge & Current Affairs',
       description: 'Build your general knowledge, stay updated with current affairs and improve your reasoning skills.',
       icon: Globe,
       color: '#859900',
       iconBg: 'bg-yellow-50 border-yellow-200 text-yellow-600',
-      seriesTitle: `${studentClass}-All India IGKO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IEOG Mock Test Series`
     },
     {
       code: 'IHO',
-      title: 'IHO (Hindi)',
+      altCode: 'IEOH',
+      title: 'IEOH (Hindi)',
       subtitle: 'Hindi Vyakaran & Sahitya',
       description: 'हिंदी व्याकरण, वर्तनी शुद्धि, मुहावरे, भाषा बोध और शब्द ज्ञान का संपूर्ण अभ्यास करें।',
       icon: BookOpen,
       color: '#dc2626',
       iconBg: 'bg-rose-50 border-rose-200 text-rose-600',
-      seriesTitle: `${studentClass}-All India IHO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IEOH Mock Test Series`
     }
   ], [studentClass]);
 

@@ -307,12 +307,12 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   {studentAccordions.content && (
                     <div className="pl-3.5 pr-1 py-1 space-y-1">
                       {[
-                        { id: 'content_imo', label: 'IMO (Mathematics)', icon: Calculator },
-                        { id: 'content_iso', label: 'ISO / NSO (Science)', icon: Rocket },
-                        { id: 'content_idlo', label: 'IDLO (Digital Literacy)', icon: Laptop },
-                        { id: 'content_ieo', label: 'IEO (English)', icon: BookOpen },
-                        { id: 'content_igko', label: 'IGKO (General Knowledge)', icon: Globe },
-                        { id: 'content_iho', label: 'IHO (Hindi)', icon: Languages }
+                        { id: 'content_imo', label: 'IEOM (Mathematics)', icon: Calculator },
+                        { id: 'content_iso', label: 'IEOS (Science)', icon: Rocket },
+                        { id: 'content_ieo', label: 'IEOE (English)', icon: BookOpen },
+                        { id: 'content_igko', label: 'IEOG (General Knowledge)', icon: Globe },
+                        { id: 'content_idlo', label: 'IEOD (Digital Literacy)', icon: Laptop },
+                        { id: 'content_iho', label: 'IEOH (Hindi)', icon: Languages }
                       ].map((sub) => {
                         const SubIcon = sub.icon;
                         const isSubActive = currentTab === sub.id;

@@ -329,60 +329,63 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
   const ALL_SUBJECT_COVERS = useMemo(() => [
     {
       code: 'IMO',
-      title: 'IMO (Mathematics)',
+      altCode: 'IEOM',
+      title: 'IEOM (Mathematics)',
       subtitle: 'Mathematics & Logical Analysis',
       icon: Calculator,
       color: '#ec4899',
       iconBg: 'bg-pink-50 border-pink-200 text-pink-600',
-      seriesTitle: `${studentClass}-All India IMO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IEOM Mock Test Series`
     },
     {
       code: 'ISO',
-      altCode: 'NSO',
-      title: 'ISO / NSO (Science)',
+      altCode: 'IEOS',
+      title: 'IEOS (Science)',
       subtitle: 'Science & Practical Discovery',
       icon: Atom,
       color: '#8b5cf6',
       iconBg: 'bg-purple-50 border-purple-200 text-purple-600',
-      seriesTitle: `${studentClass}-All India ISO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IEOS Mock Test Series`
     },
     {
       code: 'IDLO',
-      altCode: 'ICSO',
-      title: 'IDLO (Digital Literacy)',
+      altCode: 'IEOD',
+      title: 'IEOD (Digital Literacy)',
       subtitle: 'Digital Literacy, Cyber & AI',
       icon: Laptop,
       color: '#3b82f6',
       iconBg: 'bg-blue-50 border-blue-200 text-blue-600',
-      seriesTitle: `${studentClass}-All India IDLO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IEOD Mock Test Series`
     },
     {
       code: 'IEO',
-      title: 'IEO (English)',
+      altCode: 'IEOE',
+      title: 'IEOE (English)',
       subtitle: 'English Grammar & Vocabulary',
       icon: BookOpen,
       color: '#06b6d4',
       iconBg: 'bg-cyan-50 border-cyan-200 text-cyan-600',
-      seriesTitle: `${studentClass}-All India IEO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IEOE Mock Test Series`
     },
     {
       code: 'IGKO',
-      title: 'IGKO (General Knowledge)',
+      altCode: 'IEOG',
+      title: 'IEOG (General Knowledge)',
       subtitle: 'General Knowledge & Current Affairs',
       icon: Globe,
       color: '#f59e0b',
       iconBg: 'bg-amber-50 border-amber-200 text-amber-600',
-      seriesTitle: `${studentClass}-All India IGKO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IEOG Mock Test Series`
     },
     {
       code: 'IHO',
-      altCode: 'HINDI',
-      title: 'IHO (Hindi)',
+      altCode: 'IEOH',
+      title: 'IEOH (Hindi)',
       subtitle: 'हिंदी व्याकरण एवं भाषा ज्ञान',
       icon: Languages,
       color: '#10b981',
       iconBg: 'bg-emerald-50 border-emerald-200 text-emerald-600',
-      seriesTitle: `${studentClass}-All India IHO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IEOH Mock Test Series`
     }
   ], [studentClass]);
 
@@ -776,7 +779,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           {[
             {
               key: 'imo',
-              title: 'IMO (Maths)',
+              title: 'IEOM (Maths)',
               subtitle: 'Mathematics & Logic',
               icon: Calculator,
               iconColor: 'text-[#ec4899]',
@@ -784,7 +787,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             },
             {
               key: 'iso',
-              title: 'ISO / NSO',
+              title: 'IEOS (Science)',
               subtitle: 'Science & Discovery',
               icon: Rocket,
               iconColor: 'text-[#8b5cf6]',
@@ -792,7 +795,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             },
             {
               key: 'idlo',
-              title: 'IDLO (Digital)',
+              title: 'IEOD (Digital)',
               subtitle: 'Digital Literacy & AI',
               icon: Laptop,
               iconColor: 'text-[#3b82f6]',
@@ -800,7 +803,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             },
             {
               key: 'ieo',
-              title: 'IEO (English)',
+              title: 'IEOE (English)',
               subtitle: 'English & Grammar',
               icon: BookOpen,
               iconColor: 'text-[#06b6d4]',
@@ -808,7 +811,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             },
             {
               key: 'igko',
-              title: 'IGKO (GK)',
+              title: 'IEOG (GK)',
               subtitle: 'General Knowledge',
               icon: Globe,
               iconColor: 'text-[#f59e0b]',
@@ -816,7 +819,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             },
             {
               key: 'iho',
-              title: 'IHO (Hindi)',
+              title: 'IEOH (Hindi)',
               subtitle: 'हिंदी व्याकरण एवं बोध',
               icon: Languages,
               iconColor: 'text-[#10b981]',
