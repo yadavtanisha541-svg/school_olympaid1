@@ -225,7 +225,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           {user?.role === 'teacher' && (
             <div className="space-y-1 pt-2.5">
               <div className="px-3 pb-1">
-                <p className="text-xs font-black uppercase tracking-wider text-slate-400">
+                <p className="text-xs font-black uppercase tracking-wider text-red-500">
                   FACULTY PORTAL
                 </p>
               </div>
@@ -262,7 +262,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
             <div className="space-y-3.5 pt-2">
               {/* SECTION A: OLYMPIADS */}
               <div className="space-y-1.5">
-                <p className="px-3 text-xs font-black uppercase tracking-wider text-slate-400">
+                <p className="px-3 text-xs font-black uppercase tracking-wider text-red-500">
                   OLYMPIADS
                 </p>
 
@@ -434,7 +434,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
               {/* SECTION C: MY ACCOUNT */}
               <div className="space-y-1.5 pt-2 border-t border-[#312e81]/60">
-                <p className="px-3 text-xs font-black uppercase tracking-wider text-slate-400">
+                <p className="px-3 text-xs font-black uppercase tracking-wider text-red-500">
                   MY ACCOUNT
                 </p>
 
@@ -511,7 +511,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
               {/* SECTION D: OTHERS & INFORMATION */}
               <div className="space-y-1.5 pt-2 border-t border-[#312e81]/60">
-                <p className="px-3 text-xs font-black uppercase tracking-wider text-slate-400">
+                <p className="px-3 text-xs font-black uppercase tracking-wider text-red-500">
                   INFO &amp; EXTRAS
                 </p>
 
