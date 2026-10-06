@@ -692,25 +692,10 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
                   }`}>
                     <Icon className="w-4.5 h-4.5" />
                   </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className={`text-xs sm:text-sm font-black ${isGranted ? 'text-slate-900' : 'text-slate-400 line-through'}`}>
-                        {perm.name}
-                      </h4>
-                      <span className="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">
-                        {perm.key}
-                      </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                        {perm.module}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        perm.level === 'Critical' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
-                        perm.level === 'Advanced' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                        'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      }`}>
-                        {perm.level}
-                      </span>
-                    </div>
+                  <div className="space-y-0.5">
+                    <h4 className={`text-xs sm:text-sm font-black ${isGranted ? 'text-slate-900' : 'text-slate-400 line-through'}`}>
+                      {perm.name}
+                    </h4>
                     <p className="text-xs text-slate-500 leading-relaxed">
                       {perm.description}
                     </p>
