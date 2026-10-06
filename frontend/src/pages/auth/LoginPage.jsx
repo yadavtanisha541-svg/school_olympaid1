@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Eye, EyeOff, Lock, User, AlertCircle, ArrowRight, ArrowLeft, Home } from 'lucide-react';
+import { Eye, EyeOff, Lock, User, AlertCircle, ArrowRight, ArrowLeft, Home, Phone, Mail, X, HelpCircle, Building2, CheckCircle2 } from 'lucide-react';
 import { OlympiadHubLogo } from '../../components/OlympiadHubLogo';
 
 export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) => {
@@ -11,6 +11,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showCoordinatorModal, setShowCoordinatorModal] = useState(false);
 
   const handleGoHome = () => {
     if (onBackToPublic) {
@@ -169,7 +170,13 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
           <div className="mt-6 text-center">
             <p className="text-xs text-pink-100 font-semibold drop-shadow-xs">
               Don't have login credentials?{' '}
-              <span className="text-white font-black underline underline-offset-2 cursor-pointer">Contact your School Coordinator</span>
+              <button
+                type="button"
+                onClick={() => setShowCoordinatorModal(true)}
+                className="text-white font-black underline underline-offset-2 hover:text-pink-200 transition-colors cursor-pointer inline-block"
+              >
+                Contact your School Coordinator
+              </button>
             </p>
           </div>
         </div>
@@ -181,6 +188,119 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
           © {new Date().getFullYear()} OlympiadHub Assessment Portal. All Rights Reserved.
         </p>
       </div>
+
+      {/* School Coordinator & Helpdesk Modal */}
+      {showCoordinatorModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs animate-fadeIn">
+          <div
+            className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden text-slate-800 animate-scaleUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-5 sm:p-6 text-white flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center shadow-xs">
+                  <Building2 className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
+                    School Coordinator &amp; Support
+                  </h3>
+                  <p className="text-xs text-indigo-100 font-medium">
+                    National Olympiad Examination Helpdesk
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCoordinatorModal(false)}
+                className="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition-all cursor-pointer active:scale-95"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 sm:p-6 space-y-4">
+              {/* Info Box 1 */}
+              <div className="p-4 rounded-2xl bg-indigo-50/80 border border-indigo-100 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-2xs font-bold text-xs mt-0.5">
+                  1
+                </div>
+                <div className="space-y-1 text-xs">
+                  <h4 className="font-bold text-slate-900">
+                    How to get your Login Credentials?
+                  </h4>
+                  <p className="text-slate-600 leading-relaxed font-medium">
+                    Your unique Login ID (e.g. <span className="font-mono font-bold text-indigo-700">STU1001</span> or <span className="font-mono font-bold text-indigo-700">ADMIN001</span>) and password are issued directly by your registered school teacher or Olympiad in-charge.
+                  </p>
+                </div>
+              </div>
+
+              {/* Info Box 2 */}
+              <div className="p-4 rounded-2xl bg-pink-50/80 border border-pink-100 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl bg-pink-600 text-white flex items-center justify-center shrink-0 shadow-2xs font-bold text-xs mt-0.5">
+                  2
+                </div>
+                <div className="space-y-1 text-xs">
+                  <h4 className="font-bold text-slate-900">
+                    Forgot Password or Locked Account?
+                  </h4>
+                  <p className="text-slate-600 leading-relaxed font-medium">
+                    If you forgot your password or cannot access your account, your School Administrator can reset it instantly from their School Admin panel.
+                  </p>
+                </div>
+              </div>
+
+              {/* Direct Helpdesk Contacts */}
+              <div className="pt-2 border-t border-slate-100 space-y-2.5">
+                <p className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                  National Olympiad Support Lines
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <a
+                    href="tel:+919876543210"
+                    className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-all flex items-center gap-3 text-xs group cursor-pointer"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <Phone className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-slate-900">Helpline Phone</p>
+                      <p className="text-[11px] text-slate-500 font-mono">+91 98765 43210</p>
+                    </div>
+                  </a>
+
+                  <a
+                    href="mailto:support@skillriseolympiad.org"
+                    className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-all flex items-center gap-3 text-xs group cursor-pointer"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-slate-900">Email Support</p>
+                      <p className="text-[11px] text-slate-500 truncate">support@skillrise.org</p>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-slate-50 px-5 sm:px-6 py-4 border-t border-slate-200 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={() => setShowCoordinatorModal(false)}
+                className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
+              >
+                Close Window
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
