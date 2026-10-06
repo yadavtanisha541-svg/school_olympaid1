@@ -635,23 +635,24 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
     <div className="space-y-6 pb-14 font-sans w-full max-w-full overflow-x-hidden">
       
       {/* ========================================================================= */}
-      {/* 1. HERO GREETING BANNER (Clean Modern Neutral Card)                        */}
+      {/* 1. HERO GREETING BANNER (3-Mix Pastel Gradient Card)                      */}
       {/* ========================================================================= */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 md:p-7 shadow-xs relative overflow-hidden text-slate-900">
+      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-pink-50 border border-indigo-100/80 rounded-3xl p-5 sm:p-6 md:p-7 shadow-xs relative overflow-hidden text-slate-900">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           {/* Left Content */}
           <div className="space-y-3 max-w-2xl">
             <div className="flex items-start gap-3.5">
               {/* Waving Hand Circular Badge */}
-              <div className="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs flex items-center justify-center text-2xl shrink-0 mt-0.5">
+              <div className="w-11 h-11 rounded-2xl bg-white/90 border border-indigo-100 shadow-2xs flex items-center justify-center text-2xl shrink-0 mt-0.5">
                 👋
               </div>
               <div>
                 <p className="text-xs sm:text-sm font-bold text-slate-500">
                   Welcome Back,
                 </p>
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
-                  {greeting}, <span className="text-slate-800 capitalize">{studentName}</span>!
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight mt-0.5">
+                  <span className="text-slate-900">{greeting}, </span>
+                  <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent capitalize">{studentName}</span>!
                 </h1>
               </div>
             </div>
@@ -662,8 +663,8 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
 
             {/* Bottom Row: Date Pill */}
             <div className="pt-1 flex items-center flex-wrap gap-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 shadow-2xs">
-                <Calendar className="w-3.5 h-3.5 text-slate-500" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/85 backdrop-blur-xs border border-indigo-100 rounded-xl text-xs font-bold text-indigo-950 shadow-2xs">
+                <Calendar className="w-3.5 h-3.5 text-indigo-500" />
                 <span>Today: {formattedDateStr}</span>
               </div>
             </div>
@@ -672,15 +673,15 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           {/* Right Content: Scholar Star Badge & Illustration */}
           <div className="shrink-0 flex items-center justify-center md:justify-end gap-4">
             {/* Scholar Star Tier Badge Card */}
-            <div className="hidden lg:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs">
-              <div className="w-9 h-9 rounded-xl bg-slate-900 text-amber-300 flex items-center justify-center shadow-xs">
-                <Trophy className="w-5 h-5 fill-amber-300 text-amber-300" />
+            <div className="hidden lg:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/85 backdrop-blur-xs border border-purple-100 shadow-2xs">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-400 via-orange-400 to-amber-300 text-slate-900 flex items-center justify-center shadow-xs">
+                <Trophy className="w-5 h-5 fill-slate-900 text-slate-900" />
               </div>
               <div className="flex flex-col">
                 <span className="text-[11px] font-black uppercase tracking-wider text-slate-900">
                   Scholar Star
                 </span>
-                <span className="text-[9px] text-slate-500 font-semibold">Active Tier</span>
+                <span className="text-[9px] text-indigo-600 font-bold">Active Tier</span>
               </div>
             </div>
 
@@ -734,13 +735,13 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. SECTION: OLYMPIAD SUBJECTS (Clean White Cards)                         */}
+      {/* 2. SECTION: OLYMPIAD SUBJECTS (2-3 Mix Pastel Gradient Cards)             */}
       {/* ========================================================================= */}
       <div className="space-y-4 pt-2">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-              <BookOpen className="w-6 h-6 text-slate-700" />
+              <BookOpen className="w-6 h-6 text-indigo-600" />
               <span>Olympiad Subjects</span>
             </h2>
             <p className="text-xs text-slate-500 font-semibold mt-0.5">
@@ -758,7 +759,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </button>
         </div>
 
-        {/* 6 Clean White Square Subject Cards */}
+        {/* 6 Colorful 2-3 Mix Pastel Gradient Subject Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5 w-full">
           {[
             {
@@ -766,58 +767,64 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               title: 'IEOM (Maths)',
               subtitle: 'Mathematics & Logic',
               icon: Calculator,
-              iconColor: 'text-pink-600',
-              iconBg: 'bg-pink-50 border-pink-100'
+              cardBg: 'bg-gradient-to-br from-pink-50 via-rose-50 to-amber-50 border-pink-200/80 hover:border-pink-300',
+              iconBg: 'bg-gradient-to-tr from-pink-500 via-rose-500 to-amber-500 text-white shadow-pink-200 shadow-sm',
+              linkText: 'text-pink-600 group-hover:text-pink-700'
             },
             {
               key: 'iso',
               title: 'IEOS (Science)',
               subtitle: 'Science & Discovery',
               icon: Rocket,
-              iconColor: 'text-purple-600',
-              iconBg: 'bg-purple-50 border-purple-100'
+              cardBg: 'bg-gradient-to-br from-purple-50 via-indigo-50 to-sky-50 border-purple-200/80 hover:border-purple-300',
+              iconBg: 'bg-gradient-to-tr from-purple-500 via-indigo-500 to-sky-500 text-white shadow-purple-200 shadow-sm',
+              linkText: 'text-purple-600 group-hover:text-purple-700'
             },
             {
               key: 'idlo',
               title: 'IEOD (Digital)',
               subtitle: 'Digital Literacy & AI',
               icon: Laptop,
-              iconColor: 'text-blue-600',
-              iconBg: 'bg-blue-50 border-blue-100'
+              cardBg: 'bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 border-blue-200/80 hover:border-blue-300',
+              iconBg: 'bg-gradient-to-tr from-cyan-500 via-blue-500 to-indigo-500 text-white shadow-blue-200 shadow-sm',
+              linkText: 'text-blue-600 group-hover:text-blue-700'
             },
             {
               key: 'ieo',
               title: 'IEOE (English)',
               subtitle: 'English & Grammar',
               icon: BookOpen,
-              iconColor: 'text-cyan-600',
-              iconBg: 'bg-cyan-50 border-cyan-100'
+              cardBg: 'bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 border-teal-200/80 hover:border-teal-300',
+              iconBg: 'bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-teal-200 shadow-sm',
+              linkText: 'text-teal-700 group-hover:text-teal-800'
             },
             {
               key: 'igko',
               title: 'IEOG (GK)',
               subtitle: 'General Knowledge',
               icon: Globe,
-              iconColor: 'text-amber-600',
-              iconBg: 'bg-amber-50 border-amber-100'
+              cardBg: 'bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 border-amber-200/80 hover:border-amber-300',
+              iconBg: 'bg-gradient-to-tr from-amber-500 via-orange-500 to-rose-500 text-white shadow-amber-200 shadow-sm',
+              linkText: 'text-amber-700 group-hover:text-amber-800'
             },
             {
               key: 'iho',
               title: 'IEOH (Hindi)',
               subtitle: 'हिंदी व्याकरण एवं बोध',
               icon: Languages,
-              iconColor: 'text-emerald-600',
-              iconBg: 'bg-emerald-50 border-emerald-100'
+              cardBg: 'bg-gradient-to-br from-lime-50 via-emerald-50 to-teal-50 border-emerald-200/80 hover:border-emerald-300',
+              iconBg: 'bg-gradient-to-tr from-lime-500 via-emerald-500 to-teal-600 text-white shadow-emerald-200 shadow-sm',
+              linkText: 'text-emerald-700 group-hover:text-emerald-800'
             }
           ].map((sub) => (
             <div
               key={sub.key}
               onClick={() => onNavigateTab && onNavigateTab(`content_${sub.key}`)}
-              className="bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 shadow-xs hover:border-slate-300 hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1 text-slate-900"
+              className={`${sub.cardBg} rounded-3xl border p-5 sm:p-6 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1 text-slate-900`}
             >
               {/* Square Icon Container */}
-              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${sub.iconBg} border flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform shrink-0`}>
-                <sub.icon className={`w-7 h-7 sm:w-8 sm:h-8 ${sub.iconColor}`} />
+              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${sub.iconBg} flex items-center justify-center border border-white/40 group-hover:scale-105 transition-transform shrink-0`}>
+                <sub.icon className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
 
               {/* Subject Title & Subtitle */}
@@ -831,9 +838,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               </div>
 
               {/* Bottom Action Indicator */}
-              <div className="w-full pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-600 group-hover:text-slate-900 transition-colors">
+              <div className={`w-full pt-2.5 border-t border-black/5 flex items-center justify-between text-xs font-bold ${sub.linkText} transition-colors`}>
                 <span>Explore Series</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform text-slate-400" />
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </div>
             </div>
           ))}
@@ -841,22 +848,22 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. SECTION: TWO FEATURED BANNERS (Clean Neutral Cards)                     */}
+      {/* 3. SECTION: TWO FEATURED BANNERS (Rich 2-3 Mix Pastel Gradient Cards)      */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2">
         
         {/* Left Banner: Online Classes */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-slate-900">
+        <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-3xl border-2 border-indigo-200/80 hover:border-indigo-300 p-6 sm:p-7 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-slate-900">
           <div className="flex items-center gap-4 min-w-0">
-            <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center shadow-2xs shrink-0 text-slate-800">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-indigo-200 shadow-sm shrink-0 text-white border border-white/30">
               <div className="relative">
-                <BookOpen className="w-8 h-8 text-slate-700" />
-                <Lightbulb className="w-4 h-4 text-amber-500 fill-amber-500 absolute -top-1 -right-1" />
+                <BookOpen className="w-8 h-8 text-white" />
+                <Lightbulb className="w-4 h-4 text-amber-300 fill-amber-300 absolute -top-1 -right-1" />
               </div>
             </div>
 
             <div className="min-w-0 space-y-1.5">
-              <span className="inline-block px-3 py-1 rounded-lg bg-slate-100 text-slate-700 text-[10px] font-black uppercase tracking-wider border border-slate-200">
+              <span className="inline-block px-3 py-1 rounded-lg bg-indigo-100/90 text-indigo-700 text-[10px] font-black uppercase tracking-wider border border-indigo-200">
                 FEATURED
               </span>
               <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
@@ -871,7 +878,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           <button
             type="button"
             onClick={() => onNavigateTab('my_classes')}
-            className="w-full sm:w-auto px-6 py-3 bg-slate-900 text-white hover:bg-slate-800 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-xs active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-slate-900"
+            className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-sm hover:shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-indigo-600"
           >
             <span>ENROLL NOW</span>
             <ArrowRight className="w-4 h-4 text-white" />
@@ -879,17 +886,17 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
         </div>
 
         {/* Right Banner: Olympiad Intelligent Test Generator Pro */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-slate-900">
+        <div className="bg-gradient-to-r from-pink-50 via-purple-50 to-blue-50 rounded-3xl border-2 border-pink-200/80 hover:border-pink-300 p-6 sm:p-7 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-slate-900">
           <div className="flex items-center gap-4 min-w-0">
-            <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center shadow-2xs shrink-0 text-slate-800">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 flex items-center justify-center shadow-pink-200 shadow-sm shrink-0 text-white border border-white/30">
               <div className="relative">
-                <FileSpreadsheet className="w-8 h-8 text-slate-700" />
-                <Target className="w-4 h-4 text-indigo-500 absolute -top-1 -right-1" />
+                <FileSpreadsheet className="w-8 h-8 text-white" />
+                <Target className="w-4 h-4 text-yellow-300 absolute -top-1 -right-1" />
               </div>
             </div>
 
             <div className="min-w-0 space-y-1.5">
-              <span className="inline-block px-3 py-1 rounded-lg bg-slate-100 text-slate-700 text-[10px] font-black uppercase tracking-wider border border-slate-200">
+              <span className="inline-block px-3 py-1 rounded-lg bg-pink-100/90 text-pink-700 text-[10px] font-black uppercase tracking-wider border border-pink-200">
                 PRO TOOL
               </span>
               <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
@@ -904,7 +911,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           <button
             type="button"
             onClick={() => onNavigateTab('test_generator')}
-            className="w-full sm:w-auto px-6 py-3 bg-slate-900 text-white hover:bg-slate-800 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-xs active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-slate-900"
+            className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-pink-600 via-rose-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-sm hover:shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-pink-600"
           >
             <span>TRY NOW</span>
             <ArrowRight className="w-4 h-4 text-white" />
@@ -914,15 +921,15 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. SECTION: FREE SAMPLE PAPERS & PREVIOUS YEAR PAPERS                     */}
+      {/* 4. SECTION: FREE SAMPLE PAPERS & PREVIOUS YEAR PAPERS (Colorful 2-3 Mix)  */}
       {/* ========================================================================= */}
       <div className="pt-2">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           
           {/* Card 1: Spotlight: IGKO Quiz */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3 text-slate-900">
+          <div className="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 rounded-2xl border border-amber-200/80 hover:border-amber-300 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 text-slate-900">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-pink-50 text-pink-600 border border-pink-100 flex items-center justify-center shrink-0 shadow-2xs">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center shrink-0 shadow-2xs border border-white/30">
                 <FileText className="w-5 h-5" />
               </div>
               <div className="min-w-0">
@@ -938,7 +945,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             <button
               type="button"
               onClick={() => onNavigateTab('free_quizzes')}
-              className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1"
+              className="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-amber-500"
             >
               <span>Open</span>
               <ArrowRight className="w-3 h-3 text-white" />
@@ -946,9 +953,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </div>
 
           {/* Card 2: Free Sample Papers */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3 text-slate-900">
+          <div className="bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-50 rounded-2xl border border-sky-200/80 hover:border-sky-300 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 text-slate-900">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center shrink-0 shadow-2xs">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-2xs border border-white/30">
                 <FileSpreadsheet className="w-5 h-5" />
               </div>
               <div className="min-w-0">
@@ -964,7 +971,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             <button
               type="button"
               onClick={() => onNavigateTab('free_sample_papers')}
-              className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1"
+              className="px-4 py-1.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-sky-500"
             >
               <span>Open</span>
               <ArrowRight className="w-3 h-3 text-white" />
@@ -972,9 +979,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </div>
 
           {/* Card 3: Free Previous Year Papers */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs hover:border-slate-300 transition-all flex items-center justify-between gap-3 text-slate-900">
+          <div className="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 rounded-2xl border border-emerald-200/80 hover:border-emerald-300 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 text-slate-900">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0 shadow-2xs">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-2xs border border-white/30">
                 <Award className="w-5 h-5" />
               </div>
               <div className="min-w-0">
@@ -990,7 +997,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             <button
               type="button"
               onClick={() => onNavigateTab('free_past_papers')}
-              className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1"
+              className="px-4 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-emerald-500"
             >
               <span>Open</span>
               <ArrowRight className="w-3 h-3 text-white" />
@@ -1001,19 +1008,19 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 5. SECTION: SKILL DEVELOPMENT PROGRAMS                                    */}
+      {/* 5. SECTION: SKILL DEVELOPMENT PROGRAMS (Vibrant 2-3 Mix Pastel Cards)      */}
       {/* ========================================================================= */}
       <div className="space-y-3 pt-2">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Rocket className="w-5 h-5 text-slate-700" />
+            <Rocket className="w-5 h-5 text-indigo-600" />
             <span>Skill Development Programs</span>
           </h2>
 
           <button
             type="button"
             onClick={() => onNavigateTab && onNavigateTab('prog_rsdp')}
-            className="text-xs font-bold text-slate-700 hover:text-slate-900 hover:underline flex items-center gap-1 transition-colors cursor-pointer"
+            className="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1 transition-colors cursor-pointer"
           >
             <span>View All Programs</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -1026,35 +1033,45 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               id: 'prog_rsdp',
               title: 'Reasoning Skill Development',
               subtitle: 'Build a strong foundation with essential skills.',
-              iconBg: 'bg-purple-50 text-purple-600 border-purple-100',
+              cardBg: 'bg-gradient-to-br from-purple-50 via-indigo-50 to-pink-50 border-purple-200/80 hover:border-purple-300',
+              iconBg: 'bg-gradient-to-br from-purple-500 via-indigo-500 to-pink-500 text-white shadow-purple-200 shadow-sm',
+              btnBg: 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-purple-600',
               icon: Brain
             },
             {
               id: 'prog_gksdp',
               title: 'GK Skill Development',
               subtitle: 'Improve your general knowledge and current affairs.',
-              iconBg: 'bg-amber-50 text-amber-600 border-amber-100',
+              cardBg: 'bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 border-amber-200/80 hover:border-amber-300',
+              iconBg: 'bg-gradient-to-br from-amber-500 via-orange-500 to-yellow-500 text-white shadow-amber-200 shadow-sm',
+              btnBg: 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-amber-500',
               icon: Globe
             },
             {
               id: 'prog_msdp',
               title: 'Maths Skill Development',
               subtitle: 'Sharpen your math skills with practice and theory.',
-              iconBg: 'bg-pink-50 text-pink-600 border-pink-100',
+              cardBg: 'bg-gradient-to-br from-pink-50 via-rose-50 to-red-50 border-pink-200/80 hover:border-pink-300',
+              iconBg: 'bg-gradient-to-br from-pink-500 via-rose-500 to-red-500 text-white shadow-pink-200 shadow-sm',
+              btnBg: 'bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white border-pink-600',
               isMath: true
             },
             {
               id: 'prog_esdp',
               title: 'English Skill Development',
               subtitle: 'Enhance your communication and language skills.',
-              iconBg: 'bg-blue-50 text-blue-600 border-blue-100',
+              cardBg: 'bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-50 border-blue-200/80 hover:border-blue-300',
+              iconBg: 'bg-gradient-to-br from-blue-500 via-sky-500 to-indigo-500 text-white shadow-blue-200 shadow-sm',
+              btnBg: 'bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white border-blue-600',
               isLang: true
             },
             {
               id: 'prog_ssdp',
               title: 'Science Skill Development',
               subtitle: 'Explore science concepts with easy learning.',
-              iconBg: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+              cardBg: 'bg-gradient-to-br from-emerald-50 via-teal-50 to-lime-50 border-emerald-200/80 hover:border-emerald-300',
+              iconBg: 'bg-gradient-to-br from-emerald-500 via-teal-500 to-lime-500 text-white shadow-emerald-200 shadow-sm',
+              btnBg: 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white border-emerald-600',
               icon: Rocket
             }
           ].map((prog) => {
@@ -1063,11 +1080,11 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               <div
                 key={prog.id}
                 onClick={() => onNavigateTab(prog.id)}
-                className="rounded-3xl p-5 flex flex-col justify-between text-slate-900 shadow-xs hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 min-h-[210px] relative overflow-hidden bg-white cursor-pointer group border border-slate-200 hover:border-slate-300"
+                className={`rounded-3xl p-5 flex flex-col justify-between text-slate-900 shadow-xs hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 min-h-[210px] relative overflow-hidden ${prog.cardBg} cursor-pointer group border`}
               >
                 <div className="space-y-2.5 relative z-10">
                   {/* Top Circular Icon Container */}
-                  <div className={`w-10 h-10 rounded-xl ${prog.iconBg} border flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform`}>
+                  <div className={`w-10 h-10 rounded-xl ${prog.iconBg} border border-white/30 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform`}>
                     {prog.isMath ? (
                       <span className="font-black text-sm font-mono leading-none">
                         x²
@@ -1085,20 +1102,20 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                     <h3 className="font-bold text-sm text-slate-900 leading-snug">
                       {prog.title}
                     </h3>
-                    <p className="text-[11px] text-slate-500 font-medium leading-relaxed mt-1">
+                    <p className="text-[11px] text-slate-600 font-medium leading-relaxed mt-1">
                       {prog.subtitle}
                     </p>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 mt-auto relative z-10">
+                <div className="pt-3 border-t border-black/5 mt-auto relative z-10">
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       onNavigateTab(prog.id);
                     }}
-                    className="w-full py-2 px-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-2xs"
+                    className={`w-full py-2 px-3 ${prog.btnBg} rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-2xs border`}
                   >
                     <span>Start Learning</span>
                     <ArrowRight className="w-3.5 h-3.5" />
