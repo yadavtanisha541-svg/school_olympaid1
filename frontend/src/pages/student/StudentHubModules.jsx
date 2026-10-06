@@ -1292,8 +1292,26 @@ const StudentFreeQuizzesModule = ({ activeModule, user, onNavigateTab }) => {
                     }`}
                   >
                     <span className="leading-snug">{opt}</span>
-                    <span className={`w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-[11px] font-black ${
-                      isSelected ? 'bg-[#e7b84b] text-[#321630]' : 'border border-slate-300 text-slate-500'
+                    <span className={`w-6 h-6 rounded-lg shrink-0 flex items-center justify-center text-[11px] font-black ${
+                      optIdx === 0
+                        ? isSelected
+                          ? 'bg-red-600 text-white shadow-xs'
+                          : 'bg-red-100 text-red-700 border border-red-300'
+                        : optIdx === 1
+                        ? isSelected
+                          ? 'bg-emerald-600 text-white shadow-xs'
+                          : 'bg-emerald-100 text-emerald-700 border border-emerald-300'
+                        : optIdx === 2
+                        ? isSelected
+                          ? 'bg-amber-500 text-white shadow-xs'
+                          : 'bg-amber-100 text-amber-800 border border-amber-300'
+                        : optIdx === 3
+                        ? isSelected
+                          ? 'bg-orange-500 text-white shadow-xs'
+                          : 'bg-orange-100 text-orange-700 border border-orange-300'
+                        : isSelected
+                        ? 'bg-[#e7b84b] text-[#321630]'
+                        : 'border border-slate-300 text-slate-500'
                     }`}>
                       {String.fromCharCode(65 + optIdx)}
                     </span>

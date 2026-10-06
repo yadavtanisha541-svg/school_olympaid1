@@ -526,6 +526,14 @@ export const DetailedSolutionsPage = ({
                                 ? 'bg-emerald-600 text-white shadow-xs'
                                 : isUserPick
                                 ? 'bg-rose-600 text-white shadow-xs'
+                                : opt === 'A'
+                                ? 'bg-red-100 text-red-700 border border-red-300'
+                                : opt === 'B'
+                                ? 'bg-emerald-100 text-emerald-700 border border-emerald-300'
+                                : opt === 'C'
+                                ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                                : opt === 'D'
+                                ? 'bg-orange-100 text-orange-700 border border-orange-300'
                                 : 'bg-white text-slate-700 border border-slate-300'
                             }`}
                           >

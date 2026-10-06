@@ -614,8 +614,24 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
                         }`}
                       >
                         <span
-                          className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 transition-colors ${
-                            active
+                          className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs shrink-0 transition-colors ${
+                            optKey === 'A'
+                              ? active
+                                ? 'bg-red-600 text-white shadow-xs border border-red-700'
+                                : 'bg-red-100 text-red-700 border border-red-300'
+                              : optKey === 'B'
+                              ? active
+                                ? 'bg-emerald-600 text-white shadow-xs border border-emerald-700'
+                                : 'bg-emerald-100 text-emerald-700 border border-emerald-300'
+                              : optKey === 'C'
+                              ? active
+                                ? 'bg-amber-500 text-white shadow-xs border border-amber-600'
+                                : 'bg-amber-100 text-amber-800 border border-amber-300'
+                              : optKey === 'D'
+                              ? active
+                                ? 'bg-orange-500 text-white shadow-xs border border-orange-600'
+                                : 'bg-orange-100 text-orange-700 border border-orange-300'
+                              : active
                               ? 'bg-brand-600 text-white'
                               : 'bg-slate-100 text-slate-600 border border-slate-200'
                           }`}

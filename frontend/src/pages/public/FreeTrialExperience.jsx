@@ -1145,8 +1145,26 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
                           : 'bg-white border-[#edd6ed] text-slate-800 hover:bg-[#faf5fa]'
                       }`}
                     >
-                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center text-xs font-bold shrink-0 ${
-                        isSelected ? 'bg-[#6d3a68] border-[#6d3a68] text-white' : 'border-slate-300 bg-white text-slate-600'
+                      <div className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-black shrink-0 ${
+                        optIdx === 0
+                          ? isSelected
+                            ? 'bg-red-600 text-white shadow-xs'
+                            : 'bg-red-100 text-red-700 border border-red-300'
+                          : optIdx === 1
+                          ? isSelected
+                            ? 'bg-emerald-600 text-white shadow-xs'
+                            : 'bg-emerald-100 text-emerald-700 border border-emerald-300'
+                          : optIdx === 2
+                          ? isSelected
+                            ? 'bg-amber-500 text-white shadow-xs'
+                            : 'bg-amber-100 text-amber-800 border border-amber-300'
+                          : optIdx === 3
+                          ? isSelected
+                            ? 'bg-orange-500 text-white shadow-xs'
+                            : 'bg-orange-100 text-orange-700 border border-orange-300'
+                          : isSelected
+                          ? 'bg-[#6d3a68] text-white'
+                          : 'border border-slate-300 bg-white text-slate-600'
                       }`}>
                         {String.fromCharCode(65 + optIdx)}
                       </div>

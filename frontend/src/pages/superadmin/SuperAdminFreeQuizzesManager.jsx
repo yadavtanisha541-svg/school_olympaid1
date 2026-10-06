@@ -478,7 +478,17 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
                         >
                           <div className="flex items-center gap-2">
                             <span className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-black ${
-                              isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'
+                              isCorrect
+                                ? 'bg-emerald-600 text-white'
+                                : optIdx === 0
+                                ? 'bg-red-100 text-red-700 border border-red-300'
+                                : optIdx === 1
+                                ? 'bg-emerald-100 text-emerald-700 border border-emerald-300'
+                                : optIdx === 2
+                                ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                                : optIdx === 3
+                                ? 'bg-orange-100 text-orange-700 border border-orange-300'
+                                : 'bg-slate-100 text-slate-600'
                             }`}>
                               {String.fromCharCode(65 + optIdx)}
                             </span>
