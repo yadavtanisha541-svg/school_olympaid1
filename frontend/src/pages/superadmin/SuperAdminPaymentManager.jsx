@@ -294,7 +294,7 @@ export const SuperAdminPaymentManager = () => {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
                 isActive
-                  ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-md shadow-blue-950/20 border border-[#7854d6]/30'
+                  ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-md shadow-blue-950/20 border border-[#7854d6]/30'
                   : 'bg-white text-slate-600 border border-[#ebd7eb] hover:bg-slate-50 hover:text-[#16327a]'
               }`}
             >

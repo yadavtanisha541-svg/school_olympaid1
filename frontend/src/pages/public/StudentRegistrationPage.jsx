@@ -374,7 +374,7 @@ export const StudentRegistrationPage = ({ onNavigatePublic, onOpenLogin }) => {
                 <div
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black transition-all ${
                     step >= 1
-                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-sm'
+                      ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-sm'
                       : 'bg-white border border-[#edd6ed] text-slate-400'
                   }`}
                 >
@@ -401,7 +401,7 @@ export const StudentRegistrationPage = ({ onNavigatePublic, onOpenLogin }) => {
                 <div
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black transition-all ${
                     step >= 2
-                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-sm'
+                      ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-sm'
                       : 'bg-white border border-[#edd6ed] text-slate-400'
                   }`}
                 >
@@ -428,7 +428,7 @@ export const StudentRegistrationPage = ({ onNavigatePublic, onOpenLogin }) => {
                 <div
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black transition-all ${
                     step >= 3
-                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-sm'
+                      ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-sm'
                       : 'bg-white border border-[#edd6ed] text-slate-400'
                   }`}
                 >
@@ -679,7 +679,7 @@ export const StudentRegistrationPage = ({ onNavigatePublic, onOpenLogin }) => {
                     <button
                       type="button"
                       onClick={handleNextFromStep1}
-                      className="px-6 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-black flex items-center gap-2 cursor-pointer shadow-md transition-all active:scale-95"
+                      className="px-6 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-black flex items-center gap-2 cursor-pointer shadow-md transition-all active:scale-95"
                     >
                       <span>Continue</span>
                       <ArrowRight className="w-4 h-4" />
@@ -967,7 +967,7 @@ export const StudentRegistrationPage = ({ onNavigatePublic, onOpenLogin }) => {
                   <button
                     type="button"
                     onClick={handleNextFromStep2}
-                    className="px-6 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-black flex items-center gap-2 cursor-pointer shadow-md transition-all active:scale-95"
+                    className="px-6 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-black flex items-center gap-2 cursor-pointer shadow-md transition-all active:scale-95"
                   >
                     <span>Continue</span>
                     <ArrowRight className="w-4 h-4" />
@@ -1152,7 +1152,7 @@ export const StudentRegistrationPage = ({ onNavigatePublic, onOpenLogin }) => {
                           }}
                           className={`p-2 rounded-md flex flex-col items-center justify-center transition-all cursor-pointer ${
                             formData.selectedAvatar === av.id
-                              ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white ring-2 ring-[#6d3a68]'
+                              ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white ring-2 ring-[#6d3a68]'
                               : 'bg-white border border-[#edd6ed] hover:bg-[#f4ebf4]'
                           }`}
                         >
@@ -1254,7 +1254,7 @@ export const StudentRegistrationPage = ({ onNavigatePublic, onOpenLogin }) => {
                           <h4 className="text-xs font-black text-[#4e2a4a]">{cat.shortName}</h4>
                           <div
                             className={`w-5 h-5 rounded-sm flex items-center justify-center text-xs ${
-                              isChecked ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white' : 'border border-[#edd6ed] bg-white'
+                              isChecked ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white' : 'border border-[#edd6ed] bg-white'
                             }`}
                           >
                             {isChecked && '✓'}
@@ -1282,7 +1282,7 @@ export const StudentRegistrationPage = ({ onNavigatePublic, onOpenLogin }) => {
                   <button
                     type="button"
                     onClick={() => setStep(5)}
-                    className="px-6 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-black flex items-center gap-2 cursor-pointer shadow-md transition-all active:scale-95"
+                    className="px-6 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-black flex items-center gap-2 cursor-pointer shadow-md transition-all active:scale-95"
                   >
                     <span>Proceed to Payment</span>
                     <ArrowRight className="w-4 h-4" />
@@ -1365,7 +1365,7 @@ export const StudentRegistrationPage = ({ onNavigatePublic, onOpenLogin }) => {
                   <button
                     type="button"
                     onClick={handleCompleteRegistration}
-                    className="px-8 py-3.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-black flex items-center gap-2 cursor-pointer shadow-lg shadow-[#d9775b]/30 active:scale-95"
+                    className="px-8 py-3.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-black flex items-center gap-2 cursor-pointer shadow-lg shadow-[#d9775b]/30 active:scale-95"
                   >
                     <span>Pay ₹{finalTotal} &amp; Complete Registration</span>
                     <CheckCircle2 className="w-4 h-4" />
@@ -1418,7 +1418,7 @@ export const StudentRegistrationPage = ({ onNavigatePublic, onOpenLogin }) => {
                   <button
                     type="button"
                     onClick={onOpenLogin}
-                    className="px-6 py-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-black shadow-md cursor-pointer"
+                    className="px-6 py-3 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-black shadow-md cursor-pointer"
                   >
                     Log In to Student Dashboard →
                   </button>

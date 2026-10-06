@@ -278,7 +278,7 @@ export const OnlineClassesPage = ({ onNavigateTab }) => {
               <button
                 type="button"
                 onClick={() => setSelectedVideo(null)}
-                className="px-5 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-xl text-xs font-bold hover:bg-[#5c3158] transition-colors cursor-pointer"
+                className="px-5 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white rounded-xl text-xs font-bold hover:bg-[#5c3158] transition-colors cursor-pointer"
               >
                 Close Video
               </button>
@@ -329,7 +329,7 @@ export const OnlineClassesPage = ({ onNavigateTab }) => {
                       setActiveSubTab('self_paced_details');
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="px-6 py-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white font-black rounded-2xl text-xs sm:text-sm shadow-md transition-all transform active:scale-95 cursor-pointer flex items-center gap-2 border border-white/20"
+                    className="px-6 py-3 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-black rounded-2xl text-xs sm:text-sm shadow-md transition-all transform active:scale-95 cursor-pointer flex items-center gap-2 border border-white/20"
                   >
                     <span>{heroBanner.btnText || 'ENROLL NOW →'}</span>
                   </button>

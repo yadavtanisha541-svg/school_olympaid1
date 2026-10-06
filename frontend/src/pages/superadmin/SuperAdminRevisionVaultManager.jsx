@@ -288,7 +288,7 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
           <button
             type="button"
             onClick={handleOpenCreateModal}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30"
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30"
           >
             <Plus className="w-4 h-4" />
             <span>Add Revision Question</span>
@@ -419,7 +419,7 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
             <button
               type="button"
               onClick={handleOpenCreateModal}
-              className="mt-2 px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-xl text-xs font-bold hover:bg-[#5c3158] transition-colors cursor-pointer"
+              className="mt-2 px-4 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white rounded-xl text-xs font-bold hover:bg-[#5c3158] transition-colors cursor-pointer"
             >
               + Add New Question
             </button>
@@ -741,7 +741,7 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white font-bold transition-all shadow-md cursor-pointer disabled:opacity-50 border border-[#7854d6]/30"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-bold transition-all shadow-md cursor-pointer disabled:opacity-50 border border-[#7854d6]/30"
                 >
                   {saving ? 'Saving...' : modalMode === 'create' ? 'Create Question' : 'Save Changes'}
                 </button>

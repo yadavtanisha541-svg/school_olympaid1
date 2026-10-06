@@ -704,7 +704,7 @@ export const ExamResultsPage = () => {
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white flex items-center justify-center font-bold text-xs shadow-2xs">
+                          <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white flex items-center justify-center font-bold text-xs shadow-2xs">
                             {r.student_name ? r.student_name.charAt(0).toUpperCase() : 'S'}
                           </div>
                           <div>

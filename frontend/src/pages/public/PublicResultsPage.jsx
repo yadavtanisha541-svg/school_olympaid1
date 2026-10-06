@@ -160,7 +160,7 @@ export const PublicResultsPage = ({ onNavigatePublic, onOpenLogin, onOpenRegiste
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-extrabold transition-all shadow-md shadow-[#d9775b]/30 cursor-pointer"
+                className="px-6 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs font-extrabold transition-all shadow-md shadow-[#d9775b]/30 cursor-pointer"
               >
                 {loading ? 'Fetching Scorecard...' : 'View Scorecard →'}
               </button>
@@ -191,7 +191,7 @@ export const PublicResultsPage = ({ onNavigatePublic, onOpenLogin, onOpenRegiste
                 </button>
                 <button
                   onClick={() => onNavigatePublic('certificates-info')}
-                  className="px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  className="px-4 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-[#e7b84b]" />
                   <span>Verify Certificate</span>

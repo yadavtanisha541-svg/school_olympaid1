@@ -150,7 +150,7 @@ export const BecomeCoordinatorPage = ({ onNavigatePublic, onOpenRegister, onOpen
                       isCaptchaChecked: false
                     });
                   }}
-                  className="px-5 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-sm text-xs font-bold transition-all cursor-pointer"
+                  className="px-5 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-sm text-xs font-bold transition-all cursor-pointer"
                 >
                   Submit Another Inquiry
                 </button>
@@ -277,7 +277,7 @@ export const BecomeCoordinatorPage = ({ onNavigatePublic, onOpenRegister, onOpen
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-8 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xs text-xs font-black tracking-wider uppercase shadow-md shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95 disabled:opacity-60"
+                    className="px-8 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xs text-xs font-black tracking-wider uppercase shadow-md shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95 disabled:opacity-60"
                   >
                     {isSubmitting ? 'SUBMITTING...' : 'SUBMIT'}
                   </button>
@@ -374,7 +374,7 @@ export const BecomeCoordinatorPage = ({ onNavigatePublic, onOpenRegister, onOpen
             <button
               type="button"
               onClick={() => onNavigatePublic('sample-papers')}
-              className="px-5 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-full text-xs font-bold transition-all shadow-md shadow-[#4e2a4a]/20 flex items-center gap-2 cursor-pointer border border-[#6d3a68]/30"
+              className="px-5 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-full text-xs font-bold transition-all shadow-md shadow-[#4e2a4a]/20 flex items-center gap-2 cursor-pointer border border-[#6d3a68]/30"
             >
               <BookOpen className="w-3.5 h-3.5 text-[#e7b84b]" />
               <span>Workbooks</span>
@@ -383,7 +383,7 @@ export const BecomeCoordinatorPage = ({ onNavigatePublic, onOpenRegister, onOpen
             <button
               type="button"
               onClick={() => onNavigatePublic('practice-hub')}
-              className="px-5 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-full text-xs font-bold transition-all shadow-md shadow-[#4e2a4a]/20 flex items-center gap-2 cursor-pointer border border-[#6d3a68]/30"
+              className="px-5 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-full text-xs font-bold transition-all shadow-md shadow-[#4e2a4a]/20 flex items-center gap-2 cursor-pointer border border-[#6d3a68]/30"
             >
               <Video className="w-3.5 h-3.5 text-[#e7b84b]" />
               <span>Live Classes</span>
@@ -392,7 +392,7 @@ export const BecomeCoordinatorPage = ({ onNavigatePublic, onOpenRegister, onOpen
             <button
               type="button"
               onClick={() => onNavigatePublic('sample-papers')}
-              className="px-5 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-full text-xs font-bold transition-all shadow-md shadow-[#4e2a4a]/20 flex items-center gap-2 cursor-pointer border border-[#6d3a68]/30"
+              className="px-5 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-full text-xs font-bold transition-all shadow-md shadow-[#4e2a4a]/20 flex items-center gap-2 cursor-pointer border border-[#6d3a68]/30"
             >
               <FileText className="w-3.5 h-3.5 text-[#e7b84b]" />
               <span>Previous Papers</span>

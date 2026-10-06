@@ -905,7 +905,7 @@ export const AddTeacherModal = ({ isOpen = true, isFullPage = true, onClose, onS
                         <span className="truncate">{subject}</span>
                       </div>
                       {isSelected ? (
-                        <span className="w-5 h-5 rounded-full bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white flex items-center justify-center shrink-0">
+                        <span className="w-5 h-5 rounded-full bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white flex items-center justify-center shrink-0">
                           <Check className="w-3 h-3" />
                         </span>
                       ) : (
@@ -1041,7 +1041,7 @@ export const AddTeacherModal = ({ isOpen = true, isFullPage = true, onClose, onS
             <button
               type="submit"
               disabled={loading}
-              className="px-8 py-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-extrabold shadow-md shadow-[#4e2a4a]/20 transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50 active:scale-95"
+              className="px-8 py-3 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs font-extrabold shadow-md shadow-[#4e2a4a]/20 transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50 active:scale-95"
             >
               {loading ? (
                 <span>Creating Teacher Account...</span>

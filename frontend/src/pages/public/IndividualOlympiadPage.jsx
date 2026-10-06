@@ -212,7 +212,7 @@ export const IndividualOlympiadPage = ({
           <button
             type="button"
             onClick={onOpenRegister}
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white text-xs font-black shadow-xs transition-all cursor-pointer active:scale-95"
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white text-xs font-black shadow-xs transition-all cursor-pointer active:scale-95"
           >
             <span>Enroll Student 2026-27</span>
             <ArrowRight className="w-3.5 h-3.5" />

@@ -402,7 +402,7 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
                         <button
                           type="button"
                           onClick={() => handleSelectExamToStart(exam)}
-                          className="px-5 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xs text-xs font-black tracking-wider uppercase shadow-sm cursor-pointer transition-all active:scale-95"
+                          className="px-5 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xs text-xs font-black tracking-wider uppercase shadow-sm cursor-pointer transition-all active:scale-95"
                         >
                           TAKE EXAM
                         </button>
@@ -535,7 +535,7 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
                 setStage('camera-pos');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="px-8 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xs text-xs font-black tracking-wider uppercase shadow-md shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95"
+              className="px-8 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xs text-xs font-black tracking-wider uppercase shadow-md shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95"
             >
               Continue →
             </button>
@@ -573,7 +573,7 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
             </span>
             <span className="text-slate-300">—</span>
             <span className="flex items-center gap-1.5 text-[#6d3a68] px-2.5 py-0.5 rounded-full bg-[#f4ebf4] border border-[#edd6ed]">
-              <span className="w-4 h-4 rounded-full bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white text-[10px] flex items-center justify-center">2</span>
+              <span className="w-4 h-4 rounded-full bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white text-[10px] flex items-center justify-center">2</span>
               <span>Camera Position</span>
             </span>
             <span className="text-slate-300">—</span>
@@ -678,7 +678,7 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
                   }}
                   className={`px-8 py-2.5 rounded-xs text-xs font-black tracking-wider uppercase transition-all shadow-md ${
                     camPosChecked
-                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white cursor-pointer active:scale-95 shadow-[#d9775b]/30'
+                      ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white cursor-pointer active:scale-95 shadow-[#d9775b]/30'
                       : 'bg-slate-300 text-slate-500 cursor-not-allowed opacity-60'
                   }`}
                 >
@@ -722,7 +722,7 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
             </span>
             <span className="text-slate-300">—</span>
             <span className="flex items-center gap-1.5 text-[#6d3a68] px-2.5 py-0.5 rounded-full bg-[#f4ebf4] border border-[#edd6ed]">
-              <span className="w-4 h-4 rounded-full bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white text-[10px] flex items-center justify-center">3</span>
+              <span className="w-4 h-4 rounded-full bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white text-[10px] flex items-center justify-center">3</span>
               <span>Do's &amp; Don'ts</span>
             </span>
             <span className="text-slate-300">—</span>
@@ -840,7 +840,7 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
                   }}
                   className={`px-8 py-2.5 rounded-xs text-xs font-black tracking-wider uppercase transition-all shadow-md ${
                     rulesChecked
-                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white cursor-pointer active:scale-95 shadow-[#d9775b]/30'
+                      ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white cursor-pointer active:scale-95 shadow-[#d9775b]/30'
                       : 'bg-slate-300 text-slate-500 cursor-not-allowed opacity-60'
                   }`}
                 >
@@ -888,7 +888,7 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
             </span>
             <span className="text-slate-300">—</span>
             <span className="flex items-center gap-1.5 text-[#6d3a68] px-2.5 py-0.5 rounded-full bg-[#f4ebf4] border border-[#edd6ed]">
-              <span className="w-4 h-4 rounded-full bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white text-[10px] flex items-center justify-center">4</span>
+              <span className="w-4 h-4 rounded-full bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white text-[10px] flex items-center justify-center">4</span>
               <span>Instructions</span>
             </span>
           </div>
@@ -969,7 +969,7 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
                   <button
                     type="button"
                     onClick={handleToggleCamera}
-                    className="px-4 py-1.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xs text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+                    className="px-4 py-1.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xs text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
                   >
                     <Camera className="w-3.5 h-3.5" />
                     <span>{isCameraActive ? 'Close Camera' : 'Open Camera / Test Webcam'}</span>
@@ -1051,7 +1051,7 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
                 }}
                 className={`px-8 py-3 rounded-xs text-xs font-black tracking-wider uppercase transition-all shadow-md ${
                   instructionCertified
-                    ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white cursor-pointer active:scale-95 shadow-[#d9775b]/30'
+                    ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white cursor-pointer active:scale-95 shadow-[#d9775b]/30'
                     : 'bg-slate-300 text-slate-500 cursor-not-allowed opacity-60'
                 }`}
               >
@@ -1099,7 +1099,7 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
               <button
                 type="button"
                 onClick={() => setShowSubmitConfirm(true)}
-                className="px-4 py-1.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xs text-xs font-black uppercase transition-all shadow-xs cursor-pointer"
+                className="px-4 py-1.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xs text-xs font-black uppercase transition-all shadow-xs cursor-pointer"
               >
                 Submit Exam
               </button>
@@ -1215,7 +1215,7 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
                 <button
                   type="button"
                   onClick={handleSaveAndNext}
-                  className="px-5 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xs text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+                  className="px-5 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xs text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
                 >
                   <span>{currentQuestionIndex === totalQuestionsCount - 1 ? 'Save & Review' : 'Save & Next'}</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -1348,7 +1348,7 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
                 <button
                   type="button"
                   onClick={handleSubmitExam}
-                  className="px-5 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xs text-xs font-black cursor-pointer shadow-md"
+                  className="px-5 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xs text-xs font-black cursor-pointer shadow-md"
                 >
                   Yes, Submit Now
                 </button>
@@ -1444,7 +1444,7 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
               <button
                 type="button"
                 onClick={() => onNavigatePublic('register-student')}
-                className="px-6 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xs text-xs font-black shadow-md shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95 flex items-center gap-2"
+                className="px-6 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xs text-xs font-black shadow-md shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95 flex items-center gap-2"
               >
                 <span>Enroll in Official Olympiad 2026</span>
                 <ArrowRight className="w-3.5 h-3.5 text-[#e7b84b]" />

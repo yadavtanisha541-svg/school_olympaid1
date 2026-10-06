@@ -531,7 +531,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
             className={`px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer ${
               saveSuccess
                 ? 'bg-emerald-600 text-white'
-                : 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white'
+                : 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white'
             }`}
           >
             {saveSuccess ? (
@@ -587,7 +587,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
           </div>
 
           <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold shrink-0 ${
-            activeRole === 'superadmin' ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-2xs' : 'bg-slate-100 text-slate-500'
+            activeRole === 'superadmin' ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-2xs' : 'bg-slate-100 text-slate-500'
           }`}>
             {activeRole === 'superadmin' ? '● Active' : 'Select'}
           </span>
@@ -624,7 +624,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
           </div>
 
           <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold shrink-0 ${
-            activeRole === 'student' ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-2xs' : 'bg-slate-100 text-slate-500'
+            activeRole === 'student' ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-2xs' : 'bg-slate-100 text-slate-500'
           }`}>
             {activeRole === 'student' ? '● Editing' : 'Select'}
           </span>
@@ -643,7 +643,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
                 onClick={() => setSelectedModule(mod)}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                   selectedModule === mod
-                    ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
+                    ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-xs'
                     : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
                 }`}
               >
@@ -889,7 +889,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold cursor-pointer shadow-md active:scale-95"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white font-bold cursor-pointer shadow-md active:scale-95"
                 >
                   Save Capability
                 </button>

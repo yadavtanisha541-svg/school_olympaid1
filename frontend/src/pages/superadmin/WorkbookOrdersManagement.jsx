@@ -155,7 +155,7 @@ export const WorkbookOrdersManagement = () => {
             type="button"
             onClick={exportCsv}
             disabled={orders.length === 0}
-            className="px-5 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-md shadow-blue-950/20 disabled:opacity-50 border border-[#7854d6]/30"
+            className="px-5 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-md shadow-blue-950/20 disabled:opacity-50 border border-[#7854d6]/30"
           >
             <Download className="w-4 h-4 text-[#e7b84b]" />
             <span>Export CSV</span>
@@ -499,7 +499,7 @@ export const WorkbookOrdersManagement = () => {
               <button
                 type="button"
                 onClick={() => setSelectedOrder(null)}
-                className="px-4 py-1.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white hover:bg-[#5c3158] rounded-sm text-xs font-bold transition-all cursor-pointer"
+                className="px-4 py-1.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white hover:bg-[#5c3158] rounded-sm text-xs font-bold transition-all cursor-pointer"
               >
                 Done
               </button>

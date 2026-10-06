@@ -98,7 +98,7 @@ export const BlogPage = ({ onNavigatePublic, onOpenRegister }) => {
                   setSelectedPost(null);
                   onNavigatePublic('practice-hub');
                 }}
-                className="px-5 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-[#5c3158]"
+                className="px-5 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-[#5c3158]"
               >
                 Start Practice Now →
               </button>

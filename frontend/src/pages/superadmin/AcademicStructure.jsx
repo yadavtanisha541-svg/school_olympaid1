@@ -914,7 +914,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                 });
                 setShowSubjectModal(true);
               }}
-              className="px-4 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-2 shadow-xs"
+              className="px-4 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-2 shadow-xs"
             >
               <Plus className="w-4 h-4 text-[#e7b84b]" />
               <span>+ Add New Discipline</span>
@@ -937,7 +937,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                 });
                 setShowClassModal(true);
               }}
-              className="px-4 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-2 shadow-xs"
+              className="px-4 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-2 shadow-xs"
             >
               <Plus className="w-4 h-4 text-[#e7b84b]" />
               <span>+ Add New Class</span>
@@ -960,7 +960,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                 });
                 setShowChapterModal(true);
               }}
-              className="px-4 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-2 shadow-xs"
+              className="px-4 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-2 shadow-xs"
             >
               <Plus className="w-4 h-4 text-[#e7b84b]" />
               <span>+ Add New Chapter</span>
@@ -982,7 +982,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                 });
                 setShowTopicModal(true);
               }}
-              className="px-4 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-2 shadow-xs"
+              className="px-4 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-2 shadow-xs"
             >
               <Plus className="w-4 h-4 text-[#e7b84b]" />
               <span>+ Add New Topic</span>
@@ -1010,7 +1010,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                 }}
                 className={`py-2.5 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2.5 cursor-pointer whitespace-nowrap ${
                   isActive
-                    ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
+                    ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-xs'
                     : 'text-slate-600 hover:bg-[#faf5fa] hover:text-[#6d3a68]'
                 }`}
               >
@@ -1047,7 +1047,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                 }}
                 className={`py-2 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap ${
                   isActive
-                    ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
+                    ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-xs'
                     : 'text-slate-600 hover:bg-[#faf5fa] hover:text-[#6d3a68]'
                 }`}
               >
@@ -1592,7 +1592,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
                     {contentForm.syllabus_modules.map((mod, idx) => (
                       <div key={idx} className="p-3.5 bg-[#faf5fa] rounded-xl border border-[#edd6ed] space-y-2">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white">
+                          <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white">
                             Module {idx + 1}
                           </span>
                           <div className="flex items-center gap-2">
@@ -2447,7 +2447,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
             <button
               type="submit"
               disabled={actionLoading}
-              className="px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-xl font-bold shadow-xs"
+              className="px-4 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white rounded-xl font-bold shadow-xs"
             >
               {actionLoading ? 'Saving...' : editingItem ? 'Save Changes' : 'Create Class'}
             </button>
@@ -2516,7 +2516,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
             <button
               type="submit"
               disabled={actionLoading}
-              className="px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-xl font-bold shadow-xs"
+              className="px-4 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white rounded-xl font-bold shadow-xs"
             >
               {actionLoading ? 'Saving...' : 'Save Chapter'}
             </button>
@@ -2572,7 +2572,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
             <button
               type="submit"
               disabled={actionLoading}
-              className="px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-xl font-bold shadow-xs"
+              className="px-4 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white rounded-xl font-bold shadow-xs"
             >
               {actionLoading ? 'Saving...' : 'Save Topic'}
             </button>

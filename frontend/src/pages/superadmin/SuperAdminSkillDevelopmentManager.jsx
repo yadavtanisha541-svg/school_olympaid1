@@ -540,7 +540,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
               <button
                 type="button"
                 onClick={handleOpenNew}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30"
               >
                 <Plus className="w-4 h-4" />
                 <span>Create New Program</span>
@@ -759,7 +759,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                   onClick={() => setEditorTab(tab.id)}
                   className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5 cursor-pointer whitespace-nowrap ${
                     isActive
-                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-md shadow-blue-950/20 border border-[#7854d6]/30'
+                      ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-md shadow-blue-950/20 border border-[#7854d6]/30'
                       : 'bg-white text-slate-600 border border-[#ebd7eb] hover:bg-slate-50 hover:text-[#16327a]'
                   }`}
                 >
@@ -919,7 +919,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                       <button
                         type="button"
                         onClick={handleAddIntroParagraph}
-                        className="px-3.5 py-1.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer shadow-xs border border-[#7854d6]/30"
+                        className="px-3.5 py-1.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer shadow-xs border border-[#7854d6]/30"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Add Paragraph</span>
@@ -958,7 +958,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                       <button
                         type="button"
                         onClick={handleAddWhyReason}
-                        className="px-3.5 py-1.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer shadow-xs border border-[#7854d6]/30"
+                        className="px-3.5 py-1.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer shadow-xs border border-[#7854d6]/30"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Add Bullet Point</span>
@@ -1003,7 +1003,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                     <button
                       type="button"
                       onClick={handleAddSkillClass}
-                      className="px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer shadow-xs border border-[#7854d6]/30"
+                      className="px-4 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer shadow-xs border border-[#7854d6]/30"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add Another Grade</span>

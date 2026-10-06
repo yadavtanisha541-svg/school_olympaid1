@@ -287,7 +287,7 @@ export const PublicHomePage = ({
                         else if (slide.id === 3) onNavigatePublic('rankings');
                         else onNavigatePublic('practice-hub');
                       }}
-                      className="px-6 py-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-black shadow-md shadow-[#16327a]/30 transition-all cursor-pointer flex items-center gap-2 active:scale-95"
+                      className="px-6 py-3 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-black shadow-md shadow-[#16327a]/30 transition-all cursor-pointer flex items-center gap-2 active:scale-95"
                     >
                       <span>{slide.ctaText}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -377,7 +377,7 @@ export const PublicHomePage = ({
                       <button
                         type="button"
                         onClick={() => setApplicantSubmittedData(null)}
-                        className="w-full py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-black shadow-sm cursor-pointer transition-all active:scale-95"
+                        className="w-full py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-black shadow-sm cursor-pointer transition-all active:scale-95"
                       >
                         Enroll Another Student
                       </button>
@@ -397,7 +397,7 @@ export const PublicHomePage = ({
                       <span className="text-xs font-black uppercase tracking-wider text-[#16327a]">
                         New Applicant Registration
                       </span>
-                      <span className="text-[10px] font-bold text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] px-2 py-0.5 rounded-sm shadow-xs">
+                      <span className="text-[10px] font-bold text-white bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] px-2 py-0.5 rounded-sm shadow-xs">
                         Online 2026-27
                       </span>
                     </div>
@@ -496,7 +496,7 @@ export const PublicHomePage = ({
                         <button
                           type="submit"
                           disabled={submittingApplicant}
-                          className="w-full py-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-black shadow-md shadow-[#16327a]/25 cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="w-full py-3 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-black shadow-md shadow-[#16327a]/25 cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           {submittingApplicant ? (
                             <span>Submitting Application...</span>
@@ -633,7 +633,7 @@ export const PublicHomePage = ({
               <button
                 type="button"
                 onClick={onOpenRegister}
-                className="px-6 py-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-black shadow-md shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95 flex items-center gap-2"
+                className="px-6 py-3 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-black shadow-md shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95 flex items-center gap-2"
               >
                 <span>Register Student Now</span>
                 <ArrowRight className="w-4 h-4 text-[#e7b84b]" />
@@ -702,7 +702,7 @@ export const PublicHomePage = ({
                 title: 'Discover & Register',
                 desc: 'Select your preferred Olympiad disciplines and choose your suitable online test slot.',
                 image: stepRegisterChildImg,
-                badgeBg: 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white',
+                badgeBg: 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white',
                 borderHover: 'hover:border-[#6d3a68]/60',
                 action: () => onOpenRegister()
               },
@@ -711,7 +711,7 @@ export const PublicHomePage = ({
                 title: 'Prepare with Model Papers',
                 desc: 'Access past question banks, chapter blueprints, and practice mock tests.',
                 image: stepStudyChildImg,
-                badgeBg: 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white',
+                badgeBg: 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white',
                 borderHover: 'hover:border-[#d9775b]/60',
                 action: () => onNavigatePublic('sample-papers')
               },
@@ -822,7 +822,7 @@ export const PublicHomePage = ({
               <button
                 type="button"
                 onClick={onOpenRegister}
-                className="px-6 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-black shadow-md shadow-[#16327a]/30 cursor-pointer transition-all active:scale-95 flex items-center gap-2"
+                className="px-6 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-black shadow-md shadow-[#16327a]/30 cursor-pointer transition-all active:scale-95 flex items-center gap-2"
               >
                 <span>Register Student Now</span>
                 <ArrowRight className="w-4 h-4 text-[#fbbf24]" />

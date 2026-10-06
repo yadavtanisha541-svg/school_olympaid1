@@ -177,7 +177,7 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
 
           <button
             onClick={() => alert(`Enrolled in ${cur.code} Skill Certification!`)}
-            className="px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white hover:bg-[#5c3158] transition-all shadow-md cursor-pointer shrink-0"
+            className="px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white hover:bg-[#5c3158] transition-all shadow-md cursor-pointer shrink-0"
           >
             Resume Program →
           </button>
@@ -205,7 +205,7 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
                 <span className="text-[11px] font-bold text-slate-400">120 XP • 2 Badges</span>
                 <button
                   onClick={() => alert(`Starting Stage ${idx + 1}: ${lvl}`)}
-                  className="px-4 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white hover:bg-[#5c3158] transition-colors cursor-pointer"
+                  className="px-4 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white hover:bg-[#5c3158] transition-colors cursor-pointer"
                 >
                   Start Stage →
                 </button>
@@ -261,7 +261,7 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="px-5 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] transition-colors cursor-pointer shadow-sm"
+                className="px-5 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] transition-colors cursor-pointer shadow-sm"
               >
                 Post to Forum 🚀
               </button>
@@ -518,7 +518,7 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
 
           <button
             onClick={() => onNavigateTab && onNavigateTab('available_exams')}
-            className="px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white hover:bg-[#5c3158] transition-all shadow-md cursor-pointer shrink-0"
+            className="px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white hover:bg-[#5c3158] transition-all shadow-md cursor-pointer shrink-0"
           >
             Take Live Test →
           </button>
@@ -584,7 +584,7 @@ export const StudentHubModules = ({ activeModule = 'my_classes', onNavigateTab, 
               </p>
               <button
                 onClick={() => onNavigateTab && onNavigateTab('available_exams')}
-                className="w-full py-2 px-3 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] transition-colors cursor-pointer shadow-xs"
+                className="w-full py-2 px-3 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] transition-colors cursor-pointer shadow-xs"
               >
                 Attempt HOTS Challenge
               </button>
@@ -834,7 +834,7 @@ const StudentRevisionVaultModule = ({ user, onNavigateTab }) => {
               onClick={() => setSelectedSubject(sub.value)}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 selectedSubject === sub.value
-                  ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
+                  ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-xs'
                   : 'bg-[#faf5fa] text-[#6d3a68] hover:bg-[#f4ebf4] border border-[#edd6ed]'
               }`}
             >
@@ -1215,7 +1215,7 @@ const StudentFreeQuizzesModule = ({ activeModule, user, onNavigateTab }) => {
             onClick={() => setSelectedSubject(tab.value)}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               selectedSubject === tab.value
-                ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
+                ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-xs'
                 : 'bg-[#faf5fa] text-slate-700 hover:bg-[#f4eaf4] border border-[#edd6ed]'
             }`}
           >
@@ -1236,7 +1236,7 @@ const StudentFreeQuizzesModule = ({ activeModule, user, onNavigateTab }) => {
           <p className="text-xs text-slate-400">Please choose another subject or check back later.</p>
           <button
             onClick={() => setSelectedSubject('All')}
-            className="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white cursor-pointer"
+            className="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white cursor-pointer"
           >
             View All Quizzes
           </button>
@@ -1295,7 +1295,7 @@ const StudentFreeQuizzesModule = ({ activeModule, user, onNavigateTab }) => {
                     onClick={() => handleSelectOption(optIdx)}
                     className={`p-4 rounded-2xl text-left text-xs font-bold transition-all border cursor-pointer flex items-center justify-between gap-3 ${
                       isSelected
-                        ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white border-[#6d3a68] shadow-sm ring-2 ring-[#6d3a68]/20'
+                        ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white border-[#6d3a68] shadow-sm ring-2 ring-[#6d3a68]/20'
                         : 'bg-[#faf5fa] text-[#4e2a4a] border-[#edd6ed] hover:bg-[#f4ebf4] hover:border-[#6d3a68]/40'
                     }`}
                   >
@@ -1370,7 +1370,7 @@ const StudentFreeQuizzesModule = ({ activeModule, user, onNavigateTab }) => {
                     setActiveIdx(activeIdx + 1);
                     setShowHint(false);
                   }}
-                  className="px-5 py-2.5 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] transition-colors cursor-pointer shadow-sm"
+                  className="px-5 py-2.5 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] transition-colors cursor-pointer shadow-sm"
                 >
                   Next Question →
                 </button>
@@ -1418,7 +1418,7 @@ const StudentFreeQuizzesModule = ({ activeModule, user, onNavigateTab }) => {
               <button
                 type="button"
                 onClick={handleRestart}
-                className="px-5 py-2.5 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] transition-colors cursor-pointer shadow-sm"
+                className="px-5 py-2.5 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] transition-colors cursor-pointer shadow-sm"
               >
                 Retake Quiz 🔄
               </button>

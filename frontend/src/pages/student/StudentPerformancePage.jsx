@@ -351,7 +351,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
                   className="w-16 h-16 rounded-2xl object-cover ring-4 ring-purple-100 border border-[#ebd7eb] shadow-md"
                 />
               ) : (
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-black text-2xl flex items-center justify-center shadow-md ring-4 ring-purple-100">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white font-black text-2xl flex items-center justify-center shadow-md ring-4 ring-purple-100">
                   {studentName.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -396,7 +396,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex items-center gap-2 text-xs font-bold text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] border border-[#7854d6]/40 px-4 py-2 rounded-xl transition-all shadow-md shadow-purple-950/20 cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-2 text-xs font-bold text-white bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] border border-[#7854d6]/40 px-4 py-2 rounded-xl transition-all shadow-md shadow-purple-950/20 cursor-pointer active:scale-95"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Download Report</span>
@@ -545,7 +545,7 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
               <button
                 type="button"
                 onClick={() => onNavigateTab('available_exams')}
-                className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+                className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
               >
                 <Play className="w-3.5 h-3.5" />
                 <span>Start First Exam Now</span>

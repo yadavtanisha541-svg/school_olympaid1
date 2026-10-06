@@ -597,7 +597,7 @@ export const StudentMyContentPage = ({
                         <button
                           type="button"
                           onClick={() => setSelectedPaperForInstructions(paper)}
-                          className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95"
+                          className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95"
                         >
                           <span>Open Test</span>
                           <ArrowRight className="w-4 h-4" />
@@ -707,7 +707,7 @@ export const StudentMyContentPage = ({
                         setOpenedMockSeries(sub.code);
                         setSelectedSubject(sub.code);
                       }}
-                      className="w-full py-3 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-purple-950/20 active:scale-98 transition-all cursor-pointer"
+                      className="w-full py-3 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-purple-950/20 active:scale-98 transition-all cursor-pointer"
                     >
                       <span>Start Mock Test</span>
                       <ArrowRight className="w-4 h-4" />

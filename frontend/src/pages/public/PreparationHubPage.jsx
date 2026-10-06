@@ -206,7 +206,7 @@ export const PreparationHubPage = ({ onNavigatePublic, onOpenRegister }) => {
               <div className="mt-6 flex flex-wrap justify-center gap-3">
                 <button
                   onClick={handleStartPractice}
-                  className="px-8 py-3.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-black shadow-lg shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95"
+                  className="px-8 py-3.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs font-black shadow-lg shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95"
                 >
                   Start Practice Test (5 Mins) →
                 </button>
@@ -239,7 +239,7 @@ export const PreparationHubPage = ({ onNavigatePublic, onOpenRegister }) => {
               </div>
               <button
                 onClick={() => setActiveMode('result')}
-                className="px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white text-xs font-black rounded-xl shadow-sm cursor-pointer"
+                className="px-4 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white text-xs font-black rounded-xl shadow-sm cursor-pointer"
               >
                 Submit Test
               </button>
@@ -335,7 +335,7 @@ export const PreparationHubPage = ({ onNavigatePublic, onOpenRegister }) => {
                     {currentQIndex < PRACTICE_QUESTIONS_POOL.length - 1 ? (
                       <button
                         onClick={() => setCurrentQIndex((prev) => prev + 1)}
-                        className="px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1 hover:bg-[#5c3158]"
+                        className="px-4 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1 hover:bg-[#5c3158]"
                       >
                         <span>Next</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -343,7 +343,7 @@ export const PreparationHubPage = ({ onNavigatePublic, onOpenRegister }) => {
                     ) : (
                       <button
                         onClick={() => setActiveMode('result')}
-                        className="px-5 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-xl text-xs font-black cursor-pointer hover:bg-[#c85e42]"
+                        className="px-5 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white rounded-xl text-xs font-black cursor-pointer hover:bg-[#c85e42]"
                       >
                         Submit Test
                       </button>
@@ -364,7 +364,7 @@ export const PreparationHubPage = ({ onNavigatePublic, onOpenRegister }) => {
                     const isCurrent = currentQIndex === idx;
 
                     let bgClass = 'bg-[#faf5fa] text-slate-600 border-[#edd6ed]';
-                    if (isAnswered) bgClass = 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white border-[#6d3a68]';
+                    if (isAnswered) bgClass = 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white border-[#6d3a68]';
                     if (isReview) bgClass = 'bg-[#e7b84b] text-[#321630] border-[#e7b84b] font-black';
 
                     return (
@@ -447,7 +447,7 @@ export const PreparationHubPage = ({ onNavigatePublic, onOpenRegister }) => {
                 </button>
                 <button
                   onClick={onOpenRegister}
-                  className="px-6 py-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-xl text-xs font-black shadow-md cursor-pointer"
+                  className="px-6 py-3 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white rounded-xl text-xs font-black shadow-md cursor-pointer"
                 >
                   Enroll for Official Olympiad →
                 </button>

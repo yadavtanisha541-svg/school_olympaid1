@@ -47,7 +47,7 @@ export const OlympiadsPage = ({ onNavigatePublic, onOpenRegister }) => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12 font-sans text-[#4e2a4a]">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] rounded-3xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] rounded-3xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden">
         <div className="max-w-2xl space-y-3 relative z-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e7b84b]/20 text-[#e7b84b] border border-[#e7b84b]/40 text-xs font-bold uppercase tracking-wider">
             <span>Official 2026 Examination Catalog</span>
@@ -71,7 +71,7 @@ export const OlympiadsPage = ({ onNavigatePublic, onOpenRegister }) => {
               onClick={() => setSelectedSubject('all')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
                 selectedSubject === 'all'
-                  ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
+                  ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-xs'
                   : 'bg-[#faf5fa] text-[#5c3158] hover:bg-[#edd6ed]'
               }`}
             >
@@ -84,7 +84,7 @@ export const OlympiadsPage = ({ onNavigatePublic, onOpenRegister }) => {
                 onClick={() => setSelectedSubject(c.id)}
                 className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer shrink-0 ${
                   selectedSubject === c.id
-                    ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
+                    ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-xs'
                     : 'bg-[#faf5fa] text-[#5c3158] hover:bg-[#edd6ed]'
                 }`}
               >

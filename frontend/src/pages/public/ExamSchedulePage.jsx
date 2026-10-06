@@ -48,7 +48,7 @@ export const ExamSchedulePage = ({ selectedDisciplineId = 'all', onNavigatePubli
             onClick={() => setSelectedDiscipline('all')}
             className={`px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap cursor-pointer ${
               selectedDiscipline === 'all'
-                ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
+                ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-xs'
                 : 'text-slate-600 hover:bg-[#faf5fa] hover:text-[#6d3a68]'
             }`}
           >
@@ -61,7 +61,7 @@ export const ExamSchedulePage = ({ selectedDisciplineId = 'all', onNavigatePubli
               onClick={() => setSelectedDiscipline(cat.id)}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                 selectedDiscipline === cat.id
-                  ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
+                  ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-xs'
                   : 'text-slate-600 hover:bg-[#faf5fa] hover:text-[#6d3a68]'
               }`}
             >
@@ -94,13 +94,13 @@ export const ExamSchedulePage = ({ selectedDisciplineId = 'all', onNavigatePubli
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setSelectedSlotModal(cat)}
-                    className="px-5 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                    className="px-5 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
                   >
                     Select Exam Slot
                   </button>
                   <button
                     onClick={onOpenRegister}
-                    className="px-5 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-extrabold transition-all shadow-md shadow-[#d9775b]/20 cursor-pointer whitespace-nowrap"
+                    className="px-5 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-extrabold transition-all shadow-md shadow-[#d9775b]/20 cursor-pointer whitespace-nowrap"
                   >
                     Register Student →
                   </button>
@@ -205,7 +205,7 @@ export const ExamSchedulePage = ({ selectedDisciplineId = 'all', onNavigatePubli
                   setSelectedSlotModal(null);
                   onOpenRegister();
                 }}
-                className="flex-1 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
+                className="flex-1 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
               >
                 Confirm &amp; Register
               </button>

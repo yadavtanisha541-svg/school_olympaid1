@@ -33,7 +33,7 @@ export const ExamPatternPage = ({ onNavigatePublic, onOpenRegister }) => {
               onClick={() => setSelectedCatId(cat.id)}
               className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                 selectedCatId === cat.id
-                  ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-md shadow-[#6d3a68]/20'
+                  ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-md shadow-[#6d3a68]/20'
                   : 'bg-[#faf5fa] text-[#5c3158] hover:bg-[#f4ebf4]'
               }`}
             >
@@ -98,7 +98,7 @@ export const ExamPatternPage = ({ onNavigatePublic, onOpenRegister }) => {
             </div>
             <button
               onClick={onOpenRegister}
-              className="px-5 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer whitespace-nowrap self-start sm:self-auto"
+              className="px-5 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer whitespace-nowrap self-start sm:self-auto"
             >
               Enroll for This Exam →
             </button>

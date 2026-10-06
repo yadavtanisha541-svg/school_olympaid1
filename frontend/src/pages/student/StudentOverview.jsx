@@ -791,7 +791,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           <button
             type="button"
             onClick={() => onNavigateTab && onNavigateTab('my_content')}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] px-4 py-2 rounded-xl transition-all shadow-md shadow-indigo-950/20 cursor-pointer active:scale-95"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] px-4 py-2 rounded-xl transition-all shadow-md shadow-indigo-950/20 cursor-pointer active:scale-95"
           >
             <span>View All Subject Covers</span>
             <ChevronRight className="w-4 h-4" />
@@ -912,7 +912,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           <button
             type="button"
             onClick={() => onNavigateTab('my_classes')}
-            className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-lg shadow-indigo-950/40 active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-white/20"
+            className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-lg shadow-indigo-950/40 active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-white/20"
           >
             <span>ENROLL NOW</span>
             <ArrowRight className="w-4 h-4" />
@@ -946,7 +946,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           <button
             type="button"
             onClick={() => onNavigateTab('test_generator')}
-            className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-lg shadow-blue-950/40 active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-white/20"
+            className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-lg shadow-blue-950/40 active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-white/20"
           >
             <span>TRY NOW</span>
             <ArrowRight className="w-4 h-4" />
@@ -980,7 +980,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             <button
               type="button"
               onClick={() => onNavigateTab('free_quizzes')}
-              className="px-4 py-1.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-white/20"
+              className="px-4 py-1.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-white/20"
             >
               <span>Open</span>
               <ArrowRight className="w-3 h-3" />
@@ -1006,7 +1006,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             <button
               type="button"
               onClick={() => onNavigateTab('free_sample_papers')}
-              className="px-4 py-1.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-white/20"
+              className="px-4 py-1.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-white/20"
             >
               <span>Open</span>
               <ArrowRight className="w-3 h-3" />
@@ -1032,7 +1032,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             <button
               type="button"
               onClick={() => onNavigateTab('free_past_papers')}
-              className="px-4 py-1.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-white/20"
+              className="px-4 py-1.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-full text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-white/20"
             >
               <span>Open</span>
               <ArrowRight className="w-3 h-3" />
@@ -1227,7 +1227,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
 
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-2.5">
-                              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-md">
+                              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-md">
                                 {r.student_name ? r.student_name.charAt(0).toUpperCase() : 'S'}
                               </div>
                               <div className="min-w-0">

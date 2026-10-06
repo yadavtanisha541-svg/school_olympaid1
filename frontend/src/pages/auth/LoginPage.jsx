@@ -158,7 +158,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 sm:h-12.5 mt-2 rounded-2xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white font-extrabold text-xs sm:text-sm shadow-md shadow-[#4e2a4a]/20 hover:shadow-lg hover:shadow-[#4e2a4a]/30 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full h-12 sm:h-12.5 mt-2 rounded-2xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-extrabold text-xs sm:text-sm shadow-md shadow-[#4e2a4a]/20 hover:shadow-lg hover:shadow-[#4e2a4a]/30 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
             >
               <span>{loading ? 'Authenticating...' : 'Sign In to Dashboard'}</span>
               {!loading && <ArrowRight className="w-4 h-4 text-[#e7b84b]" />}

@@ -65,7 +65,7 @@ export const PricingPage = ({ onNavigatePublic, onOpenRegister }) => {
 
           {/* Card 2: Multi-Olympiad Combo (Featured) */}
           <div className="bg-gradient-to-b from-[#FAF4E0] to-white rounded-3xl p-8 border-2 border-[#e7b84b] shadow-xl flex flex-col justify-between relative">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-md">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-md">
               Most Popular Combo (Save 20%)
             </div>
 
@@ -102,7 +102,7 @@ export const PricingPage = ({ onNavigatePublic, onOpenRegister }) => {
 
             <button
               onClick={onOpenRegister}
-              className="mt-8 w-full py-3.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-black shadow-lg shadow-[#d9775b]/30 transition-all cursor-pointer"
+              className="mt-8 w-full py-3.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs font-black shadow-lg shadow-[#d9775b]/30 transition-all cursor-pointer"
             >
               Enroll for Scholar Combo →
             </button>
@@ -141,7 +141,7 @@ export const PricingPage = ({ onNavigatePublic, onOpenRegister }) => {
 
             <button
               onClick={() => onNavigatePublic('schools')}
-              className="mt-8 w-full py-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-black transition-colors cursor-pointer"
+              className="mt-8 w-full py-3 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-xl text-xs font-black transition-colors cursor-pointer"
             >
               Register School Now
             </button>
