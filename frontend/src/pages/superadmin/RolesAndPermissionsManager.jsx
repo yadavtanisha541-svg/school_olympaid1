@@ -499,28 +499,28 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
 
   return (
     <div className="space-y-6 pb-20 font-sans">
-      {/* 1. Top Header Banner */}
-      <div className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl p-6 sm:p-8 text-white shadow-xl border-2 border-indigo-900/60 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
-        <div className="space-y-2 relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-pink-200 text-xs font-bold border border-white/20">
-            <ShieldCheck className="w-4 h-4 text-pink-300" />
+      {/* 1. Top Header (Clean Direct Background Header without Box Container) */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-1">
+        <div className="space-y-1.5">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 text-pink-700 text-xs font-bold border border-pink-200">
+            <ShieldCheck className="w-4 h-4 text-pink-600" />
             <span>Role-Based Access Control (RBAC) Studio</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
             Roles &amp; Permissions Matrix
           </h1>
-          <p className="text-xs sm:text-sm text-blue-100 font-medium leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
             Manage granular access capabilities strictly aligned with Super Admin and Student Panel sidebar modules.
           </p>
         </div>
 
-        <div className="flex items-center gap-3 relative z-10 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             type="button"
             onClick={() => setShowAddModal(true)}
-            className="px-4 py-2.5 rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-xs"
+            className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-pink-300" />
+            <Plus className="w-4 h-4 text-pink-600" />
             <span>Add Capability</span>
           </button>
 
@@ -528,7 +528,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
             type="button"
             disabled={isSaving}
             onClick={handleSavePermissions}
-            className={`px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer border border-white/20 ${
+            className={`px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer ${
               saveSuccess
                 ? 'bg-emerald-600 text-white'
                 : 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white'
