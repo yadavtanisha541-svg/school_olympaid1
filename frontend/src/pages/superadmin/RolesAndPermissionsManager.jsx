@@ -637,37 +637,39 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
 
       {/* 3. Permissions Matrix List */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <Key className="w-4 h-4 text-pink-500" />
-            <h3 className="text-sm font-black text-slate-900">
-              Capabilities Matrix: {activeRole === 'superadmin' ? 'Super Administrator (Sidebar Modules Control)' : 'Student / Candidate'}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 pb-3.5 border-b border-slate-100">
+          <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-pink-50 text-pink-600 border border-pink-200 flex items-center justify-center shrink-0">
+              <Key className="w-3.5 h-3.5" />
+            </div>
+            <h3 className="text-sm font-black text-slate-900 whitespace-nowrap">
+              Capabilities Matrix: <span className="text-purple-700">{activeRole === 'superadmin' ? 'Super Administrator' : 'Student / Candidate'}</span>
             </h3>
-            <span className="text-xs font-bold text-purple-700 bg-purple-50 px-3 py-0.5 rounded-full border border-purple-200">
-              {activeRole === 'superadmin' ? `${superAdminActiveCount} / ${superAdminCatalog.length} Modules Active` : `${studentActiveCount} / ${studentCatalog.length} Enabled`}
+            <span className="text-xs font-bold text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200 whitespace-nowrap shrink-0">
+              {activeRole === 'superadmin' ? `${superAdminActiveCount} / ${superAdminCatalog.length} Active` : `${studentActiveCount} / ${studentCatalog.length} Active`}
             </span>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap text-xs">
-            <span className="text-slate-400 font-semibold text-[11px]">Quick:</span>
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-nowrap">
+            <span className="text-slate-400 font-bold text-[11px] uppercase tracking-wider shrink-0 mr-1">Quick:</span>
             <button
               type="button"
               onClick={() => handleApplyPreset('default')}
-              className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer text-[11px]"
+              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer text-xs whitespace-nowrap shrink-0"
             >
               Default
             </button>
             <button
               type="button"
               onClick={() => handleApplyPreset('all')}
-              className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold border border-emerald-200 transition-colors cursor-pointer text-[11px]"
+              className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold border border-emerald-200 transition-colors cursor-pointer text-xs whitespace-nowrap shrink-0"
             >
               Enable All
             </button>
             <button
               type="button"
               onClick={() => handleApplyPreset('none')}
-              className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold border border-rose-200 transition-colors cursor-pointer text-[11px]"
+              className="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold border border-rose-200 transition-colors cursor-pointer text-xs whitespace-nowrap shrink-0"
             >
               Revoke All
             </button>
