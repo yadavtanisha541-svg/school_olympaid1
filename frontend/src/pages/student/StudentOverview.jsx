@@ -493,9 +493,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           <button
             type="button"
             onClick={() => setSelectedPaperForInstructions(null)}
-            className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#859900] px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-indigo-600 px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 text-indigo-600" />
             <span>← Back to Mock Tests List</span>
           </button>
           <span className="text-xs font-bold text-slate-400">Pre-Examination Verification</span>
@@ -506,10 +506,10 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 pb-6 border-b border-slate-100">
             <div>
               <div className="flex items-center gap-2.5 mb-2">
-                <span className="text-[10px] font-bold text-[#859900] bg-[#859900]/10 px-2.5 py-0.5 rounded-full border border-[#859900]/30 uppercase tracking-wider">
+                <span className="text-[10px] font-black text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full border border-indigo-200 uppercase tracking-wider">
                   {paper.subject_code || 'OLYMPIAD'}
                 </span>
-                <span className="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                <span className="font-mono text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-md">
                   {paper.short_code || paper.subject_code}
                 </span>
               </div>
@@ -522,7 +522,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             </div>
 
             <div className="shrink-0 text-left sm:text-right">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 Live Mock Test Ready
               </span>
@@ -539,7 +539,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
 
             <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-100">
               <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Questions</span>
-              <h4 className="text-lg font-black text-[#859900] mt-1">{paper.questions?.length || 5} MCQs</h4>
+              <h4 className="text-lg font-black text-indigo-600 mt-1">{paper.questions?.length || 5} MCQs</h4>
               <p className="text-[10px] text-slate-400 mt-0.5">Single correct</p>
             </div>
 
@@ -571,19 +571,19 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
 
           <div className="space-y-2.5 text-xs text-slate-600 bg-slate-50/80 p-4 rounded-2xl border border-slate-100">
             <p className="flex items-start gap-2">
-              <span className="font-bold text-[#859900]">1.</span>
+              <span className="font-bold text-indigo-600">1.</span>
               <span>The timer will begin immediately when you click <strong>Start Mock Test Now</strong>.</span>
             </p>
             <p className="flex items-start gap-2">
-              <span className="font-bold text-[#859900]">2.</span>
+              <span className="font-bold text-indigo-600">2.</span>
               <span>Each correct answer awards 1 mark. There is no negative marking for unattempted questions.</span>
             </p>
             <p className="flex items-start gap-2">
-              <span className="font-bold text-[#859900]">3.</span>
+              <span className="font-bold text-indigo-600">3.</span>
               <span>You can mark questions for review and navigate freely between questions.</span>
             </p>
             <p className="flex items-start gap-2">
-              <span className="font-bold text-[#859900]">4.</span>
+              <span className="font-bold text-indigo-600">4.</span>
               <span>Upon submission, your score, accuracy %, percentile rank, and detailed answers will be generated instantly.</span>
             </p>
           </div>
@@ -594,7 +594,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               id="agreeCheck"
               checked={hasAgreedToRules}
               onChange={(e) => setHasAgreedToRules(e.target.checked)}
-              className="w-4 h-4 text-[#859900] rounded focus:ring-[#859900] cursor-pointer"
+              className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer"
             />
             <label htmlFor="agreeCheck" className="text-xs font-bold text-slate-700 cursor-pointer select-none">
               I have read and understood all the mock test instructions.
@@ -607,7 +607,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           <button
             type="button"
             onClick={() => setSelectedPaperForInstructions(null)}
-            className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-all"
+            className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-all active:scale-95"
           >
             Cancel
           </button>
@@ -621,7 +621,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                 onStartExam(pId);
               }
             }}
-            className="px-7 py-3 rounded-2xl bg-[#859900] hover:bg-[#738400] text-white font-black text-xs sm:text-sm shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95 transition-all"
+            className="px-7 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white font-black text-xs sm:text-sm shadow-md hover:shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95 transition-all border border-indigo-600"
           >
             <Play className="w-4 h-4 fill-white" />
             <span>Start Mock Test Now →</span>

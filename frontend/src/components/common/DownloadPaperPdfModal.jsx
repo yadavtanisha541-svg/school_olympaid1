@@ -247,7 +247,7 @@ export const DownloadPaperPdfModal = ({
                 onClose();
                 onStartExamAfterDownload(paper.id);
               }}
-              className="px-4 py-2 rounded-xl bg-[#859900] hover:bg-[#738400] text-white font-bold text-xs cursor-pointer shadow-xs transition-all"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white font-bold text-xs cursor-pointer shadow-xs transition-all border border-indigo-600"
             >
               ✓ PDF Ready! Start Test Now →
             </button>
