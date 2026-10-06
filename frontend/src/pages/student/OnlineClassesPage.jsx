@@ -308,18 +308,18 @@ export const OnlineClassesPage = ({ onNavigateTab }) => {
       {/* ========================================================================= */}
       {activeSubTab === 'overview' && (
         <div className="space-y-8">
-          {/* FEATURED HERO BANNER (from Super Admin & Image 1) */}
+          {/* FEATURED HERO BANNER */}
           {heroBanner?.active && (
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#381636] via-[#5c2d58] to-[#7f3977] p-6 sm:p-8 text-white shadow-lg border border-[#e7b84b]/30">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] p-6 sm:p-8 text-white shadow-xl border-2 border-indigo-400/40">
               <div className="relative z-10 max-w-2xl space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f5b82e] text-[#321630] font-black text-[11px] uppercase tracking-wider shadow-xs">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-pink-200 font-black text-[11px] uppercase tracking-wider shadow-xs border border-white/20">
                   <Sparkles className="w-3.5 h-3.5 fill-current" />
                   <span>{heroBanner.badge || 'FEATURED'}</span>
                 </div>
                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white leading-tight drop-shadow-xs">
                   {heroBanner.title}
                 </h2>
-                <p className="text-xs sm:text-sm text-pink-100 font-medium leading-relaxed">
+                <p className="text-xs sm:text-sm text-blue-100 font-medium leading-relaxed">
                   {heroBanner.subtitle}
                 </p>
                 <div className="pt-2 flex flex-wrap items-center gap-3">
@@ -329,7 +329,7 @@ export const OnlineClassesPage = ({ onNavigateTab }) => {
                       setActiveSubTab('self_paced_details');
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="px-6 py-3 bg-[#f5b82e] hover:bg-[#e2a823] text-slate-950 font-black rounded-2xl text-xs sm:text-sm shadow-md transition-all transform active:scale-95 cursor-pointer flex items-center gap-2"
+                    className="px-6 py-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white font-black rounded-2xl text-xs sm:text-sm shadow-md transition-all transform active:scale-95 cursor-pointer flex items-center gap-2 border border-white/20"
                   >
                     <span>{heroBanner.btnText || 'ENROLL NOW →'}</span>
                   </button>

@@ -1068,35 +1068,35 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               id: 'prog_rsdp',
               title: 'Reasoning Skill Development',
               subtitle: 'Build a strong foundation with essential skills.',
-              gradient: 'from-[#1e3a8a] via-[#5b21b6] to-[#9d174d]',
+              gradient: 'from-[#1e1b4b] via-[#311042] to-[#831843]',
               icon: Brain
             },
             {
               id: 'prog_gksdp',
               title: 'GK Skill Development',
               subtitle: 'Improve your general knowledge and current affairs.',
-              gradient: 'from-[#16327a] via-[#122459] to-[#0c183d]',
+              gradient: 'from-[#0f172a] via-[#1e1b4b] to-[#4c0519]',
               icon: Globe
             },
             {
               id: 'prog_msdp',
               title: 'Maths Skill Development',
               subtitle: 'Sharpen your math skills with practice and theory.',
-              gradient: 'from-[#6242b5] via-[#4d2f9e] to-[#241a4a]',
+              gradient: 'from-[#2e1065] via-[#4a044e] to-[#831843]',
               isMath: true
             },
             {
               id: 'prog_esdp',
               title: 'English Skill Development',
               subtitle: 'Enhance your communication and language skills.',
-              gradient: 'from-[#1e3a8a] via-[#172b69] to-[#101e48]',
+              gradient: 'from-[#172554] via-[#1e1b4b] to-[#701a75]',
               isLang: true
             },
             {
               id: 'prog_ssdp',
               title: 'Science Skill Development',
               subtitle: 'Explore science concepts with easy learning.',
-              gradient: 'from-[#1e3a8a] via-[#5b21b6] to-[#9d174d]',
+              gradient: 'from-[#1e1b4b] via-[#3b0764] to-[#9d174d]',
               icon: Rocket
             }
           ].map((prog) => {
@@ -1105,7 +1105,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               <div
                 key={prog.id}
                 onClick={() => onNavigateTab(prog.id)}
-                className={`rounded-3xl p-5 flex flex-col justify-between text-white shadow-lg hover:shadow-2xl transition-all duration-200 transform hover:-translate-y-1 min-h-[210px] relative overflow-hidden bg-gradient-to-b ${prog.gradient} cursor-pointer group border border-white/10`}
+                className={`rounded-3xl p-5 flex flex-col justify-between text-white shadow-xl hover:shadow-2xl transition-all duration-200 transform hover:-translate-y-1.5 min-h-[220px] relative overflow-hidden bg-gradient-to-b ${prog.gradient} cursor-pointer group border-2 border-indigo-900/60 hover:border-pink-400`}
               >
                 {/* Frosted subtle geometric glow */}
                 <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none" />
@@ -1143,7 +1143,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                       e.stopPropagation();
                       onNavigateTab(prog.id);
                     }}
-                    className="w-full py-2 px-3 bg-white/25 hover:bg-white/35 text-white rounded-full text-xs font-bold transition-all backdrop-blur-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-2xs"
+                    className="w-full py-2.5 px-3 bg-gradient-to-r from-[#2563eb]/60 via-[#7c3aed]/70 to-[#db2777]/80 hover:from-[#2563eb] hover:via-[#7c3aed] hover:to-[#db2777] text-white rounded-full text-xs font-bold transition-all backdrop-blur-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-md border border-white/20"
                   >
                     <span>Start Learning</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -1170,28 +1170,28 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </p>
         </div>
 
-        {/* LIVE STUDENTS RESULTS TABLE (Dark Box) */}
+        {/* LIVE STUDENTS RESULTS TABLE (Mixed Gradient Dark Box) */}
         <div className="space-y-3">
-          <div className="bg-[#121c3b] rounded-3xl border border-[#2a3a68] shadow-xl overflow-hidden text-white">
+          <div className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 shadow-xl overflow-hidden text-white">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-[#1a2850] border-b border-[#2a3a68] text-purple-200 text-[10px] uppercase font-bold tracking-wider">
+                <thead className="bg-[#1e1b4b]/90 border-b border-indigo-900/60 text-pink-200 text-[10px] uppercase font-bold tracking-wider">
                   <tr>
-                    <th className="py-3 px-3 w-10 text-center">#</th>
-                    <th className="py-3 px-4">Student</th>
-                    <th className="py-3 px-3">Class</th>
-                    <th className="py-3 px-4">Test Title &amp; Subject</th>
-                    <th className="py-3 px-4">School</th>
-                    <th className="py-3 px-4">Percentage</th>
-                    <th className="py-3 px-4 text-right">Status</th>
+                    <th className="py-3.5 px-3 w-10 text-center">#</th>
+                    <th className="py-3.5 px-4">Student</th>
+                    <th className="py-3.5 px-3">Class</th>
+                    <th className="py-3.5 px-4">Test Title &amp; Subject</th>
+                    <th className="py-3.5 px-4">School</th>
+                    <th className="py-3.5 px-4">Percentage</th>
+                    <th className="py-3.5 px-4 text-right">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#1f2c52] font-medium text-slate-200">
+                <tbody className="divide-y divide-indigo-950/60 font-medium text-slate-200">
                   {resultsLoading ? (
                     <tr>
                       <td colSpan={7} className="py-10 text-center text-slate-400">
                         <div className="flex items-center justify-center gap-2">
-                          <RotateCcw className="w-4 h-4 animate-spin text-purple-400" />
+                          <RotateCcw className="w-4 h-4 animate-spin text-pink-400" />
                           <span>Loading live student exam results...</span>
                         </div>
                       </td>
@@ -1217,8 +1217,8 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                       return (
                         <tr
                           key={r.id || idx}
-                          className={`hover:bg-[#1b2852]/80 transition-colors ${
-                            isMyRecord ? 'bg-purple-950/40 font-semibold' : ''
+                          className={`hover:bg-purple-950/40 transition-colors ${
+                            isMyRecord ? 'bg-purple-950/60 font-semibold' : ''
                           }`}
                         >
                           <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-400 text-xs">
