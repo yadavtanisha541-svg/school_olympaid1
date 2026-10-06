@@ -614,26 +614,26 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
                         }`}
                       >
                         <span
-                          className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs shrink-0 transition-colors ${
+                          className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs shrink-0 transition-all ${
                             optKey === 'A'
                               ? active
-                                ? 'bg-red-600 text-white shadow-xs border border-red-700'
-                                : 'bg-red-100 text-red-700 border border-red-300'
+                                ? 'bg-red-100 border-2 border-red-400 text-red-700 ring-2 ring-red-200 shadow-xs'
+                                : 'bg-red-50 border border-red-200 text-red-700 hover:bg-red-100'
                               : optKey === 'B'
                               ? active
-                                ? 'bg-emerald-600 text-white shadow-xs border border-emerald-700'
-                                : 'bg-emerald-100 text-emerald-700 border border-emerald-300'
+                                ? 'bg-emerald-100 border-2 border-emerald-400 text-emerald-700 ring-2 ring-emerald-200 shadow-xs'
+                                : 'bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100'
                               : optKey === 'C'
                               ? active
-                                ? 'bg-amber-500 text-white shadow-xs border border-amber-600'
-                                : 'bg-amber-100 text-amber-800 border border-amber-300'
+                                ? 'bg-amber-100 border-2 border-amber-400 text-amber-800 ring-2 ring-amber-200 shadow-xs'
+                                : 'bg-amber-50 border border-amber-200 text-amber-800 hover:bg-amber-100'
                               : optKey === 'D'
                               ? active
-                                ? 'bg-orange-500 text-white shadow-xs border border-orange-600'
-                                : 'bg-orange-100 text-orange-700 border border-orange-300'
+                                ? 'bg-orange-100 border-2 border-orange-400 text-orange-800 ring-2 ring-orange-200 shadow-xs'
+                                : 'bg-orange-50 border border-orange-200 text-orange-800 hover:bg-orange-100'
                               : active
-                              ? 'bg-brand-600 text-white'
-                              : 'bg-slate-100 text-slate-600 border border-slate-200'
+                              ? 'bg-brand-50 border-2 border-brand-400 text-brand-700'
+                              : 'bg-slate-50 text-slate-700 border border-slate-200'
                           }`}
                         >
                           {optKey}

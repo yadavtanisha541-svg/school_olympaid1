@@ -521,20 +521,20 @@ export const DetailedSolutionsPage = ({
                       >
                         <div className="flex items-center gap-3">
                           <span
-                            className={`w-7 h-7 rounded-xl font-black flex items-center justify-center text-xs shrink-0 ${
+                            className={`w-7 h-7 rounded-xl font-black flex items-center justify-center text-xs shrink-0 transition-all ${
                               isThisCorrect
-                                ? 'bg-emerald-600 text-white shadow-xs'
+                                ? 'bg-emerald-100 border-2 border-emerald-400 text-emerald-800 ring-2 ring-emerald-200 shadow-xs'
                                 : isUserPick
-                                ? 'bg-rose-600 text-white shadow-xs'
+                                ? 'bg-rose-100 border-2 border-rose-400 text-rose-800 ring-2 ring-rose-200 shadow-xs'
                                 : opt === 'A'
-                                ? 'bg-red-100 text-red-700 border border-red-300'
+                                ? 'bg-red-50 border border-red-200 text-red-700'
                                 : opt === 'B'
-                                ? 'bg-emerald-100 text-emerald-700 border border-emerald-300'
+                                ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
                                 : opt === 'C'
-                                ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                                ? 'bg-amber-50 border border-amber-200 text-amber-800'
                                 : opt === 'D'
-                                ? 'bg-orange-100 text-orange-700 border border-orange-300'
-                                : 'bg-white text-slate-700 border border-slate-300'
+                                ? 'bg-orange-50 border border-orange-200 text-orange-800'
+                                : 'bg-slate-50 text-slate-700 border border-slate-200'
                             }`}
                           >
                             {opt}

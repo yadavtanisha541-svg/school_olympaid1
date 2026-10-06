@@ -681,25 +681,25 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
                     >
                       <div className="flex items-center gap-3.5 min-w-0">
                         <span
-                          className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs transition-colors shrink-0 ${
+                          className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs transition-all shrink-0 ${
                             optionLabel === 'A'
                               ? isSelected
-                                ? 'bg-red-600 text-white shadow-xs border border-red-700'
-                                : 'bg-red-100 text-red-700 border border-red-300'
+                                ? 'bg-red-100 border-2 border-red-400 text-red-700 ring-2 ring-red-200 shadow-xs'
+                                : 'bg-red-50 border border-red-200 text-red-700 hover:bg-red-100'
                               : optionLabel === 'B'
                               ? isSelected
-                                ? 'bg-emerald-600 text-white shadow-xs border border-emerald-700'
-                                : 'bg-emerald-100 text-emerald-700 border border-emerald-300'
+                                ? 'bg-emerald-100 border-2 border-emerald-400 text-emerald-700 ring-2 ring-emerald-200 shadow-xs'
+                                : 'bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100'
                               : optionLabel === 'C'
                               ? isSelected
-                                ? 'bg-amber-500 text-white shadow-xs border border-amber-600'
-                                : 'bg-amber-100 text-amber-800 border border-amber-300'
+                                ? 'bg-amber-100 border-2 border-amber-400 text-amber-800 ring-2 ring-amber-200 shadow-xs'
+                                : 'bg-amber-50 border border-amber-200 text-amber-800 hover:bg-amber-100'
                               : optionLabel === 'D'
                               ? isSelected
-                                ? 'bg-orange-500 text-white shadow-xs border border-orange-600'
-                                : 'bg-orange-100 text-orange-700 border border-orange-300'
+                                ? 'bg-orange-100 border-2 border-orange-400 text-orange-800 ring-2 ring-orange-200 shadow-xs'
+                                : 'bg-orange-50 border border-orange-200 text-orange-800 hover:bg-orange-100'
                               : isSelected
-                              ? 'bg-[#6d3a68] text-white shadow-xs'
+                              ? 'bg-[#6d3a68]/20 text-[#6d3a68]'
                               : 'bg-[#faf5fa] text-slate-600 group-hover:bg-[#f4ebf4] group-hover:text-[#6d3a68]'
                           }`}
                         >
@@ -1120,7 +1120,17 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
                           className={`p-3 rounded-xl border text-xs flex items-center justify-between gap-2 ${optClass}`}
                         >
                           <div className="flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-md bg-slate-100 flex items-center justify-center font-bold text-[10px] text-slate-700 shrink-0">
+                            <span className={`w-5 h-5 rounded-md flex items-center justify-center font-black text-[10px] shrink-0 ${
+                              optIdx === 0
+                                ? 'bg-red-50 border border-red-200 text-red-700'
+                                : optIdx === 1
+                                ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+                                : optIdx === 2
+                                ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                                : optIdx === 3
+                                ? 'bg-orange-50 border border-orange-200 text-orange-800'
+                                : 'bg-slate-100 text-slate-700'
+                            }`}>
                               {String.fromCharCode(65 + optIdx)}
                             </span>
                             <span>{opt}</span>

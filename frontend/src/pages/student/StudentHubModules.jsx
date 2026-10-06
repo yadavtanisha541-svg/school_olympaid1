@@ -944,12 +944,20 @@ const StudentRevisionVaultModule = ({ user, onNavigateTab }) => {
                         >
                           <div className="flex items-center gap-2.5">
                             <span
-                              className={`w-6 h-6 rounded-lg font-bold flex items-center justify-center text-xs shrink-0 ${
+                              className={`w-6 h-6 rounded-lg font-black flex items-center justify-center text-xs shrink-0 transition-all ${
                                 isSelected && isCorrect
-                                  ? 'bg-emerald-600 text-white'
+                                  ? 'bg-emerald-100 border-2 border-emerald-400 text-emerald-800 ring-2 ring-emerald-200'
                                   : isSelected && !isCorrect
-                                  ? 'bg-rose-600 text-white'
-                                  : 'bg-slate-100 text-slate-700'
+                                  ? 'bg-rose-100 border-2 border-rose-400 text-rose-800 ring-2 ring-rose-200'
+                                  : letter === 'A'
+                                  ? 'bg-red-50 border border-red-200 text-red-700'
+                                  : letter === 'B'
+                                  ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+                                  : letter === 'C'
+                                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                                  : letter === 'D'
+                                  ? 'bg-orange-50 border border-orange-200 text-orange-800'
+                                  : 'bg-slate-50 text-slate-700 border border-slate-200'
                               }`}
                             >
                               {letter}
@@ -1292,23 +1300,23 @@ const StudentFreeQuizzesModule = ({ activeModule, user, onNavigateTab }) => {
                     }`}
                   >
                     <span className="leading-snug">{opt}</span>
-                    <span className={`w-6 h-6 rounded-lg shrink-0 flex items-center justify-center text-[11px] font-black ${
+                    <span className={`w-6 h-6 rounded-lg shrink-0 flex items-center justify-center text-[11px] font-black transition-all ${
                       optIdx === 0
                         ? isSelected
-                          ? 'bg-red-600 text-white shadow-xs'
-                          : 'bg-red-100 text-red-700 border border-red-300'
+                          ? 'bg-red-100 border-2 border-red-400 text-red-700 ring-2 ring-red-200'
+                          : 'bg-red-50 border border-red-200 text-red-700'
                         : optIdx === 1
                         ? isSelected
-                          ? 'bg-emerald-600 text-white shadow-xs'
-                          : 'bg-emerald-100 text-emerald-700 border border-emerald-300'
+                          ? 'bg-emerald-100 border-2 border-emerald-400 text-emerald-700 ring-2 ring-emerald-200'
+                          : 'bg-emerald-50 border border-emerald-200 text-emerald-700'
                         : optIdx === 2
                         ? isSelected
-                          ? 'bg-amber-500 text-white shadow-xs'
-                          : 'bg-amber-100 text-amber-800 border border-amber-300'
+                          ? 'bg-amber-100 border-2 border-amber-400 text-amber-800 ring-2 ring-amber-200'
+                          : 'bg-amber-50 border border-amber-200 text-amber-800'
                         : optIdx === 3
                         ? isSelected
-                          ? 'bg-orange-500 text-white shadow-xs'
-                          : 'bg-orange-100 text-orange-700 border border-orange-300'
+                          ? 'bg-orange-100 border-2 border-orange-400 text-orange-800 ring-2 ring-orange-200'
+                          : 'bg-orange-50 border border-orange-200 text-orange-800'
                         : isSelected
                         ? 'bg-[#e7b84b] text-[#321630]'
                         : 'border border-slate-300 text-slate-500'

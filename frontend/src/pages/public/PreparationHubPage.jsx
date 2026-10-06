@@ -269,8 +269,26 @@ export const PreparationHubPage = ({ onNavigatePublic, onOpenRegister }) => {
                         }`}
                       >
                         <span
-                          className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black shrink-0 ${
-                            isSelected ? 'bg-[#6d3a68] text-white' : 'bg-white border border-[#edd6ed] text-slate-500'
+                          className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black shrink-0 transition-all ${
+                            oIdx === 0
+                              ? isSelected
+                                ? 'bg-red-100 border-2 border-red-400 text-red-700 ring-2 ring-red-200'
+                                : 'bg-red-50 border border-red-200 text-red-700'
+                              : oIdx === 1
+                              ? isSelected
+                                ? 'bg-emerald-100 border-2 border-emerald-400 text-emerald-700 ring-2 ring-emerald-200'
+                                : 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+                              : oIdx === 2
+                              ? isSelected
+                                ? 'bg-amber-100 border-2 border-amber-400 text-amber-800 ring-2 ring-amber-200'
+                                : 'bg-amber-50 border border-amber-200 text-amber-800'
+                              : oIdx === 3
+                              ? isSelected
+                                ? 'bg-orange-100 border-2 border-orange-400 text-orange-800 ring-2 ring-orange-200'
+                                : 'bg-orange-50 border border-orange-200 text-orange-800'
+                              : isSelected
+                              ? 'bg-[#6d3a68]/20 text-[#6d3a68]'
+                              : 'bg-white border border-[#edd6ed] text-slate-500'
                           }`}
                         >
                           {String.fromCharCode(65 + oIdx)}

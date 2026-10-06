@@ -1342,7 +1342,19 @@ export const TestGeneratorAdminManager = () => {
                         }`}
                       >
                         <div className="flex items-center gap-2">
-                          <span className="font-bold">{String.fromCharCode(65 + optIdx)}.</span>
+                          <span className={`w-5 h-5 rounded-md flex items-center justify-center font-black text-[10px] shrink-0 ${
+                            optIdx === 0
+                              ? 'bg-red-50 border border-red-200 text-red-700'
+                              : optIdx === 1
+                              ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+                              : optIdx === 2
+                              ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                              : optIdx === 3
+                              ? 'bg-orange-50 border border-orange-200 text-orange-800'
+                              : 'bg-slate-100 text-slate-700'
+                          }`}>
+                            {String.fromCharCode(65 + optIdx)}
+                          </span>
                           <span>{opt}</span>
                         </div>
                         {q.correct === optIdx && <span className="text-emerald-600 font-black">✓ Correct</span>}

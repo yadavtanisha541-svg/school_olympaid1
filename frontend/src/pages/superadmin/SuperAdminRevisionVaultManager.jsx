@@ -505,18 +505,18 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
                         >
                           <div className="flex items-center gap-2">
                             <span
-                              className={`w-5 h-5 rounded-md font-bold flex items-center justify-center text-[10px] ${
+                              className={`w-5 h-5 rounded-md font-black flex items-center justify-center text-[10px] transition-all ${
                                 isCorrect
-                                  ? 'bg-emerald-600 text-white'
+                                  ? 'bg-emerald-100 border-2 border-emerald-400 text-emerald-800'
                                   : letter === 'A'
-                                  ? 'bg-red-100 text-red-700 border border-red-300'
+                                  ? 'bg-red-50 border border-red-200 text-red-700'
                                   : letter === 'B'
-                                  ? 'bg-emerald-100 text-emerald-700 border border-emerald-300'
+                                  ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
                                   : letter === 'C'
-                                  ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
                                   : letter === 'D'
-                                  ? 'bg-orange-100 text-orange-700 border border-orange-300'
-                                  : 'bg-slate-100 text-slate-600'
+                                  ? 'bg-orange-50 border border-orange-200 text-orange-800'
+                                  : 'bg-slate-50 text-slate-700 border border-slate-200'
                               }`}
                             >
                               {letter}

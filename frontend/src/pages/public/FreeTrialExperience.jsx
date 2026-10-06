@@ -1145,25 +1145,25 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
                           : 'bg-white border-[#edd6ed] text-slate-800 hover:bg-[#faf5fa]'
                       }`}
                     >
-                      <div className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-black shrink-0 ${
+                      <div className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-black shrink-0 transition-all ${
                         optIdx === 0
                           ? isSelected
-                            ? 'bg-red-600 text-white shadow-xs'
-                            : 'bg-red-100 text-red-700 border border-red-300'
+                            ? 'bg-red-100 border-2 border-red-400 text-red-700 ring-2 ring-red-200'
+                            : 'bg-red-50 border border-red-200 text-red-700'
                           : optIdx === 1
                           ? isSelected
-                            ? 'bg-emerald-600 text-white shadow-xs'
-                            : 'bg-emerald-100 text-emerald-700 border border-emerald-300'
+                            ? 'bg-emerald-100 border-2 border-emerald-400 text-emerald-700 ring-2 ring-emerald-200'
+                            : 'bg-emerald-50 border border-emerald-200 text-emerald-700'
                           : optIdx === 2
                           ? isSelected
-                            ? 'bg-amber-500 text-white shadow-xs'
-                            : 'bg-amber-100 text-amber-800 border border-amber-300'
+                            ? 'bg-amber-100 border-2 border-amber-400 text-amber-800 ring-2 ring-amber-200'
+                            : 'bg-amber-50 border border-amber-200 text-amber-800'
                           : optIdx === 3
                           ? isSelected
-                            ? 'bg-orange-500 text-white shadow-xs'
-                            : 'bg-orange-100 text-orange-700 border border-orange-300'
+                            ? 'bg-orange-100 border-2 border-orange-400 text-orange-800 ring-2 ring-orange-200'
+                            : 'bg-orange-50 border border-orange-200 text-orange-800'
                           : isSelected
-                          ? 'bg-[#6d3a68] text-white'
+                          ? 'bg-[#6d3a68]/20 text-[#6d3a68]'
                           : 'border border-slate-300 bg-white text-slate-600'
                       }`}>
                         {String.fromCharCode(65 + optIdx)}
@@ -1495,7 +1495,19 @@ export const FreeTrialExperience = ({ onNavigatePublic, onOpenLogin, onOpenRegis
 
                         return (
                           <div key={oIdx} className={`p-2 rounded-xs border flex items-center gap-2 ${optBg}`}>
-                            <span className="font-bold">{String.fromCharCode(65 + oIdx)}.</span>
+                            <span className={`w-5 h-5 rounded-md flex items-center justify-center font-black text-[10px] shrink-0 ${
+                              oIdx === 0
+                                ? 'bg-red-50 border border-red-200 text-red-700'
+                                : oIdx === 1
+                                ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+                                : oIdx === 2
+                                ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                                : oIdx === 3
+                                ? 'bg-orange-50 border border-orange-200 text-orange-800'
+                                : 'bg-slate-100 text-slate-700'
+                            }`}>
+                              {String.fromCharCode(65 + oIdx)}
+                            </span>
                             <span>{opt}</span>
                             {isRightChoice && <Check className="w-3.5 h-3.5 ml-auto text-emerald-600" />}
                           </div>
