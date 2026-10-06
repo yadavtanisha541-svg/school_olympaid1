@@ -54,105 +54,231 @@ const initialStore = {
   free_quizzes: [
     {
       id: 1,
-      title: 'Number Systems & Roman Numerals Sprint',
-      subject: 'Mathematics',
+      class_name: 'All',
+      subject: 'Mathematics (IMO)',
       subject_code: 'IMO',
-      class: 'Class 6',
-      class_name: 'Class 6',
-      duration_minutes: 5,
-      total_marks: 5,
-      questions_count: 5,
-      status: 'published',
-      description: 'Quick daily 5-minute mathematics Olympiad quiz focusing on roman numerals and large number estimation.',
-      questions: [
-        {
-          id: 1,
-          q: 'What is the value of Roman numeral CLXVIII in standard Hindu-Arabic numeral system?',
-          options: ['168', '148', '178', '158'],
-          correct: 0,
-          marks: 1,
-          hint: 'C = 100, L = 50, X = 10, VIII = 8',
-          explanation: 'C (100) + L (50) + X (10) + V (5) + III (3) = 168.'
-        },
-        {
-          id: 2,
-          q: 'The smallest 6-digit natural number formed using digits 4, 0, 3, 7, 1, 9 without repetition is:',
-          options: ['103479', '013479', '130479', '103497'],
-          correct: 0,
-          marks: 1,
-          hint: 'First digit cannot be zero.',
-          explanation: 'Arrange digits in ascending order placing the smallest non-zero digit first: 1, 0, 3, 4, 7, 9 = 103479.'
-        },
-        {
-          id: 3,
-          q: 'Find the greatest common divisor (HCF) of 84 and 126.',
-          options: ['42', '21', '14', '28'],
-          correct: 0,
-          marks: 1,
-          hint: '84 = 42 x 2, 126 = 42 x 3',
-          explanation: '84 = 2^2 x 3 x 7, 126 = 2 x 3^2 x 7. HCF = 2 x 3 x 7 = 42.'
-        },
-        {
-          id: 4,
-          q: 'A prime number is always:',
-          options: ['An integer with exactly two distinct positive divisors', 'An odd number', 'A positive number ending in 1, 3, 7 or 9', 'Divisible by 3'],
-          correct: 0,
-          marks: 1,
-          hint: 'Consider 2 as a prime number.',
-          explanation: 'A prime number is a natural number greater than 1 that has no positive divisors other than 1 and itself.'
-        },
-        {
-          id: 5,
-          q: 'If 3x + 7 = 28, find the value of 2x - 3.',
-          options: ['11', '7', '14', '9'],
-          correct: 0,
-          marks: 1,
-          hint: 'First solve for x.',
-          explanation: '3x = 21 => x = 7. Therefore 2(7) - 3 = 14 - 3 = 11.'
-        }
-      ]
+      question_text: 'Which geometric shape has 3 sides and the sum of its interior angles is always 180°?',
+      option_a: 'Square',
+      option_b: 'Triangle',
+      option_c: 'Hexagon',
+      option_d: 'Circle',
+      options: ['Square', 'Triangle', 'Hexagon', 'Circle'],
+      correct_option: 1,
+      correct: 1,
+      q: 'Which geometric shape has 3 sides and the sum of its interior angles is always 180°?',
+      hint: 'Think of equilateral, isosceles, and scalene shapes.',
+      explanation: 'A triangle always has 3 straight sides and interior angles adding up to 180°.',
+      difficulty: 'Foundation',
+      status: 'active'
     },
     {
       id: 2,
-      title: 'Plant Kingdom & Photosynthesis Quick Check',
-      subject: 'Science',
-      subject_code: 'NSO',
-      class: 'Class 6',
+      class_name: 'All',
+      subject: 'Mathematics (IMO)',
+      subject_code: 'IMO',
+      question_text: 'Complete the pattern: 2, 6, 12, 20, 30, ___ ?',
+      option_a: '38',
+      option_b: '40',
+      option_c: '42',
+      option_d: '44',
+      options: ['38', '40', '42', '44'],
+      correct_option: 2,
+      correct: 2,
+      q: 'Complete the pattern: 2, 6, 12, 20, 30, ___ ?',
+      hint: 'Differences between consecutive terms are +4, +6, +8, +10, +12.',
+      explanation: '30 + 12 = 42. (Pattern is 1×2, 2×3, 3×4, 4×5, 5×6, 6×7 = 42).',
+      difficulty: 'Intermediate',
+      status: 'active'
+    },
+    {
+      id: 3,
+      class_name: 'Class 1',
+      subject: 'Mathematics (IMO)',
+      subject_code: 'IMO',
+      question_text: 'What is the sum of 14 + 18?',
+      option_a: '28',
+      option_b: '32',
+      option_c: '30',
+      option_d: '34',
+      options: ['28', '32', '30', '34'],
+      correct_option: 1,
+      correct: 1,
+      q: 'What is the sum of 14 + 18?',
+      hint: '14 + 18 = (14 + 10) + 8 = 24 + 8.',
+      explanation: '14 + 18 = 32.',
+      difficulty: 'Foundation',
+      status: 'active'
+    },
+    {
+      id: 4,
       class_name: 'Class 6',
-      duration_minutes: 5,
-      total_marks: 5,
-      questions_count: 5,
-      status: 'published',
-      description: 'Test your understanding of autotrophic nutrition, stomata function, and chlorophyll action.',
-      questions: [
-        {
-          id: 1,
-          q: 'Which gas is predominantly released by green plants during the process of photosynthesis?',
-          options: ['Oxygen', 'Carbon dioxide', 'Nitrogen', 'Methane'],
-          correct: 0,
-          marks: 1,
-          hint: 'Essential for human respiration.',
-          explanation: 'During photosynthesis in sunlight, plants convert CO2 and water into glucose and release O2 gas.'
-        },
-        {
-          id: 2,
-          q: 'The tiny pores present on the surface of leaves responsible for gaseous exchange are called:',
-          options: ['Stomata', 'Chloroplasts', 'Lenticels', 'Xylem'],
-          correct: 0,
-          marks: 1,
-          hint: 'Guarded by kidney-shaped guard cells.',
-          explanation: 'Stomata are microscopic apertures mainly present on leaf epidermises that regulate transpiration and gas diffusion.'
-        },
-        {
-          id: 3,
-          q: 'Which pigment gives green color to plant leaves and traps sunlight energy?',
-          options: ['Chlorophyll', 'Carotenoid', 'Anthocyanin', 'Hemoglobin'],
-          correct: 0,
-          marks: 1,
-          hint: 'Found inside chloroplasts.',
-          explanation: 'Chlorophyll absorbs blue and red wavelengths of light and reflects green light, giving plants their characteristic color.'
-        }
-      ]
+      subject: 'Mathematics (IMO)',
+      subject_code: 'IMO',
+      question_text: 'If a pizza is divided into 8 equal slices and Rohan ate 3 slices, what fraction remains?',
+      option_a: '3/8',
+      option_b: '5/8',
+      option_c: '1/2',
+      option_d: '1/4',
+      options: ['3/8', '5/8', '1/2', '1/4'],
+      correct_option: 1,
+      correct: 1,
+      q: 'If a pizza is divided into 8 equal slices and Rohan ate 3 slices, what fraction remains?',
+      hint: 'Total is 8/8. Subtract 3/8 from 8/8.',
+      explanation: '8/8 - 3/8 = 5/8 remaining.',
+      difficulty: 'Foundation',
+      status: 'active'
+    },
+    {
+      id: 5,
+      class_name: 'All',
+      subject: 'Science (NSO)',
+      subject_code: 'NSO',
+      question_text: 'Which planet is known as the "Red Planet" in our Solar System?',
+      option_a: 'Venus',
+      option_b: 'Mars',
+      option_c: 'Jupiter',
+      option_d: 'Mercury',
+      options: ['Venus', 'Mars', 'Jupiter', 'Mercury'],
+      correct_option: 1,
+      correct: 1,
+      q: 'Which planet is known as the "Red Planet" in our Solar System?',
+      hint: 'Its reddish appearance is due to iron oxide on its surface.',
+      explanation: 'Mars appears reddish because of extensive iron oxide across its soil and rocks.',
+      difficulty: 'Foundation',
+      status: 'active'
+    },
+    {
+      id: 6,
+      class_name: 'All',
+      subject: 'Science (NSO)',
+      subject_code: 'NSO',
+      question_text: 'Which process do green plants use to synthesize food using sunlight, water, and CO2?',
+      option_a: 'Respiration',
+      option_b: 'Photosynthesis',
+      option_c: 'Transpiration',
+      option_d: 'Germination',
+      options: ['Respiration', 'Photosynthesis', 'Transpiration', 'Germination'],
+      correct_option: 1,
+      correct: 1,
+      q: 'Which process do green plants use to synthesize food using sunlight, water, and CO2?',
+      hint: 'Chlorophyll captures light energy to produce glucose.',
+      explanation: 'Photosynthesis converts solar energy into chemical energy in green plant leaves.',
+      difficulty: 'Foundation',
+      status: 'active'
+    },
+    {
+      id: 7,
+      class_name: 'All',
+      subject: 'English (IEO)',
+      subject_code: 'IEO',
+      question_text: 'In English grammar, what is the superlative form of the adjective "GOOD"?',
+      option_a: 'Gooder',
+      option_b: 'Better',
+      option_c: 'Best',
+      option_d: 'Most Good',
+      options: ['Gooder', 'Better', 'Best', 'Most Good'],
+      correct_option: 2,
+      correct: 2,
+      q: 'In English grammar, what is the superlative form of the adjective "GOOD"?',
+      hint: 'Good -> Better -> Best.',
+      explanation: 'The degrees of comparison are: Good (positive), Better (comparative), Best (superlative).',
+      difficulty: 'Foundation',
+      status: 'active'
+    },
+    {
+      id: 8,
+      class_name: 'All',
+      subject: 'English (IEO)',
+      subject_code: 'IEO',
+      question_text: 'Choose the correctly spelled word:',
+      option_a: 'Accomodate',
+      option_b: 'Accommodate',
+      option_c: 'Acomodate',
+      option_d: 'Acommodate',
+      options: ['Accomodate', 'Accommodate', 'Acomodate', 'Acommodate'],
+      correct_option: 1,
+      correct: 1,
+      q: 'Choose the correctly spelled word:',
+      hint: 'It has double "c" and double "m".',
+      explanation: 'The correct spelling is ACCOMMODATE.',
+      difficulty: 'Foundation',
+      status: 'active'
+    },
+    {
+      id: 9,
+      class_name: 'All',
+      subject: 'Cyber & AI (ICSO)',
+      subject_code: 'ICSO',
+      question_text: 'Which component is considered the "Brain" of a computer?',
+      option_a: 'RAM',
+      option_b: 'Hard Drive',
+      option_c: 'CPU (Central Processing Unit)',
+      option_d: 'Monitor',
+      options: ['RAM', 'Hard Drive', 'CPU (Central Processing Unit)', 'Monitor'],
+      correct_option: 2,
+      correct: 2,
+      q: 'Which component is considered the "Brain" of a computer?',
+      hint: 'It executes program instructions and calculates data.',
+      explanation: 'The CPU (Central Processing Unit) performs instructions and operations.',
+      difficulty: 'Foundation',
+      status: 'active'
+    },
+    {
+      id: 10,
+      class_name: 'All',
+      subject: 'Cyber & AI (ICSO)',
+      subject_code: 'ICSO',
+      question_text: 'What does "WWW" stand for in website addresses?',
+      option_a: 'World Wide Web',
+      option_b: 'Wide World Web',
+      option_c: 'World Web Wide',
+      option_d: 'Web World Wide',
+      options: ['World Wide Web', 'Wide World Web', 'World Web Wide', 'Web World Wide'],
+      correct_option: 0,
+      correct: 0,
+      q: 'What does "WWW" stand for in website addresses?',
+      hint: 'Invented by Sir Tim Berners-Lee in 1989.',
+      explanation: 'WWW stands for World Wide Web.',
+      difficulty: 'Foundation',
+      status: 'active'
+    },
+    {
+      id: 11,
+      class_name: 'All',
+      subject: 'General Knowledge (IGKO)',
+      subject_code: 'IGKO',
+      question_text: 'Which is the largest ocean on Earth covering more than 30% of the planet surface?',
+      option_a: 'Atlantic Ocean',
+      option_b: 'Indian Ocean',
+      option_c: 'Pacific Ocean',
+      option_d: 'Arctic Ocean',
+      options: ['Atlantic Ocean', 'Indian Ocean', 'Pacific Ocean', 'Arctic Ocean'],
+      correct_option: 2,
+      correct: 2,
+      q: 'Which is the largest ocean on Earth covering more than 30% of the planet surface?',
+      hint: 'It contains the Mariana Trench, the deepest point on Earth.',
+      explanation: 'The Pacific Ocean is the largest and deepest of Earth\'s oceanic divisions.',
+      difficulty: 'Foundation',
+      status: 'active'
+    },
+    {
+      id: 12,
+      class_name: 'All',
+      subject: 'Reasoning (ISSO)',
+      subject_code: 'ISSO',
+      question_text: 'If DOCTOR is related to HOSPITAL, then TEACHER is related to:',
+      option_a: 'Court',
+      option_b: 'School',
+      option_c: 'Factory',
+      option_d: 'Hospital',
+      options: ['Court', 'School', 'Factory', 'Hospital'],
+      correct_option: 1,
+      correct: 1,
+      q: 'If DOCTOR is related to HOSPITAL, then TEACHER is related to:',
+      hint: 'Where does a teacher perform their primary profession?',
+      explanation: 'A doctor works in a hospital; similarly, a teacher works in a school.',
+      difficulty: 'Foundation',
+      status: 'active'
     }
   ],
   online_classes: [
@@ -532,41 +658,151 @@ export const mockEngine = {
     // FREE QUIZZES
     if (root === 'free-quizzes') {
       let quizzes = getDb('free_quizzes');
-      if (method === 'GET') {
-        return { success: true, data: quizzes };
+      if (!Array.isArray(quizzes) || quizzes.length === 0 || !quizzes[0].question_text) {
+        quizzes = initialStore.free_quizzes;
+        saveDb('free_quizzes', quizzes);
       }
+
+      if (method === 'GET') {
+        let filtered = [...quizzes];
+
+        // Normalize options & question_text
+        filtered = filtered.map((q) => {
+          const optA = q.option_a || q.options?.[0] || '';
+          const optB = q.option_b || q.options?.[1] || '';
+          const optC = q.option_c || q.options?.[2] || '';
+          const optD = q.option_d || q.options?.[3] || '';
+          const qText = q.question_text || q.q || q.title || '';
+          const corr = typeof q.correct_option === 'number' ? q.correct_option : (typeof q.correct === 'number' ? q.correct : 0);
+          return {
+            ...q,
+            question_text: qText,
+            q: qText,
+            option_a: optA,
+            option_b: optB,
+            option_c: optC,
+            option_d: optD,
+            options: q.options || [optA, optB, optC, optD],
+            correct_option: corr,
+            correct: corr
+          };
+        });
+
+        // Filter by Class
+        if (endpoint.includes('?')) {
+          const urlParams = new URLSearchParams(endpoint.split('?')[1]);
+          const classFilter = urlParams.get('class') || '';
+          const subjectFilter = urlParams.get('subject') || '';
+          const statusFilter = urlParams.get('status') || '';
+          const searchFilter = urlParams.get('search') || '';
+
+          if (classFilter && classFilter !== 'All') {
+            const numMatch = classFilter.match(/\d+/);
+            const cNum = numMatch ? numMatch[0] : '';
+            filtered = filtered.filter((q) => {
+              const qc = (q.class_name || q.class || '').toLowerCase();
+              return qc === 'all' || qc.includes(classFilter.toLowerCase()) || (cNum && qc.includes(cNum));
+            });
+          }
+
+          if (subjectFilter && subjectFilter !== 'All') {
+            const target = subjectFilter.toLowerCase();
+            filtered = filtered.filter((q) => {
+              const qs = (q.subject || '').toLowerCase();
+              const qsc = (q.subject_code || '').toLowerCase();
+              return qs.includes(target) || qsc.includes(target) || target.includes(qsc);
+            });
+          }
+
+          if (statusFilter && statusFilter !== 'All') {
+            filtered = filtered.filter((q) => (q.status || 'active') === statusFilter);
+          }
+
+          if (searchFilter) {
+            const s = searchFilter.toLowerCase();
+            filtered = filtered.filter((q) =>
+              (q.question_text || '').toLowerCase().includes(s) ||
+              (q.option_a || '').toLowerCase().includes(s) ||
+              (q.option_b || '').toLowerCase().includes(s) ||
+              (q.subject || '').toLowerCase().includes(s)
+            );
+          }
+        }
+
+        return { success: true, data: filtered };
+      }
+
       if (method === 'POST' && sub === 'seed') {
         saveDb('free_quizzes', initialStore.free_quizzes);
         return { success: true, message: 'Reset to sample quizzes', data: initialStore.free_quizzes };
       }
+
       if (method === 'POST') {
+        const optA = body.option_a || body.options?.[0] || '';
+        const optB = body.option_b || body.options?.[1] || '';
+        const optC = body.option_c || body.options?.[2] || '';
+        const optD = body.option_d || body.options?.[3] || '';
+        const qText = body.question_text || body.q || '';
+        const corr = typeof body.correct_option === 'number' ? body.correct_option : (typeof body.correct === 'number' ? body.correct : 0);
+
         const newQuiz = {
           id: Date.now(),
-          title: body.title || 'Untitled Quiz',
-          subject: body.subject || 'Mathematics',
+          class_name: body.class_name || body.class || 'All',
+          subject: body.subject || 'Mathematics (IMO)',
           subject_code: body.subject_code || 'IMO',
-          class: body.class || body.class_name || 'Class 6',
-          class_name: body.class_name || body.class || 'Class 6',
-          duration_minutes: parseInt(body.duration_minutes) || 5,
-          total_marks: parseInt(body.total_marks) || 5,
-          questions_count: Array.isArray(body.questions) ? body.questions.length : 0,
-          status: body.status || 'published',
-          description: body.description || '',
-          questions: Array.isArray(body.questions) ? body.questions : []
+          question_text: qText,
+          q: qText,
+          option_a: optA,
+          option_b: optB,
+          option_c: optC,
+          option_d: optD,
+          options: [optA, optB, optC, optD],
+          correct_option: corr,
+          correct: corr,
+          hint: body.hint || '',
+          explanation: body.explanation || '',
+          difficulty: body.difficulty || 'Foundation',
+          status: body.status || 'active',
+          created_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
         };
         quizzes.unshift(newQuiz);
         saveDb('free_quizzes', quizzes);
-        return { success: true, message: 'Free Quiz created successfully', data: newQuiz };
+        return { success: true, message: 'Free Quiz question created successfully', data: newQuiz };
       }
+
       if (method === 'PUT' && sub) {
-        quizzes = quizzes.map((q) => (String(q.id) === String(sub) ? { ...q, ...body } : q));
+        quizzes = quizzes.map((q) => {
+          if (String(q.id) === String(sub)) {
+            const optA = body.option_a !== undefined ? body.option_a : (q.option_a || q.options?.[0] || '');
+            const optB = body.option_b !== undefined ? body.option_b : (q.option_b || q.options?.[1] || '');
+            const optC = body.option_c !== undefined ? body.option_c : (q.option_c || q.options?.[2] || '');
+            const optD = body.option_d !== undefined ? body.option_d : (q.option_d || q.options?.[3] || '');
+            const qText = body.question_text !== undefined ? body.question_text : (q.question_text || q.q || '');
+            const corr = body.correct_option !== undefined ? Number(body.correct_option) : (q.correct_option ?? q.correct ?? 0);
+            return {
+              ...q,
+              ...body,
+              question_text: qText,
+              q: qText,
+              option_a: optA,
+              option_b: optB,
+              option_c: optC,
+              option_d: optD,
+              options: [optA, optB, optC, optD],
+              correct_option: corr,
+              correct: corr
+            };
+          }
+          return q;
+        });
         saveDb('free_quizzes', quizzes);
-        return { success: true, message: 'Free Quiz updated successfully' };
+        return { success: true, message: 'Free Quiz question updated successfully' };
       }
+
       if (method === 'DELETE' && sub) {
         quizzes = quizzes.filter((q) => String(q.id) !== String(sub));
         saveDb('free_quizzes', quizzes);
-        return { success: true, message: 'Free Quiz deleted successfully' };
+        return { success: true, message: 'Free Quiz question deleted successfully' };
       }
     }
 

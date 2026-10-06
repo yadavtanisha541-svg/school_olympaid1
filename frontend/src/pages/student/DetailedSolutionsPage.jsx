@@ -282,18 +282,18 @@ export const DetailedSolutionsPage = ({
   }
 
   return (
-    <div className="space-y-5 max-w-6xl mx-auto font-sans pb-16 animate-in fade-in duration-200 text-slate-100">
+    <div className="space-y-5 max-w-6xl mx-auto font-sans pb-16 animate-in fade-in duration-200">
       {/* 1. TOP TITLE & ACTION BUTTONS HEADER BAR */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-800">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-700 to-indigo-600 text-white border border-purple-400/40 flex items-center justify-center font-black text-base shrink-0 shadow-lg shadow-purple-950/40">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-[#ebd7eb]">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl bg-white border border-[#ebd7eb] shadow-xs flex items-center justify-center text-[#80497D] font-black text-lg shrink-0">
             Ω
           </div>
           <div>
-            <h1 className="text-lg sm:text-xl font-black text-white tracking-tight">
+            <h1 className="text-lg sm:text-2xl font-black text-[#422240] tracking-tight leading-snug">
               {examTitle}
             </h1>
-            <p className="text-[11px] text-purple-300/80 font-medium">Detailed Solutions &amp; Performance Review</p>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium">Detailed Solutions &amp; Performance Review</p>
           </div>
         </div>
 
@@ -302,9 +302,9 @@ export const DetailedSolutionsPage = ({
           <button
             type="button"
             onClick={handleViewAnalysis}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-blue-800/60 bg-[#161d31] hover:bg-[#1f2942] text-blue-300 font-bold text-xs shadow-md transition-all cursor-pointer active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-blue-200 bg-white hover:bg-blue-50/50 text-[#16327a] font-bold text-xs shadow-2xs transition-all cursor-pointer active:scale-95"
           >
-            <Globe className="w-3.5 h-3.5 text-blue-400" />
+            <Globe className="w-3.5 h-3.5 text-blue-600" />
             <span>View Analysis</span>
           </button>
 
@@ -312,9 +312,9 @@ export const DetailedSolutionsPage = ({
           <button
             type="button"
             onClick={handleGoToList}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-700 bg-[#161d31] hover:bg-[#1f2942] text-slate-300 font-bold text-xs shadow-md transition-all cursor-pointer active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-all cursor-pointer active:scale-95"
           >
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+            <Calendar className="w-3.5 h-3.5 text-slate-500" />
             <span>Go to Test List</span>
           </button>
 
@@ -323,7 +323,7 @@ export const DetailedSolutionsPage = ({
             <button
               type="button"
               onClick={onBack}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-700 bg-[#161d31] hover:bg-[#1f2942] text-slate-300 font-bold text-xs shadow-md transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-all cursor-pointer active:scale-95"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back</span>
@@ -334,7 +334,7 @@ export const DetailedSolutionsPage = ({
           <button
             type="button"
             onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-purple-900/30 border border-purple-400/30 transition-all cursor-pointer active:scale-95"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#5b3da8] to-[#16327a] text-white font-bold text-xs shadow-md shadow-purple-950/20 border border-[#7854d6]/40 transition-all cursor-pointer active:scale-95"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Print Solutions</span>
@@ -343,16 +343,16 @@ export const DetailedSolutionsPage = ({
       </div>
 
       {/* 2. SUMMARY METRICS CARD WITH 4 FILTER RADIOS */}
-      <div className="bg-[#13192b]/95 backdrop-blur-md rounded-3xl border border-[#2d3758] p-5 sm:p-6 shadow-xl shadow-purple-950/20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-800">
+      <div className="bg-white rounded-3xl border border-[#eee6f8] p-5 sm:p-6 shadow-card">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
           {/* Metric 1: Total Marks & Score */}
           <div className="pb-3 sm:pb-0 sm:pr-4">
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Marks Scored</p>
             <div className="flex items-baseline gap-1.5 mt-1">
-              <span className="text-2xl sm:text-3xl font-black text-purple-300">{scoreObtained}</span>
-              <span className="text-xs font-bold text-slate-500">/ {totalMarks}</span>
+              <span className="text-2xl sm:text-3xl font-black text-[#2e1065]">{scoreObtained}</span>
+              <span className="text-xs font-bold text-slate-400">/ {totalMarks}</span>
             </div>
-            <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">
+            <p className="text-[11px] text-emerald-600 font-bold mt-0.5">
               {correctCount} of {totalQuestionsCount} questions correct
             </p>
           </div>
@@ -360,19 +360,19 @@ export const DetailedSolutionsPage = ({
           {/* Metric 2: Time Taken / Total Duration */}
           <div className="pt-3 sm:pt-0 sm:px-4">
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Time Taken / Total</p>
-            <p className="text-lg sm:text-xl font-black text-blue-300 font-mono mt-1">
+            <p className="text-lg sm:text-xl font-black text-[#16327a] font-mono mt-1">
               {timeFormatted}
             </p>
-            <p className="text-[10px] text-slate-500 font-medium mt-0.5">Automated timer recording</p>
+            <p className="text-[11px] text-slate-400 font-medium mt-0.5">Automated timer recording</p>
           </div>
 
           {/* Metric 3: Cutoff / Total Marks */}
           <div className="pt-3 sm:pt-0 sm:px-4">
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Cutoff / Total Marks</p>
-            <p className="text-lg sm:text-xl font-black text-white font-mono mt-1">
+            <p className="text-lg sm:text-xl font-black text-slate-800 font-mono mt-1">
               {cutoffMarks} / {totalMarks}
             </p>
-            <p className="text-[10px] text-purple-300 font-semibold mt-0.5">
+            <p className="text-[11px] text-[#7c3aed] font-bold mt-0.5">
               {scoreObtained >= cutoffMarks ? '✓ Qualified Merit Benchmark' : 'Practice Target Benchmark'}
             </p>
           </div>
@@ -381,61 +381,61 @@ export const DetailedSolutionsPage = ({
           <div className="pt-3 sm:pt-0 sm:pl-4 flex flex-col justify-center gap-1.5">
             <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
               {/* All */}
-              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-300 select-none group">
+              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700 select-none group">
                 <input
                   type="radio"
                   name="solutionFilter"
                   value="all"
                   checked={filterType === 'all'}
                   onChange={() => setFilterType('all')}
-                  className="w-3.5 h-3.5 text-blue-500 bg-slate-900 border-slate-700 focus:ring-blue-400 cursor-pointer"
+                  className="w-3.5 h-3.5 text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer"
                 />
-                <span className={filterType === 'all' ? 'text-blue-400 font-black' : ''}>
+                <span className={filterType === 'all' ? 'text-blue-700 font-black' : ''}>
                   All ({totalQuestionsCount})
                 </span>
               </label>
 
               {/* Correct */}
-              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-emerald-400 select-none group">
+              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-emerald-700 select-none group">
                 <input
                   type="radio"
                   name="solutionFilter"
                   value="correct"
                   checked={filterType === 'correct'}
                   onChange={() => setFilterType('correct')}
-                  className="w-3.5 h-3.5 text-emerald-500 bg-slate-900 border-slate-700 focus:ring-emerald-400 cursor-pointer"
+                  className="w-3.5 h-3.5 text-emerald-600 border-slate-300 focus:ring-emerald-500 cursor-pointer"
                 />
-                <span className={filterType === 'correct' ? 'text-emerald-300 font-black underline' : ''}>
+                <span className={filterType === 'correct' ? 'text-emerald-700 font-black underline' : ''}>
                   Correct ({correctCount})
                 </span>
               </label>
 
               {/* Wrong */}
-              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-rose-400 select-none group">
+              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-rose-700 select-none group">
                 <input
                   type="radio"
                   name="solutionFilter"
                   value="wrong"
                   checked={filterType === 'wrong'}
                   onChange={() => setFilterType('wrong')}
-                  className="w-3.5 h-3.5 text-rose-500 bg-slate-900 border-slate-700 focus:ring-rose-400 cursor-pointer"
+                  className="w-3.5 h-3.5 text-rose-600 border-slate-300 focus:ring-rose-500 cursor-pointer"
                 />
-                <span className={filterType === 'wrong' ? 'text-rose-300 font-black underline' : ''}>
+                <span className={filterType === 'wrong' ? 'text-rose-700 font-black underline' : ''}>
                   Wrong ({wrongCount})
                 </span>
               </label>
 
               {/* Unattempted */}
-              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-amber-400 select-none group">
+              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-amber-700 select-none group">
                 <input
                   type="radio"
                   name="solutionFilter"
                   value="unattempted"
                   checked={filterType === 'unattempted'}
                   onChange={() => setFilterType('unattempted')}
-                  className="w-3.5 h-3.5 text-amber-500 bg-slate-900 border-slate-700 focus:ring-amber-400 cursor-pointer"
+                  className="w-3.5 h-3.5 text-amber-600 border-slate-300 focus:ring-amber-500 cursor-pointer"
                 />
-                <span className={filterType === 'unattempted' ? 'text-amber-300 font-black underline' : ''}>
+                <span className={filterType === 'unattempted' ? 'text-amber-800 font-black underline' : ''}>
                   Unattempted ({unattemptedCount})
                 </span>
               </label>
@@ -445,16 +445,16 @@ export const DetailedSolutionsPage = ({
       </div>
 
       {/* 3. QUESTIONS & SOLUTIONS LIST */}
-      <div className="space-y-5 pt-1">
+      <div className="space-y-4 pt-1">
         {filteredSolutions.length === 0 ? (
-          <div className="bg-[#13192b]/95 backdrop-blur-md rounded-3xl border border-[#2d3758] p-8 text-center text-slate-400 space-y-3">
-            <p className="text-sm font-bold text-slate-200">
-              No questions found for the selected filter: <span className="uppercase text-blue-400 font-bold">{filterType}</span> ({filterType === 'correct' ? correctCount : (filterType === 'wrong' ? wrongCount : unattemptedCount)})
+          <div className="bg-white rounded-3xl border border-[#eee6f8] p-8 text-center text-slate-500 space-y-3 shadow-card">
+            <p className="text-sm font-bold text-slate-700">
+              No questions found for the selected filter: <span className="uppercase text-blue-600 font-bold">{filterType}</span> ({filterType === 'correct' ? correctCount : (filterType === 'wrong' ? wrongCount : unattemptedCount)})
             </p>
             <button
               type="button"
               onClick={() => setFilterType('all')}
-              className="px-4 py-1.5 rounded-xl bg-purple-950/80 hover:bg-purple-900 text-purple-200 border border-purple-800/60 font-bold text-xs cursor-pointer shadow-md transition-colors"
+              className="px-4 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-[#5b3da8] border border-purple-200 font-bold text-xs cursor-pointer shadow-xs transition-colors"
             >
               Show All Questions ({totalQuestionsCount})
             </button>
@@ -470,24 +470,24 @@ export const DetailedSolutionsPage = ({
             return (
               <div
                 key={item.id || idx}
-                className="bg-[#13192b]/95 backdrop-blur-md rounded-2xl border border-[#2d3758] p-5 sm:p-7 shadow-xl shadow-purple-950/20 space-y-4 animate-in fade-in duration-150 hover:border-purple-500/40 transition-all"
+                className="bg-white rounded-3xl border border-[#eee6f8] p-5 sm:p-7 shadow-card space-y-4 animate-in fade-in duration-150 hover:border-purple-300 transition-all"
               >
                 {/* Question Header: Question pill on left, STATUS on right */}
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800 flex-wrap gap-2">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-purple-300 bg-[#1e2246] px-3 py-1 rounded-lg border border-purple-800/60">
+                    <span className="text-xs font-black text-[#6d3a68] bg-[#faf5fa] px-3.5 py-1 rounded-xl border border-[#ebd7eb]">
                       Question {idx + 1}
                     </span>
                   </div>
 
                   <div>
                     <span
-                      className={`inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-xs font-bold border ${
+                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-extrabold border ${
                         isCorrect
-                          ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800/60'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                           : isWrong
-                          ? 'bg-rose-950/80 text-rose-300 border-rose-800/60'
-                          : 'bg-amber-950/80 text-amber-300 border-amber-800/60'
+                          ? 'bg-rose-50 text-rose-700 border-rose-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-200'
                       }`}
                     >
                       {isCorrect ? '✓ CORRECT (+1.0)' : isWrong ? '✗ INCORRECT (0.0)' : '○ UNATTEMPTED (0.0)'}
@@ -496,7 +496,7 @@ export const DetailedSolutionsPage = ({
                 </div>
 
                 {/* Question Text */}
-                <h3 className="text-base sm:text-lg font-bold text-white leading-snug">
+                <h3 className="text-base sm:text-lg font-black text-[#2e1065] leading-snug">
                   {item.question_text}
                 </h3>
 
@@ -507,26 +507,26 @@ export const DetailedSolutionsPage = ({
                     const isUserPick = userSelected === opt;
                     const isThisCorrect = correctOpt === opt;
 
-                    let cardStyle = 'border-slate-800 bg-[#182038] text-slate-200 hover:border-slate-700';
+                    let cardStyle = 'border-slate-200 bg-slate-50/70 text-slate-700 hover:bg-slate-100/80';
                     if (isThisCorrect) {
-                      cardStyle = 'border-emerald-500/80 bg-emerald-950/50 text-emerald-100 font-bold ring-1 ring-emerald-500/40';
+                      cardStyle = 'border-2 border-emerald-500 bg-emerald-50/90 text-emerald-950 font-bold shadow-xs';
                     } else if (isUserPick && !isThisCorrect) {
-                      cardStyle = 'border-rose-500/80 bg-rose-950/50 text-rose-100 font-bold ring-1 ring-rose-500/40';
+                      cardStyle = 'border-2 border-rose-500 bg-rose-50/90 text-rose-950 font-bold shadow-xs';
                     }
 
                     return (
                       <div
                         key={opt}
-                        className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 text-xs sm:text-sm transition-all ${cardStyle}`}
+                        className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 text-xs sm:text-sm transition-all ${cardStyle}`}
                       >
                         <div className="flex items-center gap-3">
                           <span
-                            className={`w-7 h-7 rounded-lg font-bold flex items-center justify-center text-xs shrink-0 ${
+                            className={`w-7 h-7 rounded-xl font-black flex items-center justify-center text-xs shrink-0 ${
                               isThisCorrect
-                                ? 'bg-emerald-500 text-white shadow-md'
+                                ? 'bg-emerald-600 text-white shadow-xs'
                                 : isUserPick
-                                ? 'bg-rose-500 text-white shadow-md'
-                                : 'bg-[#121727] text-slate-300 border border-slate-700'
+                                ? 'bg-rose-600 text-white shadow-xs'
+                                : 'bg-white text-slate-700 border border-slate-300'
                             }`}
                           >
                             {opt}
@@ -536,12 +536,12 @@ export const DetailedSolutionsPage = ({
 
                         <div className="flex items-center gap-2 shrink-0">
                           {isThisCorrect && (
-                            <span className="text-[11px] font-bold text-emerald-300 bg-emerald-950/90 px-2.5 py-1 rounded-md flex items-center gap-1 border border-emerald-700/60 shadow-xs">
+                            <span className="text-[11px] font-extrabold text-emerald-700 bg-emerald-100/90 px-2.5 py-1 rounded-lg flex items-center gap-1 border border-emerald-300 shadow-2xs">
                               <Check className="w-3.5 h-3.5" /> Correct Answer
                             </span>
                           )}
                           {isUserPick && !isThisCorrect && (
-                            <span className="text-[11px] font-bold text-rose-300 bg-rose-950/90 px-2.5 py-1 rounded-md border border-rose-700/60 shadow-xs">
+                            <span className="text-[11px] font-extrabold text-rose-700 bg-rose-100/90 px-2.5 py-1 rounded-lg border border-rose-300 shadow-2xs">
                               Your Selection
                             </span>
                           )}
@@ -553,11 +553,11 @@ export const DetailedSolutionsPage = ({
 
                 {/* Step-by-Step Explanation */}
                 {item.explanation && (
-                  <div className="p-4 bg-[#1e1c3b]/80 border border-purple-800/60 rounded-2xl text-xs space-y-1.5 mt-2">
-                    <span className="font-bold text-purple-300 block uppercase tracking-wider text-[10px]">
+                  <div className="p-4 sm:p-5 bg-gradient-to-r from-[#faf6fa] via-white to-[#fdf7f5] border border-[#ebd7eb] rounded-2xl text-xs space-y-1 mt-3">
+                    <span className="font-black text-[#80497D] block uppercase tracking-wider text-[11px]">
                       Step-by-Step Mathematical &amp; Conceptual Solution:
                     </span>
-                    <p className="text-slate-200 leading-relaxed font-medium text-xs sm:text-[13px]">
+                    <p className="text-slate-700 leading-relaxed font-medium text-xs sm:text-[13px]">
                       {item.explanation}
                     </p>
                   </div>

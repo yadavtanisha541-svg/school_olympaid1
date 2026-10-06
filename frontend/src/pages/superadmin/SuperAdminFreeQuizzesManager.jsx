@@ -401,23 +401,30 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
         ) : (
           <div className="space-y-4">
             {quizzes.map((quiz, idx) => {
-              const options = [quiz.option_a, quiz.option_b, quiz.option_c, quiz.option_d];
+              const optA = quiz.option_a || (Array.isArray(quiz.options) ? quiz.options[0] : '') || '';
+              const optB = quiz.option_b || (Array.isArray(quiz.options) ? quiz.options[1] : '') || '';
+              const optC = quiz.option_c || (Array.isArray(quiz.options) ? quiz.options[2] : '') || '';
+              const optD = quiz.option_d || (Array.isArray(quiz.options) ? quiz.options[3] : '') || '';
+              const options = [optA, optB, optC, optD];
+              const qStatement = quiz.question_text || quiz.q || quiz.title || 'Untitled Quiz Question';
+              const correctIdx = typeof quiz.correct_option === 'number' ? quiz.correct_option : (typeof quiz.correct === 'number' ? quiz.correct : 0);
+
               return (
                 <div
-                  key={quiz.id}
+                  key={quiz.id || idx}
                   className="p-5 rounded-2xl bg-[#faf5fa] border border-[#edd6ed] space-y-3 hover:border-[#6d3a68]/40 transition-all shadow-2xs group"
                 >
                   {/* Header */}
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <div className="flex items-center gap-2">
                       <span className="font-black text-xs text-[#6d3a68]">
-                        {quiz.subject}
+                        {quiz.subject || 'Olympiad'}
                       </span>
                       <span className="px-2 py-0.5 rounded-md bg-white border border-[#edd6ed] text-[10px] font-bold text-slate-600">
-                        {quiz.class_name}
+                        {quiz.class_name || quiz.class || 'All'}
                       </span>
                       <span className="px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-[10px] font-bold text-amber-800">
-                        {quiz.difficulty}
+                        {quiz.difficulty || 'Foundation'}
                       </span>
                       {quiz.status === 'inactive' && (
                         <span className="px-2 py-0.5 rounded-md bg-slate-200 text-[10px] font-bold text-slate-600">
@@ -453,13 +460,13 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
 
                   {/* Question Statement */}
                   <p className="text-sm font-bold text-[#321630] leading-relaxed">
-                    {quiz.question_text}
+                    {qStatement}
                   </p>
 
                   {/* 4 Options Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                     {options.map((opt, optIdx) => {
-                      const isCorrect = quiz.correct_option === optIdx;
+                      const isCorrect = correctIdx === optIdx;
                       return (
                         <div
                           key={optIdx}
@@ -475,7 +482,7 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
                             }`}>
                               {String.fromCharCode(65 + optIdx)}
                             </span>
-                            <span>{opt}</span>
+                            <span>{opt || `Option ${String.fromCharCode(65 + optIdx)}`}</span>
                           </div>
                           {isCorrect && (
                             <span className="text-[10px] font-black text-emerald-700 uppercase">
