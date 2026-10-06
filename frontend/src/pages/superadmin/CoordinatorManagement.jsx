@@ -146,7 +146,7 @@ export const CoordinatorManagement = () => {
             type="button"
             onClick={exportCsv}
             disabled={inquiries.length === 0}
-            className="px-5 py-2.5 bg-gradient-to-r from-[#5b3da8] to-[#16327a] hover:from-[#4d3291] hover:to-[#122459] text-white rounded-xl text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-md shadow-blue-950/20 disabled:opacity-50 border border-[#7854d6]/30"
+            className="px-5 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be185d] text-white rounded-xl text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-md shadow-purple-950/20 disabled:opacity-50 border border-white/20"
           >
             <Download className="w-4 h-4 text-[#e7b84b]" />
             <span>Export CSV</span>

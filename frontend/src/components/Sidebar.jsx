@@ -157,7 +157,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
             }}
             className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer ${
               currentTab === 'overview'
-                ? 'bg-gradient-to-r from-[#5b3da8] to-[#16327a] text-white font-bold shadow-lg shadow-purple-950/40 border border-[#7854d6]/40'
+                ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-purple-950/40 border border-purple-400/40'
                 : 'text-slate-200 hover:bg-[#1a264e] hover:text-white font-semibold'
             }`}
           >
@@ -189,7 +189,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     }}
                     className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer text-left ${
                       isActive
-                        ? 'bg-gradient-to-r from-[#5b3da8] to-[#16327a] text-white font-bold shadow-lg shadow-purple-950/40 border border-[#7854d6]/40'
+                        ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-purple-950/40 border border-purple-400/40'
                         : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                     }`}
                   >
@@ -225,7 +225,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     }}
                     className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer text-left ${
                       isActive
-                        ? 'bg-gradient-to-r from-[#5b3da8] to-[#16327a] text-white font-bold shadow-lg shadow-purple-950/40 border border-[#7854d6]/40'
+                        ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-purple-950/40 border border-purple-400/40'
                         : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                     }`}
                   >
@@ -252,7 +252,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                 <div>
                   <div className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold transition-colors ${
                     currentTab === 'my_content' || currentTab.startsWith('content_')
-                      ? 'bg-gradient-to-r from-[#5b3da8] to-[#16327a] text-white shadow-lg shadow-purple-950/40 border border-[#7854d6]/40'
+                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-lg shadow-purple-950/40 border border-purple-400/40'
                       : 'text-slate-200 hover:bg-[#1a264e] hover:text-white'
                   }`}>
                     <button
@@ -333,7 +333,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   }}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
                     currentTab === 'my_classes'
-                      ? 'bg-gradient-to-r from-[#5b3da8] to-[#16327a] text-white font-bold shadow-lg shadow-purple-950/40 border border-[#7854d6]/40'
+                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-purple-950/40 border border-purple-400/40'
                       : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                   }`}
                 >
@@ -408,7 +408,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   }}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
                     currentTab === 'my_revision'
-                      ? 'bg-gradient-to-r from-[#5b3da8] to-[#16327a] text-white font-bold shadow-lg shadow-purple-950/40 border border-[#7854d6]/40'
+                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-purple-950/40 border border-purple-400/40'
                       : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                   }`}
                 >
@@ -614,7 +614,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   }}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
                     currentTab === 'free_quizzes'
-                      ? 'bg-gradient-to-r from-[#5b3da8] to-[#16327a] text-white font-bold shadow-lg shadow-purple-950/40 border border-[#7854d6]/40'
+                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-bold shadow-lg shadow-purple-950/40 border border-purple-400/40'
                       : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                   }`}
                 >
@@ -660,7 +660,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                 }}
                 className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[14px] font-bold transition-all cursor-pointer ${
                   currentTab === 'profile'
-                    ? 'bg-gradient-to-r from-[#5b3da8] to-[#16327a] text-white'
+                    ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white'
                     : 'text-slate-200 hover:bg-[#1a264e] hover:text-white'
                 }`}
               >
@@ -695,7 +695,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
             title="Click to open Profile & Logout menu"
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#5b3da8] to-[#16327a] text-white font-black text-sm flex items-center justify-center border border-purple-400/30 shrink-0 shadow-xs">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-black text-sm flex items-center justify-center border border-purple-400/30 shrink-0 shadow-xs">
                 {(user?.full_name || user?.name || user?.login_id || 'C').charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">

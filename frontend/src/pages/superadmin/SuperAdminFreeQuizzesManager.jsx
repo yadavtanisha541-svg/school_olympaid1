@@ -260,7 +260,7 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
           <button
             type="button"
             onClick={handleOpenCreateModal}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#5b3da8] to-[#16327a] hover:from-[#4d3291] hover:to-[#122459] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30"
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be185d] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-purple-950/20 active:scale-95 cursor-pointer border border-white/20"
           >
             <Plus className="w-4 h-4" />
             <span>Add Quiz Question</span>
@@ -709,7 +709,7 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#5b3da8] to-[#16327a] hover:from-[#4d3291] hover:to-[#122459] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-50 border border-[#7854d6]/30"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be185d] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-50 border border-white/20"
                 >
                   {saving ? 'Saving...' : modalMode === 'create' ? 'Save & Publish' : 'Update Question'}
                 </button>

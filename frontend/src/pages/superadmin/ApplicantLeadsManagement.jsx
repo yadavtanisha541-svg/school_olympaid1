@@ -513,7 +513,7 @@ export const ApplicantLeadsManagement = () => {
                   type="button"
                   onClick={handleSaveNotes}
                   disabled={savingNotes}
-                  className="px-4 py-2 bg-gradient-to-r from-[#16327a] to-[#5b3da8] hover:from-[#122459] hover:to-[#4d3291] text-white rounded-md text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be185d] text-white rounded-md text-xs font-bold transition-all cursor-pointer disabled:opacity-50 border border-white/20"
                 >
                   {savingNotes ? 'Saving Notes...' : 'Save Remarks'}
                 </button>

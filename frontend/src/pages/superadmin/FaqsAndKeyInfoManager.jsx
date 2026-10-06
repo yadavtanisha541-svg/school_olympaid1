@@ -363,7 +363,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
               onClick={() => setActiveSection(tab.id)}
               className={`px-4 py-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2.5 cursor-pointer ${
                 isActive
-                  ? 'bg-gradient-to-r from-[#5b3da8] to-[#16327a] text-white shadow-md shadow-blue-950/20 border border-[#7854d6]/30'
+                  ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-md shadow-purple-950/20 border border-white/20'
                   : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
               }`}
             >
@@ -396,7 +396,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
                   setEditingMenuItem(null);
                   setIsAddingMenuItem(true);
                 }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-[#5b3da8] to-[#16327a] hover:from-[#4d3291] hover:to-[#122459] text-white transition-all cursor-pointer shadow-md shadow-blue-950/20 w-fit border border-[#7854d6]/30"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be185d] text-white transition-all cursor-pointer shadow-md shadow-purple-950/20 w-fit border border-white/20"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add New Menu Item</span>
