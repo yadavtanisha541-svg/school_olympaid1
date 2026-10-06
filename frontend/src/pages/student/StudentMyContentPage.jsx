@@ -4,6 +4,7 @@ import { apiClient } from '../../api/client';
 import {
   BookOpen,
   ArrowLeft,
+  ArrowRight,
   ChevronRight,
   Shield,
   Play,
@@ -15,7 +16,12 @@ import {
   Sparkles,
   Palette,
   Layers,
-  Download
+  Download,
+  Check,
+  CheckCircle2,
+  BarChart2,
+  Trophy,
+  FileText
 } from 'lucide-react';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 
@@ -117,6 +123,7 @@ export const StudentMyContentPage = ({
       code: 'IGKO',
       title: 'IGKO (General Knowledge)',
       subtitle: 'General Knowledge & Current Affairs',
+      description: 'Build your general knowledge, stay updated with current affairs and improve your reasoning skills.',
       icon: Globe,
       color: '#859900',
       iconBg: 'bg-amber-50 border-amber-200 text-amber-600',
@@ -127,6 +134,7 @@ export const StudentMyContentPage = ({
       altCode: 'NSO',
       title: 'ISO / NSO (Science)',
       subtitle: 'Science & Practical Discovery',
+      description: 'Master scientific principles, experimental observation, physics, chemistry, biology concepts and logic.',
       icon: Atom,
       color: '#059669',
       iconBg: 'bg-emerald-50 border-emerald-200 text-emerald-600',
@@ -136,6 +144,7 @@ export const StudentMyContentPage = ({
       code: 'IMO',
       title: 'IMO (Mathematics)',
       subtitle: 'Mathematics & Logical Analysis',
+      description: 'Sharpen mathematical problem-solving, arithmetic speed, geometry, number systems and analytical reasoning.',
       icon: Calculator,
       color: '#d97706',
       iconBg: 'bg-blue-50 border-blue-200 text-blue-600',
@@ -145,6 +154,7 @@ export const StudentMyContentPage = ({
       code: 'IEO',
       title: 'IEO (English)',
       subtitle: 'English Grammar & Vocabulary',
+      description: 'Enhance English grammar proficiency, comprehension reading, vocabulary power and verbal communication.',
       icon: BookOpen,
       color: '#ea580c',
       iconBg: 'bg-purple-50 border-purple-200 text-purple-600',
@@ -155,6 +165,7 @@ export const StudentMyContentPage = ({
       altCode: 'ICO',
       title: 'ICSO (Cyber & AI)',
       subtitle: 'Cyber Safety, Coding & IT',
+      description: 'Learn cyber safety, algorithms, coding fundamentals, artificial intelligence basics and digital logic.',
       icon: Laptop,
       color: '#0284c7',
       iconBg: 'bg-sky-50 border-sky-200 text-sky-600',
@@ -165,6 +176,7 @@ export const StudentMyContentPage = ({
       altCode: 'LRO',
       title: 'ISSO / LRO (Reasoning)',
       subtitle: 'Logical Reasoning & Social Aptitude',
+      description: 'Boost pattern identification, analogies, analytical reasoning, series completion and social aptitude.',
       icon: Brain,
       color: '#7c3aed',
       iconBg: 'bg-rose-50 border-rose-200 text-rose-600',
@@ -174,6 +186,7 @@ export const StudentMyContentPage = ({
       code: 'VC',
       title: 'VC (Vocabulary)',
       subtitle: 'Vocabulary Champions Olympiad',
+      description: 'Master word roots, synonyms, antonyms, idioms, phrases and advance vocabulary championship skills.',
       icon: Sparkles,
       color: '#6d3a68',
       iconBg: 'bg-pink-50 border-pink-200 text-pink-600',
@@ -183,6 +196,7 @@ export const StudentMyContentPage = ({
       code: 'EGO',
       title: 'EGO (Environment)',
       subtitle: 'Environment & Green Olympiad',
+      description: 'Understand ecosystems, biodiversity, natural resource management, climate conservation and green sciences.',
       icon: Atom,
       color: '#059669',
       iconBg: 'bg-teal-50 border-teal-200 text-teal-600',
@@ -192,6 +206,7 @@ export const StudentMyContentPage = ({
       code: 'CAO',
       title: 'CAO (Creative Arts)',
       subtitle: 'Creative Arts & Aesthetic Design',
+      description: 'Explore creative design thinking, visual perspectives, color theory, aesthetic sense and artistic expression.',
       icon: Palette,
       color: '#80497D',
       iconBg: 'bg-violet-50 border-violet-200 text-violet-600',
@@ -630,50 +645,82 @@ export const StudentMyContentPage = ({
               return (
                 <div
                   key={sub.code}
-                  className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-[#859900] p-6 shadow-xs hover:shadow-xl transition-all duration-200 flex flex-col justify-between group hover:-translate-y-1 relative overflow-hidden"
+                  className="bg-white rounded-3xl border border-slate-200/90 hover:border-emerald-500/80 p-6 sm:p-7 shadow-xs hover:shadow-xl transition-all duration-200 flex flex-col justify-between group relative overflow-hidden"
                 >
-                  {/* Top Header */}
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <div className={`w-14 h-14 rounded-2xl border ${sub.iconBg} flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform shrink-0`}>
-                      <SubIcon className="w-7 h-7" />
+                  <div>
+                    {/* Top Header Row */}
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-12 h-12 rounded-2xl border ${sub.iconBg} flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform shrink-0`}>
+                          <SubIcon className="w-6 h-6" />
+                        </div>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="px-2.5 py-0.5 rounded-full bg-[#e6f4ea] text-[#137333] border border-[#ceead6] text-[11px] font-extrabold uppercase tracking-wide">
+                            {studentClass}
+                          </span>
+                          <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[11px] font-bold">
+                            {sub.code}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e6f4ea] text-[#137333] border border-[#ceead6] text-xs font-bold shrink-0">
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>{subPapers.length} Mock Tests</span>
+                      </div>
                     </div>
-                    <span className="px-3 py-1 rounded-full bg-[#859900]/10 text-[#5e6d00] border border-[#859900]/20 text-[11px] font-black tracking-wide">
-                      {subPapers.length} Mock Tests
-                    </span>
+
+                    {/* Title, Subtitle & Description */}
+                    <div className="space-y-1 mb-6">
+                      <h3 className="font-black text-slate-900 text-xl sm:text-2xl tracking-tight leading-snug group-hover:text-emerald-700 transition-colors">
+                        {sub.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-500 font-semibold">
+                        {sub.subtitle}
+                      </p>
+                      <p className="text-xs text-slate-600 font-normal leading-relaxed pt-2">
+                        {sub.description || 'Practice authentic Olympiad questions, improve speed and accuracy, and boost your rank.'}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Subject Details */}
-                  <div className="space-y-1.5 mb-5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-extrabold text-[#859900] uppercase tracking-wider bg-lime-50 px-2 py-0.5 rounded">
-                        {studentClass}
-                      </span>
-                      <span className="text-[11px] font-bold text-slate-400">
-                        {sub.code}
-                      </span>
-                    </div>
-                    <h3 className="font-black text-slate-900 text-lg tracking-tight group-hover:text-[#859900] transition-colors leading-snug">
-                      {sub.title}
-                    </h3>
-                    <p className="text-xs text-slate-500 font-medium line-clamp-2">
-                      {sub.subtitle}
-                    </p>
-                  </div>
+                  {/* Bottom Action Bar & Highlights (Image 1 without illustration image) */}
+                  <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenedMockSeries(sub.code);
+                        setSelectedSubject(sub.code);
+                      }}
+                      className="px-6 py-2.5 rounded-full bg-[#1b7e47] hover:bg-[#136136] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-950/20 active:scale-95 transition-all cursor-pointer shrink-0"
+                    >
+                      <span>Start Mock Test</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
 
-                  {/* Action Button: Opens Mock Tests Series for this Subject */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpenedMockSeries(sub.code);
-                      setSelectedSubject(sub.code);
-                    }}
-                    className="w-full pt-3 pb-1 border-t border-slate-100 flex items-center justify-between text-xs font-black text-[#859900] group-hover:translate-x-0.5 transition-all cursor-pointer"
-                  >
-                    <span>Open {sub.code} Mock Tests</span>
-                    <div className="w-8 h-8 rounded-full bg-[#859900]/10 flex items-center justify-center text-[#859900] group-hover:bg-[#859900] group-hover:text-white transition-colors">
-                      <ChevronRight className="w-4 h-4" />
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-700 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-full shadow-2xs">
+                        <div className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                          <Check className="w-2.5 h-2.5 stroke-[3]" />
+                        </div>
+                        <span>Updated Syllabus</span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-700 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-full shadow-2xs">
+                        <div className="w-4 h-4 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                          <BarChart2 className="w-2.5 h-2.5" />
+                        </div>
+                        <span>Real Exam Pattern</span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-700 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-full shadow-2xs">
+                        <div className="w-4 h-4 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                          <Trophy className="w-2.5 h-2.5" />
+                        </div>
+                        <span>Improve Your Score</span>
+                      </div>
                     </div>
-                  </button>
+                  </div>
                 </div>
               );
             })}
