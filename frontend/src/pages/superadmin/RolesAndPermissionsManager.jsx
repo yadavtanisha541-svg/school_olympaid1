@@ -554,90 +554,80 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
         </div>
       </div>
 
-      {/* 2. Top Role Selection Cards (Compact & Sleek) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-3xl">
+      {/* 2. Top Role Selection Cards (Slim & Compact) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl">
         {/* Super Admin Master Overview */}
         <div
           onClick={() => setActiveRole('superadmin')}
-          className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
+          className={`px-3.5 py-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
             activeRole === 'superadmin'
-              ? 'bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] border-pink-400 text-white shadow-md ring-1 ring-pink-400/40'
-              : 'bg-white border-slate-200 hover:border-indigo-400 shadow-2xs opacity-90 hover:opacity-100'
+              ? 'bg-gradient-to-r from-[#0f172a] via-[#1e1b4b] to-[#3b0764] border-pink-400 text-white shadow-sm ring-1 ring-pink-400/40'
+              : 'bg-white border-slate-200 hover:border-indigo-400 text-slate-800 shadow-2xs'
           }`}
         >
-          <div>
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold shadow-xs ${
-                activeRole === 'superadmin' ? 'bg-white/10 text-pink-300 border border-white/20' : 'bg-purple-50 text-purple-700 border border-purple-200'
-              }`}>
-                <Sparkles className="w-4 h-4" />
-              </span>
-              <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-400/40 font-mono">
-                ROOT SYSTEM
-              </span>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow-2xs ${
+              activeRole === 'superadmin' ? 'bg-white/10 text-pink-300 border border-white/20' : 'bg-purple-50 text-purple-700 border border-purple-200'
+            }`}>
+              <Sparkles className="w-3.5 h-3.5" />
+            </span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <h3 className={`text-xs font-black truncate ${activeRole === 'superadmin' ? 'text-white' : 'text-slate-900'}`}>
+                  Super Administrator
+                </h3>
+                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                  ROOT
+                </span>
+              </div>
+              <p className={`text-[10px] truncate ${activeRole === 'superadmin' ? 'text-pink-200' : 'text-slate-400'}`}>
+                {catalog.length} / {catalog.length} Permissions (Unrestricted)
+              </p>
             </div>
-            <h3 className={`text-sm font-black ${activeRole === 'superadmin' ? 'text-white' : 'text-slate-900'}`}>
-              Super Administrator
-            </h3>
-            <p className={`text-[11px] mt-0.5 leading-snug line-clamp-2 ${activeRole === 'superadmin' ? 'text-blue-100' : 'text-slate-500'}`}>
-              Full master control across all 20 Super Admin management modules and student panels. (Unrestricted root access).
-            </p>
           </div>
 
-          <div className={`pt-2.5 mt-3 border-t flex items-center justify-between text-[11px] ${
-            activeRole === 'superadmin' ? 'border-white/20' : 'border-slate-100'
+          <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold shrink-0 ${
+            activeRole === 'superadmin' ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-2xs' : 'bg-slate-100 text-slate-500'
           }`}>
-            <span className={`font-bold ${activeRole === 'superadmin' ? 'text-pink-300' : 'text-purple-700'}`}>
-              {catalog.length} / {catalog.length} (Unrestricted)
-            </span>
-            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-              activeRole === 'superadmin' ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-2xs' : 'bg-slate-100 text-slate-600'
-            }`}>
-              {activeRole === 'superadmin' ? '● Active View' : 'Select'}
-            </span>
-          </div>
+            {activeRole === 'superadmin' ? '● Active' : 'Select'}
+          </span>
         </div>
 
         {/* Student Role Card */}
         <div
           onClick={() => setActiveRole('student')}
-          className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
+          className={`px-3.5 py-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
             activeRole === 'student'
-              ? 'bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] border-pink-400 text-white shadow-md ring-1 ring-pink-400/40'
-              : 'bg-white border-slate-200 hover:border-indigo-400 shadow-2xs opacity-90 hover:opacity-100'
+              ? 'bg-gradient-to-r from-[#0f172a] via-[#1e1b4b] to-[#3b0764] border-pink-400 text-white shadow-sm ring-1 ring-pink-400/40'
+              : 'bg-white border-slate-200 hover:border-indigo-400 text-slate-800 shadow-2xs'
           }`}
         >
-          <div>
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold shadow-xs ${
-                activeRole === 'student' ? 'bg-white/10 text-pink-300 border border-white/20' : 'bg-pink-50 text-pink-700 border border-pink-200'
-              }`}>
-                <GraduationCap className="w-4 h-4" />
-              </span>
-              <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-400/40 font-mono">
-                CANDIDATE / LEARNER
-              </span>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow-2xs ${
+              activeRole === 'student' ? 'bg-white/10 text-pink-300 border border-white/20' : 'bg-pink-50 text-pink-700 border border-pink-200'
+            }`}>
+              <GraduationCap className="w-3.5 h-3.5" />
+            </span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <h3 className={`text-xs font-black truncate ${activeRole === 'student' ? 'text-white' : 'text-slate-900'}`}>
+                  Student / Candidate
+                </h3>
+                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-400/30">
+                  LEARNER
+                </span>
+              </div>
+              <p className={`text-[10px] truncate ${activeRole === 'student' ? 'text-pink-200' : 'text-slate-400'}`}>
+                {studentActiveCount} / {catalog.length} Permissions Enabled
+              </p>
             </div>
-            <h3 className={`text-sm font-black ${activeRole === 'student' ? 'text-white' : 'text-slate-900'}`}>
-              Student / Candidate
-            </h3>
-            <p className={`text-[11px] mt-0.5 leading-snug line-clamp-2 ${activeRole === 'student' ? 'text-blue-100' : 'text-slate-500'}`}>
-              Enrolled students (Classes 1-12) accessing mock tests, online classes, skill programs, scorecards, and certificates.
-            </p>
           </div>
 
-          <div className={`pt-2.5 mt-3 border-t flex items-center justify-between text-[11px] ${
-            activeRole === 'student' ? 'border-white/20' : 'border-slate-100'
+          <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold shrink-0 ${
+            activeRole === 'student' ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-2xs' : 'bg-slate-100 text-slate-500'
           }`}>
-            <span className={`font-bold ${activeRole === 'student' ? 'text-pink-300' : 'text-pink-700'}`}>
-              {studentActiveCount} / {catalog.length} Enabled
-            </span>
-            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-              activeRole === 'student' ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-2xs' : 'bg-slate-100 text-slate-600'
-            }`}>
-              {activeRole === 'student' ? '● Editing Now' : 'Select'}
-            </span>
-          </div>
+            {activeRole === 'student' ? '● Editing' : 'Select'}
+          </span>
         </div>
       </div>
 
