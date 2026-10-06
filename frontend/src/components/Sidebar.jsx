@@ -154,9 +154,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                 onGoToPublic();
                 if (onClose) onClose();
               }}
-              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-bold text-blue-100 bg-gradient-to-r from-[#1e3a8a]/80 via-[#4338ca]/60 to-[#831843]/60 hover:from-[#1e40af] hover:via-[#4f46e5] hover:to-[#9d174d] border border-indigo-500/40 mb-2 cursor-pointer shadow-md transition-all"
+              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-200 bg-slate-800 hover:bg-slate-700 border border-slate-700 mb-2 cursor-pointer shadow-xs transition-all"
             >
-              <Globe className="w-4.5 h-4.5 text-blue-300 shrink-0" />
+              <Globe className="w-4.5 h-4.5 text-slate-300 shrink-0" />
               <span>🌐 View Public Website</span>
             </button>
           )}
@@ -171,11 +171,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
               }}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer ${
                 currentTab === 'overview'
-                  ? 'bg-gradient-to-r from-[#2b27cf] via-[#7e2dbf] to-[#e0469b] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
-                  : 'text-slate-200 hover:bg-[#1a264e] hover:text-white font-semibold'
+                  ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                  : 'text-slate-300 hover:bg-[#1a264e] hover:text-white font-semibold'
               }`}
             >
-              <LayoutDashboard className={`w-5 h-5 shrink-0 ${currentTab === 'overview' ? 'text-white' : 'text-blue-300'}`} />
+              <LayoutDashboard className={`w-5 h-5 shrink-0 ${currentTab === 'overview' ? 'text-white' : 'text-slate-400'}`} />
               <span>Dashboard</span>
             </button>
           )}
@@ -186,7 +186,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           {user?.role === 'superadmin' && (
             <div className="space-y-1 pt-2.5">
               <div className="px-3 pb-1">
-                <p className="text-xs font-black uppercase tracking-wider text-pink-300">
+                <p className="text-xs font-black uppercase tracking-wider text-slate-400">
                   ADMINISTRATION
                 </p>
               </div>
@@ -207,11 +207,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                       }}
                       className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer text-left ${
                         isActive
-                          ? 'bg-gradient-to-r from-[#2b27cf] via-[#7e2dbf] to-[#e0469b] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
-                          : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
+                          ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                          : 'text-slate-300 font-semibold hover:bg-[#1a264e] hover:text-white'
                       }`}
                     >
-                      <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-blue-300'}`} />
+                      <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                       <span className="truncate">{item.label}</span>
                     </button>
                   );
@@ -225,7 +225,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           {user?.role === 'teacher' && (
             <div className="space-y-1 pt-2.5">
               <div className="px-3 pb-1">
-                <p className="text-xs font-black uppercase tracking-wider text-pink-300">
+                <p className="text-xs font-black uppercase tracking-wider text-slate-400">
                   FACULTY PORTAL
                 </p>
               </div>
@@ -243,11 +243,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     }}
                     className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer text-left ${
                       isActive
-                        ? 'bg-gradient-to-r from-[#2b27cf] via-[#7e2dbf] to-[#e0469b] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
-                        : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
+                        ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                        : 'text-slate-300 font-semibold hover:bg-[#1a264e] hover:text-white'
                     }`}
                   >
-                    <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-blue-300'}`} />
+                    <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                     <span className="truncate">{item.label}</span>
                   </button>
                 );
@@ -256,13 +256,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           )}
 
           {/* ========================================================================= */}
-          {/* 3. STUDENT PORTAL (CLEAN ACCORDION WITH THEMED DARK STYLING)              */}
+          {/* 3. STUDENT PORTAL (CLEAN MODERN ACCORDION STYLING)                        */}
           {/* ========================================================================= */}
           {(!user || user?.role === 'student') && (
             <div className="space-y-3.5 pt-2">
               {/* SECTION A: OLYMPIADS */}
               <div className="space-y-1.5">
-                <p className="px-3 text-xs font-black uppercase tracking-wider text-pink-300">
+                <p className="px-3 text-xs font-black uppercase tracking-wider text-slate-400">
                   OLYMPIADS
                 </p>
 
@@ -270,7 +270,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                 <div>
                   <div className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold transition-colors ${
                     currentTab === 'my_content' || currentTab.startsWith('content_')
-                      ? 'bg-gradient-to-r from-[#2b27cf] via-[#7e2dbf] to-[#e0469b] text-white shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
+                      ? 'bg-slate-800 text-white shadow-sm border border-slate-700'
                       : 'text-slate-200 hover:bg-[#1a264e] hover:text-white'
                   }`}>
                     <button
@@ -284,7 +284,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                       }}
                       className="flex-1 flex items-center gap-2.5 text-left cursor-pointer"
                     >
-                      <BookOpen className="w-5 h-5 text-pink-200 shrink-0" />
+                      <BookOpen className="w-5 h-5 text-slate-300 shrink-0" />
                       <span>Mock Test</span>
                     </button>
                     <button
@@ -326,11 +326,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                             }}
                             className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                               isSubActive
-                                ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
+                                ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
                                 : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                             }`}
                           >
-                            <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-pink-300' : 'text-blue-300'}`} />
+                            <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-white' : 'text-slate-400'}`} />
                             <span className="truncate">{sub.label}</span>
                           </button>
                         );
@@ -348,11 +348,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   }}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
                     currentTab === 'my_classes'
-                      ? 'bg-gradient-to-r from-[#2b27cf] via-[#7e2dbf] to-[#e0469b] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
+                      ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
                       : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                   }`}
                 >
-                  <Users className="w-5 h-5 text-blue-300 shrink-0" />
+                  <Users className="w-5 h-5 text-slate-400 shrink-0" />
                   <span>My Classes</span>
                 </button>
               </div>
@@ -367,7 +367,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-slate-200 hover:bg-[#1a264e] hover:text-white cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <BarChart3 className="w-5 h-5 text-blue-400 shrink-0" />
+                      <BarChart3 className="w-5 h-5 text-slate-400 shrink-0" />
                       <span>My Performance</span>
                     </div>
                     {studentAccordions.performance ? (
@@ -388,11 +388,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'performance'
-                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
+                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
-                        <BarChart3 className="w-4 h-4 text-purple-300 shrink-0" />
+                        <BarChart3 className="w-4 h-4 text-slate-400 shrink-0" />
                         <span className="truncate">Statistics &amp; Reports</span>
                       </button>
                       <button
@@ -403,11 +403,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'analysis' || currentTab === 'exam_solutions'
-                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
+                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
-                        <TrendingUp className="w-4 h-4 text-blue-300 shrink-0" />
+                        <TrendingUp className="w-4 h-4 text-slate-400 shrink-0" />
                         <span className="truncate">Analysis</span>
                       </button>
                     </div>
@@ -423,18 +423,18 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   }}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
                     currentTab === 'my_revision'
-                      ? 'bg-gradient-to-r from-[#2b27cf] via-[#7e2dbf] to-[#e0469b] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
+                      ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
                       : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                   }`}
                 >
-                  <Bookmark className="w-5 h-5 text-pink-300 shrink-0" />
+                  <Bookmark className="w-5 h-5 text-slate-400 shrink-0" />
                   <span>My Revision</span>
                 </button>
               </div>
 
               {/* SECTION C: MY ACCOUNT */}
               <div className="space-y-1.5 pt-2 border-t border-[#312e81]/60">
-                <p className="px-3 text-xs font-black uppercase tracking-wider text-pink-300">
+                <p className="px-3 text-xs font-black uppercase tracking-wider text-slate-400">
                   MY ACCOUNT
                 </p>
 
@@ -446,7 +446,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-slate-200 hover:bg-[#1a264e] hover:text-white cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <User className="w-5 h-5 text-amber-300 shrink-0" />
+                      <User className="w-5 h-5 text-slate-400 shrink-0" />
                       <span>My Account</span>
                     </div>
                     {studentAccordions.account ? (
@@ -467,11 +467,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'profile'
-                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
+                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
-                        <User className="w-4 h-4 text-purple-300 shrink-0" />
+                        <User className="w-4 h-4 text-slate-400 shrink-0" />
                         <span className="truncate">My Profile</span>
                       </button>
                       <button
@@ -482,11 +482,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'my_orders'
-                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
+                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
-                        <CreditCard className="w-4 h-4 text-blue-300 shrink-0" />
+                        <CreditCard className="w-4 h-4 text-slate-400 shrink-0" />
                         <span className="truncate">My Orders</span>
                       </button>
                       <button
@@ -497,11 +497,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'my_wallet'
-                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
+                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
-                        <Wallet className="w-4 h-4 text-emerald-300 shrink-0" />
+                        <Wallet className="w-4 h-4 text-slate-400 shrink-0" />
                         <span className="truncate">My Wallet</span>
                       </button>
                     </div>
@@ -511,7 +511,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
               {/* SECTION D: OTHERS & INFORMATION */}
               <div className="space-y-1.5 pt-2 border-t border-[#312e81]/60">
-                <p className="px-3 text-xs font-black uppercase tracking-wider text-pink-300">
+                <p className="px-3 text-xs font-black uppercase tracking-wider text-slate-400">
                   INFO &amp; EXTRAS
                 </p>
 
@@ -523,7 +523,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-slate-200 hover:bg-[#1a264e] hover:text-white cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <Info className="w-5 h-5 text-purple-300 shrink-0" />
+                      <Info className="w-5 h-5 text-slate-400 shrink-0" />
                       <span>Info</span>
                     </div>
                     {studentAccordions.info ? (
@@ -552,11 +552,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                             }}
                             className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                               isSubActive
-                                ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
+                                ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
                                 : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                             }`}
                           >
-                            <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-pink-300' : 'text-blue-300'}`} />
+                            <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-white' : 'text-slate-400'}`} />
                             <span className="truncate">{sub.label}</span>
                           </button>
                         );
@@ -573,7 +573,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-slate-200 hover:bg-[#1a264e] hover:text-white cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <Send className="w-5 h-5 text-blue-400 shrink-0" />
+                      <Send className="w-5 h-5 text-slate-400 shrink-0" />
                       <span>Free Zone</span>
                     </div>
                     {studentAccordions.freeZone ? (
@@ -594,11 +594,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'free_sample_papers'
-                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
+                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
-                        <FileText className="w-4 h-4 text-purple-300 shrink-0" />
+                        <FileText className="w-4 h-4 text-slate-400 shrink-0" />
                         <span className="truncate">Sample Papers &amp; OMR</span>
                       </button>
                       <button
@@ -609,11 +609,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         }}
                         className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'free_past_papers'
-                            ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
+                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
-                        <FileSpreadsheet className="w-4 h-4 text-blue-300 shrink-0" />
+                        <FileSpreadsheet className="w-4 h-4 text-slate-400 shrink-0" />
                         <span className="truncate">Previous Year Papers</span>
                       </button>
                     </div>
@@ -629,11 +629,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   }}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
                     currentTab === 'free_quizzes'
-                      ? 'bg-gradient-to-r from-[#2b27cf] via-[#7e2dbf] to-[#e0469b] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
+                      ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
                       : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                   }`}
                 >
-                  <HelpCircle className="w-5 h-5 text-blue-300 shrink-0" />
+                  <HelpCircle className="w-5 h-5 text-slate-400 shrink-0" />
                   <span>FREE Quizzes</span>
                 </button>
               </div>
@@ -675,11 +675,11 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                 }}
                 className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[14px] font-bold transition-all cursor-pointer ${
                   currentTab === 'profile'
-                    ? 'bg-gradient-to-r from-[#2b27cf] via-[#7e2dbf] to-[#e0469b] text-white'
+                    ? 'bg-slate-800 text-white'
                     : 'text-slate-200 hover:bg-[#1a264e] hover:text-white'
                 }`}
               >
-                <User className="w-4.5 h-4.5 text-purple-300" />
+                <User className="w-4.5 h-4.5 text-slate-400" />
                 <span>My Profile</span>
               </button>
 
@@ -704,28 +704,28 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
             onClick={() => setIsUserMenuOpen(prev => !prev)}
             className={`w-full flex items-center justify-between p-2.5 rounded-2xl bg-[#131d3d] border transition-all cursor-pointer text-left ${
               isUserMenuOpen
-                ? 'border-purple-400 ring-2 ring-purple-500/30 shadow-md bg-[#18254c]'
-                : 'border-[#263560] hover:border-purple-400/60 shadow-md hover:bg-[#18254c]'
+                ? 'border-slate-500 ring-2 ring-slate-500/30 shadow-md bg-[#18254c]'
+                : 'border-[#263560] hover:border-slate-500/60 shadow-md hover:bg-[#18254c]'
             }`}
             title="Click to open Profile & Logout menu"
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#2b27cf] via-[#7e2dbf] to-[#e0469b] text-white font-black text-sm flex items-center justify-center border border-purple-400/30 shrink-0 shadow-xs">
+              <div className="w-9 h-9 rounded-xl bg-slate-800 text-white font-black text-sm flex items-center justify-center border border-slate-700 shrink-0 shadow-xs">
                 {(user?.full_name || user?.name || user?.login_id || 'C').charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
                 <p className="text-[14px] font-bold text-white truncate">
                   {user?.full_name || user?.name || user?.login_id || 'Candidate'}
                 </p>
-                <span className="inline-block px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#1e1c45] text-purple-200 border border-purple-800/60 capitalize">
+                <span className="inline-block px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#1e1c45] text-slate-300 border border-slate-700 capitalize">
                   {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'teacher' ? 'Faculty' : 'Candidate'}
                 </span>
               </div>
             </div>
 
-            <div className="p-1 rounded-lg text-slate-400 hover:text-purple-300 transition-colors shrink-0">
+            <div className="p-1 rounded-lg text-slate-400 hover:text-white transition-colors shrink-0">
               {isUserMenuOpen ? (
-                <ChevronDown className="w-4.5 h-4.5 text-purple-300" />
+                <ChevronDown className="w-4.5 h-4.5 text-white" />
               ) : (
                 <ChevronUp className="w-4.5 h-4.5 text-slate-400" />
               )}
