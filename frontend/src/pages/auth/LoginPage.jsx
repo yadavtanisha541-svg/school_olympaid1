@@ -46,48 +46,49 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col justify-between items-center py-6 sm:py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gradient-to-b from-[#b93787] via-[#6e32a0] to-[#2355c8]">
-      {/* Ambient Lighting Accents */}
-      <div className="absolute top-[-10%] left-[-8%] w-[480px] h-[480px] rounded-full bg-pink-400/20 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-8%] w-[520px] h-[520px] rounded-full bg-blue-400/20 blur-3xl pointer-events-none" />
+    <div className="min-h-screen w-full flex flex-col justify-between items-center py-6 sm:py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-slate-100/90 font-sans">
+      {/* Ambient Lighting Accents in background */}
+      <div className="absolute top-[-10%] left-[-8%] w-[480px] h-[480px] rounded-full bg-pink-200/40 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-8%] w-[520px] h-[520px] rounded-full bg-blue-200/40 blur-3xl pointer-events-none" />
 
       {/* Decorative Subtle Background Dots */}
       <div
-        className="absolute inset-0 opacity-[0.06] pointer-events-none"
+        className="absolute inset-0 opacity-[0.35] pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(#ffffff 1.2px, transparent 1.2px)`,
-          backgroundSize: '28px 28px'
+          backgroundImage: `radial-gradient(#94a3b8 1.2px, transparent 1.2px)`,
+          backgroundSize: '24px 24px'
         }}
       />
 
       {/* Top Header Navigation: Back to Website */}
-      <div className="w-full max-w-4xl mx-auto flex items-center justify-start relative z-20 mb-4 sm:mb-2">
+      <div className="w-full max-w-lg mx-auto flex items-center justify-start relative z-20 mb-3 sm:mb-2">
         <button
           type="button"
           onClick={handleGoHome}
-          className="inline-flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-bold shadow-xs backdrop-blur-md transition-all cursor-pointer group active:scale-95"
+          className="inline-flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold shadow-xs transition-all cursor-pointer group active:scale-95"
         >
-          <ArrowLeft className="w-4 h-4 text-white group-hover:-translate-x-0.5 transition-transform" />
+          <ArrowLeft className="w-4 h-4 text-slate-600 group-hover:-translate-x-0.5 transition-transform" />
           <span>← Back to Website</span>
         </button>
       </div>
 
-      <div className="w-full max-w-md relative z-10 my-auto">
+      {/* Center Square Login Box Card with Pink -> Purple -> Blue Gradient */}
+      <div className="w-full max-w-md relative z-10 my-auto bg-gradient-to-b from-[#b93787] via-[#6e32a0] to-[#2355c8] rounded-[32px] p-6 sm:p-8 shadow-2xl border-2 border-white/30 text-white">
         {/* Branding Header */}
-        <div className="text-center mb-7 flex flex-col items-center">
-          <div className="mb-3 transform hover:scale-105 transition-transform duration-200 cursor-pointer p-2 rounded-2xl bg-white/90 backdrop-blur-sm shadow-md" onClick={handleGoHome} title="Go to Home">
+        <div className="text-center mb-6 flex flex-col items-center">
+          <div className="mb-3 transform hover:scale-105 transition-transform duration-200 cursor-pointer p-2 rounded-2xl bg-white/95 shadow-md" onClick={handleGoHome} title="Go to Home">
             <OlympiadHubLogo size="lg" />
           </div>
-          <p className="mt-2 text-xs sm:text-sm text-pink-100 font-bold tracking-wide drop-shadow-xs">
+          <p className="mt-1 text-xs sm:text-sm text-pink-100 font-bold tracking-wide drop-shadow-xs">
             National Online Examination &amp; Olympiad Assessment System
           </p>
         </div>
 
         {/* Login Form Container */}
-        <div className="w-full px-2 sm:px-4">
-          <form className="space-y-5" onSubmit={handleSubmit}>
+        <div className="w-full">
+          <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit}>
             {error && (
-              <div className="p-3.5 rounded-2xl bg-rose-500/90 border border-white/20 text-white text-xs font-bold flex items-start gap-2.5 animate-shake shadow-lg backdrop-blur-md">
+              <div className="p-3.5 rounded-2xl bg-rose-500/90 border border-white/30 text-white text-xs font-bold flex items-start gap-2.5 animate-shake shadow-lg backdrop-blur-md">
                 <AlertCircle className="w-4 h-4 text-white shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
@@ -165,13 +166,20 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
           </form>
 
           {/* Additional Quick Help */}
-          <div className="mt-7 text-center">
+          <div className="mt-6 text-center">
             <p className="text-xs text-pink-100 font-semibold drop-shadow-xs">
               Don't have login credentials?{' '}
               <span className="text-white font-black underline underline-offset-2 cursor-pointer">Contact your School Coordinator</span>
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Footer */}
+      <div className="relative z-10 text-center mt-3">
+        <p className="text-[11px] text-slate-500 font-bold">
+          © {new Date().getFullYear()} OlympiadHub Assessment Portal. All Rights Reserved.
+        </p>
       </div>
     </div>
   );
