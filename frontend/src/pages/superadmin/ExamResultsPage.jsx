@@ -75,9 +75,32 @@ export const ExamResultsPage = () => {
       const combined = [...localList, ...apiResults];
       const seen = new Set();
       const unique = [];
-      combined.forEach((r) => {
-        if (!r) return;
-        const uid = r.id || r.attempt_id || `${r.student_login_id || r.student_name}_${r.exam_title}_${r.submitted_at}`;
+      combined.forEach((rawR) => {
+        if (!rawR) return;
+        const totalQ = Number(rawR.total_marks || rawR.total_questions || rawR.totalQuestions || 60);
+        const scoreVal = Number(rawR.score || rawR.earnedScore || 0);
+        const calcPct = rawR.percentage !== undefined && rawR.percentage !== null && !isNaN(Number(rawR.percentage))
+          ? parseFloat(rawR.percentage).toFixed(1)
+          : (totalQ > 0 ? ((scoreVal / totalQ) * 100).toFixed(1) : '0.0');
+
+        const r = {
+          ...rawR,
+          id: rawR.id || rawR.attempt_id || Date.now(),
+          student_name: rawR.student_name || rawR.name || rawR.full_name || rawR.studentName || 'Student Candidate',
+          student_login_id: rawR.student_login_id || rawR.login_id || rawR.studentLoginId || (rawR.student_id ? 'STU-00' + rawR.student_id : 'ID'),
+          class_name: rawR.class_name || rawR.class || rawR.grade || 'Class 6',
+          exam_title: rawR.exam_title || rawR.title || rawR.paper_title || rawR.examTitle || 'Olympiad Practice Test',
+          subject_name: rawR.subject_name || rawR.subject || rawR.subject_code || 'Olympiad',
+          school_name: rawR.school_name || rawR.student_school || rawR.school || 'Independent Candidate',
+          percentage: calcPct,
+          score: scoreVal,
+          total_marks: totalQ,
+          passed: Number(calcPct) >= 40 || Number(rawR.passed) === 1,
+          status: rawR.status || 'completed',
+          submitted_at: rawR.submitted_at || rawR.created_at || rawR.date || new Date().toISOString()
+        };
+
+        const uid = r.id || r.attempt_id || `${r.student_login_id}_${r.exam_title}_${r.submitted_at}`;
         if (!seen.has(uid)) {
           seen.add(uid);
           unique.push(r);

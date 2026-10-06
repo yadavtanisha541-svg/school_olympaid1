@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { apiClient } from '../../api/client';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   Clock,
   AlertTriangle,
@@ -21,6 +22,7 @@ import { Modal } from '../../components/Modal';
 import { Badge } from '../../components/Badge';
 
 export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
+  const { user } = useAuth();
   const [sessionData, setSessionData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -299,6 +301,8 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
       const unansweredCount = qList.length - answeredCount;
       const totalMarks = qList.reduce((sum, q) => sum + (Number(q.marks) || 1), 0);
       const earnedScore = serverRes?.data?.score !== undefined ? Number(serverRes.data.score) : correctCount;
+      const pct = (totalMarks > 0) ? Number(((earnedScore / totalMarks) * 100).toFixed(1)) : 0;
+      const isPassed = pct >= 40;
 
       const record = {
         id: attemptId,
@@ -306,6 +310,17 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
         exam_id: examId,
         exam_title: sessionData?.exam?.title || 'Olympiad Exam',
         title: sessionData?.exam?.title || 'Olympiad Exam',
+        paper_title: sessionData?.exam?.title || 'Olympiad Exam',
+        subject: sessionData?.exam?.subject_name || sessionData?.exam?.subject || sessionData?.exam?.subject_code || 'Olympiad',
+        subject_name: sessionData?.exam?.subject_name || sessionData?.exam?.subject || sessionData?.exam?.subject_code || 'Olympiad',
+        subject_code: sessionData?.exam?.subject_code || 'IMO',
+        class_name: user?.class_name || sessionData?.exam?.class_name || 'Class 6',
+        student_id: user?.id || sessionData?.student?.id || 1,
+        student_name: user?.full_name || user?.name || sessionData?.student?.full_name || 'Student Candidate',
+        student_login_id: user?.login_id || sessionData?.student?.login_id || 'STU-001',
+        student_email: user?.email || '',
+        student_school: user?.school_name || user?.school || 'Independent Candidate',
+        school_name: user?.school_name || user?.school || 'Independent Candidate',
         total_questions: qList.length,
         total_marks: totalMarks,
         score: earnedScore,
@@ -313,6 +328,9 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
         correct_count: correctCount,
         wrong_count: Math.max(0, wrongCount),
         unanswered_count: Math.max(0, unansweredCount),
+        percentage: pct,
+        passed: isPassed,
+        status: 'completed',
         time_spent_seconds: Math.max(1, ((sessionData?.exam?.duration_minutes || 60) * 60) - remainingSeconds),
         time_taken_seconds: Math.max(1, ((sessionData?.exam?.duration_minutes || 60) * 60) - remainingSeconds),
         duration_minutes: sessionData?.exam?.duration_minutes || 60,
@@ -322,9 +340,40 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
 
       const existing = JSON.parse(localStorage.getItem('olympiadhub_student_attempts') || '[]');
       localStorage.setItem('olympiadhub_student_attempts', JSON.stringify([record, ...existing.filter(e => String(e.id || e.attempt_id) !== String(attemptId))]));
+      
+      const existingResults = JSON.parse(localStorage.getItem('olympiadhub_db_results') || '[]');
+      localStorage.setItem('olympiadhub_db_results', JSON.stringify([record, ...existingResults.filter(e => String(e.id || e.attempt_id) !== String(attemptId))]));
+      
       localStorage.setItem('olympiadhub_last_submitted_exam', JSON.stringify(record));
+
+      // Backup persist to server /test-generator/submit endpoint to ensure MySQL sync
+      apiClient.post('/test-generator/submit', {
+        student_id: record.student_id,
+        student_name: record.student_name,
+        student_login_id: record.student_login_id,
+        student_email: record.student_email,
+        student_school: record.school_name,
+        exam_id: record.exam_id,
+        title: record.exam_title,
+        subject: record.subject_name,
+        grade: record.class_name,
+        score: record.score,
+        totalMarks: record.total_marks,
+        totalQuestions: record.total_questions,
+        correctCount: record.correct_count,
+        wrongCount: record.wrong_count,
+        unansweredCount: record.unanswered_count,
+        timeSpentSeconds: record.time_taken_seconds,
+        durationMinutes: record.duration_minutes,
+        questions: qList
+      }).catch(() => {});
+
+      window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: record }));
+      window.dispatchEvent(new Event('exam-submitted'));
+      return record;
     } catch (e) {
       console.warn('Could not cache exam locally:', e);
+      return null;
     }
   };
 
@@ -335,10 +384,14 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
       const res = await apiClient.post('/exam-engine/submit', {
         attempt_id: sessionData.attempt_id
       });
-      cacheAttemptLocally(sessionData.attempt_id, res);
+      const rec = cacheAttemptLocally(sessionData.attempt_id, res);
+      window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: rec || res }));
+      window.dispatchEvent(new Event('exam-submitted'));
       onExamCompleted(sessionData.attempt_id);
     } catch (err) {
-      cacheAttemptLocally(sessionData.attempt_id, null);
+      const rec = cacheAttemptLocally(sessionData.attempt_id, null);
+      window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: rec }));
+      window.dispatchEvent(new Event('exam-submitted'));
       onExamCompleted(sessionData.attempt_id);
     }
   };
@@ -349,14 +402,16 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
       const res = await apiClient.post('/exam-engine/submit', {
         attempt_id: sessionData.attempt_id
       });
-      cacheAttemptLocally(sessionData.attempt_id, res);
+      const rec = cacheAttemptLocally(sessionData.attempt_id, res);
       setShowSubmitModal(false);
-      window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: res }));
+      window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: rec || res }));
       window.dispatchEvent(new Event('exam-submitted'));
       onExamCompleted(sessionData.attempt_id);
     } catch (err) {
-      cacheAttemptLocally(sessionData.attempt_id, null);
+      const rec = cacheAttemptLocally(sessionData.attempt_id, null);
       setShowSubmitModal(false);
+      window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: rec }));
+      window.dispatchEvent(new Event('exam-submitted'));
       onExamCompleted(sessionData.attempt_id);
     }
   };
