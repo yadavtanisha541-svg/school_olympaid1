@@ -8,7 +8,7 @@ export const BlogPage = ({ onNavigatePublic, onOpenRegister }) => {
   return (
     <div className="bg-[#fff9f2] min-h-screen pb-20">
       {/* Header Banner */}
-      <div className="bg-gradient-to-br from-[#4e2a4a] via-[#6d3a68] to-[#8c4e8b] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="max-w-7xl mx-auto relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e7b84b]/20 border border-[#e7b84b]/40 text-[#e7b84b] text-xs font-bold uppercase tracking-wider mb-4">
             <BookOpen className="w-3.5 h-3.5" />
@@ -98,7 +98,7 @@ export const BlogPage = ({ onNavigatePublic, onOpenRegister }) => {
                   setSelectedPost(null);
                   onNavigatePublic('practice-hub');
                 }}
-                className="px-5 py-2.5 bg-[#6d3a68] text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-[#5c3158]"
+                className="px-5 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-[#5c3158]"
               >
                 Start Practice Now →
               </button>

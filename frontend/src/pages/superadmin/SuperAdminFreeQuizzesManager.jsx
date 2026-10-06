@@ -355,7 +355,7 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
           </div>
           <button
             type="submit"
-            className="px-3.5 py-2 rounded-xl bg-[#6d3a68] hover:bg-[#5c3158] text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
           >
             Search
           </button>
@@ -393,7 +393,7 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
             <button
               type="button"
               onClick={handleOpenCreateModal}
-              className="mt-2 px-4 py-2 bg-[#6d3a68] text-white rounded-xl text-xs font-bold hover:bg-[#5c3158] transition-colors cursor-pointer"
+              className="mt-2 px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-xl text-xs font-bold hover:bg-[#5c3158] transition-colors cursor-pointer"
             >
               + Add First Question
             </button>

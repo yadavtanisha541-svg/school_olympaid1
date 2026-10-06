@@ -185,7 +185,7 @@ export const SamplePapersPage = ({ onNavigatePublic, onOpenRegister }) => {
   return (
     <div className="bg-[#fff9f2] min-h-screen pb-20">
       {/* Header Banner */}
-      <div className="bg-gradient-to-br from-[#4e2a4a] via-[#6d3a68] to-[#8c4e8b] text-white py-14 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white py-14 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e7b84b]/20 border border-[#e7b84b]/40 text-[#e7b84b] text-xs font-bold uppercase tracking-wider mb-4">
             <Download className="w-3.5 h-3.5" />
@@ -291,7 +291,7 @@ export const SamplePapersPage = ({ onNavigatePublic, onOpenRegister }) => {
               onClick={() => setSelectedSubject('all')}
               className={`px-3 py-1 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 selectedSubject === 'all'
-                  ? 'bg-[#6d3a68] text-white'
+                  ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white'
                   : 'bg-[#faf5fa] text-[#6d3a68] hover:bg-[#f4ebf4]'
               }`}
             >
@@ -303,7 +303,7 @@ export const SamplePapersPage = ({ onNavigatePublic, onOpenRegister }) => {
                 onClick={() => setSelectedSubject(s.id)}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   selectedSubject === s.id
-                    ? 'bg-[#6d3a68] text-white shadow-xs'
+                    ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
                     : 'bg-[#faf5fa] text-[#5c3158] hover:bg-[#f4ebf4] border border-[#edd6ed]'
                 }`}
               >
@@ -334,7 +334,7 @@ export const SamplePapersPage = ({ onNavigatePublic, onOpenRegister }) => {
               onClick={() => {
                 if (filteredPapers.length > 0) handleInitiateMockTest(filteredPapers[0]);
               }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#d9775b] hover:bg-[#c85e42] text-white rounded-xl text-xs font-extrabold shadow-sm transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-extrabold shadow-sm transition-all cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5 text-[#e7b84b]" />
               <span>Take Free Mock Test</span>
@@ -405,7 +405,7 @@ export const SamplePapersPage = ({ onNavigatePublic, onOpenRegister }) => {
                 </button>
                 <button
                   onClick={() => handleInitiateMockTest(paper)}
-                  className="flex-1 py-2.5 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-colors shadow-sm cursor-pointer"
+                  className="flex-1 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-colors shadow-sm cursor-pointer"
                 >
                   <Play className="w-3.5 h-3.5 text-[#e7b84b]" />
                   <span>Mock Test</span>
@@ -424,7 +424,7 @@ export const SamplePapersPage = ({ onNavigatePublic, onOpenRegister }) => {
           <div className="bg-white rounded-3xl max-w-lg w-full border border-[#edd6ed] shadow-2xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200">
             
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#4e2a4a] via-[#6d3a68] to-[#8c4e8b] text-white px-6 py-5 flex items-start justify-between">
+            <div className="bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white px-6 py-5 flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-[#e7b84b] shrink-0">
                   <GraduationCap className="w-6 h-6" />
@@ -554,7 +554,7 @@ export const SamplePapersPage = ({ onNavigatePublic, onOpenRegister }) => {
               <div className="pt-3">
                 <button
                   type="submit"
-                  className="w-full py-3 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98"
+                  className="w-full py-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98"
                 >
                   <Sparkles className="w-4 h-4 text-[#e7b84b]" />
                   <span>Start Mock Test &amp; View Sample Paper →</span>
@@ -577,7 +577,7 @@ export const SamplePapersPage = ({ onNavigatePublic, onOpenRegister }) => {
           <div className="bg-white rounded-3xl max-w-4xl w-full border border-[#edd6ed] shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
             
             {/* Modal Header Controls */}
-            <div className="bg-gradient-to-r from-[#4e2a4a] via-[#6d3a68] to-[#8c4e8b] text-white px-6 py-4 flex items-center justify-between shrink-0">
+            <div className="bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white px-6 py-4 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#e7b84b]">
                   <FileText className="w-5 h-5" />
@@ -642,7 +642,7 @@ export const SamplePapersPage = ({ onNavigatePublic, onOpenRegister }) => {
                   onClick={() => setShowSolutions(!showSolutions)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
                     showSolutions
-                      ? 'bg-[#d9775b] text-white shadow-xs'
+                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
                       : 'bg-white border border-[#6d3a68] text-[#6d3a68] hover:bg-[#f4ebf4]'
                   }`}
                 >
@@ -729,7 +729,7 @@ export const SamplePapersPage = ({ onNavigatePublic, onOpenRegister }) => {
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-start gap-2.5">
                           <span className={`w-6 h-6 rounded-lg text-xs font-black flex items-center justify-center shrink-0 ${
-                            isAnswered ? 'bg-[#d9775b] text-white' : 'bg-[#6d3a68] text-white'
+                            isAnswered ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white' : 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white'
                           }`}>
                             {qItem.qNum}
                           </span>
@@ -767,7 +767,7 @@ export const SamplePapersPage = ({ onNavigatePublic, onOpenRegister }) => {
                               optionClass = 'bg-white border-[#edd6ed] text-slate-500 opacity-80';
                             }
                           } else if (isOptionSelected) {
-                            optionClass = 'bg-[#6d3a68] text-white border-[#6d3a68] shadow-xs';
+                            optionClass = 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white border-[#6d3a68] shadow-xs';
                           }
 
                           return (
@@ -834,7 +834,7 @@ export const SamplePapersPage = ({ onNavigatePublic, onOpenRegister }) => {
                       setActivePaperModal(null);
                       if (onOpenRegister) onOpenRegister();
                     }}
-                    className="px-4 py-2 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-xl text-xs font-extrabold shadow-sm flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-extrabold shadow-sm flex items-center gap-1.5 cursor-pointer"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-[#e7b84b]" />
                     <span>Register for {activePaperModal.shortName || 'Olympiad'}</span>

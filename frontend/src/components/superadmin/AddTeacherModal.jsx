@@ -905,7 +905,7 @@ export const AddTeacherModal = ({ isOpen = true, isFullPage = true, onClose, onS
                         <span className="truncate">{subject}</span>
                       </div>
                       {isSelected ? (
-                        <span className="w-5 h-5 rounded-full bg-[#6d3a68] text-white flex items-center justify-center shrink-0">
+                        <span className="w-5 h-5 rounded-full bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white flex items-center justify-center shrink-0">
                           <Check className="w-3 h-3" />
                         </span>
                       ) : (
@@ -1041,7 +1041,7 @@ export const AddTeacherModal = ({ isOpen = true, isFullPage = true, onClose, onS
             <button
               type="submit"
               disabled={loading}
-              className="px-8 py-3 bg-gradient-to-r from-[#4e2a4a] via-[#6d3a68] to-[#d9775b] hover:from-[#3d1f39] hover:via-[#5c2f57] hover:to-[#c85e42] text-white rounded-xl text-xs font-extrabold shadow-md shadow-[#4e2a4a]/20 transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50 active:scale-95"
+              className="px-8 py-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-extrabold shadow-md shadow-[#4e2a4a]/20 transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50 active:scale-95"
             >
               {loading ? (
                 <span>Creating Teacher Account...</span>

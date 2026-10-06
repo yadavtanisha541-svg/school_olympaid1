@@ -301,7 +301,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
     <div className="space-y-6 pb-20">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#4e2a4a] text-white px-5 py-3 rounded-2xl shadow-xl border border-[#e7b84b]/40 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-200">
+        <div className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white px-5 py-3 rounded-2xl shadow-xl border border-[#e7b84b]/40 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-200">
           <CheckCircle2 className="w-5 h-5 text-[#e7b84b]" />
           <span className="text-xs font-bold">{toastMessage}</span>
         </div>
@@ -574,7 +574,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
                   </button>
                   <button
                     onClick={handleSaveMenuForm}
-                    className="px-5 py-2 rounded-xl text-xs font-black text-white bg-[#6d3a68] hover:bg-[#5c3158] transition-colors cursor-pointer shadow-sm"
+                    className="px-5 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] transition-colors cursor-pointer shadow-sm"
                   >
                     Save Menu Item
                   </button>
@@ -607,7 +607,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
                   setEditingFaq(null);
                   setIsAddingFaq(true);
                 }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#6d3a68] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-sm w-fit"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-sm w-fit"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add New FAQ Question</span>
@@ -715,7 +715,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
                   </button>
                   <button
                     onClick={handleSaveFaqForm}
-                    className="px-5 py-2 rounded-xl text-xs font-black text-white bg-[#6d3a68] hover:bg-[#5c3158] transition-colors cursor-pointer shadow-sm"
+                    className="px-5 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] transition-colors cursor-pointer shadow-sm"
                   >
                     Save FAQ
                   </button>
@@ -793,7 +793,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
 
               <button
                 onClick={handleSaveDates}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-[#6d3a68] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-md shadow-[#6d3a68]/20 w-fit"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-md shadow-[#6d3a68]/20 w-fit"
               >
                 <Save className="w-4 h-4 text-[#e7b84b]" />
                 <span>Save All Date Changes</span>
@@ -810,7 +810,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
                     onClick={() => setSelectedDateSubject(key)}
                     className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                       selectedDateSubject === key
-                        ? 'bg-[#6d3a68] text-white shadow-sm'
+                        ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-sm'
                         : 'bg-[#faf5fa] text-[#4e2a4a] hover:bg-[#f4ebf4]'
                     }`}
                   >
@@ -824,7 +824,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
             {datesConfig[selectedDateSubject] && (
               <div className="bg-[#faf5fa] rounded-2xl p-6 border border-[#edd6ed] space-y-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="px-3 py-1 rounded-full text-xs font-black bg-[#6d3a68] text-white">
+                  <span className="px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white">
                     {OLYMPIAD_SUBJECT_METADATA[selectedDateSubject]?.code}
                   </span>
                   <h4 className="text-sm font-black text-[#4e2a4a]">
@@ -963,7 +963,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
                 <div className="pt-3 flex justify-end">
                   <button
                     onClick={handleSaveDates}
-                    className="px-5 py-2 rounded-xl text-xs font-black text-white bg-[#6d3a68] hover:bg-[#5c3158] transition-colors cursor-pointer shadow-sm"
+                    className="px-5 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] transition-colors cursor-pointer shadow-sm"
                   >
                     Save {OLYMPIAD_SUBJECT_METADATA[selectedDateSubject]?.code} Dates
                   </button>
@@ -992,7 +992,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
 
               <button
                 onClick={handleSaveSyllabus}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-[#6d3a68] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-md shadow-[#6d3a68]/20 w-fit"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-md shadow-[#6d3a68]/20 w-fit"
               >
                 <Save className="w-4 h-4 text-[#e7b84b]" />
                 <span>Save Syllabus Updates</span>
@@ -1083,7 +1083,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
             <div className="mt-6 flex justify-end">
               <button
                 onClick={handleSaveSyllabus}
-                className="px-6 py-2.5 rounded-xl text-xs font-black text-white bg-[#6d3a68] hover:bg-[#5c3158] transition-colors cursor-pointer shadow-md shadow-[#6d3a68]/20"
+                className="px-6 py-2.5 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] transition-colors cursor-pointer shadow-md shadow-[#6d3a68]/20"
               >
                 Save Syllabus for {selectedSyllabusClass}
               </button>
@@ -1110,7 +1110,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
 
               <button
                 onClick={handleSaveSamplePapers}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-[#6d3a68] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-md shadow-[#6d3a68]/20 w-fit"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-md shadow-[#6d3a68]/20 w-fit"
               >
                 <Save className="w-4 h-4 text-[#e7b84b]" />
                 <span>Save Sample Paper Settings</span>
@@ -1200,7 +1200,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
 
               <button
                 onClick={handleSavePattern}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-[#6d3a68] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-md shadow-[#6d3a68]/20 w-fit"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-md shadow-[#6d3a68]/20 w-fit"
               >
                 <Save className="w-4 h-4 text-[#e7b84b]" />
                 <span>Save Marking Scheme</span>
@@ -1221,7 +1221,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
                   onClick={() => setSelectedPatternBand(band.id)}
                   className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                     selectedPatternBand === band.id
-                      ? 'bg-[#6d3a68] text-white shadow-sm'
+                      ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-sm'
                       : 'bg-[#faf5fa] text-[#4e2a4a] hover:bg-[#f4ebf4]'
                   }`}
                 >
@@ -1367,7 +1367,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
                 <div className="pt-3 flex justify-end">
                   <button
                     onClick={handleSavePattern}
-                    className="px-5 py-2 rounded-xl text-xs font-black text-white bg-[#6d3a68] hover:bg-[#5c3158] transition-colors cursor-pointer shadow-sm"
+                    className="px-5 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] transition-colors cursor-pointer shadow-sm"
                   >
                     Save Marking Scheme for this Band
                   </button>

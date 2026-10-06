@@ -709,7 +709,7 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
                       </div>
 
                       {isSelected && (
-                        <div className="w-5 h-5 rounded-full bg-[#6d3a68] text-white flex items-center justify-center shrink-0">
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white flex items-center justify-center shrink-0">
                           <Check className="w-3.5 h-3.5" />
                         </div>
                       )}
@@ -947,7 +947,7 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
               <button
                 type="button"
                 onClick={() => handleStartTest(activePaper)}
-                className="px-4 py-1.5 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md cursor-pointer flex items-center gap-1.5"
+                className="px-4 py-1.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md cursor-pointer flex items-center gap-1.5"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Retake Test ⚡</span>
@@ -1438,7 +1438,7 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
                     onClick={() => setSelectedClass(g)}
                     className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
                       selectedClass === g
-                        ? 'bg-[#d9775b] text-white border-[#d9775b] shadow-xs'
+                        ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white border-[#d9775b] shadow-xs'
                         : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
                     }`}
                   >
@@ -1568,7 +1568,7 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
                         onClick={() => setSelectedYear(yr)}
                         className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
                           selectedYear === yr
-                            ? 'bg-[#6d3a68] text-white border-[#6d3a68] shadow-xs'
+                            ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white border-[#6d3a68] shadow-xs'
                             : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                         }`}
                       >
@@ -1582,7 +1582,7 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
                         onClick={() => setSelectedSampleSet(set)}
                         className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
                           selectedSampleSet === set
-                            ? 'bg-[#6d3a68] text-white border-[#6d3a68] shadow-xs'
+                            ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white border-[#6d3a68] shadow-xs'
                             : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                         }`}
                       >

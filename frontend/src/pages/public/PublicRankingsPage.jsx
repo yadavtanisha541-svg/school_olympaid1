@@ -77,7 +77,7 @@ export const PublicRankingsPage = ({ onNavigatePublic, onOpenRegister }) => {
   return (
     <div className="bg-[#fff9f2] min-h-screen pb-20">
       {/* Header Banner */}
-      <div className="bg-gradient-to-br from-[#4e2a4a] via-[#6d3a68] to-[#8c4e8b] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e7b84b]/20 border border-[#e7b84b]/40 text-[#e7b84b] text-xs font-bold uppercase tracking-wider mb-4">
             <Trophy className="w-3.5 h-3.5" />
@@ -102,7 +102,7 @@ export const PublicRankingsPage = ({ onNavigatePublic, onOpenRegister }) => {
               }}
               className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
                 activeTab === 'leaderboard'
-                  ? 'bg-[#6d3a68] text-white shadow-md shadow-[#6d3a68]/20'
+                  ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-md shadow-[#6d3a68]/20'
                   : 'bg-[#faf5fa] text-[#5c3158] hover:bg-[#f4ebf4]'
               }`}
             >
@@ -114,7 +114,7 @@ export const PublicRankingsPage = ({ onNavigatePublic, onOpenRegister }) => {
               }}
               className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
                 activeTab === 'cutoffs'
-                  ? 'bg-[#6d3a68] text-white shadow-md shadow-[#6d3a68]/20'
+                  ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-md shadow-[#6d3a68]/20'
                   : 'bg-[#faf5fa] text-[#5c3158] hover:bg-[#f4ebf4]'
               }`}
             >
@@ -212,7 +212,7 @@ export const PublicRankingsPage = ({ onNavigatePublic, onOpenRegister }) => {
                     } else if (row.rank === 2) {
                       rankBadge = <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-300 text-[#321630] font-black text-xs shadow-sm">2</span>;
                     } else if (row.rank === 3) {
-                      rankBadge = <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#d9775b] text-white font-black text-xs shadow-sm">3</span>;
+                      rankBadge = <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-black text-xs shadow-sm">3</span>;
                     } else {
                       rankBadge = <span className="text-xs font-bold text-slate-500">{row.rank}</span>;
                     }
@@ -317,7 +317,7 @@ export const PublicRankingsPage = ({ onNavigatePublic, onOpenRegister }) => {
                         onClick={() => setSelectedCutoffSubject(s.id)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                           selectedCutoffSubject === s.id
-                            ? 'bg-[#6d3a68] text-white shadow-sm'
+                            ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-sm'
                             : 'bg-[#faf5fa] text-slate-600 hover:bg-[#f4ebf4]'
                         }`}
                       >
@@ -420,7 +420,7 @@ export const PublicRankingsPage = ({ onNavigatePublic, onOpenRegister }) => {
                               {row.totalMarks}
                             </td>
                             <td className="py-4 px-4 text-center bg-[#faf4e0]/40">
-                              <span className="px-3 py-1 rounded-lg font-black text-xs bg-[#6d3a68] text-white shadow-xs">
+                              <span className="px-3 py-1 rounded-lg font-black text-xs bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs">
                                 {row.level1CutOff} / {row.totalMarks}
                               </span>
                             </td>
@@ -497,7 +497,7 @@ export const PublicRankingsPage = ({ onNavigatePublic, onOpenRegister }) => {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                     <div className="bg-[#fff9f2] p-4 rounded-2xl border border-[#edd6ed]">
-                      <div className="w-7 h-7 rounded-full bg-[#6d3a68] text-white flex items-center justify-center font-black text-xs mb-2">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white flex items-center justify-center font-black text-xs mb-2">
                         1
                       </div>
                       <h4 className="font-bold text-[#4e2a4a] mb-1">Top 5% National/International</h4>
@@ -507,7 +507,7 @@ export const PublicRankingsPage = ({ onNavigatePublic, onOpenRegister }) => {
                     </div>
 
                     <div className="bg-[#fff9f2] p-4 rounded-2xl border border-[#edd6ed]">
-                      <div className="w-7 h-7 rounded-full bg-[#d9775b] text-white flex items-center justify-center font-black text-xs mb-2">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white flex items-center justify-center font-black text-xs mb-2">
                         2
                       </div>
                       <h4 className="font-bold text-[#4e2a4a] mb-1">Top 25 Zonal Rank Holders</h4>
@@ -557,7 +557,7 @@ export const PublicRankingsPage = ({ onNavigatePublic, onOpenRegister }) => {
                     </button>
                     <button
                       onClick={() => onOpenRegister ? onOpenRegister() : (onNavigatePublic && onNavigatePublic('direct-enrollment'))}
-                      className="px-5 py-2.5 rounded-xl text-xs font-black bg-[#6d3a68] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-md shadow-[#6d3a68]/20"
+                      className="px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-md shadow-[#6d3a68]/20"
                     >
                       Register for Olympiad
                     </button>

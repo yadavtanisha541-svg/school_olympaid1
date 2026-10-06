@@ -25,7 +25,7 @@ export const ExamSchedulePage = ({ selectedDisciplineId = 'all', onNavigatePubli
   return (
     <div className="bg-[#fff9f2] min-h-screen pb-20">
       {/* Header Banner */}
-      <div className="bg-gradient-to-br from-[#4e2a4a] via-[#6d3a68] to-[#8c4e8b] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e7b84b]/20 border border-[#e7b84b]/40 text-[#e7b84b] text-xs font-bold uppercase tracking-wider mb-4">
             <Calendar className="w-3.5 h-3.5" />
@@ -48,7 +48,7 @@ export const ExamSchedulePage = ({ selectedDisciplineId = 'all', onNavigatePubli
             onClick={() => setSelectedDiscipline('all')}
             className={`px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap cursor-pointer ${
               selectedDiscipline === 'all'
-                ? 'bg-[#6d3a68] text-white shadow-xs'
+                ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
                 : 'text-slate-600 hover:bg-[#faf5fa] hover:text-[#6d3a68]'
             }`}
           >
@@ -61,7 +61,7 @@ export const ExamSchedulePage = ({ selectedDisciplineId = 'all', onNavigatePubli
               onClick={() => setSelectedDiscipline(cat.id)}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                 selectedDiscipline === cat.id
-                  ? 'bg-[#6d3a68] text-white shadow-xs'
+                  ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-xs'
                   : 'text-slate-600 hover:bg-[#faf5fa] hover:text-[#6d3a68]'
               }`}
             >
@@ -94,13 +94,13 @@ export const ExamSchedulePage = ({ selectedDisciplineId = 'all', onNavigatePubli
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setSelectedSlotModal(cat)}
-                    className="px-5 py-2.5 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-md text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                    className="px-5 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
                   >
                     Select Exam Slot
                   </button>
                   <button
                     onClick={onOpenRegister}
-                    className="px-5 py-2.5 bg-gradient-to-r from-[#d9775b] to-[#c85e42] hover:from-[#c85e42] hover:to-[#a74a32] text-white rounded-md text-xs font-extrabold transition-all shadow-md shadow-[#d9775b]/20 cursor-pointer whitespace-nowrap"
+                    className="px-5 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-extrabold transition-all shadow-md shadow-[#d9775b]/20 cursor-pointer whitespace-nowrap"
                   >
                     Register Student →
                   </button>
@@ -205,7 +205,7 @@ export const ExamSchedulePage = ({ selectedDisciplineId = 'all', onNavigatePubli
                   setSelectedSlotModal(null);
                   onOpenRegister();
                 }}
-                className="flex-1 py-2.5 bg-[#d9775b] hover:bg-[#c85e42] text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
+                className="flex-1 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
               >
                 Confirm &amp; Register
               </button>

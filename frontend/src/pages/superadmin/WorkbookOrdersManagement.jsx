@@ -499,7 +499,7 @@ export const WorkbookOrdersManagement = () => {
               <button
                 type="button"
                 onClick={() => setSelectedOrder(null)}
-                className="px-4 py-1.5 bg-[#6d3a68] text-white hover:bg-[#5c3158] rounded-sm text-xs font-bold transition-all cursor-pointer"
+                className="px-4 py-1.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white hover:bg-[#5c3158] rounded-sm text-xs font-bold transition-all cursor-pointer"
               >
                 Done
               </button>

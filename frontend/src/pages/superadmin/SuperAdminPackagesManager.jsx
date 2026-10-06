@@ -724,7 +724,7 @@ export const SuperAdminPackagesManager = () => {
               onClick={() => setPaperModalTab('details')}
               className={`py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
                 paperModalTab === 'details'
-                  ? 'bg-[#4e2a4a] text-white shadow-xs'
+                  ? 'bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
@@ -736,7 +736,7 @@ export const SuperAdminPackagesManager = () => {
               onClick={() => setPaperModalTab('questions')}
               className={`py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
                 paperModalTab === 'questions'
-                  ? 'bg-[#4e2a4a] text-white shadow-xs'
+                  ? 'bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
@@ -748,7 +748,7 @@ export const SuperAdminPackagesManager = () => {
               onClick={() => setPaperModalTab('bulk')}
               className={`py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
                 paperModalTab === 'bulk'
-                  ? 'bg-[#4e2a4a] text-white shadow-xs'
+                  ? 'bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
@@ -916,7 +916,7 @@ export const SuperAdminPackagesManager = () => {
                           setPaperSections([...paperSections, newSectionInput.trim()]);
                           setNewSectionInput('');
                         }}
-                        className="px-3 py-1.5 bg-[#4e2a4a] text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-[#3d203a]"
+                        className="px-3 py-1.5 bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-[#3d203a]"
                       >
                         Add
                       </button>
@@ -1757,7 +1757,7 @@ Explanation: Sir Tim Berners-Lee invented the WWW at CERN in 1989.`}
               }}
               className={`py-2 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap ${
                 isActive
-                  ? 'bg-[#4e2a4a] text-white shadow-xs'
+                  ? 'bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-200/60 hover:text-[#4e2a4a]'
               }`}
             >

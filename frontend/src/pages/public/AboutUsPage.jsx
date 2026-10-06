@@ -6,7 +6,7 @@ export const AboutUsPage = ({ onNavigatePublic, onOpenRegister }) => {
   return (
     <div className="bg-[#fff9f2] min-h-screen pb-20">
       {/* Header Banner */}
-      <div className="bg-gradient-to-br from-[#4e2a4a] via-[#6d3a68] to-[#8c4e8b] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="max-w-7xl mx-auto relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e7b84b]/20 border border-[#e7b84b]/40 text-[#e7b84b] text-xs font-bold uppercase tracking-wider mb-4">
             <Sparkles className="w-3.5 h-3.5" />
@@ -66,7 +66,7 @@ export const AboutUsPage = ({ onNavigatePublic, onOpenRegister }) => {
         </div>
 
         {/* CTA Card */}
-        <div className="mt-12 bg-gradient-to-r from-[#4e2a4a] to-[#6d3a68] rounded-3xl p-8 sm:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+        <div className="mt-12 bg-gradient-to-r from-[#1e3a8a] via-[#5b21b6] to-[#9d174d] rounded-3xl p-8 sm:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
           <div>
             <h3 className="text-2xl font-black text-white">Join the SkillRise Olympiad Ecosystem</h3>
             <p className="text-xs text-[#deb8de] mt-1 max-w-xl">
@@ -76,7 +76,7 @@ export const AboutUsPage = ({ onNavigatePublic, onOpenRegister }) => {
           <div className="flex gap-3">
             <button
               onClick={onOpenRegister}
-              className="px-6 py-3 bg-[#d9775b] hover:bg-[#c85e42] text-white rounded-xl text-xs font-black shadow-md cursor-pointer whitespace-nowrap"
+              className="px-6 py-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-black shadow-md cursor-pointer whitespace-nowrap"
             >
               Register Student Now →
             </button>

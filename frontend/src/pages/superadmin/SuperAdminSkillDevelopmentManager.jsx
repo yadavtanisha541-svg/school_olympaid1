@@ -503,7 +503,7 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
     <div className="space-y-6 pb-20 font-sans">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#4e2a4a] text-white px-5 py-3 rounded-2xl shadow-xl border border-[#e7b84b]/40 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-200">
+        <div className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white px-5 py-3 rounded-2xl shadow-xl border border-[#e7b84b]/40 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-200">
           <CheckCircle2 className="w-5 h-5 text-[#e7b84b]" />
           <span className="text-xs font-bold">{toastMessage}</span>
         </div>

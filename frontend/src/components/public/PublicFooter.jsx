@@ -22,7 +22,7 @@ export const PublicFooter = ({ onNavigatePublic, onOpenLogin, onOpenRegister }) 
   };
 
   return (
-    <footer className="bg-gradient-to-b from-[#0e1738] via-[#121c44] to-[#0a1028] text-slate-200 border-t border-[#1e295d] relative overflow-hidden">
+    <footer className="bg-gradient-to-b from-[#0f172a] via-[#1e1b4b] to-[#2e1065] text-slate-200 border-t border-[#1e295d] relative overflow-hidden">
       {/* Background Decorative Gradient Glow */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#5b3da8]/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-10 w-96 h-96 bg-[#16327a]/25 rounded-full blur-3xl pointer-events-none" />

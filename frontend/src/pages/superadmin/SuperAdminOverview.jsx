@@ -134,112 +134,112 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
         </div>
       </div>
 
-      {/* 2. Top Metric Cards (Row 1: 4 Light Mixed Gradient Theme Boxes) */}
+      {/* 2. Top Metric Cards (Row 1: 4 Mixed Gradient Theme Boxes) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Total Students */}
-        <div className="bg-gradient-to-br from-blue-50/90 via-indigo-50/70 to-pink-50/90 rounded-3xl border-2 border-indigo-200/90 hover:border-pink-400 p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-200 flex items-center justify-between text-slate-900 group hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 hover:border-pink-400 p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
           <div className="flex items-center gap-3.5">
-            <div className="w-14 h-14 rounded-2xl bg-white text-pink-600 border border-pink-200 flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-white/10 text-pink-300 border border-white/20 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
               <Users className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-xs sm:text-sm font-bold text-slate-600">Total Students</p>
-              <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mt-0.5 font-mono">
+              <p className="text-xs sm:text-sm font-bold text-slate-300">Total Students</p>
+              <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight mt-0.5 font-mono">
                 {metrics.total_students ?? 2}
               </h3>
-              <p className="text-xs text-pink-600 font-semibold mt-0.5">Enrolled candidates</p>
+              <p className="text-xs text-pink-300 font-semibold mt-0.5">Enrolled candidates</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <svg className="w-14 h-7 text-pink-600 stroke-current fill-none" viewBox="0 0 50 20">
+            <svg className="w-14 h-7 text-pink-400 stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 15 Q 15 5 25 10 T 50 3" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-xs font-black text-pink-700 mt-1 bg-white px-2 py-0.5 rounded-lg border border-pink-200 shadow-2xs">↑ 12%</span>
+            <span className="text-xs font-black text-pink-300 mt-1 bg-white/10 px-2 py-0.5 rounded-lg border border-white/20">↑ 12%</span>
           </div>
         </div>
 
         {/* Registered Schools */}
-        <div className="bg-gradient-to-br from-blue-50/90 via-indigo-50/70 to-pink-50/90 rounded-3xl border-2 border-indigo-200/90 hover:border-emerald-400 p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-200 flex items-center justify-between text-slate-900 group hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 hover:border-emerald-400 p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
           <div className="flex items-center gap-3.5">
-            <div className="w-14 h-14 rounded-2xl bg-white text-emerald-600 border border-emerald-200 flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-white/10 text-emerald-300 border border-white/20 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
               <Building2 className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-xs sm:text-sm font-bold text-slate-600">Registered Schools</p>
-              <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 leading-tight mt-0.5 font-mono">
+              <p className="text-xs sm:text-sm font-bold text-slate-300">Registered Schools</p>
+              <h3 className="text-2xl sm:text-3xl font-black text-emerald-300 leading-tight mt-0.5 font-mono">
                 {metrics.total_schools ?? 12}
               </h3>
-              <p className="text-xs text-emerald-600 font-semibold mt-0.5">Partner Institutions</p>
+              <p className="text-xs text-emerald-300 font-semibold mt-0.5">Partner Institutions</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <svg className="w-14 h-7 text-emerald-600 stroke-current fill-none" viewBox="0 0 50 20">
+            <svg className="w-14 h-7 text-emerald-400 stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 18 Q 12 12 25 8 T 50 2" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-xs font-black text-emerald-700 mt-1 bg-white px-2 py-0.5 rounded-lg border border-emerald-200 shadow-2xs">↑ 18%</span>
+            <span className="text-xs font-black text-emerald-300 mt-1 bg-white/10 px-2 py-0.5 rounded-lg border border-white/20">↑ 18%</span>
           </div>
         </div>
 
         {/* Total Exams */}
-        <div className="bg-gradient-to-br from-blue-50/90 via-indigo-50/70 to-pink-50/90 rounded-3xl border-2 border-indigo-200/90 hover:border-blue-400 p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-200 flex items-center justify-between text-slate-900 group hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 hover:border-blue-400 p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
           <div className="flex items-center gap-3.5">
-            <div className="w-14 h-14 rounded-2xl bg-white text-blue-600 border border-blue-200 flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-white/10 text-blue-300 border border-white/20 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
               <FileSpreadsheet className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-xs sm:text-sm font-bold text-slate-600">Total Exams</p>
-              <h3 className="text-2xl sm:text-3xl font-black text-blue-700 leading-tight mt-0.5 font-mono">
+              <p className="text-xs sm:text-sm font-bold text-slate-300">Total Exams</p>
+              <h3 className="text-2xl sm:text-3xl font-black text-blue-300 leading-tight mt-0.5 font-mono">
                 {metrics.total_exams ?? 2}
               </h3>
-              <p className="text-xs text-blue-600 font-semibold mt-0.5">Live Olympiads</p>
+              <p className="text-xs text-blue-300 font-semibold mt-0.5">Live Olympiads</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <svg className="w-14 h-7 text-blue-600 stroke-current fill-none" viewBox="0 0 50 20">
+            <svg className="w-14 h-7 text-blue-400 stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 16 Q 15 14 30 6 T 50 2" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-xs font-black text-blue-700 mt-1 bg-white px-2 py-0.5 rounded-lg border border-blue-200 shadow-2xs">↑ 50%</span>
+            <span className="text-xs font-black text-blue-300 mt-1 bg-white/10 px-2 py-0.5 rounded-lg border border-white/20">↑ 50%</span>
           </div>
         </div>
 
         {/* Questions in Bank */}
-        <div className="bg-gradient-to-br from-blue-50/90 via-indigo-50/70 to-pink-50/90 rounded-3xl border-2 border-indigo-200/90 hover:border-amber-400 p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-200 flex items-center justify-between text-slate-900 group hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 hover:border-amber-400 p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
           <div className="flex items-center gap-3.5">
-            <div className="w-14 h-14 rounded-2xl bg-white text-amber-600 border border-amber-200 flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-white/10 text-amber-300 border border-white/20 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
               <FileText className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-xs sm:text-sm font-bold text-slate-600">Questions in Bank</p>
-              <h3 className="text-2xl sm:text-3xl font-black text-amber-700 leading-tight mt-0.5 font-mono">
+              <p className="text-xs sm:text-sm font-bold text-slate-300">Questions in Bank</p>
+              <h3 className="text-2xl sm:text-3xl font-black text-amber-300 leading-tight mt-0.5 font-mono">
                 {metrics.total_questions ?? 3}
               </h3>
-              <p className="text-xs text-amber-600 font-semibold mt-0.5">Across all subjects</p>
+              <p className="text-xs text-amber-300 font-semibold mt-0.5">Across all subjects</p>
             </div>
           </div>
           <div className="text-right flex flex-col items-end">
-            <svg className="w-14 h-7 text-amber-600 stroke-current fill-none" viewBox="0 0 50 20">
+            <svg className="w-14 h-7 text-amber-400 stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 18 Q 15 10 30 12 T 50 4" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-xs font-black text-amber-700 mt-1 bg-white px-2 py-0.5 rounded-lg border border-amber-200 shadow-2xs">↑ 33%</span>
+            <span className="text-xs font-black text-amber-300 mt-1 bg-white/10 px-2 py-0.5 rounded-lg border border-white/20">↑ 33%</span>
           </div>
         </div>
       </div>
 
-      {/* 3. Performance & Analytics Section (Light Mixed Theme Boxes) */}
+      {/* 3. Performance & Analytics Section (Mixed Gradient Theme Boxes) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Chart: Assigned vs Completed Participation Trend (7 Cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border-2 border-indigo-100 p-6 shadow-md text-slate-800 flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 p-6 shadow-xl text-white flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 text-indigo-800 border border-indigo-200 font-bold text-xs uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/10 text-pink-200 border border-white/20 font-bold text-xs uppercase tracking-wider">
                 Participation YoY Growth
               </span>
-              <div className="flex items-center gap-3 text-xs sm:text-sm font-bold text-slate-600">
+              <div className="flex items-center gap-3 text-xs sm:text-sm font-bold text-slate-300">
                 <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-pink-500" /> This Period (Pink)
+                  <span className="w-3 h-3 rounded-full bg-pink-400" /> This Period (Pink/Purple)
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-blue-500" /> Previous (Blue)
+                  <span className="w-3 h-3 rounded-full bg-blue-400" /> Previous (Blue)
                 </span>
               </div>
             </div>
@@ -247,34 +247,34 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             {/* Line Trend SVG */}
             <div className="h-48 w-full mt-4">
               <svg className="w-full h-full overflow-visible" viewBox="0 0 500 130" preserveAspectRatio="none">
-                <line x1="0" y1="10" x2="500" y2="10" stroke="#f1f5f9" strokeDasharray="3" />
-                <line x1="0" y1="50" x2="500" y2="50" stroke="#f1f5f9" strokeDasharray="3" />
-                <line x1="0" y1="90" x2="500" y2="90" stroke="#f1f5f9" strokeDasharray="3" />
-                <line x1="0" y1="130" x2="500" y2="130" stroke="#e2e8f0" />
+                <line x1="0" y1="10" x2="500" y2="10" stroke="#312e81" strokeDasharray="3" />
+                <line x1="0" y1="50" x2="500" y2="50" stroke="#312e81" strokeDasharray="3" />
+                <line x1="0" y1="90" x2="500" y2="90" stroke="#312e81" strokeDasharray="3" />
+                <line x1="0" y1="130" x2="500" y2="130" stroke="#4338ca" />
 
                 {/* Primary Trend (This Year - Pink/Purple) */}
                 <path
                   d="M 0 85 Q 80 75 160 55 T 320 40 T 500 20"
                   fill="none"
-                  stroke="#db2777"
+                  stroke="#f472b6"
                   strokeWidth="3.5"
                   strokeLinecap="round"
                 />
-                <circle cx="160" cy="55" r="4" fill="#db2777" stroke="#ffffff" strokeWidth="2" />
-                <circle cx="320" cy="40" r="4" fill="#db2777" stroke="#ffffff" strokeWidth="2" />
-                <circle cx="500" cy="20" r="4" fill="#db2777" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="160" cy="55" r="4" fill="#f472b6" stroke="#1e1b4b" strokeWidth="2" />
+                <circle cx="320" cy="40" r="4" fill="#f472b6" stroke="#1e1b4b" strokeWidth="2" />
+                <circle cx="500" cy="20" r="4" fill="#f472b6" stroke="#1e1b4b" strokeWidth="2" />
 
                 {/* Secondary Trend (Last Year - Blue) */}
                 <path
                   d="M 0 105 Q 80 95 160 80 T 320 65 T 500 45"
                   fill="none"
-                  stroke="#2563eb"
+                  stroke="#60a5fa"
                   strokeWidth="3"
                   strokeLinecap="round"
                 />
-                <circle cx="160" cy="80" r="3.5" fill="#2563eb" stroke="#ffffff" strokeWidth="2" />
-                <circle cx="320" cy="65" r="3.5" fill="#2563eb" stroke="#ffffff" strokeWidth="2" />
-                <circle cx="500" cy="45" r="3.5" fill="#2563eb" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="160" cy="80" r="3.5" fill="#60a5fa" stroke="#1e1b4b" strokeWidth="2" />
+                <circle cx="320" cy="65" r="3.5" fill="#60a5fa" stroke="#1e1b4b" strokeWidth="2" />
+                <circle cx="500" cy="45" r="3.5" fill="#60a5fa" stroke="#1e1b4b" strokeWidth="2" />
               </svg>
             </div>
 
@@ -285,16 +285,16 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
         </div>
 
         {/* Right Chart: Subject Accuracy Breakdown (5 Cols) */}
-        <div className="lg:col-span-5 bg-white rounded-3xl border-2 border-indigo-100 p-6 shadow-md text-slate-800 flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 p-6 shadow-xl text-white flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 text-indigo-800 border border-indigo-200 font-bold text-xs uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/10 text-pink-200 border border-white/20 font-bold text-xs uppercase tracking-wider">
                 Subject Accuracy
               </span>
               <button
                 type="button"
                 onClick={() => onNavigateTab('results')}
-                className="text-xs sm:text-sm font-bold text-indigo-600 hover:text-pink-600 hover:underline cursor-pointer"
+                className="text-xs sm:text-sm font-bold text-pink-300 hover:text-white hover:underline cursor-pointer"
               >
                 Details →
               </button>
@@ -303,19 +303,19 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             {/* Horizontal Progress Bars */}
             <div className="space-y-4 mt-4">
               {[
-                { name: 'Mathematics', accuracy: 92, color: '#db2777' },
-                { name: 'Science & Physics', accuracy: 84, color: '#2563eb' },
-                { name: 'English & Literature', accuracy: 88, color: '#7c3aed' },
-                { name: 'General Knowledge', accuracy: 76, color: '#059669' }
+                { name: 'Mathematics', accuracy: 92, color: '#f472b6' },
+                { name: 'Science & Physics', accuracy: 84, color: '#60a5fa' },
+                { name: 'English & Literature', accuracy: 88, color: '#c084fc' },
+                { name: 'General Knowledge', accuracy: 76, color: '#34d399' }
               ].map((sub, i) => (
                 <div key={i}>
                   <div className="flex justify-between text-xs sm:text-sm font-bold mb-1.5">
-                    <span className="text-slate-800 font-semibold">{sub.name}</span>
-                    <span className="font-mono text-indigo-900 font-black">{sub.accuracy}%</span>
+                    <span className="text-white font-semibold">{sub.name}</span>
+                    <span className="font-mono text-pink-200 font-black">{sub.accuracy}%</span>
                   </div>
-                  <div className="h-3 rounded-full bg-slate-100 overflow-hidden p-0.5 border border-slate-200">
+                  <div className="h-3 rounded-full bg-black/40 overflow-hidden p-0.5 border border-white/10">
                     <div
-                      className="h-full rounded-full transition-all duration-500 shadow-xs"
+                      className="h-full rounded-full transition-all duration-500 shadow-sm"
                       style={{ width: `${sub.accuracy}%`, backgroundColor: sub.color }}
                     />
                   </div>
@@ -324,9 +324,9 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm font-semibold text-slate-600">
+          <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs sm:text-sm font-semibold text-slate-300">
             <span>Overall Platform Accuracy</span>
-            <span className="font-black text-emerald-600 font-mono text-base">{metrics.avg_score ?? 85}%</span>
+            <span className="font-black text-emerald-300 font-mono text-base">{metrics.avg_score ?? 85}%</span>
           </div>
         </div>
       </div>
@@ -334,15 +334,15 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
       {/* 4. Bottom Section: Submissions & Activity Logs */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Recent Submissions (7 Cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border-2 border-indigo-100 p-6 shadow-md text-slate-800">
+        <div className="lg:col-span-7 bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 p-6 shadow-xl text-white">
           <div className="flex items-center justify-between mb-4">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 text-indigo-800 border border-indigo-200 font-bold text-xs uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/10 text-pink-200 border border-white/20 font-bold text-xs uppercase tracking-wider">
               Candidate Submissions
             </span>
             <button
               type="button"
               onClick={() => onNavigateTab('results')}
-              className="text-xs font-bold text-indigo-600 hover:text-pink-600 hover:underline cursor-pointer"
+              className="text-xs font-bold text-pink-300 hover:text-white hover:underline cursor-pointer"
             >
               View All Results →
             </button>
@@ -350,25 +350,25 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
 
           <div className="space-y-2.5 mt-3">
             {candidateSubmissions.map((cand, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 hover:bg-indigo-50/50 border border-slate-200/80 transition-all">
+              <div key={idx} className="flex items-center justify-between p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                  <div className={`w-9 h-9 rounded-xl bg-gradient-to-tr ${cand.color || 'from-[#1d4ed8] to-[#db2777]'} text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-md`}>
                     {cand.initials || (cand.student_name ? cand.student_name.charAt(0) : 'S')}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-slate-900 truncate">
+                    <p className="text-xs font-bold text-white truncate">
                       {cand.name || cand.student_name}
                     </p>
-                    <p className="text-[11px] text-slate-500 truncate">
+                    <p className="text-[11px] text-slate-300 truncate">
                       {cand.exam || cand.exam_title}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2.5 shrink-0 ml-2">
-                  <span className="text-[11px] text-slate-500 font-medium">
+                  <span className="text-[11px] text-slate-300 font-medium">
                     {cand.time || 'Today'}
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-950/80 text-emerald-300 border border-emerald-800/60">
                     PASSED
                   </span>
                 </div>
@@ -378,16 +378,16 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
         </div>
 
         {/* Audit Activity Summary (5 Cols) */}
-        <div className="lg:col-span-5 bg-white rounded-3xl border-2 border-indigo-100 p-6 shadow-md text-slate-800 flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#3b0764] rounded-3xl border-2 border-indigo-900/60 p-6 shadow-xl text-white flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 text-indigo-800 border border-indigo-200 font-bold text-xs uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/10 text-pink-200 border border-white/20 font-bold text-xs uppercase tracking-wider">
                 System Audit Trail
               </span>
               <button
                 type="button"
                 onClick={() => onNavigateTab('activity_logs')}
-                className="text-xs font-bold text-indigo-600 hover:text-pink-600 hover:underline cursor-pointer"
+                className="text-xs font-bold text-pink-300 hover:text-white hover:underline cursor-pointer"
               >
                 Full Logs →
               </button>
@@ -395,12 +395,12 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
 
             <div className="space-y-2.5 mt-3">
               {recentLogs.slice(0, 4).map((log, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
+                <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs">
                   <div className="min-w-0 flex-1 pr-2">
-                    <p className="font-bold text-slate-900 truncate text-xs">{log.action}</p>
-                    <p className="text-[11px] text-slate-500 truncate">{log.user || log.user_name || 'System'}</p>
+                    <p className="font-bold text-white truncate text-xs">{log.action}</p>
+                    <p className="text-[11px] text-slate-300 truncate">{log.user || log.user_name || 'System'}</p>
                   </div>
-                  <span className="text-[10px] font-mono text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200 shrink-0 font-bold">
+                  <span className="text-[10px] font-mono text-pink-200 bg-white/10 px-2 py-0.5 rounded-md border border-white/20 shrink-0">
                     {log.module}
                   </span>
                 </div>

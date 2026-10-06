@@ -82,7 +82,7 @@ export const SyllabusPage = ({ onNavigatePublic, onOpenRegister }) => {
   return (
     <div className="bg-[#fff9f2] min-h-screen pb-20">
       {/* Header Banner */}
-      <div className="bg-gradient-to-br from-[#4e2a4a] via-[#6d3a68] to-[#8c4e8b] text-white py-14 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white py-14 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e7b84b]/20 border border-[#e7b84b]/40 text-[#e7b84b] text-xs font-bold uppercase tracking-wider mb-4">
             <BookOpen className="w-3.5 h-3.5" />
@@ -106,7 +106,7 @@ export const SyllabusPage = ({ onNavigatePublic, onOpenRegister }) => {
               onClick={() => setSelectedCategory(cat.id)}
               className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 ${
                 selectedCategory === cat.id
-                  ? 'bg-[#6d3a68] text-white shadow-md shadow-[#6d3a68]/20'
+                  ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-md shadow-[#6d3a68]/20'
                   : 'bg-[#faf5fa] text-[#5c3158] hover:bg-[#f4ebf4]'
               }`}
             >
@@ -149,7 +149,7 @@ export const SyllabusPage = ({ onNavigatePublic, onOpenRegister }) => {
                       onClick={() => setSelectedClass(cls)}
                       className={`py-2 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
                         selectedClass === cls
-                          ? 'bg-[#d9775b] text-white shadow-sm'
+                          ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-sm'
                           : 'bg-[#faf5fa] text-[#5c3158] hover:bg-[#f4ebf4] border border-[#edd6ed]/60'
                       }`}
                     >
@@ -171,7 +171,7 @@ export const SyllabusPage = ({ onNavigatePublic, onOpenRegister }) => {
                       onClick={() => setSelectedClass(cls)}
                       className={`py-2 px-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
                         selectedClass === cls
-                          ? 'bg-[#d9775b] text-white shadow-sm'
+                          ? 'bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white shadow-sm'
                           : 'bg-[#faf5fa] text-[#5c3158] hover:bg-[#f4ebf4] border border-[#edd6ed]/60'
                       }`}
                     >
@@ -225,7 +225,7 @@ export const SyllabusPage = ({ onNavigatePublic, onOpenRegister }) => {
                 </button>
                 <button
                   onClick={onOpenRegister}
-                  className="w-full py-2.5 bg-[#6d3a68] text-white rounded-xl text-xs font-extrabold hover:bg-[#5c3158] transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-1.5"
+                  className="w-full py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-xl text-xs font-extrabold hover:bg-[#5c3158] transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#e7b84b]" />
                   <span>Register for {currentOlympiad.shortName}</span>
@@ -259,7 +259,7 @@ export const SyllabusPage = ({ onNavigatePublic, onOpenRegister }) => {
                   </button>
                   <button
                     onClick={() => onNavigatePublic('practice-hub')}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#d9775b] hover:bg-[#c85e42] text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-[#e7b84b]" />
                     <span>Practice Topics</span>
@@ -277,7 +277,7 @@ export const SyllabusPage = ({ onNavigatePublic, onOpenRegister }) => {
                     <div className="flex items-start justify-between gap-4">
                       <div className="space-y-1.5 flex-1">
                         <div className="flex items-center gap-2.5">
-                          <span className="w-6 h-6 rounded-lg bg-[#6d3a68] text-white text-xs font-black flex items-center justify-center shrink-0">
+                          <span className="w-6 h-6 rounded-lg bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white text-xs font-black flex items-center justify-center shrink-0">
                             {idx + 1}
                           </span>
                           <h3 className="text-sm font-black text-[#4e2a4a]">

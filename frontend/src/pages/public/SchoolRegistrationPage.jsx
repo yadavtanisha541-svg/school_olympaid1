@@ -363,7 +363,7 @@ ${520 + streamLen}
                     authorizedCheckbox: false
                   }));
                 }}
-                className="px-6 py-2.5 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-sm text-xs font-bold transition-all cursor-pointer shadow-sm"
+                className="px-6 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-sm text-xs font-bold transition-all cursor-pointer shadow-sm"
               >
                 Register Another School
               </button>
@@ -722,7 +722,7 @@ ${520 + streamLen}
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-[#d9775b] to-[#c85e42] hover:from-[#c85e42] hover:to-[#a74a32] text-white rounded-sm text-xs font-black shadow-md shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-sm text-xs font-black shadow-md shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <span>Submitting School Registration...</span>

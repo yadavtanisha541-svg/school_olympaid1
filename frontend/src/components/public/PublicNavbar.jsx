@@ -213,7 +213,7 @@ export const PublicNavbar = ({
                                   onClick={() => handleLinkClick('olympiad-detail', cat.id)}
                                   className={`w-full text-left px-3.5 py-2.5 text-xs font-bold transition-all flex items-center justify-between cursor-pointer group ${
                                     isHovered
-                                      ? 'bg-[#4e2a4a] text-white shadow-xs'
+                                      ? 'bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white shadow-xs'
                                       : 'text-[#4e2a4a] hover:bg-[#f4ebf4] hover:text-[#6d3a68]'
                                   }`}
                                 >
@@ -234,7 +234,7 @@ export const PublicNavbar = ({
                               onClick={() => handleLinkClick('syllabus')}
                               className={`w-full text-left px-3.5 py-2.5 text-xs font-bold transition-all flex items-center justify-between cursor-pointer group ${
                                 hoveredOlympiadId === 'class-wise'
-                                  ? 'bg-[#4e2a4a] text-white shadow-xs'
+                                  ? 'bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white shadow-xs'
                                   : 'text-[#4e2a4a] hover:bg-[#f4ebf4] hover:text-[#6d3a68]'
                               }`}
                             >
@@ -311,7 +311,7 @@ export const PublicNavbar = ({
                                   handleLinkClick('olympiad-detail', activeHoveredCat.id, 'Nursery');
                                 }
                               }}
-                              className="w-full py-2 px-3 bg-gradient-to-r from-[#d9775b] to-[#c85e42] hover:from-[#c85e42] hover:to-[#a74a32] text-white rounded-sm text-xs font-black shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                              className="w-full py-2 px-3 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-sm text-xs font-black shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
                             >
                               <span>
                                 {hoveredOlympiadId === 'class-wise'
@@ -390,7 +390,7 @@ export const PublicNavbar = ({
                             onClick={() => handleLinkClick('faqs')}
                             className={`w-full text-left px-4 py-2.5 text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
                               hoveredPrepId === 'ask'
-                                ? 'bg-[#4e2a4a] text-white shadow-xs'
+                                ? 'bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white shadow-xs'
                                 : 'text-[#4e2a4a] hover:bg-[#f4ebf4] hover:text-[#6d3a68]'
                             }`}
                           >
@@ -407,7 +407,7 @@ export const PublicNavbar = ({
                             onClick={() => handleLinkClick('syllabus')}
                             className={`w-full text-left px-4 py-2.5 text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
                               hoveredPrepId === 'guides'
-                                ? 'bg-[#4e2a4a] text-white shadow-xs'
+                                ? 'bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white shadow-xs'
                                 : 'text-[#4e2a4a] hover:bg-[#f4ebf4] hover:text-[#6d3a68]'
                             }`}
                           >
@@ -424,7 +424,7 @@ export const PublicNavbar = ({
                             onClick={() => handleLinkClick('sample-papers')}
                             className={`w-full text-left px-4 py-2.5 text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
                               hoveredPrepId === 'worksheets'
-                                ? 'bg-[#4e2a4a] text-white shadow-xs'
+                                ? 'bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white shadow-xs'
                                 : 'text-[#4e2a4a] hover:bg-[#f4ebf4] hover:text-[#6d3a68]'
                             }`}
                           >
@@ -628,7 +628,7 @@ export const PublicNavbar = ({
                 <button
                   type="button"
                   onClick={onGoToDashboard}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#6d3a68] to-[#8c4e8b] text-white rounded-md text-xs font-bold shadow-md shadow-[#6d3a68]/20 hover:shadow-lg hover:from-[#5c3158] hover:to-[#783559] transition-all cursor-pointer active:scale-95"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-md text-xs font-bold shadow-md shadow-[#6d3a68]/20 hover:shadow-lg hover:from-[#5c3158] hover:to-[#783559] transition-all cursor-pointer active:scale-95"
                 >
                   <BarChart3 className="w-4 h-4 text-[#e7b84b]" />
                   <span>Go to My Dashboard ({user.role})</span>
@@ -656,7 +656,7 @@ export const PublicNavbar = ({
                   <button
                     type="button"
                     onClick={() => setOpenDropdown(openDropdown === 'register' ? null : 'register')}
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-[#16327a] via-[#322378] to-[#5b3da8] hover:from-[#122459] hover:to-[#4d3291] text-white rounded-md text-xs font-extrabold transition-all shadow-md shadow-[#16327a]/30 cursor-pointer active:scale-95"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-md text-xs font-extrabold transition-all shadow-md shadow-[#16327a]/30 cursor-pointer active:scale-95"
                   >
                     <span>Register Now</span>
                     <ChevronDown
@@ -714,7 +714,7 @@ export const PublicNavbar = ({
               <button
                 type="button"
                 onClick={onGoToDashboard}
-                className="px-3 py-1.5 bg-[#6d3a68] text-white rounded-md text-xs font-bold"
+                className="px-3 py-1.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white rounded-md text-xs font-bold"
               >
                 Dashboard
               </button>
@@ -862,7 +862,7 @@ export const PublicNavbar = ({
                     setMobileMenuOpen(false);
                     onOpenRegister();
                   }}
-                  className="w-full py-2.5 text-center bg-gradient-to-r from-[#d9775b] to-[#c85e42] text-white font-extrabold rounded-md text-xs shadow-md"
+                  className="w-full py-2.5 text-center bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-extrabold rounded-md text-xs shadow-md"
                 >
                   Register Now (Student Enrollment)
                 </button>
@@ -874,7 +874,7 @@ export const PublicNavbar = ({
                   setMobileMenuOpen(false);
                   onGoToDashboard();
                 }}
-                className="w-full py-2.5 text-center bg-[#6d3a68] text-white font-extrabold rounded-md text-xs shadow-md"
+                className="w-full py-2.5 text-center bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] text-white font-extrabold rounded-md text-xs shadow-md"
               >
                 Go to Dashboard
               </button>

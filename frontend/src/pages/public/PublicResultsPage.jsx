@@ -99,7 +99,7 @@ export const PublicResultsPage = ({ onNavigatePublic, onOpenLogin, onOpenRegiste
   return (
     <div className="bg-[#fff9f2] min-h-screen pb-20">
       {/* Header Banner */}
-      <div className="bg-gradient-to-br from-[#4e2a4a] via-[#6d3a68] to-[#8c4e8b] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e7b84b]/20 border border-[#e7b84b]/40 text-[#e7b84b] text-xs font-bold uppercase tracking-wider mb-4">
             <BarChart3 className="w-3.5 h-3.5" />
@@ -160,7 +160,7 @@ export const PublicResultsPage = ({ onNavigatePublic, onOpenLogin, onOpenRegiste
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2.5 bg-gradient-to-r from-[#d9775b] to-[#c85e42] hover:from-[#c85e42] hover:to-[#a74a32] text-white rounded-xl text-xs font-extrabold transition-all shadow-md shadow-[#d9775b]/30 cursor-pointer"
+                className="px-6 py-2.5 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-extrabold transition-all shadow-md shadow-[#d9775b]/30 cursor-pointer"
               >
                 {loading ? 'Fetching Scorecard...' : 'View Scorecard →'}
               </button>
@@ -191,7 +191,7 @@ export const PublicResultsPage = ({ onNavigatePublic, onOpenLogin, onOpenRegiste
                 </button>
                 <button
                   onClick={() => onNavigatePublic('certificates-info')}
-                  className="px-4 py-2 bg-[#6d3a68] hover:bg-[#5c3158] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  className="px-4 py-2 bg-gradient-to-r from-[#2563eb] via-[#7c3aed] to-[#db2777] hover:from-[#1d4ed8] hover:via-[#6d28d9] hover:to-[#be123c] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-[#e7b84b]" />
                   <span>Verify Certificate</span>
