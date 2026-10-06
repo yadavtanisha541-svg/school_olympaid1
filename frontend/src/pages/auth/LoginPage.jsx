@@ -107,7 +107,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                   type="text"
                   value={loginId}
                   onChange={(e) => setLoginId(e.target.value)}
-                  placeholder="e.g. ADMIN001, TCH101, STU1001"
+                  placeholder="Enter your Login ID"
                   className="block w-full pl-11 pr-4 h-12 bg-white text-slate-900 placeholder-slate-400 border border-white/40 focus:border-indigo-400 focus:ring-4 focus:ring-white/30 rounded-2xl text-xs sm:text-sm font-bold transition-all focus:outline-none shadow-md"
                   required
                 />
