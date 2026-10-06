@@ -186,7 +186,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           {user?.role === 'superadmin' && (
             <div className="space-y-1 pt-2.5">
               <div className="px-3 pb-1">
-                <p className="text-xs font-black uppercase tracking-wider text-slate-400">
+                <p className="text-xs font-black uppercase tracking-wider text-red-500">
                   ADMINISTRATION
                 </p>
               </div>
