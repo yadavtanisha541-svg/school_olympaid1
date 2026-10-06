@@ -328,13 +328,13 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
 
   const ALL_SUBJECT_COVERS = useMemo(() => [
     {
-      code: 'IGKO',
-      title: 'IGKO (General Knowledge)',
-      subtitle: 'General Knowledge & Current Affairs',
-      icon: Globe,
-      color: '#859900',
-      iconBg: 'bg-amber-50 border-amber-200 text-amber-600',
-      seriesTitle: `${studentClass}-All India IGKO Mock Test Series`
+      code: 'IMO',
+      title: 'IMO (Mathematics)',
+      subtitle: 'Mathematics & Logical Analysis',
+      icon: Calculator,
+      color: '#ec4899',
+      iconBg: 'bg-pink-50 border-pink-200 text-pink-600',
+      seriesTitle: `${studentClass}-All India IMO Mock Test Series`
     },
     {
       code: 'ISO',
@@ -342,74 +342,47 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       title: 'ISO / NSO (Science)',
       subtitle: 'Science & Practical Discovery',
       icon: Atom,
-      color: '#059669',
-      iconBg: 'bg-emerald-50 border-emerald-200 text-emerald-600',
+      color: '#8b5cf6',
+      iconBg: 'bg-purple-50 border-purple-200 text-purple-600',
       seriesTitle: `${studentClass}-All India ISO Mock Test Series`
     },
     {
-      code: 'IMO',
-      title: 'IMO (Mathematics)',
-      subtitle: 'Mathematics & Logical Analysis',
-      icon: Calculator,
-      color: '#d97706',
+      code: 'IDLO',
+      altCode: 'ICSO',
+      title: 'IDLO (Digital Literacy)',
+      subtitle: 'Digital Literacy, Cyber & AI',
+      icon: Laptop,
+      color: '#3b82f6',
       iconBg: 'bg-blue-50 border-blue-200 text-blue-600',
-      seriesTitle: `${studentClass}-All India IMO Mock Test Series`
+      seriesTitle: `${studentClass}-All India IDLO Mock Test Series`
     },
     {
       code: 'IEO',
       title: 'IEO (English)',
       subtitle: 'English Grammar & Vocabulary',
       icon: BookOpen,
-      color: '#ea580c',
-      iconBg: 'bg-purple-50 border-purple-200 text-purple-600',
+      color: '#06b6d4',
+      iconBg: 'bg-cyan-50 border-cyan-200 text-cyan-600',
       seriesTitle: `${studentClass}-All India IEO Mock Test Series`
     },
     {
-      code: 'ICSO',
-      altCode: 'ICO',
-      title: 'ICSO (Cyber & AI)',
-      subtitle: 'Cyber Safety, Coding & IT',
-      icon: Laptop,
-      color: '#0284c7',
-      iconBg: 'bg-sky-50 border-sky-200 text-sky-600',
-      seriesTitle: `${studentClass}-All India ICSO Mock Test Series`
+      code: 'IGKO',
+      title: 'IGKO (General Knowledge)',
+      subtitle: 'General Knowledge & Current Affairs',
+      icon: Globe,
+      color: '#f59e0b',
+      iconBg: 'bg-amber-50 border-amber-200 text-amber-600',
+      seriesTitle: `${studentClass}-All India IGKO Mock Test Series`
     },
     {
-      code: 'ISSO',
-      altCode: 'LRO',
-      title: 'ISSO / LRO (Reasoning)',
-      subtitle: 'Logical Reasoning & Social Aptitude',
-      icon: Brain,
-      color: '#7c3aed',
-      iconBg: 'bg-rose-50 border-rose-200 text-rose-600',
-      seriesTitle: `${studentClass}-All India ISSO Mock Test Series`
-    },
-    {
-      code: 'VC',
-      title: 'VC (Vocabulary)',
-      subtitle: 'Vocabulary Champions Olympiad',
-      icon: Sparkles,
-      color: '#6d3a68',
-      iconBg: 'bg-pink-50 border-pink-200 text-pink-600',
-      seriesTitle: `${studentClass}-All India VC Mock Test Series`
-    },
-    {
-      code: 'EGO',
-      title: 'EGO (Environment)',
-      subtitle: 'Environment & Green Olympiad',
-      icon: Atom,
-      color: '#059669',
-      iconBg: 'bg-teal-50 border-teal-200 text-teal-600',
-      seriesTitle: `${studentClass}-All India EGO Mock Test Series`
-    },
-    {
-      code: 'CAO',
-      title: 'CAO (Creative Arts)',
-      subtitle: 'Creative Arts & Aesthetic Design',
-      icon: Palette,
-      color: '#80497D',
-      iconBg: 'bg-violet-50 border-violet-200 text-violet-600',
-      seriesTitle: `${studentClass}-All India CAO Mock Test Series`
+      code: 'IHO',
+      altCode: 'HINDI',
+      title: 'IHO (Hindi)',
+      subtitle: 'हिंदी व्याकरण एवं भाषा ज्ञान',
+      icon: Languages,
+      color: '#10b981',
+      iconBg: 'bg-emerald-50 border-emerald-200 text-emerald-600',
+      seriesTitle: `${studentClass}-All India IHO Mock Test Series`
     }
   ], [studentClass]);
 

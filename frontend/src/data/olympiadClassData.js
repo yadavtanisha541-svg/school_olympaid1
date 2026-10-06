@@ -1,5 +1,6 @@
 // Comprehensive Olympiad Class & Subject Schedule Master Data (Academic Year 2026-2027)
-// Full support for all Classes (Nursery to Class 12) across all 9 Olympiad Disciplines
+// Full support for all Classes (Nursery to Class 12) across all 6 Core Disciplines:
+// Mathematics, Science, Digital Literacy, English, General Knowledge, Hindi
 
 export const ALL_CLASSES = [
   'Nursery',
@@ -20,53 +21,14 @@ export const ALL_CLASSES = [
 ];
 
 export const OLYMPIAD_SUBJECT_METADATA = {
-  english: {
-    id: 'english',
-    code: 'IEO',
-    fullName: 'International English Olympiad',
-    shortName: 'English',
-    quote: 'Every new word makes you smarter.',
-    colorHex: '#6d3a68',
-    accentHex: '#d9775b',
-    iconName: 'BookOpen',
-    tagline: 'Grammar fluency, lexical depth, phonetics, reading comprehension, and verbal aptitude.',
-    examDates2026_2027: {
-      level1Dates: '05 Dec 2026, 09 Jan 2027 & 23 Jan 2027',
-      level2Dates: '20th January 2027 & 3rd February 2027',
-      lastDateReg: '15th November 2026',
-      level1AnswerKey: '24th - 25th January 2027',
-      level2AnswerKey: '4th - 5th February 2027',
-      level1Result: 'Generally announced within 30 days after the last answer key date',
-      level2Result: 'Typically announced within a month after the final answer key is released',
-      feeIndia: 'INR ₹250 per student (for students studying and residing in India)',
-      feeInternational: 'USD $15 (for students studying and residing outside of India)'
-    },
-    ageMap: {
-      'Nursery': '3-4 years old',
-      'LKG': '4-5 years old',
-      'UKG': '5-6 years old',
-      'Class 1': '5-7 years old',
-      'Class 2': '6-8 years old',
-      'Class 3': '7-9 years old',
-      'Class 4': '8-10 years old',
-      'Class 5': '9-11 years old',
-      'Class 6': '10-12 years old',
-      'Class 7': '11-13 years old',
-      'Class 8': '12-14 years old',
-      'Class 9': '13-15 years old',
-      'Class 10': '14-16 years old',
-      'Class 11': '15-17 years old',
-      'Class 12': '16-18 years old'
-    }
-  },
   math: {
     id: 'math',
     code: 'IMO',
     fullName: 'International Mathematics Olympiad',
     shortName: 'Mathematics',
     quote: 'Mathematics is the language with which God has written the universe.',
-    colorHex: '#4e2a4a',
-    accentHex: '#d9775b',
+    colorHex: '#ec4899',
+    accentHex: '#8b5cf6',
     iconName: 'Calculator',
     tagline: 'Test mathematical intuition, problem-solving, and logical deduction.',
     examDates2026_2027: {
@@ -100,12 +62,12 @@ export const OLYMPIAD_SUBJECT_METADATA = {
   },
   science: {
     id: 'science',
-    code: 'NSO',
-    fullName: 'National Science Olympiad',
+    code: 'ISO',
+    fullName: 'International Science Olympiad',
     shortName: 'Science',
     quote: 'Curiosity is the engine of achievement and scientific breakthrough.',
-    colorHex: '#d9775b',
-    accentHex: '#e7b84b',
+    colorHex: '#8b5cf6',
+    accentHex: '#3b82f6',
     iconName: 'Atom',
     tagline: 'Empowering scientific inquiry, experimental logic, and natural exploration.',
     examDates2026_2027: {
@@ -137,53 +99,14 @@ export const OLYMPIAD_SUBJECT_METADATA = {
       'Class 12': '16-18 years old'
     }
   },
-  reasoning: {
-    id: 'reasoning',
-    code: 'LRO',
-    fullName: 'Logical Reasoning Olympiad',
-    shortName: 'Reasoning',
-    quote: 'Logic will get you from A to Z; reasoning will get you everywhere.',
-    colorHex: '#6c568d',
-    accentHex: '#e7b84b',
-    iconName: 'Brain',
-    tagline: 'Sharpen mental acuity, pattern recognition, spatial cognition, and deductive agility.',
-    examDates2026_2027: {
-      level1Dates: '19 Dec 2026 & 15 Jan 2027',
-      level2Dates: 'Single Stage Grand Championship',
-      lastDateReg: '1st December 2026',
-      level1AnswerKey: '16th - 17th January 2027',
-      level2AnswerKey: 'N/A (Single Tier Merit)',
-      level1Result: 'Announced within 20 days of exam completion',
-      level2Result: 'N/A',
-      feeIndia: 'INR ₹250 per student',
-      feeInternational: 'USD $15 per student'
-    },
-    ageMap: {
-      'Nursery': '3-4 years old',
-      'LKG': '4-5 years old',
-      'UKG': '5-6 years old',
-      'Class 1': '5-7 years old',
-      'Class 2': '6-8 years old',
-      'Class 3': '7-9 years old',
-      'Class 4': '8-10 years old',
-      'Class 5': '9-11 years old',
-      'Class 6': '10-12 years old',
-      'Class 7': '11-13 years old',
-      'Class 8': '12-14 years old',
-      'Class 9': '13-15 years old',
-      'Class 10': '14-16 years old',
-      'Class 11': '15-17 years old',
-      'Class 12': '16-18 years old'
-    }
-  },
-  cyber: {
-    id: 'cyber',
-    code: 'ICO',
-    fullName: 'International Cyber & AI Olympiad',
-    shortName: 'Cyber & AI',
-    quote: 'Code and algorithmic thinking are the superpowers of tomorrow.',
-    colorHex: '#b17b25',
-    accentHex: '#6d3a68',
+  digital_literacy: {
+    id: 'digital_literacy',
+    code: 'IDLO',
+    fullName: 'International Digital Literacy Olympiad',
+    shortName: 'Digital Literacy',
+    quote: 'Digital literacy and computational thinking are essential superpowers for modern innovators.',
+    colorHex: '#3b82f6',
+    accentHex: '#8b5cf6',
     iconName: 'Cpu',
     tagline: 'Computational thinking, algorithms, modern AI awareness, and digital safety.',
     examDates2026_2027: {
@@ -215,63 +138,24 @@ export const OLYMPIAD_SUBJECT_METADATA = {
       'Class 12': '16-18 years old'
     }
   },
-  vocab: {
-    id: 'vocab',
-    code: 'VC',
-    fullName: 'International Vocabulary Championship',
-    shortName: 'Vocabulary',
-    quote: 'Words are our most inexhaustible source of magic and persuasion.',
-    colorHex: '#6d3a68',
-    accentHex: '#e7b84b',
-    iconName: 'Sparkles',
-    tagline: 'Orthography, phonetics, word origin mastery, and linguistic precision.',
+  english: {
+    id: 'english',
+    code: 'IEO',
+    fullName: 'International English Olympiad',
+    shortName: 'English',
+    quote: 'Every new word makes you smarter.',
+    colorHex: '#06b6d4',
+    accentHex: '#ec4899',
+    iconName: 'BookOpen',
+    tagline: 'Grammar fluency, lexical depth, reading comprehension, and verbal aptitude.',
     examDates2026_2027: {
-      level1Dates: '15 Dec 2026 & 19 Jan 2027',
-      level2Dates: '18th January 2027 & 1st February 2027',
-      lastDateReg: '18th November 2026',
-      level1AnswerKey: '20th - 21st January 2027',
-      level2AnswerKey: '3rd - 4th February 2027',
-      level1Result: 'Announced within 25 days after the answer key release',
-      level2Result: 'Announced within 30 days after Level 2 exam',
-      feeIndia: 'INR ₹250 per student',
-      feeInternational: 'USD $15 per student'
-    },
-    ageMap: {
-      'Nursery': '3-4 years old',
-      'LKG': '4-5 years old',
-      'UKG': '5-6 years old',
-      'Class 1': '5-7 years old',
-      'Class 2': '6-8 years old',
-      'Class 3': '7-9 years old',
-      'Class 4': '8-10 years old',
-      'Class 5': '9-11 years old',
-      'Class 6': '10-12 years old',
-      'Class 7': '11-13 years old',
-      'Class 8': '12-14 years old',
-      'Class 9': '13-15 years old',
-      'Class 10': '14-16 years old',
-      'Class 11': '15-17 years old',
-      'Class 12': '16-18 years old'
-    }
-  },
-  environment: {
-    id: 'environment',
-    code: 'EGO',
-    fullName: 'Global Environment & Green Olympiad',
-    shortName: 'Environment',
-    quote: 'To protect the earth is to preserve our collective human tomorrow.',
-    colorHex: '#2e7d32',
-    accentHex: '#e7b84b',
-    iconName: 'Globe',
-    tagline: 'Eco-literacy, biodiversity, climate action, and renewable sustainability.',
-    examDates2026_2027: {
-      level1Dates: '22 Dec 2026 & 26 Jan 2027',
-      level2Dates: 'Single Stage Grand Championship',
-      lastDateReg: '22nd November 2026',
-      level1AnswerKey: '27th - 28th January 2027',
-      level2AnswerKey: 'N/A',
-      level1Result: 'Announced within 20 days of exam completion',
-      level2Result: 'N/A',
+      level1Dates: '05 Dec 2026, 09 Jan 2027 & 23 Jan 2027',
+      level2Dates: '20th January 2027 & 3rd February 2027',
+      lastDateReg: '15th November 2026',
+      level1AnswerKey: '24th - 25th January 2027',
+      level2AnswerKey: '4th - 5th February 2027',
+      level1Result: 'Generally announced within 30 days after the last answer key date',
+      level2Result: 'Typically announced within a month after the final answer key is released',
       feeIndia: 'INR ₹250 per student',
       feeInternational: 'USD $15 per student'
     },
@@ -296,12 +180,12 @@ export const OLYMPIAD_SUBJECT_METADATA = {
   gk: {
     id: 'gk',
     code: 'IGKO',
-    fullName: 'General Knowledge & Current Affairs Olympiad',
+    fullName: 'International General Knowledge Olympiad',
     shortName: 'General Knowledge',
     quote: 'Knowledge is the greatest currency of modern leadership.',
-    colorHex: '#8c4e8b',
-    accentHex: '#d9775b',
-    iconName: 'Sparkles',
+    colorHex: '#f59e0b',
+    accentHex: '#ec4899',
+    iconName: 'Globe',
     tagline: 'Global awareness, discoveries, national heritage, geopolitics, and current news.',
     examDates2026_2027: {
       level1Dates: '15 Dec 2026, 19 Jan 2027 & 02 Feb 2027',
@@ -332,23 +216,23 @@ export const OLYMPIAD_SUBJECT_METADATA = {
       'Class 12': '16-18 years old'
     }
   },
-  arts: {
-    id: 'arts',
-    code: 'CAO',
-    fullName: 'Creative Arts & Visual Thinking Olympiad',
-    shortName: 'Creative Arts',
-    quote: 'Art is the signature of civilization and human imagination.',
-    colorHex: '#c2410c',
-    accentHex: '#e7b84b',
-    iconName: 'Palette',
-    tagline: 'Aesthetic composition, color harmony, visual perception, and artistic critique.',
+  hindi: {
+    id: 'hindi',
+    code: 'IHO',
+    fullName: 'International Hindi Olympiad',
+    shortName: 'Hindi',
+    quote: 'हिंदी हमारी संस्कृति और अभिव्यक्ति की अनमोल धरोहर है।',
+    colorHex: '#10b981',
+    accentHex: '#3b82f6',
+    iconName: 'Languages',
+    tagline: 'हिंदी व्याकरण, शब्द सामर्थ्य, भाषा ज्ञान एवं अपठित बोध में निपुणता।',
     examDates2026_2027: {
-      level1Dates: '24 Dec 2026 & 29 Jan 2027',
-      level2Dates: 'Single Tier Creative Assessment',
+      level1Dates: '20 Dec 2026, 12 Jan 2027 & 26 Jan 2027',
+      level2Dates: 'Single Tier Grand Championship',
       lastDateReg: '5th December 2026',
-      level1AnswerKey: '30th - 31st January 2027',
+      level1AnswerKey: '28th - 29th January 2027',
       level2AnswerKey: 'N/A',
-      level1Result: 'Announced within 25 days of submission',
+      level1Result: 'Announced within 20 days of exam completion',
       level2Result: 'N/A',
       feeIndia: 'INR ₹250 per student',
       feeInternational: 'USD $15 per student'
@@ -373,51 +257,21 @@ export const OLYMPIAD_SUBJECT_METADATA = {
   }
 };
 
+// Aliases for backwards compatibility
+OLYMPIAD_SUBJECT_METADATA.cyber = OLYMPIAD_SUBJECT_METADATA.digital_literacy;
+OLYMPIAD_SUBJECT_METADATA['digital-literacy'] = OLYMPIAD_SUBJECT_METADATA.digital_literacy;
+OLYMPIAD_SUBJECT_METADATA.idlo = OLYMPIAD_SUBJECT_METADATA.digital_literacy;
+
 // Helper: Generates detailed, realistic class-specific syllabus
 export const getClassSyllabus = (subjectId, classLevel) => {
   const isEarly = ['Nursery', 'LKG', 'UKG'].includes(classLevel);
   const isPrimary = ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'].includes(classLevel);
   const isMiddle = ['Class 6', 'Class 7', 'Class 8'].includes(classLevel);
 
-  const normId = subjectId === 'spell-bee' ? 'vocab' :
-                 subjectId === 'environmental' ? 'environment' :
-                 subjectId === 'drawing' ? 'arts' : subjectId;
+  const normId = (subjectId || '').toLowerCase().replace(/[^a-z]/g, '');
 
-  // 1. ENGLISH (IEO)
-  if (normId === 'english') {
-    if (isEarly) {
-      return [
-        { topic: 'Letters, Alphabet & Phonics', description: 'Identification of capital & small letters, matching sounds with pictures, vowels (A, E, I, O, U) intro.', questions: 15, learningOutcomes: 'Master alphabet phonetics and letter recognition.' },
-        { topic: 'Picture Vocabulary & Everyday Objects', description: 'Animals, birds, fruits, vegetables, colors, body parts, classroom and home items.', questions: 15, learningOutcomes: 'Build 200+ word visual vocabulary.' },
-        { topic: 'Rhyming Words & Sound Patterns', description: 'Simple 3-letter word rhymes (cat-bat-mat), initial consonants, ending sounds.', questions: 10, learningOutcomes: 'Develop auditory rhyming intuition.' },
-        { topic: 'Opposites & Simple Concepts', description: 'Big/Small, Up/Down, In/Out, Hot/Cold, Happy/Sad visually represented.', questions: 10, learningOutcomes: 'Understand foundational antonym pairs.' }
-      ];
-    } else if (isPrimary) {
-      return [
-        { topic: 'Word and Structure Knowledge', description: 'Nouns, Pronouns, Verbs, Adjectives, Articles (A/An/The), Prepositions, Singular/Plural, Genders.', questions: 20, learningOutcomes: 'Apply core parts of speech and structural grammar correctly.' },
-        { topic: 'Reading Comprehension', description: 'Short stories, poems, informational snippets, direct fact-finding and inferential deductions.', questions: 15, learningOutcomes: 'Extract key ideas and make contextual narrative deductions.' },
-        { topic: 'Spelling, Punctuation & Synonyms', description: 'Correct spellings, capital letters, full stops, question marks, opposites and synonyms.', questions: 10, learningOutcomes: 'Eliminate orthographic errors and punctuation mistakes.' },
-        { topic: 'Achievers Higher Order Section', description: 'Contextual sentence rearrangement, contextual riddles, verbal logic.', questions: 5, learningOutcomes: 'Solve high-level competitive language challenges.' }
-      ];
-    } else if (isMiddle) {
-      return [
-        { topic: 'Advanced Grammar & Tenses', description: 'Subject-Verb Agreement, Active/Passive Voice, Direct/Indirect Speech, Modals, Conjunctions.', questions: 20, learningOutcomes: 'Master complex syntax, clause dependencies, and tense consistency.' },
-        { topic: 'Critical Reading & Textual Analysis', description: 'Multi-paragraph passages, tone identification, character analysis, central theme deduction.', questions: 15, learningOutcomes: 'Evaluate nuanced authorial tone and thematic subtleties.' },
-        { topic: 'Lexical Range & Idiomatic Usage', description: 'Phrasal verbs, idioms & proverbs, collocations, word origins, etymology.', questions: 10, learningOutcomes: 'Expand sophisticated vocabulary and figurative agility.' },
-        { topic: 'Achievers Verbal Aptitude', description: 'Error spotting, paragraph coherence, rhetorical nuances and competitive puzzle solving.', questions: 5, learningOutcomes: 'Demonstrate elite verbal reasoning under timed conditions.' }
-      ];
-    } else {
-      return [
-        { topic: 'Complex Syntactical Mastery', description: 'Clauses, synthesis of sentences, conditional clauses, advanced prepositions and determiners.', questions: 20, learningOutcomes: 'Synthesize complex sentences and eliminate structural subtleties.' },
-        { topic: 'Advanced Literary & Analytical Reading', description: 'Discursive essays, philosophical extracts, satire recognition, implicit argument evaluation.', questions: 15, learningOutcomes: 'Perform deep critical inference on dense academic texts.' },
-        { topic: 'Sophisticated Lexicon & Etymology', description: 'Latin & Greek roots, formal registers, foreign expressions in English, precise word choice.', questions: 10, learningOutcomes: 'Master competitive international level vocabulary.' },
-        { topic: 'Achievers Elite HOTS Section', description: 'Verbal reasoning, critical inference, argument evaluation under competitive constraints.', questions: 5, learningOutcomes: 'Formulate rapid deductions for top Olympiad percentiles.' }
-      ];
-    }
-  }
-
-  // 2. MATHEMATICS (IMO)
-  if (normId === 'math') {
+  // 1. MATHEMATICS (IMO)
+  if (normId.includes('math')) {
     if (isEarly) {
       return [
         { topic: 'Pre-Number Concepts & Shapes', description: 'Big/Small, Tall/Short, More/Less, Heavy/Light, 2D shapes (Circle, Square, Triangle, Rectangle).', questions: 15, learningOutcomes: 'Develop spatial intuition and comparative visual sense.' },
@@ -449,74 +303,41 @@ export const getClassSyllabus = (subjectId, classLevel) => {
     }
   }
 
-  // 3. SCIENCE (NSO)
-  if (normId === 'science') {
+  // 2. SCIENCE (ISO / NSO)
+  if (normId.includes('sci')) {
     if (isEarly) {
       return [
-        { topic: 'Living & Non-Living Things', description: 'Plants, animals, birds, insects, human body parts and 5 senses.', questions: 15, learningOutcomes: 'Distinguish living organisms and identify human sense organs.' },
-        { topic: 'Our Natural Environment', description: 'Sun, Moon, Stars, Water, Air, Seasons (Summer, Winter, Rainy), Day & Night.', questions: 15, learningOutcomes: 'Understand basic celestial, weather, and seasonal phenomena.' },
-        { topic: 'Good Habits & Safety Rules', description: 'Hygiene, healthy foods, traffic lights, classroom safety.', questions: 10, learningOutcomes: 'Adopt healthy habits and personal safety awareness.' },
-        { topic: 'Animal Kingdom & Homes', description: 'Pet animals, wild animals, water animals, their babies, sounds and habitats.', questions: 10, learningOutcomes: 'Categorize fauna by habitat, diet, and offspring.' }
+        { topic: 'My Body & 5 Senses', description: 'Eyes, ears, nose, tongue, skin and their everyday protective functions.', questions: 15, learningOutcomes: 'Understand sensory organs and basic personal hygiene.' },
+        { topic: 'Plants, Trees & Animals', description: 'Parts of plants, flowers, domestic and wild animals, birds and baby animals.', questions: 15, learningOutcomes: 'Identify flora and fauna in natural surroundings.' },
+        { topic: 'Air, Water & Weather', description: 'Sun, moon, stars, rain, wind, hot and cold seasons, clean drinking water.', questions: 10, learningOutcomes: 'Connect basic weather elements to everyday life.' },
+        { topic: 'Living & Non-Living Things', description: 'Characteristics of living things vs toys, vehicles, and household objects.', questions: 10, learningOutcomes: 'Classify objects based on life properties.' }
       ];
     } else if (isPrimary) {
       return [
-        { topic: 'Plants & Animals Systems', description: 'Photosynthesis, plant parts, adaptation in animals, food chains, life cycles.', questions: 20, learningOutcomes: 'Understand biological adaptations and energy transfer in nature.' },
-        { topic: 'Human Body & Health', description: 'Digestive system, skeletal system, circulatory system, nutrients, diseases & immunity.', questions: 15, learningOutcomes: 'Comprehend human organ systems and balanced nutrition.' },
-        { topic: 'Matter, Energy & Simple Machines', description: 'States of matter, heat, light, sound, force, work, levers, pulleys, friction.', questions: 10, learningOutcomes: 'Apply fundamental laws of physical mechanics and energy.' },
-        { topic: 'Achievers Science Hotspot', description: 'Scientific investigation puzzles, experimental setup analysis, environmental challenges.', questions: 5, learningOutcomes: 'Formulate hypotheses and diagnose lab experimental setups.' }
+        { topic: 'Plant & Animal Life Systems', description: 'Photosynthesis, seed dispersal, animal adaptations, food chains, life cycles.', questions: 20, learningOutcomes: 'Understand biological systems and ecological dependencies.' },
+        { topic: 'Human Body, Nutrition & Health', description: 'Digestive, respiratory, circulatory systems, balanced diet, vitamins & diseases.', questions: 15, learningOutcomes: 'Apply principles of human health and nutritional balance.' },
+        { topic: 'Matter, Materials & Simple Machines', description: 'Solids, liquids, gases, properties of materials, levers, pulleys, friction & gravity.', questions: 10, learningOutcomes: 'Investigate physical properties of matter and mechanics.' },
+        { topic: 'Achievers Investigative Science', description: 'Scientific method, experiment analysis, multi-concept reasoning problems.', questions: 5, learningOutcomes: 'Solve investigative case challenges with scientific inquiry.' }
       ];
     } else if (isMiddle) {
       return [
-        { topic: 'Mechanics, Thermal Physics & Optics', description: 'Motion, force & pressure, sound waves, light reflection/refraction, heat transfer, electric circuits.', questions: 20, learningOutcomes: 'Calculate physical quantities and analyze circuit diagrams.' },
-        { topic: 'Chemical Reactions & Materials', description: 'Acids, bases, salts, physical & chemical changes, metals & non-metals, combustion.', questions: 15, learningOutcomes: 'Predict chemical reactions and material properties.' },
-        { topic: 'Cell Biology, Microorganisms & Ecology', description: 'Cell structure & functions, microorganisms, reproduction in plants/animals, conservation.', questions: 10, learningOutcomes: 'Analyze cellular processes and ecological balance.' },
-        { topic: 'Achievers Investigative Discovery', description: 'Scientific deduction, laboratory apparatus analysis, multi-variable experiments.', questions: 5, learningOutcomes: 'Solve multi-layered scientific reasoning questions.' }
+        { topic: 'Cell Biology & Human Physiology', description: 'Cell structure, microorganisms, respiration, reproduction, endocrine system.', questions: 20, learningOutcomes: 'Master microscopic biology and physiological mechanisms.' },
+        { topic: 'Chemical Substances & Chemical Reactions', description: 'Acids, bases, salts, physical & chemical changes, metals & non-metals, combustion.', questions: 15, learningOutcomes: 'Analyze chemical transformations and write balanced word equations.' },
+        { topic: 'Force, Motion, Light & Electricity', description: 'Newton laws, friction, sound waves, reflection, refraction, electric circuits, magnets.', questions: 10, learningOutcomes: 'Calculate kinematic variables and optical ray diagrams.' },
+        { topic: 'Achievers Scientific Diagnosis', description: 'Experimental data tables, hypothesis testing, advanced laboratory deductions.', questions: 5, learningOutcomes: 'Demonstrate advanced scientific diagnosis and HOTS logic.' }
       ];
     } else {
       return [
-        { topic: 'Physics Principles', description: 'Kinematics, Newton\'s laws, gravitation, electricity, magnetism, optics, nuclear energy.', questions: 20, learningOutcomes: 'Master fundamental and advanced laws of physical sciences.' },
-        { topic: 'Chemistry & Molecular Interactions', description: 'Atomic structure, periodic classification, chemical reactions, thermodynamics, organic functional groups.', questions: 15, learningOutcomes: 'Analyze molecular structures, reaction energetics, and organic syntheses.' },
-        { topic: 'Life Sciences & Biotechnology', description: 'Cell biology, genetics, human physiology, ecology, evolution, biotechnology applications.', questions: 10, learningOutcomes: 'Synthesize genetic, cellular, and biotechnological concepts.' },
-        { topic: 'Achievers Research & HOTS', description: 'Data-driven experimental diagnosis, laboratory graphs, Olympiad-level multi-step science.', questions: 5, learningOutcomes: 'Evaluate experimental data and scientific research scenarios.' }
+        { topic: 'Advanced Mechanics, Electromagnetism & Optics', description: 'Thermodynamics, electromagnetic induction, wave optics, modern physics, nuclear reactions.', questions: 20, learningOutcomes: 'Formulate mathematical physics models and solve advanced problems.' },
+        { topic: 'Organic, Inorganic & Physical Chemistry', description: 'Periodic trends, chemical bonding, stoichiometry, equilibrium, carbon compounds, kinetics.', questions: 15, learningOutcomes: 'Synthesize reaction mechanisms and thermodynamic calculations.' },
+        { topic: 'Genetics, Evolution & Biotechnology', description: 'DNA replication, Mendelian genetics, ecology, recombinant DNA technology, cell biology.', questions: 10, learningOutcomes: 'Analyze molecular genetics and bio-technological frontiers.' },
+        { topic: 'Achievers Research & Discovery Frontier', description: 'Multi-disciplinary scientific synthesis, Olympiad level case analysis.', questions: 5, learningOutcomes: 'Achieve top international scientific benchmark problem solving.' }
       ];
     }
   }
 
-  // 4. LOGICAL REASONING (LRO)
-  if (normId === 'reasoning') {
-    if (isEarly) {
-      return [
-        { topic: 'Visual Discrimination & Matching', description: 'Odd one out, matching identical objects, shadow matching, shape pairing.', questions: 15, learningOutcomes: 'Sharpen visual focus and spot subtle differences.' },
-        { topic: 'Patterns & Sorting Sequences', description: 'Color patterns, size ordering, repeating sequence completion, missing item in sequence.', questions: 15, learningOutcomes: 'Grasp sequential patterns and sorting criteria.' },
-        { topic: 'Spatial Relations & Direction Sense', description: 'Left/Right, Top/Bottom, Inside/Outside, Near/Far, maze pathfinding.', questions: 10, learningOutcomes: 'Understand basic spatial geometry and directional orientation.' },
-        { topic: 'Early Logic Puzzles', description: 'Picture classification, story sequence arrangement, simple deduction grids.', questions: 10, learningOutcomes: 'Formulate basic deductive reasoning from visual cues.' }
-      ];
-    } else if (isPrimary) {
-      return [
-        { topic: 'Verbal Reasoning & Coding', description: 'Number & letter series, coding-decoding, analogy, classification, alphabetical order, ranking.', questions: 20, learningOutcomes: 'Deconstruct word, letter, and number cipher codes.' },
-        { topic: 'Non-Verbal & Spatial Reasoning', description: 'Embedded figures, mirror images, pattern completion, figure matrix, geometric grouping.', questions: 15, learningOutcomes: 'Perform 2D mental rotations and visual abstraction.' },
-        { topic: 'Relational Logic & Direction Tests', description: 'Blood relations, direction sense, family tree diagrams, calendar & clock reasoning.', questions: 10, learningOutcomes: 'Map family networks and multi-step compass routes.' },
-        { topic: 'Achievers Cognitive Brain Teasers', description: 'Multi-parameter grid puzzles, logical deductions, truth/lie scenarios.', questions: 5, learningOutcomes: 'Solve complex Olympiad-level matrix logic puzzles.' }
-      ];
-    } else if (isMiddle) {
-      return [
-        { topic: 'Advanced Verbal Logic & Syllogisms', description: 'Syllogisms, statement-assumptions, cause-and-effect, input-output sequencing, blood relations matrices.', questions: 20, learningOutcomes: 'Master formal logical deduction and syllogistic reasoning.' },
-        { topic: 'Non-Verbal Spatial Intelligence', description: 'Cube & dice rotations, paper folding & cutting, figure formation, dot situations, series matrices.', questions: 15, learningOutcomes: 'Visualize 3D solid unfolding and spatial transformations.' },
-        { topic: 'Analytical & Seating Arrangements', description: 'Linear & circular seating arrangements, Venn diagrams, mathematical operations logic.', questions: 10, learningOutcomes: 'Decompose multi-condition seating and set intersections.' },
-        { topic: 'Achievers Deduction Frontier', description: 'Complex logic grids, scheduling puzzles, binary logic, conditional deduction.', questions: 5, learningOutcomes: 'Tackle high-tier contest logic under speed constraints.' }
-      ];
-    } else {
-      return [
-        { topic: 'Critical Reasoning & Argument Analysis', description: 'Statement-arguments, statement-conclusions, course of action, deductive fallacies, data sufficiency.', questions: 20, learningOutcomes: 'Critique logical arguments and identify formal fallacies.' },
-        { topic: 'High-Order Spatial & Abstract Matrices', description: '3D spatial manipulation, complex unfolded nets, visual transformations, multi-layer matrix completion.', questions: 15, learningOutcomes: 'Solve abstract matrix transformations and isometric problems.' },
-        { topic: 'Algorithmic Logic & Complex Puzzles', description: 'Multi-floor building puzzles, tournament logic, matrix ranking, network routes, probability logic.', questions: 10, learningOutcomes: 'Master complex multi-constraint scheduling and deduction.' },
-        { topic: 'Achievers Mastermind Challenge', description: 'Olympiad ranker challenges, multi-step constraint satisfaction, analytical synthesis.', questions: 5, learningOutcomes: 'Achieve 99th percentile cognitive problem breakdown.' }
-      ];
-    }
-  }
-
-  // 5. CYBER & AI (ICO)
-  if (normId === 'cyber') {
+  // 3. DIGITAL LITERACY (IDLO)
+  if (normId.includes('digit') || normId.includes('cyber') || normId.includes('comp') || normId.includes('idlo')) {
     if (isEarly) {
       return [
         { topic: 'Introduction to Smart Devices & Computers', description: 'Recognizing Computer, Mouse, Keyboard, Monitor, Tablet, Smartphone, and Printer.', questions: 15, learningOutcomes: 'Identify everyday computing hardware and modern digital gadgets.' },
@@ -548,107 +369,41 @@ export const getClassSyllabus = (subjectId, classLevel) => {
     }
   }
 
-  // 6. VOCABULARY CHAMPIONSHIP (VC / SPELL BEE)
-  if (normId === 'vocab') {
+  // 4. ENGLISH (IEO)
+  if (normId.includes('eng')) {
     if (isEarly) {
       return [
-        { topic: 'Alphabet Sounds & Sight Words', description: 'Initial letters, phonics sounds, simple 2 & 3 letter sight words (the, is, on, at, in, to).', questions: 15, learningOutcomes: 'Recognize high-frequency sight words and phonetic sounds.' },
-        { topic: 'Picture-to-Word Matching', description: 'Naming farm animals, classroom items, transport vehicles, colors, shapes correctly.', questions: 15, learningOutcomes: 'Spell foundational nouns and everyday objects accurately.' },
-        { topic: 'Word Families & Rhyming Pairs', description: 'Short vowel families (-at, -an, -op, -ig, -en), phonetic spelling patterns.', questions: 10, learningOutcomes: 'Build word family ladders through sound blends.' },
-        { topic: 'Missing Letters & Word Puzzles', description: 'Completing 3-4 letter words with missing vowel or consonant, letter unscrambling.', questions: 10, learningOutcomes: 'Decode missing letter positions in short words.' }
+        { topic: 'Letters, Alphabet & Phonics', description: 'Identification of capital & small letters, matching sounds with pictures, vowels (A, E, I, O, U) intro.', questions: 15, learningOutcomes: 'Master alphabet phonetics and letter recognition.' },
+        { topic: 'Picture Vocabulary & Everyday Objects', description: 'Animals, birds, fruits, vegetables, colors, body parts, classroom and home items.', questions: 15, learningOutcomes: 'Build 200+ word visual vocabulary.' },
+        { topic: 'Rhyming Words & Sound Patterns', description: 'Simple 3-letter word rhymes (cat-bat-mat), initial consonants, ending sounds.', questions: 10, learningOutcomes: 'Develop auditory rhyming intuition.' },
+        { topic: 'Opposites & Simple Concepts', description: 'Big/Small, Up/Down, In/Out, Hot/Cold, Happy/Sad visually represented.', questions: 10, learningOutcomes: 'Understand foundational antonym pairs.' }
       ];
     } else if (isPrimary) {
       return [
-        { topic: 'Phonics, Spelling Rules & Silent Letters', description: 'Rules for -ie vs -ei, doubling consonants, silent k, w, b, g, plural spelling rules.', questions: 20, learningOutcomes: 'Apply English orthographic spelling rules without error.' },
-        { topic: 'Prefixes, Suffixes & Compound Words', description: 'Un-, re-, dis-, -ful, -less, -ment, making compound words (butterfly, sunlight).', questions: 15, learningOutcomes: 'Construct morphologically complex derivative words.' },
-        { topic: 'Synonyms, Antonyms & Homophones', description: 'Common homophones (their/there/they\'re, right/write, sea/see), context clues, antonym pairs.', questions: 10, learningOutcomes: 'Differentiate tricky homophones and select precise words.' },
-        { topic: 'Achievers Word Master & Spell Bee', description: 'Speed spell recognition, anagrams, jumbled letters, tricky spelling corrections.', questions: 5, learningOutcomes: 'Compete at championship level spelling speed tests.' }
+        { topic: 'Word and Structure Knowledge', description: 'Nouns, Pronouns, Verbs, Adjectives, Articles (A/An/The), Prepositions, Singular/Plural, Genders.', questions: 20, learningOutcomes: 'Apply core parts of speech and structural grammar correctly.' },
+        { topic: 'Reading Comprehension', description: 'Short stories, poems, informational snippets, direct fact-finding and inferential deductions.', questions: 15, learningOutcomes: 'Extract key ideas and make contextual narrative deductions.' },
+        { topic: 'Spelling, Punctuation & Synonyms', description: 'Correct spellings, capital letters, full stops, question marks, opposites and synonyms.', questions: 10, learningOutcomes: 'Eliminate orthographic errors and punctuation mistakes.' },
+        { topic: 'Achievers Higher Order Section', description: 'Contextual sentence rearrangement, contextual riddles, verbal logic.', questions: 5, learningOutcomes: 'Solve high-level competitive language challenges.' }
       ];
     } else if (isMiddle) {
       return [
-        { topic: 'Greek & Latin Roots & Etymology', description: 'Bio, geo, tele, chron, aud, dict, graph, auto, creating word trees and derivatives.', questions: 20, learningOutcomes: 'Deduce unknown word meanings and spellings from classic roots.' },
-        { topic: 'Confusables, Homonyms & Collocations', description: 'Affect vs effect, principal vs principle, strong collocations, lexical nuances.', questions: 15, learningOutcomes: 'Eliminate homographic and near-homophonic confusion.' },
-        { topic: 'Idioms, Proverbs & Figurative Expressions', description: 'Origin of idioms, metaphoric usage, proverbs in context, figurative language.', questions: 10, learningOutcomes: 'Incorporate idiomatic mastery into advanced verbal reasoning.' },
-        { topic: 'Achievers Lexicon Virtuoso', description: 'Championship level spelling list, loan words from French/German, etymological deduction.', questions: 5, learningOutcomes: 'Spell challenging multi-lingual etymological words.' }
+        { topic: 'Advanced Grammar & Tenses', description: 'Subject-Verb Agreement, Active/Passive Voice, Direct/Indirect Speech, Modals, Conjunctions.', questions: 20, learningOutcomes: 'Master complex syntax, clause dependencies, and tense consistency.' },
+        { topic: 'Critical Reading & Textual Analysis', description: 'Multi-paragraph passages, tone identification, character analysis, central theme deduction.', questions: 15, learningOutcomes: 'Evaluate nuanced authorial tone and thematic subtleties.' },
+        { topic: 'Lexical Range & Idiomatic Usage', description: 'Phrasal verbs, idioms & proverbs, collocations, word origins, etymology.', questions: 10, learningOutcomes: 'Expand sophisticated vocabulary and figurative agility.' },
+        { topic: 'Achievers Verbal Aptitude', description: 'Error spotting, paragraph coherence, rhetorical nuances and competitive puzzle solving.', questions: 5, learningOutcomes: 'Demonstrate elite verbal reasoning under timed conditions.' }
       ];
     } else {
       return [
-        { topic: 'Advanced Etymology & Morphological Analysis', description: 'Greek/Latin roots in medicine, law, academia, foreign phrases in English (bona fide, status quo).', questions: 20, learningOutcomes: 'Analyze scholarly and professional registers with high etymological accuracy.' },
-        { topic: 'Sophisticated Vocabulary & Academic Register', description: 'GRE/SAT level high-frequency words, nuance differentiation, rhetorical vocabulary.', questions: 15, learningOutcomes: 'Master elite vocabulary for international competitions.' },
-        { topic: 'Orthographic Precision & Obscure Spellings', description: 'Exceptions to spelling rules, archaic spellings, international spelling variations UK vs US.', questions: 10, learningOutcomes: 'Identify hyper-specific orthographic edge cases.' },
-        { topic: 'Achievers Grand Spelling Master', description: 'National Spell Bee finals level words, auditory spelling deduction, morphological breakdown.', questions: 5, learningOutcomes: 'Demonstrate national champion tier spelling fluency.' }
+        { topic: 'Complex Syntactical Mastery', description: 'Clauses, synthesis of sentences, conditional clauses, advanced prepositions and determiners.', questions: 20, learningOutcomes: 'Synthesize complex sentences and eliminate structural subtleties.' },
+        { topic: 'Advanced Literary & Analytical Reading', description: 'Discursive essays, philosophical extracts, satire recognition, implicit argument evaluation.', questions: 15, learningOutcomes: 'Perform deep critical inference on dense academic texts.' },
+        { topic: 'Sophisticated Lexicon & Etymology', description: 'Latin & Greek roots, formal registers, foreign expressions in English, precise word choice.', questions: 10, learningOutcomes: 'Master competitive international level vocabulary.' },
+        { topic: 'Achievers Elite HOTS Section', description: 'Verbal reasoning, critical inference, argument evaluation under competitive constraints.', questions: 5, learningOutcomes: 'Formulate rapid deductions for top Olympiad percentiles.' }
       ];
     }
   }
 
-  // 7. ENVIRONMENT (EGO)
-  if (normId === 'environment') {
-    if (isEarly) {
-      return [
-        { topic: 'Our Earth, Plants & Trees', description: 'Types of trees, leaves, flowers, watering plants, importance of greenery around us.', questions: 15, learningOutcomes: 'Appreciate natural flora and basic plant care.' },
-        { topic: 'Animal Care & Habitats', description: 'Pets, jungle animals, water animals, saving bird nests, kind behavior to animals.', questions: 15, learningOutcomes: 'Understand animal habitats and compassion for living creatures.' },
-        { topic: 'Clean Surroundings & Water Conservation', description: 'Throwing trash in dustbins, closing dripping taps, keeping school/home clean.', questions: 10, learningOutcomes: 'Practice clean living habits and save water daily.' },
-        { topic: 'Sun, Rain, Seasons & Nature Fun', description: 'Sun gives light, rain fills rivers, rainbows, appreciating nature beauty.', questions: 10, learningOutcomes: 'Relate seasonal weather patterns to daily life.' }
-      ];
-    } else if (isPrimary) {
-      return [
-        { topic: 'Ecosystems, Forests & Wildlife Conservation', description: 'Food chains, habitats, endangered species, national parks, deforestation effects.', questions: 20, learningOutcomes: 'Understand food webs and wildlife conservation necessities.' },
-        { topic: 'Waste Management & 3Rs', description: 'Reduce, Reuse, Recycle, biodegradable vs non-biodegradable waste, composting.', questions: 15, learningOutcomes: 'Categorize waste and implement zero-waste principles.' },
-        { topic: 'Natural Resources & Pollution Control', description: 'Air, water, soil, noise pollution causes and solutions, saving water & electricity.', questions: 10, learningOutcomes: 'Analyze pollution causes and practical remediation steps.' },
-        { topic: 'Achievers Green Crusader Challenge', description: 'Eco-friendly habits, sustainable living choices, conservation case puzzles.', questions: 5, learningOutcomes: 'Solve real-world ecological problem scenarios.' }
-      ];
-    } else if (isMiddle) {
-      return [
-        { topic: 'Climate Change & Global Warming', description: 'Greenhouse effect, greenhouse gases, rising sea levels, melting glaciers, carbon emissions.', questions: 20, learningOutcomes: 'Analyze causes and global implications of climate disruption.' },
-        { topic: 'Renewable Energy & Green Technology', description: 'Solar power, wind turbines, hydroelectricity, biomass, geothermal, EV mobility.', questions: 15, learningOutcomes: 'Evaluate clean energy generation systems and storage.' },
-        { topic: 'Water Cycles, Oceans & Forest Biomes', description: 'Rainwater harvesting, ocean acidification, plastic in oceans, wetland preservation.', questions: 10, learningOutcomes: 'Assess marine health, hydrology, and forest preservation.' },
-        { topic: 'Achievers Eco-Warrior Case Analysis', description: 'UN Sustainable Development Goals (SDGs), international climate accords, environmental laws.', questions: 5, learningOutcomes: 'Interpret global sustainability agreements and national green policies.' }
-      ];
-    } else {
-      return [
-        { topic: 'Climate Science & Atmospheric Dynamics', description: 'Carbon budgets, radiative forcing, feedback loops, IPCC reports, ozone depletion and recovery.', questions: 20, learningOutcomes: 'Model planetary climate systems and atmospheric science.' },
-        { topic: 'Sustainable Development, Circular Economy & Clean Tech', description: 'Zero waste manufacturing, carbon credits, green hydrogen, nuclear energy, smart grids.', questions: 15, learningOutcomes: 'Synthesize circular economy models and futuristic energy transitions.' },
-        { topic: 'Environmental Policies, Treaties & Biodiversity Hotspots', description: 'Paris Agreement, COP summits, Ramsar sites, biodiversity loss, environmental ethics.', questions: 10, learningOutcomes: 'Critique international treaties and biodiversity conservation frameworks.' },
-        { topic: 'Achievers Global Sustainability Leadership', description: 'Designing urban sustainability models, climate risk modeling, renewable economics.', questions: 5, learningOutcomes: 'Propose scalable eco-engineering and policy solutions.' }
-      ];
-    }
-  }
-
-  // 8. CREATIVE ARTS (CAO)
-  if (normId === 'arts') {
-    if (isEarly) {
-      return [
-        { topic: 'Colors Recognition & Mixing', description: 'Red, Blue, Yellow primary colors, mixing colors to make green, orange, purple.', questions: 15, learningOutcomes: 'Identify color palettes and understand primary color blends.' },
-        { topic: 'Basic Shapes, Lines & Doodling', description: 'Straight, wavy, zigzag lines, circles, squares, drawing simple houses, sun, flowers.', questions: 15, learningOutcomes: 'Develop fine motor pencil control and basic shape construction.' },
-        { topic: 'Visual Discrimination & Matching Art', description: 'Spotting differences in pictures, matching color shades, complete the picture puzzle.', questions: 10, learningOutcomes: 'Enhance visual perception and artistic detail spotting.' },
-        { topic: 'Craft, Textures & Hand Impressions', description: 'Paper folding basics, finger painting, clay modeling shapes, textures (soft, rough, smooth).', questions: 10, learningOutcomes: 'Explore multi-sensory textures and creative crafting.' }
-      ];
-    } else if (isPrimary) {
-      return [
-        { topic: 'Color Wheel & Principles of Composition', description: 'Primary, secondary, warm, cool colors, symmetry, balance, pattern, repetition.', questions: 20, learningOutcomes: 'Master color harmony and core 2D visual design rules.' },
-        { topic: 'Drawing Techniques & 2D/3D Rendering', description: 'Sketching, shading with pencils, light and shadows, horizon lines, basic proportions.', questions: 15, learningOutcomes: 'Render volumetric form with tonal values and shading.' },
-        { topic: 'Folk & Traditional Art Forms of India', description: 'Madhubani, Warli, Gond, Kalamkari art motifs, regional art heritage.', questions: 10, learningOutcomes: 'Appreciate indigenous Indian folk traditions and motifs.' },
-        { topic: 'Achievers Creative Design Thinking', description: 'Designing logos, posters, imaginative theme illustration, visual storytelling.', questions: 5, learningOutcomes: 'Create original visual communications and design layouts.' }
-      ];
-    } else if (isMiddle) {
-      return [
-        { topic: 'Linear Perspective & Spatial Depth', description: '1-point and 2-point perspective, vanishing points, foreshortening, isometric drawings.', questions: 20, learningOutcomes: 'Construct geometric 3D architectural scenes accurately.' },
-        { topic: 'Color Harmonies & Visual Balance', description: 'Complementary, analogous, triadic schemes, contrast, emphasis, rhythm, proportion in art.', questions: 15, learningOutcomes: 'Apply complex color harmonies and dynamic compositional balance.' },
-        { topic: 'Famous World Artists & Art Movements', description: 'Renaissance, Impressionism, Cubism, Leonardo da Vinci, Van Gogh, Picasso, Raja Ravi Varma.', questions: 10, learningOutcomes: 'Analyze historical art eras and master painters\' styles.' },
-        { topic: 'Achievers Visual Aesthetics Critique', description: 'Art analysis, composition evaluation, digital illustration basics, typography.', questions: 5, learningOutcomes: 'Evaluate artwork aesthetics with formal critical frameworks.' }
-      ];
-    } else {
-      return [
-        { topic: 'Advanced Spatial Geometry, Perspective & Anatomy', description: '3-point perspective, dynamic figure drawing, proportions, anatomical contours, chiaroscuro.', questions: 20, learningOutcomes: 'Render human anatomical proportions and complex multi-point vistas.' },
-        { topic: 'Modern Art Movements & Critical Theory', description: 'Surrealism, Abstract Expressionism, Pop Art, Bauhaus, aesthetics philosophy, semiotics in art.', questions: 15, learningOutcomes: 'Interpret philosophical movements and modern visual semiotics.' },
-        { topic: 'Graphic Design, UI/UX Principles & Digital Media', description: 'Grid systems, visual hierarchy, color psychology in branding, vector vs raster, digital rendering.', questions: 10, learningOutcomes: 'Design digital user interfaces and brand design identities.' },
-        { topic: 'Achievers Masterclass in Visual Arts', description: 'Curatorial writing, contemporary art critique, portfolio conceptualization, design innovation.', questions: 5, learningOutcomes: 'Produce professional grade aesthetic critique and portfolios.' }
-      ];
-    }
-  }
-
-  // 9. GENERAL KNOWLEDGE (IGKO / GK)
-  if (normId === 'gk') {
+  // 5. GENERAL KNOWLEDGE (IGKO)
+  if (normId.includes('gk') || normId.includes('general')) {
     if (isEarly) {
       return [
         { topic: 'Myself, Family & Helpers', description: 'Family members, community helpers (doctor, teacher, police officer, firefighter).', questions: 15, learningOutcomes: 'Recognize community roles and social connections.' },
@@ -676,6 +431,39 @@ export const getClassSyllabus = (subjectId, classLevel) => {
         { topic: 'Advanced History, Governance & Constitutional Law', description: 'Evolution of democracies, governance models, landmark judicial rulings, political philosophy.', questions: 15, learningOutcomes: 'Synthesize comparative constitutional laws and historical governance.' },
         { topic: 'Science, Tech Discoveries & Space Exploration', description: 'ISRO/NASA missions, quantum computing breakthroughs, Nobel laureates in science, biotech frontiers.', questions: 10, learningOutcomes: 'Track cutting-edge scientific innovations and space exploration missions.' },
         { topic: 'Achievers National & Global Quizmaster', description: 'High-stakes competitive trivia, multi-disciplinary current affairs, speed round analysis.', questions: 5, learningOutcomes: 'Perform at national master quizzer competitive standards.' }
+      ];
+    }
+  }
+
+  // 6. HINDI (IHO)
+  if (normId.includes('hin') || normId.includes('iho')) {
+    if (isEarly) {
+      return [
+        { topic: 'स्वर, व्यंजन एवं वर्णमाला', description: 'अ से ज्ञ तक वर्णों की पहचान, चित्र देखकर पहला अक्षर पहचानना, दो अक्षर वाले सरल शब्द।', questions: 15, learningOutcomes: 'वर्णमाला एवं बुनियादी अक्षरों की सही पहचान।' },
+        { topic: 'चित्र पहचान एवं सरल शब्द', description: 'फल, फूल, पशु, पक्षी, रंग, शरीर के अंग एवं घर की वस्तुओं के नाम।', questions: 15, learningOutcomes: 'चित्र देखकर सटीक हिंदी शब्द ज्ञान विकसित करना।' },
+        { topic: 'मात्राओं का ज्ञान', description: 'आ, इ, ई, उ, ऊ की मात्रा वाले सरल शब्द एवं मिलान।', questions: 10, learningOutcomes: 'मात्राओं की पहचान और सही उच्चारण।' },
+        { topic: 'सरल विलोम एवं तुकबंदी शब्द', description: 'बड़ा/छोटा, ऊपर/नीचे, दिन/रात, सरल तुकांत शब्द (नल-जल, घर-पर)।', questions: 10, learningOutcomes: 'बुनियादी विलोम एवं तुकांत शब्दों का ज्ञान।' }
+      ];
+    } else if (isPrimary) {
+      return [
+        { topic: 'संज्ञा, सर्वनाम, विशेषण एवं क्रिया', description: 'संज्ञा के भेद, सर्वनाम, विशेषण, क्रिया, लिंग (पुल्लिंग/स्त्रीलिंग), वचन (एकवचन/बहुवचन)।', questions: 20, learningOutcomes: 'व्याकरण के आधारभूत घटकों की सही पहचान एवं प्रयोग।' },
+        { topic: 'शब्द भंडार (पर्यायवाची एवं विलोम शब्द)', description: 'समानार्थी शब्द, विलोम शब्द, अनेकार्थी शब्द, अनेक शब्दों के लिए एक शब्द।', questions: 15, learningOutcomes: 'समृद्ध हिंदी शब्दावली का निर्माण।' },
+        { topic: 'मुहावरे, अशुद्धि शोधन एवं वर्तनी', description: 'प्रचलित मुहावरे, शुद्ध वर्तनी, वाक्य शुद्धि, विराम चिह्न।', questions: 10, learningOutcomes: 'त्रुटिरहित हिंदी लेखन एवं मुहावरों का सटीक प्रयोग।' },
+        { topic: 'अपठित गद्यांश एवं अचीवर्स सेक्शन', description: 'सरल अपठित गद्यांश पर आधारित प्रश्न, भाषा बोध एवं उच्च स्तरीय चिंतन।', questions: 5, learningOutcomes: 'पठन-बोध और विश्लेषणात्मक चिंतन में निपुणता।' }
+      ];
+    } else if (isMiddle) {
+      return [
+        { topic: 'संधि, समास, उपसर्ग एवं प्रत्यय', description: 'स्वर संधि, समास के प्रमुख भेद, तत्सम-तद्भव, उपसर्ग, प्रत्यय, काल एवं कारक।', questions: 20, learningOutcomes: 'गंभीर व्याकरणिक संरचनाओं का विश्लेषण एवं अनुप्रयोग।' },
+        { topic: 'वाच्य, वाक्य भेद एवं पद परिचय', description: 'कर्तृवाच्य/कर्मवाच्य/भाववाच्य, सरल-संयुक्त-मिश्र वाक्य, पद परिचय।', questions: 15, learningOutcomes: 'जटिल वाक्य संरचना और पद परिचय में दक्षता।' },
+        { topic: 'उन्नत मुहावरे, लोकोक्तियाँ एवं शब्द सामर्थ्य', description: 'विशिष्ट मुहावरे, लोकोक्तियाँ, युग्म शब्द, समरूपी भिन्नार्थक शब्द।', questions: 10, learningOutcomes: 'अलंकारिक भाषा शैली और मुहावरों का स्वाभाविक प्रयोग।' },
+        { topic: 'अचीवर्स साहित्यिक बोध एवं पद्यांश विश्लेषण', description: 'काव्यांश का भाव ग्रहण, भाषा सौंदर्य, रस एवं अलंकार परिचय।', questions: 5, learningOutcomes: 'साहित्यिक मूल्यांकन एवं प्रतियोगी स्तर पर शीर्ष प्रदर्शन।' }
+      ];
+    } else {
+      return [
+        { topic: 'रस, छंद, अलंकार एवं काव्य सौंदर्य', description: 'रस के अवयव, प्रमुख छंद, शब्दालंकार एवं अर्थालंकार, काव्य गुण एवं दोष।', questions: 20, learningOutcomes: 'काव्य शास्त्र और सौंदर्य शास्त्रीय विश्लेषण में पारंगतता।' },
+        { topic: 'हिंदी साहित्य का इतिहास एवं प्रमुख कृतियाँ', description: 'आदिकाल, भक्तिकाल, रीतिकाल एवं आधुनिक काल, प्रमुख कवि, लेखक एवं रचनाएँ।', questions: 15, learningOutcomes: 'हिंदी साहित्य के कालखंडों और साहित्यिक धाराओं की समझ।' },
+        { topic: 'प्रयोजनमूलक हिंदी, अनुवाद एवं परिभाषिक शब्दावली', description: 'प्रशासनिक हिंदी, तकनीकी शब्दावली, अंग्रेजी से हिंदी सटीक अनुवाद, जनसंचार माध्यम।', questions: 10, learningOutcomes: 'व्यावसायिक एवं प्रशासनिक हिंदी का आधिकारिक प्रयोग।' },
+        { topic: 'अचीवर्स ग्रैंड हिंदी मास्टरमाइंड', description: 'उच्च स्तरीय आलोचनात्मक गद्य विश्लेषण, गूढ़ व्याकरणिक पहेलियाँ, राष्ट्रीय स्तर का बौद्धिक चिंतन।', questions: 5, learningOutcomes: 'अंतर्राष्ट्रीय हिंदी ओलंपियाड में सर्वोच्च रैंक हासिल करना।' }
       ];
     }
   }
@@ -743,9 +531,17 @@ export const SAMPLE_PAPER_YEARS = [2026, 2025, 2024, 2023, 2022];
 
 export const generateSamplePapersCatalog = () => {
   const catalog = [];
-  const subjects = Object.values(OLYMPIAD_SUBJECT_METADATA);
+  const subjects = [
+    OLYMPIAD_SUBJECT_METADATA.math,
+    OLYMPIAD_SUBJECT_METADATA.science,
+    OLYMPIAD_SUBJECT_METADATA.digital_literacy,
+    OLYMPIAD_SUBJECT_METADATA.english,
+    OLYMPIAD_SUBJECT_METADATA.gk,
+    OLYMPIAD_SUBJECT_METADATA.hindi
+  ];
 
   subjects.forEach((subj) => {
+    if (!subj) return;
     ALL_CLASSES.forEach((cls) => {
       SAMPLE_PAPER_YEARS.forEach((year) => {
         const isEarly = ['Nursery', 'LKG', 'UKG'].includes(cls);
@@ -766,8 +562,8 @@ export const generateSamplePapersCatalog = () => {
           totalMarks: isEarly ? 40 : 60,
           difficulty: isModel ? 'Official Benchmark' : 'Standard Contest',
           pdfSize: isEarly ? '1.8 MB' : '2.4 MB',
-          colorHex: subj.colorHex || '#6d3a68',
-          accentHex: subj.accentHex || '#d9775b',
+          colorHex: subj.colorHex || '#ec4899',
+          accentHex: subj.accentHex || '#8b5cf6',
           hasSolutions: true,
           hasHots: true,
           hasOmr: true
@@ -783,11 +579,9 @@ export const generateSamplePapersCatalog = () => {
 export const getSamplePaperQuestions = (subjectId, classLevel) => {
   const isEarly = ['Nursery', 'LKG', 'UKG'].includes(classLevel);
   const isPrimary = ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'].includes(classLevel);
-  const normId = subjectId === 'spell-bee' ? 'vocab' :
-                 subjectId === 'environmental' ? 'environment' :
-                 subjectId === 'drawing' ? 'arts' : subjectId;
+  const normId = (subjectId || '').toLowerCase().replace(/[^a-z]/g, '');
 
-  if (normId === 'math') {
+  if (normId.includes('math')) {
     if (isEarly) {
       return [
         {
@@ -908,125 +702,86 @@ export const getSamplePaperQuestions = (subjectId, classLevel) => {
     }
   }
 
-  if (normId === 'science') {
-    if (isEarly) {
-      return [
-        {
-          qNum: 1,
-          question: 'Which sense organ helps you smell a flower?',
-          options: ['Eyes', 'Ears', 'Nose', 'Tongue'],
-          correct: 2,
-          explanation: 'Our nose helps us to smell different fragrances and scents.'
-        },
-        {
-          qNum: 2,
-          question: 'What do green plants need from the sky to make their food?',
-          options: ['Moonlight', 'Sunlight', 'Stars', 'Wind only'],
-          correct: 1,
-          explanation: 'Plants use sunlight to perform photosynthesis.'
-        },
-        {
-          qNum: 3,
-          question: 'A baby dog is called a:',
-          options: ['Kitten', 'Cub', 'Puppy', 'Calf'],
-          correct: 2,
-          explanation: 'A young dog is called a puppy.'
-        },
-        {
-          qNum: 4,
-          question: 'Which of the following is a living thing?',
-          options: ['Plastic Toy', 'Green Tree', 'Wooden Chair', 'Stone'],
-          correct: 1,
-          explanation: 'Trees grow, breathe, and reproduce, making them living things.'
-        },
-        {
-          qNum: 5,
-          section: 'Achievers Section',
-          question: 'In which season do we wear warm woollen clothes?',
-          options: ['Summer', 'Rainy', 'Winter', 'Spring'],
-          correct: 2,
-          explanation: 'Woollen clothes keep us warm during the cold winter season.'
-        }
-      ];
-    } else if (isPrimary) {
-      return [
-        {
-          qNum: 1,
-          question: 'Which green pigment in leaves captures solar energy for photosynthesis?',
-          options: ['Hemoglobin', 'Chlorophyll', 'Melanin', 'Carotene'],
-          correct: 1,
-          explanation: 'Chlorophyll is the green pigment in chloroplasts that absorbs sunlight.'
-        },
-        {
-          qNum: 2,
-          question: 'Which organ of the human body pumps blood to all parts?',
-          options: ['Lungs', 'Stomach', 'Heart', 'Kidneys'],
-          correct: 2,
-          explanation: 'The human heart is the muscular pumping organ that circulates blood.'
-        },
-        {
-          qNum: 3,
-          question: 'Which simple machine is a bottle opener an example of?',
-          options: ['Pulley', 'Lever', 'Inclined plane', 'Screw'],
-          correct: 1,
-          explanation: 'A bottle opener is a class-2 lever where load is between fulcrum and effort.'
-        },
-        {
-          qNum: 4,
-          question: 'What is the process of water changing into water vapor called?',
-          options: ['Condensation', 'Evaporation', 'Freezing', 'Precipitation'],
-          correct: 1,
-          explanation: 'Evaporation is the phase change from liquid water to gaseous vapor.'
-        },
-        {
-          qNum: 5,
-          section: 'Achievers HOTS Section',
-          question: 'Why do aquatic animals survive in frozen lakes during winter?',
-          options: ['Water freezes from bottom to top', 'Ice is heavier than liquid water', 'Water has maximum density at 4°C and ice forms an insulating top layer', 'Fish hibernate in air pockets'],
-          correct: 2,
-          explanation: 'Anomalous expansion causes ice to float on top at 0°C, while 4°C water remains liquid beneath.'
-        }
-      ];
-    } else {
-      return [
-        {
-          qNum: 1,
-          question: 'What is the SI unit of electric potential difference (Voltage)?',
-          options: ['Ampere', 'Volt', 'Ohm', 'Watt'],
-          correct: 1,
-          explanation: 'The SI unit of electric potential difference is the Volt (V).'
-        },
-        {
-          qNum: 2,
-          question: 'Which cell organelle is known as the powerhouse of the cell?',
-          options: ['Ribosome', 'Golgi apparatus', 'Mitochondria', 'Endoplasmic reticulum'],
-          correct: 2,
-          explanation: 'Mitochondria produce ATP through cellular respiration, powering the cell.'
-        },
-        {
-          qNum: 3,
-          question: 'What is the pH value of pure distilled water at 25°C?',
-          options: ['0', '7', '14', '1'],
-          correct: 1,
-          explanation: 'Pure water has equal concentrations of H+ and OH- ions, giving a neutral pH of 7.'
-        },
-        {
-          qNum: 4,
-          question: 'According to Newton\'s Second Law of Motion, Force equals:',
-          options: ['Mass × Velocity', 'Mass × Acceleration', 'Work / Time', 'Mass × Distance'],
-          correct: 1,
-          explanation: 'F = m × a (Force = Mass × Acceleration).'
-        },
-        {
-          qNum: 5,
-          section: 'Achievers HOTS Section',
-          question: 'When light travels from an optically denser medium to a rarer medium at an angle greater than critical angle, what occurs?',
-          options: ['Refraction', 'Diffraction', 'Total Internal Reflection', 'Dispersion'],
-          correct: 2,
-          explanation: 'When angle of incidence exceeds critical angle in a denser medium, Total Internal Reflection occurs.'
-        }
-      ];
-    }
+  if (normId.includes('hindi') || normId.includes('iho')) {
+    return [
+      {
+        qNum: 1,
+        question: 'निम्नलिखित में से "सूर्य" शब्द का उचित पर्यायवाची शब्द कौन सा है?',
+        options: ['दिनकर', 'निशाकर', 'जलद', 'पयोधि'],
+        correct: 0,
+        explanation: 'सूर्य के पर्यायवाची शब्द दिनकर, दिवाकर, भानु, रवि हैं। निशाकर चंद्रमा का पर्यायवाची है।'
+      },
+      {
+        qNum: 2,
+        question: 'शुद्ध वर्तनी वाले शब्द का चयन कीजिए:',
+        options: ['उज्वल', 'उज्ज्वल', 'उजवल', 'उज्जवल'],
+        correct: 1,
+        explanation: 'शुद्ध वर्तनी "उज्ज्वल" (दो आधे ज) होती है।'
+      },
+      {
+        qNum: 3,
+        question: '"आँखों का तारा होना" मुहावरे का सही अर्थ क्या है?',
+        options: ['बहुत प्यारा होना', 'नेत्र रोग होना', 'दूर की वस्तु देखना', 'अंधा होना'],
+        correct: 0,
+        explanation: '"आँखों का तारा होना" का अर्थ अत्यंत प्रिय अथवा बहुत प्यारा होना है।'
+      },
+      {
+        qNum: 4,
+        question: '"सज्जन" शब्द का सही संधि विच्छेद क्या होगा?',
+        options: ['सज + जन', 'सत् + जन', 'सद + जन', 'सत + जन'],
+        correct: 1,
+        explanation: 'सत् + जन = सज्जन (व्यंजन संधि नियम त् + ज = ज्ज)।'
+      },
+      {
+        qNum: 5,
+        section: 'अचीवर्स खण्ड (HOTS)',
+        question: 'जहाँ उपमेय में उपमान की संभावना की जाए, वहाँ कौन सा अलंकार होता है?',
+        options: ['उपमा अलंकार', 'उत्प्रेक्षा अलंकार', 'रूपक अलंकार', 'श्लेष अलंकार'],
+        correct: 1,
+        explanation: 'जहाँ उपमेय में उपमान की संभावना व्यक्त की जाए, वहाँ उत्प्रेक्षा अलंकार होता है (वाचक शब्द: जनु, मनु, जानो, मानो)।'
+      }
+    ];
+  }
+
+  if (normId.includes('sci')) {
+    return [
+      {
+        qNum: 1,
+        question: 'Which green pigment in leaves captures solar energy for photosynthesis?',
+        options: ['Hemoglobin', 'Chlorophyll', 'Melanin', 'Carotene'],
+        correct: 1,
+        explanation: 'Chlorophyll is the green pigment in chloroplasts that absorbs sunlight.'
+      },
+      {
+        qNum: 2,
+        question: 'Which organ of the human body pumps blood to all parts?',
+        options: ['Lungs', 'Stomach', 'Heart', 'Kidneys'],
+        correct: 2,
+        explanation: 'The human heart is the muscular pumping organ that circulates blood.'
+      },
+      {
+        qNum: 3,
+        question: 'What is the SI unit of electric potential difference (Voltage)?',
+        options: ['Ampere', 'Volt', 'Ohm', 'Watt'],
+        correct: 1,
+        explanation: 'The SI unit of electric potential difference is the Volt (V).'
+      },
+      {
+        qNum: 4,
+        question: 'What is the pH value of pure distilled water at 25°C?',
+        options: ['0', '7', '14', '1'],
+        correct: 1,
+        explanation: 'Pure water has equal concentrations of H+ and OH- ions, giving a neutral pH of 7.'
+      },
+      {
+        qNum: 5,
+        section: 'Achievers HOTS Section',
+        question: 'According to Newton\'s Second Law of Motion, Force equals:',
+        options: ['Mass × Velocity', 'Mass × Acceleration', 'Work / Time', 'Mass × Distance'],
+        correct: 1,
+        explanation: 'F = m × a (Force = Mass × Acceleration).'
+      }
+    ];
   }
 
   // English & general fallback questions
@@ -1040,21 +795,21 @@ export const getSamplePaperQuestions = (subjectId, classLevel) => {
     },
     {
       qNum: 2,
-      question: 'Identify the part of speech of the underlined word: "The swift cheetah ran across the meadow."',
+      question: 'Identify the part of speech of the word: "The swift cheetah ran across the meadow."',
       options: ['Noun', 'Adjective', 'Verb', 'Adverb'],
       correct: 1,
       explanation: '"Swift" describes the noun cheetah, making it an adjective.'
     },
     {
       qNum: 3,
-      question: 'Select the antonym (opposite) of the word "ABUNDANT":',
+      question: 'Select the antonym of the word "ABUNDANT":',
       options: ['Plentiful', 'Scarce', 'Lavish', 'Generous'],
       correct: 1,
       explanation: 'Abundant means existing in large quantities; scarce means in short supply.'
     },
     {
       qNum: 4,
-      question: 'Fill in the blank with the correct preposition: "She has been studying _____ 6 o\'clock this morning."',
+      question: 'Fill in the blank: "She has been studying _____ 6 o\'clock this morning."',
       options: ['for', 'from', 'since', 'at'],
       correct: 2,
       explanation: '"Since" is used for a specific point in time in the past.'
@@ -1062,7 +817,7 @@ export const getSamplePaperQuestions = (subjectId, classLevel) => {
     {
       qNum: 5,
       section: 'Achievers Verbal HOTS',
-      question: 'Rearrange the jumbled words into a meaningful proverb: "than / louder / speak / actions / words"',
+      question: 'Rearrange the jumbled words: "than / louder / speak / actions / words"',
       options: ['Actions speak louder than words', 'Words speak louder than actions', 'Louder actions than words speak', 'Actions than words louder speak'],
       correct: 0,
       explanation: 'The correct English idiom is "Actions speak louder than words".'
@@ -1078,20 +833,19 @@ export const getClassWiseCutOffData = (subjectId = 'math') => {
   const meta = OLYMPIAD_SUBJECT_METADATA[subjectId] || OLYMPIAD_SUBJECT_METADATA.math;
   const l2Date = meta.examDates2026_2027?.level2Dates || '28th January 2027 & 12th February 2027';
 
-  // Base cut-off profiles tailored by subject nuance
+  // Base cut-off profiles tailored by subject nuance for 6 core subjects
   const subjectOffsets = {
     math: { baseCut: 46, hotsMin: 12, diffRate: 1.0 },
     science: { baseCut: 45, hotsMin: 11, diffRate: 1.0 },
+    digital_literacy: { baseCut: 44, hotsMin: 10, diffRate: 0.95 },
     english: { baseCut: 47, hotsMin: 13, diffRate: 0.9 },
-    reasoning: { baseCut: 46, hotsMin: 12, diffRate: 1.05 },
-    cyber: { baseCut: 44, hotsMin: 10, diffRate: 0.95 },
-    vocabulary: { baseCut: 45, hotsMin: 11, diffRate: 0.9 },
-    environment: { baseCut: 43, hotsMin: 10, diffRate: 0.9 },
-    arts: { baseCut: 42, hotsMin: 9, diffRate: 0.85 },
-    gk: { baseCut: 44, hotsMin: 10, diffRate: 0.95 }
+    gk: { baseCut: 44, hotsMin: 10, diffRate: 0.95 },
+    hindi: { baseCut: 45, hotsMin: 11, diffRate: 0.95 }
   };
 
-  const config = subjectOffsets[subjectId] || subjectOffsets.math;
+  const normKey = (subjectId || '').toLowerCase().replace(/[^a-z]/g, '');
+  const matchedKey = Object.keys(subjectOffsets).find(k => normKey.includes(k.replace(/_/g, ''))) || 'math';
+  const config = subjectOffsets[matchedKey] || subjectOffsets.math;
 
   return ALL_CLASSES.map((clsName, idx) => {
     const isEarly = ['Nursery', 'LKG', 'UKG'].includes(clsName);
@@ -1134,7 +888,6 @@ export const getClassWiseCutOffData = (subjectId = 'math') => {
       y2025 = level1CutOff - 1;
       y2024 = level1CutOff - 2;
     } else {
-      // Class 1 to 12
       const classNum = parseInt(clsName.replace('Class ', ''), 10) || 1;
       const classScale = Math.min(8, Math.floor(classNum * 0.7));
       level1CutOff = Math.min(55, Math.round((config.baseCut + classScale) * (isEarly ? 0.65 : 1)));
@@ -1170,5 +923,3 @@ export const getClassWiseCutOffData = (subjectId = 'math') => {
     };
   });
 };
-
-

@@ -480,15 +480,12 @@ const initialStore = {
     { id: 15, name: 'Class 12', code: 'C12', order_num: 15, order_no: 15, category: 'Senior Secondary', age_group: '16-18 years old', description: 'Curriculum framework with Olympiad practice sets.', status: 'active' }
   ],
   academic_subjects: [
-    { id: 1, name: 'Mathematics', full_name: 'Mathematics Olympiad (IMO)', code: 'IMO', slug: 'math', icon: 'Calculator', color: '#4e2a4a', category: 'Mathematics', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Comprehensive Olympiad testing conceptual mastery and analytical depth.' },
-    { id: 2, name: 'Science', full_name: 'Science Olympiad (NSO)', code: 'NSO', slug: 'science', icon: 'Atom', color: '#d9775b', category: 'Science', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Comprehensive Olympiad testing conceptual mastery and analytical depth.' },
-    { id: 3, name: 'English', full_name: 'English Olympiad (IEO)', code: 'IEO', slug: 'english', icon: 'BookOpen', color: '#6d3a68', category: 'Language', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Comprehensive Olympiad testing conceptual mastery and analytical depth.' },
-    { id: 4, name: 'Reasoning', full_name: 'Reasoning Olympiad (LRO)', code: 'LRO', slug: 'reasoning', icon: 'Brain', color: '#6c568d', category: 'Reasoning', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Comprehensive Olympiad testing conceptual mastery and analytical depth.' },
-    { id: 5, name: 'Cyber & AI', full_name: 'Cyber & AI Olympiad (ICO)', code: 'ICO', slug: 'cyber', icon: 'Cpu', color: '#b17b25', category: 'Technology', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Comprehensive Olympiad testing conceptual mastery and analytical depth.' },
-    { id: 6, name: 'Vocabulary', full_name: 'Vocabulary Olympiad (VC)', code: 'VC', slug: 'vocab', icon: 'Sparkles', color: '#6d3a68', category: 'Language', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Comprehensive Olympiad testing conceptual mastery and analytical depth.' },
-    { id: 7, name: 'Environment', full_name: 'Environment Olympiad (EGO)', code: 'EGO', slug: 'environment', icon: 'Atom', color: '#059669', category: 'Science', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Comprehensive Olympiad testing conceptual mastery and analytical depth.' },
-    { id: 8, name: 'Creative Arts', full_name: 'Creative Arts Olympiad (CAO)', code: 'CAO', slug: 'arts', icon: 'Palette', color: '#80497D', category: 'Arts', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Comprehensive Olympiad testing conceptual mastery and analytical depth.' },
-    { id: 9, name: 'General Knowledge', full_name: 'General Knowledge Olympiad (IGKO)', code: 'IGKO', slug: 'gk', icon: 'Globe', color: '#906223', category: 'General', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Comprehensive Olympiad testing conceptual mastery and analytical depth.' }
+    { id: 1, name: 'Mathematics', full_name: 'Mathematics Olympiad (IMO)', code: 'IMO', slug: 'math', icon: 'Calculator', color: '#ec4899', category: 'STEM', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Comprehensive Olympiad testing conceptual mastery and analytical depth.' },
+    { id: 2, name: 'Science', full_name: 'Science Olympiad (ISO)', code: 'ISO', slug: 'science', icon: 'Atom', color: '#8b5cf6', category: 'STEM', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Comprehensive Olympiad testing conceptual mastery and scientific inquiry.' },
+    { id: 3, name: 'Digital Literacy', full_name: 'Digital Literacy Olympiad (IDLO)', code: 'IDLO', slug: 'digital-literacy', icon: 'Cpu', color: '#3b82f6', category: 'Computer & IT', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Computational thinking, algorithms, modern AI awareness, and digital safety.' },
+    { id: 4, name: 'English', full_name: 'English Olympiad (IEO)', code: 'IEO', slug: 'english', icon: 'BookOpen', color: '#06b6d4', category: 'Languages', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Comprehensive Olympiad testing grammar, lexical depth, and verbal aptitude.' },
+    { id: 5, name: 'General Knowledge', full_name: 'General Knowledge Olympiad (IGKO)', code: 'IGKO', slug: 'gk', icon: 'Globe', color: '#f59e0b', category: 'General Awareness', questions_count: 50, duration_minutes: 60, status: 'active', description: 'Global awareness, discoveries, national heritage, and current affairs.' },
+    { id: 6, name: 'Hindi', full_name: 'Hindi Olympiad (IHO)', code: 'IHO', slug: 'hindi', icon: 'Languages', color: '#10b981', category: 'Languages', questions_count: 50, duration_minutes: 60, status: 'active', description: 'हिंदी व्याकरण, शब्द सामर्थ्य, भाषा ज्ञान एवं अपठित बोध।' }
   ],
   bank_settings: {
     bank_name: 'HDFC Bank Ltd',
@@ -517,7 +514,7 @@ function getDb(table) {
       return defaultData;
     }
     const parsed = JSON.parse(raw);
-    if (table === 'academic_subjects' && (parsed.length < 9 || parsed.some(s => s.code === 'NCO' || s.code === 'RAO'))) {
+    if (table === 'academic_subjects' && (parsed.length !== 6 || parsed.some(s => s.code === 'NCO' || s.code === 'RAO' || s.code === 'LRO' || s.code === 'VC' || s.code === 'EGO' || s.code === 'CAO'))) {
       localStorage.setItem(STORAGE_PREFIX + table, JSON.stringify(initialStore.academic_subjects));
       return initialStore.academic_subjects;
     }

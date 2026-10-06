@@ -302,19 +302,16 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     </button>
                   </div>
 
-                  {/* Clean Sub-items for all 9 Olympiad subjects */}
+                  {/* Clean Sub-items for all 6 core Olympiad subjects */}
                   {studentAccordions.content && (
                     <div className="pl-6 pr-2 py-1 space-y-1">
                       {[
-                        { id: 'content_igko', label: 'IGKO (GK)', icon: Globe },
+                        { id: 'content_imo', label: 'IMO (Mathematics)', icon: Calculator },
                         { id: 'content_iso', label: 'ISO / NSO (Science)', icon: Rocket },
-                        { id: 'content_imo', label: 'IMO (Maths)', icon: Calculator },
+                        { id: 'content_idlo', label: 'IDLO (Digital Literacy)', icon: Laptop },
                         { id: 'content_ieo', label: 'IEO (English)', icon: BookOpen },
-                        { id: 'content_icso', label: 'ICSO (Cyber)', icon: Laptop },
-                        { id: 'content_isso', label: 'ISSO (Reasoning)', icon: Brain },
-                        { id: 'content_vc', label: 'VC (Vocabulary)', icon: Sparkles },
-                        { id: 'content_ego', label: 'EGO (Environment)', icon: Atom },
-                        { id: 'content_cao', label: 'CAO (Creative Arts)', icon: Palette }
+                        { id: 'content_igko', label: 'IGKO (General Knowledge)', icon: Globe },
+                        { id: 'content_iho', label: 'IHO (Hindi)', icon: Languages }
                       ].map((sub) => {
                         const SubIcon = sub.icon;
                         const isSubActive = currentTab === sub.id;

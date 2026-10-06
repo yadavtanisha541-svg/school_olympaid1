@@ -37,7 +37,7 @@ export const DEFAULT_SUPERADMIN_FAQS = [
     id: 'faq-4',
     category: 'Subjects & Curriculum',
     q: 'Which all subjects are covered under SkillRise Olympiads?',
-    a: 'SkillRise Olympiads covers 9 major disciplines for Nursery to Class 12: Mathematics Olympiad (IMO), Science Olympiad (NSO), English Olympiad (IEO), Cyber & AI Olympiad (ICO), Reasoning Olympiad (IRO), Vocabulary Championship (IVC), Environmental Studies (GECO), Creative Arts (ICAO), and General Knowledge (IGKO).',
+    a: 'SkillRise Olympiads covers 6 major disciplines for Nursery to Class 12: Mathematics (IMO), Science (ISO), Digital Literacy (IDLO), English (IEO), General Knowledge (IGKO), and Hindi (IHO).',
     enabled: true,
     order: 4
   },

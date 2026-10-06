@@ -1,5 +1,5 @@
 // OlympiadHub - Master Public Catalog & System Data
-// Original content structure with Plum, Coral, Gold, Lavender & Ivory identity
+// 6 Core Disciplines: Mathematics, Science, Digital Literacy, English, General Knowledge, Hindi
 
 export const OLYMPIAD_CATEGORIES = [
   {
@@ -9,10 +9,10 @@ export const OLYMPIAD_CATEGORIES = [
     code: 'IMO-2026',
     icon: 'Calculator',
     badgeColor: 'plum',
-    colorHex: '#6d3a68',
-    bgLight: '#faf5fa',
-    borderLight: '#edd6ed',
-    accentColor: '#d9775b',
+    colorHex: '#ec4899',
+    bgLight: '#fdf2f8',
+    borderLight: '#fbcfe8',
+    accentColor: '#8b5cf6',
     tagline: 'Test mathematical intuition, problem-solving, and logical deduction.',
     description: 'The premier national and international mathematical contest designed to challenge analytical thinking, spatial reasoning, and numerical precision across all student tiers.',
     eligibleClasses: 'Classes 1 to 12',
@@ -66,15 +66,15 @@ export const OLYMPIAD_CATEGORIES = [
   },
   {
     id: 'science',
-    name: 'National Science Olympiad',
+    name: 'International Science Olympiad',
     shortName: 'Science',
-    code: 'NSO-2026',
+    code: 'ISO-2026',
     icon: 'Atom',
-    badgeColor: 'coral',
-    colorHex: '#d9775b',
-    bgLight: '#fdf6f4',
-    borderLight: '#f7d7cc',
-    accentColor: '#e7b84b',
+    badgeColor: 'purple',
+    colorHex: '#8b5cf6',
+    bgLight: '#f5f3ff',
+    borderLight: '#ddd6fe',
+    accentColor: '#3b82f6',
     tagline: 'Empowering scientific inquiry, experimental logic, and natural exploration.',
     description: 'A comprehensive science assessment evaluating physics, chemistry, biology, and scientific methodology for budding researchers and innovators.',
     eligibleClasses: 'Classes 1 to 12',
@@ -121,16 +121,72 @@ export const OLYMPIAD_CATEGORIES = [
     }
   },
   {
+    id: 'digital-literacy',
+    name: 'International Digital Literacy Olympiad',
+    shortName: 'Digital Literacy',
+    code: 'IDLO-2026',
+    icon: 'Cpu',
+    badgeColor: 'blue',
+    colorHex: '#3b82f6',
+    bgLight: '#eff6ff',
+    borderLight: '#bfdbfe',
+    accentColor: '#8b5cf6',
+    tagline: 'Computational thinking, cyber safety, AI fundamentals, and digital empowerment.',
+    description: 'Empowering future technologists with computer science concepts, programming fundamentals, cybersecurity best practices, and practical Artificial Intelligence literacy.',
+    eligibleClasses: 'Classes 1 to 12',
+    classesList: ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'],
+    durationMinutes: 60,
+    totalQuestions: 50,
+    totalMarks: 60,
+    levels: 2,
+    difficulty: 'Computational & Futuristic',
+    fee: 250,
+    examDates: ['10 Dec 2026', '14 Jan 2027', '28 Jan 2027'],
+    syllabus: [
+      {
+        topic: 'Computer Hardware & Networking',
+        description: 'CPU architecture, memory hierarchies, peripherals, networking protocols, cloud principles.',
+        learningOutcomes: 'Understand system internals and internet infrastructure.',
+        questionsCount: 85
+      },
+      {
+        topic: 'Algorithms & Computational Logic',
+        description: 'Flowcharts, pseudo-code, loops, conditional branching, data structures (Arrays, Stacks).',
+        learningOutcomes: 'Develop programmatic thinking and optimization mindset.',
+        questionsCount: 110
+      },
+      {
+        topic: 'Cybersecurity & Ethical Computing',
+        description: 'Malware defense, encryption basics, phishing prevention, digital footprints, netiquette.',
+        learningOutcomes: 'Operate safely and responsibly in modern digital environments.',
+        questionsCount: 75
+      },
+      {
+        topic: 'AI Literacy & Emerging Tech',
+        description: 'Machine learning fundamentals, neural networks intuition, robotics, prompt logic.',
+        learningOutcomes: 'Appreciate how modern AI systems process signals and patterns.',
+        questionsCount: 60
+      }
+    ],
+    pattern: {
+      sections: [
+        { name: 'Section 1: Computer Fundamentals', questions: 20, marksPerQ: 1, negative: 0.25, desc: 'Hardware, software & OS basics' },
+        { name: 'Section 2: Algorithmic Thinking', questions: 20, marksPerQ: 1, negative: 0.25, desc: 'Logic, loops and structured steps' },
+        { name: 'Section 3: Achievers Cyber Frontier', questions: 10, marksPerQ: 2, negative: 0.50, desc: 'Modern AI and complex logic' }
+      ]
+    }
+  },
+  {
     id: 'english',
     name: 'International English Olympiad',
     shortName: 'English',
     code: 'IEO-2026',
     icon: 'BookOpen',
-    badgeColor: 'plum',
-    colorHex: '#8c4e8b',
-    bgLight: '#faf5fa',
-    borderLight: '#edd6ed',
-    accentColor: '#d9775b',
+    badgeColor: 'cyan',
+    colorHex: '#06b6d4',
+    bgLight: '#ecfeff',
+    borderLight: '#a5f3fc',
+    accentColor: '#ec4899',
     tagline: 'Mastering grammar, vocabulary, reading comprehension, and articulate expression.',
     description: 'An international benchmark assessment for English language proficiency, assessing lexical depth, syntax mastery, contextual inference, and verbal nuance.',
     eligibleClasses: 'Classes 1 to 12',
@@ -177,273 +233,16 @@ export const OLYMPIAD_CATEGORIES = [
     }
   },
   {
-    id: 'reasoning',
-    name: 'Logical Reasoning Olympiad',
-    shortName: 'Reasoning',
-    code: 'LRO-2026',
-    icon: 'Brain',
-    badgeColor: 'lavender',
-    colorHex: '#6c568d',
-    bgLight: '#f3f0fb',
-    borderLight: '#e8e2f7',
-    accentColor: '#e7b84b',
-    tagline: 'Sharpen mental acuity, pattern recognition, spatial cognition, and deductive agility.',
-    description: 'Designed to build core cognitive capabilities, critical deduction, non-verbal abstract intelligence, and algorithmic thinking essential for future STEM leaders.',
-    eligibleClasses: 'Classes 1 to 12',
-    classesList: ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'],
-    durationMinutes: 60,
-    totalQuestions: 50,
-    totalMarks: 50,
-    levels: 1,
-    difficulty: 'Analytical & Cognitive',
-    fee: 250,
-    examDates: ['19 Dec 2026', '15 Jan 2027'],
-    syllabus: [
-      {
-        topic: 'Verbal Reasoning & Syllogisms',
-        description: 'Coding-decoding, blood relations, direction sense, series completion, ranking tests.',
-        learningOutcomes: 'Develop step-by-step logical decomposition.',
-        questionsCount: 110
-      },
-      {
-        topic: 'Non-Verbal & Spatial Cognition',
-        description: 'Figure matrix, pattern folding, mirror & water images, embedded figures, cube rotations.',
-        learningOutcomes: 'Master mental 3D rotation and geometric pattern abstraction.',
-        questionsCount: 125
-      },
-      {
-        topic: 'Analytical & Critical Logic',
-        description: 'Venn diagrams, statement-assumptions, data sufficiency, puzzle grids, seating arrangements.',
-        learningOutcomes: 'Formulate hypotheses and eliminate invalid options swiftly.',
-        questionsCount: 90
-      }
-    ],
-    pattern: {
-      sections: [
-        { name: 'Section 1: Verbal Patterns', questions: 20, marksPerQ: 1, negative: 0.20, desc: 'Language and relational logic' },
-        { name: 'Section 2: Spatial & Non-Verbal', questions: 20, marksPerQ: 1, negative: 0.20, desc: 'Visual transformation and matrices' },
-        { name: 'Section 3: Master Puzzles', questions: 10, marksPerQ: 1, negative: 0.20, desc: 'Multi-parameter seating and deduction' }
-      ]
-    }
-  },
-  {
-    id: 'cyber',
-    name: 'International Cyber & AI Olympiad',
-    shortName: 'Cyber & AI',
-    code: 'ICO-2026',
-    icon: 'Cpu',
-    badgeColor: 'gold',
-    colorHex: '#b17b25',
-    bgLight: '#faf4e0',
-    borderLight: '#f5e7bf',
-    accentColor: '#6d3a68',
-    tagline: 'Computational thinking, algorithms, modern AI awareness, and digital safety.',
-    description: 'Empowering future technologists with computer science concepts, programming fundamentals, cybersecurity best practices, and practical Artificial Intelligence literacy.',
-    eligibleClasses: 'Classes 1 to 12',
-    classesList: ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'],
-    durationMinutes: 60,
-    totalQuestions: 50,
-    totalMarks: 60,
-    levels: 2,
-    difficulty: 'Computational & Futuristic',
-    fee: 250,
-    examDates: ['10 Dec 2026', '14 Jan 2027', '28 Jan 2027'],
-    syllabus: [
-      {
-        topic: 'Computer Hardware & Networking',
-        description: 'CPU architecture, memory hierarchies, peripherals, networking protocols, cloud principles.',
-        learningOutcomes: 'Understand system internals and internet infrastructure.',
-        questionsCount: 85
-      },
-      {
-        topic: 'Algorithms & Computational Logic',
-        description: 'Flowcharts, pseudo-code, loops, conditional branching, data structures (Arrays, Stacks).',
-        learningOutcomes: 'Develop programmatic thinking and optimization mindset.',
-        questionsCount: 110
-      },
-      {
-        topic: 'Cybersecurity & Ethical Computing',
-        description: 'Malware defense, encryption basics, phishing prevention, digital footprints, netiquette.',
-        learningOutcomes: 'Operate safely and responsibly in modern digital environments.',
-        questionsCount: 75
-      },
-      {
-        topic: 'AI Literacy & Emerging Tech',
-        description: 'Machine learning fundamentals, neural networks intuition, robotics, prompt logic.',
-        learningOutcomes: 'Appreciate how modern AI systems process signals and patterns.',
-        questionsCount: 60
-      }
-    ],
-    pattern: {
-      sections: [
-        { name: 'Section 1: Computer Fundamentals', questions: 20, marksPerQ: 1, negative: 0.25, desc: 'Hardware, software & OS basics' },
-        { name: 'Section 2: Algorithmic Thinking', questions: 20, marksPerQ: 1, negative: 0.25, desc: 'Logic, loops and structured steps' },
-        { name: 'Section 3: Achievers Cyber Frontier', questions: 10, marksPerQ: 2, negative: 0.50, desc: 'Modern AI and complex logic' }
-      ]
-    }
-  },
-
-  {
-    id: 'spell-bee',
-    name: 'Vocabulary Championship',
-    shortName: 'Vocabulary',
-    code: 'VC-2026',
-    icon: 'Sparkles',
-    badgeColor: 'plum',
-    colorHex: '#6d3a68',
-    bgLight: '#faf5fa',
-    borderLight: '#edd6ed',
-    accentColor: '#e7b84b',
-    tagline: 'Orthography, phonetics, word origin mastery, and linguistic precision.',
-    description: 'A celebrated competition for spellers testing word origins (Greek, Latin, French), homophones, silent letters, and sophisticated vocabulary application.',
-    eligibleClasses: 'Classes 1 to 12',
-    classesList: ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'],
-    durationMinutes: 45,
-    totalQuestions: 50,
-    totalMarks: 50,
-    levels: 2,
-    difficulty: 'Orthographic & Linguistic',
-    fee: 250,
-    examDates: ['15 Dec 2026', '19 Jan 2027'],
-    syllabus: [
-      {
-        topic: 'Phonetics & Word Spellings',
-        description: 'Silent letters, double consonants, prefixes & suffixes, complex vowel blends.',
-        learningOutcomes: 'Master 1,500+ contest spelling words.',
-        questionsCount: 200
-      },
-      {
-        topic: 'Etymology & Word Roots',
-        description: 'Greek and Latin roots, loan words from French/German, word morphology.',
-        learningOutcomes: 'Deduce unknown spellings from roots.',
-        questionsCount: 140
-      },
-      {
-        topic: 'Contextual Usage & Confusables',
-        description: 'Homophones, homonyms, context collocations, precision definitions.',
-        learningOutcomes: 'Eliminate common linguistic confusions.',
-        questionsCount: 110
-      }
-    ],
-    pattern: {
-      sections: [
-        { name: 'Section 1: Spell Check & Identify', questions: 20, marksPerQ: 1, negative: 0, desc: 'Spotting correct and incorrect spellings' },
-        { name: 'Section 2: Etymology & Roots', questions: 20, marksPerQ: 1, negative: 0, desc: 'Root-based vocabulary questions' },
-        { name: 'Section 3: Audio Spell Master', questions: 10, marksPerQ: 1, negative: 0, desc: 'Listening and choosing correct orthography' }
-      ]
-    }
-  },
-  {
-    id: 'environmental',
-    name: 'Earth Guardian & Environment Olympiad',
-    shortName: 'Environment',
-    code: 'EGO-2026',
-    icon: 'Globe',
-    badgeColor: 'coral',
-    colorHex: '#c85e42',
-    bgLight: '#fdf6f4',
-    borderLight: '#f7d7cc',
-    accentColor: '#e7b84b',
-    tagline: 'Climate science, renewable energy, biodiversity preservation, and sustainable action.',
-    description: 'A forward-looking environmental championship inspiring young eco-stewards with climate literacy, renewable innovations, circular economy, and conservation principles.',
-    eligibleClasses: 'Classes 1 to 12',
-    classesList: ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'],
-    durationMinutes: 50,
-    totalQuestions: 50,
-    totalMarks: 50,
-    levels: 1,
-    difficulty: 'Ecological & Global Awareness',
-    fee: 250,
-    examDates: ['22 Dec 2026', '26 Jan 2027'],
-    syllabus: [
-      {
-        topic: 'Ecosystems & Biodiversity',
-        description: 'Biomes, endangered species, food webs, marine ecosystems, and rainforest conservation.',
-        learningOutcomes: 'Understand planetary ecological balances.',
-        questionsCount: 95
-      },
-      {
-        topic: 'Renewable Resources & Clean Tech',
-        description: 'Solar, wind, hydro, geothermal energy, electric mobility, and zero-waste systems.',
-        learningOutcomes: 'Grasp modern sustainable technology frontiers.',
-        questionsCount: 85
-      },
-      {
-        topic: 'Climate Science & Global Goals',
-        description: 'Carbon cycle, greenhouse effect, UN SDGs, ozone recovery, sustainable agriculture.',
-        learningOutcomes: 'Analyze international environmental treaties and solutions.',
-        questionsCount: 90
-      }
-    ],
-    pattern: {
-      sections: [
-        { name: 'Section 1: Ecological Fundamentals', questions: 25, marksPerQ: 1, negative: 0.20, desc: 'Biodiversity & nature systems' },
-        { name: 'Section 2: Sustainable Innovations', questions: 15, marksPerQ: 1, negative: 0.20, desc: 'Green tech & renewable solutions' },
-        { name: 'Section 3: Earth Guardian Challenge', questions: 10, marksPerQ: 1, negative: 0.20, desc: 'Case analysis & conservation plans' }
-      ]
-    }
-  },
-  {
-    id: 'drawing',
-    name: 'Creative Arts & Visual Expression Olympiad',
-    shortName: 'Creative Arts',
-    code: 'CAO-2026',
-    icon: 'Palette',
-    badgeColor: 'lavender',
-    colorHex: '#826ba8',
-    bgLight: '#f3f0fb',
-    borderLight: '#e8e2f7',
-    accentColor: '#d9775b',
-    tagline: 'Art history, perspective, color theory, design thinking, and visual storytelling.',
-    description: 'A distinctive Olympiad assessing aesthetic sense, design fundamentals, visual balance, perspective geometry, and historical art movements.',
-    eligibleClasses: 'Classes 1 to 12',
-    classesList: ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'],
-    durationMinutes: 50,
-    totalQuestions: 40,
-    totalMarks: 50,
-    levels: 1,
-    difficulty: 'Visual & Creative',
-    fee: 250,
-    examDates: ['24 Dec 2026', '29 Jan 2027'],
-    syllabus: [
-      {
-        topic: 'Color Harmony & Principles of Design',
-        description: 'Color wheels, primary/secondary/tertiary colors, tints/shades, contrast, balance, rhythm.',
-        learningOutcomes: 'Master foundational visual design terminology.',
-        questionsCount: 80
-      },
-      {
-        topic: 'Perspective & Spatial Rendering',
-        description: '1-point & 2-point perspective, vanishing points, horizon lines, shadow casting, proportions.',
-        learningOutcomes: 'Understand accurate 3D representation on 2D planes.',
-        questionsCount: 75
-      },
-      {
-        topic: 'World Art History & Masterpieces',
-        description: 'Renaissance, Impressionism, Cubism, traditional Indian art forms (Madhubani, Warli), modern design.',
-        learningOutcomes: 'Broaden cultural awareness and artistic appreciation.',
-        questionsCount: 70
-      }
-    ],
-    pattern: {
-      sections: [
-        { name: 'Section 1: Design Fundamentals', questions: 20, marksPerQ: 1, negative: 0, desc: 'Color, rhythm and visual rules' },
-        { name: 'Section 2: Perspective & Technique', questions: 10, marksPerQ: 1.5, negative: 0, desc: 'Spatial geometry and drawing logic' },
-        { name: 'Section 3: Art Heritage & Modern Forms', questions: 10, marksPerQ: 1.5, negative: 0, desc: 'Art history and movement analysis' }
-      ]
-    }
-  },
-  {
     id: 'gk',
-    name: 'General Knowledge & Current Affairs Olympiad',
+    name: 'International General Knowledge Olympiad',
     shortName: 'General Knowledge',
     code: 'IGKO-2026',
-    icon: 'Sparkles',
-    badgeColor: 'plum',
-    colorHex: '#8c4e8b',
-    bgLight: '#faf5fa',
-    borderLight: '#edd6ed',
-    accentColor: '#d9775b',
+    icon: 'Globe',
+    badgeColor: 'amber',
+    colorHex: '#f59e0b',
+    bgLight: '#fffbeb',
+    borderLight: '#fde68a',
+    accentColor: '#ec4899',
     tagline: 'Global awareness, discoveries, national heritage, geopolitics, and current news.',
     description: 'A global benchmarking assessment evaluating general awareness, world geography, history, modern science, sports, civics, and international current affairs.',
     eligibleClasses: 'Classes 1 to 12',
@@ -488,13 +287,69 @@ export const OLYMPIAD_CATEGORIES = [
         { name: 'Section 3: Achievers Hotspot', questions: 10, marksPerQ: 1, negative: 0.20, desc: 'Complex multi-disciplinary GK' }
       ]
     }
+  },
+  {
+    id: 'hindi',
+    name: 'International Hindi Olympiad',
+    shortName: 'Hindi',
+    code: 'IHO-2026',
+    icon: 'Languages',
+    badgeColor: 'emerald',
+    colorHex: '#10b981',
+    bgLight: '#ecfdf5',
+    borderLight: '#a7f3d0',
+    accentColor: '#3b82f6',
+    tagline: 'हिंदी व्याकरण, शब्द सामर्थ्य, भाषा ज्ञान एवं अपठित बोध में निपुणता।',
+    description: 'हिंदी भाषा के प्रति अनुराग, शुद्ध वर्तनी, व्याकरणिक नियमों की समझ, समृद्ध शब्दकोश तथा पठित-अपठित गद्यांश बोध का अंतर्राष्ट्रीय स्तर पर मूल्यांकन।',
+    eligibleClasses: 'Classes 1 to 12',
+    classesList: ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'],
+    durationMinutes: 50,
+    totalQuestions: 50,
+    totalMarks: 50,
+    levels: 2,
+    difficulty: 'Linguistic & Grammar Proficiency',
+    fee: 250,
+    examDates: ['20 Dec 2026', '12 Jan 2027', '26 Jan 2027'],
+    syllabus: [
+      {
+        topic: 'वर्ण विचार एवं वर्तनी शुद्धि',
+        description: 'स्वर, व्यंजन, मात्राएँ, संयुक्त व्यंजन, अनुस्वार, अनुनासिक तथा शुद्ध वर्तनी नियम।',
+        learningOutcomes: 'शुद्ध उच्चारण एवं त्रुटिहीन वर्तनी लेखन में दक्षता।',
+        questionsCount: 110
+      },
+      {
+        topic: 'व्याकरण बोध (संज्ञा, सर्वनाम, क्रिया, विशेषण)',
+        description: 'लिंग, वचन, कारक, काल, वाच्य, संधि, समास तथा पद परिचय की विस्तृत समझ।',
+        learningOutcomes: 'व्याकरण के आधारभूत नियमों का व्यावहारिक अनुप्रयोग।',
+        questionsCount: 130
+      },
+      {
+        topic: 'शब्द भंडार एवं मुहावरे',
+        description: 'पर्यायवाची, विलोम, अनेकार्थी शब्द, वाक्यांश के लिए एक शब्द, मुहावरे और लोकोक्तियाँ।',
+        learningOutcomes: 'समृद्ध शब्द संपदा एवं प्रभावी अभिव्यक्ति क्षमता।',
+        questionsCount: 120
+      },
+      {
+        topic: 'अपठित गद्यांश एवं उच्च स्तरीय चिंतन (HOTS)',
+        description: 'भाव ग्रहण, काव्यांश विश्लेषण, केंद्रीय विचार निरूपण एवं अचीवर्स सेक्शन।',
+        learningOutcomes: 'तीव्र पठन बोध एवं आलोचनात्मक साहित्यिक समझ।',
+        questionsCount: 60
+      }
+    ],
+    pattern: {
+      sections: [
+        { name: 'खण्ड 1: भाषा एवं व्याकरण ज्ञान', questions: 25, marksPerQ: 1, negative: 0.20, desc: 'वर्ण, शब्द एवं व्याकरणिक संरचना' },
+        { name: 'खण्ड 2: अपठित बोध एवं साहित्य', questions: 15, marksPerQ: 1, negative: 0.20, desc: 'गद्यांश, पद्यांश एवं भाव बोध' },
+        { name: 'खण्ड 3: अचीवर्स सेक्शन (HOTS)', questions: 10, marksPerQ: 1, negative: 0.20, desc: 'उच्च स्तरीय भाषा चिंतन एवं मुहावरे' }
+      ]
+    }
   }
 ];
 
 export const TRUST_STATS = [
   { label: 'Active Students Enrolled', value: '45,000+', count: 45000, suffix: '+', icon: 'Users' },
   { label: 'Partner Schools Globally', value: '1,200+', count: 1200, suffix: '+', icon: 'Building' },
-  { label: 'Olympiad Categories', value: '9 Premier Disciplines', count: 9, suffix: '', icon: 'BookOpen' },
+  { label: 'Olympiad Categories', value: '6 Premier Disciplines', count: 6, suffix: '', icon: 'BookOpen' },
   { label: 'Participating Countries', value: '30+ Nations', count: 30, suffix: '+', icon: 'Globe' }
 ];
 
@@ -553,19 +408,21 @@ export const SAMPLE_PAPERS_CATALOG = [
   { id: 'sp-1', year: '2026', title: 'Official Sample Paper 2026', olympiad: 'Mathematics', class: 'Class 5', questions: 50, duration: '60 mins', difficulty: 'Official Model', pdfSize: '2.4 MB' },
   { id: 'sp-2', year: '2026', title: 'Official Sample Paper 2026', olympiad: 'Science', class: 'Class 5', questions: 50, duration: '60 mins', difficulty: 'Official Model', pdfSize: '2.8 MB' },
   { id: 'sp-3', year: '2026', title: 'Official Sample Paper 2026', olympiad: 'English', class: 'Class 4', questions: 50, duration: '60 mins', difficulty: 'Official Model', pdfSize: '1.9 MB' },
-  { id: 'sp-4', year: '2025', title: 'Previous Year Paper 2025', olympiad: 'Mathematics', class: 'Class 6', questions: 50, duration: '60 mins', difficulty: 'Past Actual', pdfSize: '3.1 MB' },
-  { id: 'sp-5', year: '2025', title: 'Previous Year Paper 2025', olympiad: 'Science', class: 'Class 7', questions: 50, duration: '60 mins', difficulty: 'Past Actual', pdfSize: '2.9 MB' },
-  { id: 'sp-6', year: '2024', title: 'Previous Year Paper 2024', olympiad: 'Reasoning', class: 'Class 5', questions: 50, duration: '60 mins', difficulty: 'Past Actual', pdfSize: '2.1 MB' },
-  { id: 'sp-7', year: '2024', title: 'Previous Year Paper 2024', olympiad: 'Cyber & AI', class: 'Class 8', questions: 50, duration: '60 mins', difficulty: 'Past Actual', pdfSize: '2.7 MB' },
-  { id: 'sp-8', year: '2023', title: 'Previous Year Paper 2023', olympiad: 'Mathematics', class: 'Class 8', questions: 50, duration: '60 mins', difficulty: 'Past Actual', pdfSize: '3.0 MB' },
-  { id: 'sp-9', year: '2022', title: 'Previous Year Paper 2022', olympiad: 'English', class: 'Class 5', questions: 50, duration: '60 mins', difficulty: 'Past Actual', pdfSize: '2.2 MB' }
+  { id: 'sp-4', year: '2026', title: 'Official Sample Paper 2026', olympiad: 'Digital Literacy', class: 'Class 6', questions: 50, duration: '60 mins', difficulty: 'Official Model', pdfSize: '2.7 MB' },
+  { id: 'sp-5', year: '2026', title: 'Official Sample Paper 2026', olympiad: 'General Knowledge', class: 'Class 5', questions: 50, duration: '50 mins', difficulty: 'Official Model', pdfSize: '2.1 MB' },
+  { id: 'sp-6', year: '2026', title: 'Official Sample Paper 2026', olympiad: 'Hindi', class: 'Class 5', questions: 50, duration: '50 mins', difficulty: 'Official Model', pdfSize: '2.0 MB' },
+  { id: 'sp-7', year: '2025', title: 'Previous Year Paper 2025', olympiad: 'Mathematics', class: 'Class 6', questions: 50, duration: '60 mins', difficulty: 'Past Actual', pdfSize: '3.1 MB' },
+  { id: 'sp-8', year: '2025', title: 'Previous Year Paper 2025', olympiad: 'Science', class: 'Class 7', questions: 50, duration: '60 mins', difficulty: 'Past Actual', pdfSize: '2.9 MB' },
+  { id: 'sp-9', year: '2025', title: 'Previous Year Paper 2025', olympiad: 'Hindi', class: 'Class 6', questions: 50, duration: '50 mins', difficulty: 'Past Actual', pdfSize: '2.3 MB' }
 ];
 
 export const WORKBOOKS_CATALOG = [
   { id: 'wb-1', title: 'Olympiad Champion Math Workbook', subject: 'Mathematics', class: 'Class 5', pages: 180, rating: 4.9, reviews: 340, desc: 'Over 800+ categorized questions, chapter tests, past exam papers, and detailed solution rationales.', badge: 'Bestseller' },
   { id: 'wb-2', title: 'Science Explorer Olympiad Masterguide', subject: 'Science', class: 'Class 5', pages: 210, rating: 4.8, reviews: 290, desc: 'Illustrated scientific concepts, experiment breakdowns, HOTS questions, and model test papers.', badge: 'Top Rated' },
-  { id: 'wb-3', title: 'Word Mastery & Grammar Workbook', subject: 'English', class: 'Class 4', pages: 160, rating: 4.9, reviews: 210, desc: 'Complete coverage of grammar mechanics, 1,200 vocabulary roots, reading passages, and mock tests.', badge: 'Recommended' },
-  { id: 'wb-4', title: 'Logical Brain Agility Workbook', subject: 'Reasoning', class: 'Class 6', pages: 190, rating: 4.9, reviews: 410, desc: 'Step-by-step puzzle solving, spatial rotation tricks, coding-decoding shortcuts, and mental agility drills.', badge: 'Popular' }
+  { id: 'wb-3', title: 'Digital Literacy & Cyber Skills Workbook', subject: 'Digital Literacy', class: 'Class 6', pages: 175, rating: 4.9, reviews: 260, desc: 'Practical computer logic, algorithms, AI foundations, and cyber safety drills.', badge: 'New Edition' },
+  { id: 'wb-4', title: 'Word Mastery & Grammar Workbook', subject: 'English', class: 'Class 4', pages: 160, rating: 4.9, reviews: 210, desc: 'Complete coverage of grammar mechanics, 1,200 vocabulary roots, reading passages, and mock tests.', badge: 'Recommended' },
+  { id: 'wb-5', title: 'General Knowledge & Current Affairs Master', subject: 'General Knowledge', class: 'Class 5', pages: 150, rating: 4.8, reviews: 185, desc: 'Global facts, Indian heritage, space discoveries, and current affairs quizzes.', badge: 'Popular' },
+  { id: 'wb-6', title: 'हिंदी भाषा एवं व्याकरण अभ्यास पुस्तिका', subject: 'Hindi', class: 'Class 5', pages: 165, rating: 4.9, reviews: 220, desc: 'सम्पूर्ण व्याकरण, शब्द भंडार, मुहावरे, अपठित गद्यांश एवं अभ्यास प्रश्न पत्र।', badge: 'Bestseller' }
 ];
 
 export const FAQS_LIST = [
@@ -577,7 +434,7 @@ export const FAQS_LIST = [
   {
     category: 'Registration',
     q: 'Can a student register for multiple Olympiad disciplines in the same year?',
-    a: 'Yes! Students are encouraged to participate in multiple categories such as Mathematics, Science, English, Cyber & AI, and Reasoning. Exam slots are specifically staggered to prevent timing clashes.'
+    a: 'Yes! Students can participate in all 6 core subjects: Mathematics, Science, Digital Literacy, English, General Knowledge, and Hindi. Exam slots are staggered to prevent timing clashes.'
   },
   {
     category: 'Exams & Mode',
@@ -634,13 +491,13 @@ export const BLOG_POSTS = [
   },
   {
     id: 'blog-3',
-    title: 'Demystifying AI & Computational Thinking for Elementary School Students',
-    category: 'Cyber & AI',
+    title: 'Demystifying AI & Digital Literacy for School Students',
+    category: 'Digital Literacy',
     author: 'Ananya Deshmukh',
     readTime: '4 min read',
     date: 'Sep 10, 2026',
-    snippet: 'How early exposure to pattern recognition, flowcharts, and conditional logic prepares young learners for an AI-native world.',
-    tags: ['Artificial Intelligence', 'Kids Coding', 'Future Skills']
+    snippet: 'How early exposure to computational logic, digital safety, and AI concepts prepares young learners for an AI-native world.',
+    tags: ['Artificial Intelligence', 'Digital Literacy', 'Future Skills']
   }
 ];
 
@@ -663,7 +520,7 @@ export const TESTIMONIALS = [
   },
   {
     name: 'Vikramaditya Rao',
-    role: 'Student (Class 8 Science & Cyber Medalist)',
+    role: 'Student (Class 8 Science & Digital Literacy Medalist)',
     school: 'National Public School, Bengaluru',
     comment: 'The live test interface with auto-save and the instant scorecard breakdown showed me exactly which physics concepts I needed to revise. Truly international standard!',
     rating: 5,
@@ -674,9 +531,10 @@ export const TESTIMONIALS = [
 export const CUTOFF_DATA = [
   { olympiad: 'Mathematics Olympiad', class: 'Class 5', year: '2026', maxMarks: 60, level1Cutoff: 44.5, level2Cutoff: 52.0, top1Percentile: 56.5 },
   { olympiad: 'Science Olympiad', class: 'Class 5', year: '2026', maxMarks: 60, level1Cutoff: 42.0, level2Cutoff: 50.5, top1Percentile: 55.0 },
+  { olympiad: 'Digital Literacy Olympiad', class: 'Class 6', year: '2026', maxMarks: 60, level1Cutoff: 43.0, level2Cutoff: 51.0, top1Percentile: 55.5 },
   { olympiad: 'English Olympiad', class: 'Class 5', year: '2026', maxMarks: 60, level1Cutoff: 46.0, level2Cutoff: 53.5, top1Percentile: 57.5 },
-  { olympiad: 'Reasoning Olympiad', class: 'Class 5', year: '2026', maxMarks: 50, level1Cutoff: 39.0, level2Cutoff: 45.0, top1Percentile: 48.0 },
-  { olympiad: 'Cyber & AI Olympiad', class: 'Class 8', year: '2026', maxMarks: 60, level1Cutoff: 43.0, level2Cutoff: 51.0, top1Percentile: 55.5 }
+  { olympiad: 'General Knowledge Olympiad', class: 'Class 5', year: '2026', maxMarks: 50, level1Cutoff: 40.0, level2Cutoff: 46.0, top1Percentile: 48.5 },
+  { olympiad: 'Hindi Olympiad', class: 'Class 5', year: '2026', maxMarks: 50, level1Cutoff: 41.5, level2Cutoff: 47.0, top1Percentile: 49.0 }
 ];
 
 export const PUBLIC_LEADERBOARD = [
