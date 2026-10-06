@@ -812,7 +812,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               subtitle: 'General Knowledge',
               icon: Globe,
               iconColor: 'text-[#f59e0b]',
-              iconBg: 'bg-[#24124a] border-[#441f7e]'
+              iconBg: 'bg-[#311b5e] border-[#552c96]'
             },
             {
               key: 'iho',
@@ -820,16 +820,16 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               subtitle: 'हिंदी व्याकरण एवं बोध',
               icon: Languages,
               iconColor: 'text-[#10b981]',
-              iconBg: 'bg-[#24124a] border-[#441f7e]'
+              iconBg: 'bg-[#311b5e] border-[#552c96]'
             }
           ].map((sub) => (
             <div
               key={sub.key}
               onClick={() => onNavigateTab && onNavigateTab(`content_${sub.key}`)}
-              className="bg-[#13092c] rounded-3xl border border-[#2e1659] p-5 sm:p-6 shadow-xl hover:border-[#7e2dbf]/80 hover:shadow-2xl transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1.5 text-white"
+              className="bg-[#201245] rounded-3xl border border-[#3e2070] p-5 sm:p-6 shadow-xl hover:border-[#7e2dbf]/80 hover:shadow-2xl transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1.5 text-white"
             >
               {/* Square Icon Container */}
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#24124a] border border-[#441f7e] text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#311b5e] border border-[#552c96] text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
                 <sub.icon className={`w-7 h-7 sm:w-8 sm:h-8 ${sub.iconColor}`} />
               </div>
 
@@ -844,7 +844,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               </div>
 
               {/* Bottom Action Indicator */}
-              <div className="w-full pt-2.5 border-t border-[#2e1659] flex items-center justify-between text-xs font-black text-pink-300 group-hover:text-white transition-colors">
+              <div className="w-full pt-2.5 border-t border-[#3e2070] flex items-center justify-between text-xs font-black text-pink-300 group-hover:text-white transition-colors">
                 <span>Explore Series</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -933,9 +933,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           
           {/* Card 1: Spotlight: IGKO Quiz */}
-          <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-4 sm:p-5 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between gap-3 text-white">
+          <div className="bg-[#201245] rounded-2xl border border-[#3e2070] p-4 sm:p-5 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between gap-3 text-white">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-[#24124a] text-[#e0469b] border border-[#441f7e] flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-[#311b5e] text-[#e0469b] border border-[#552c96] flex items-center justify-center shrink-0 shadow-xs">
                 <FileText className="w-5 h-5" />
               </div>
               <div className="min-w-0">
@@ -959,9 +959,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </div>
 
           {/* Card 2: Free Sample Papers */}
-          <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-4 sm:p-5 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between gap-3 text-white">
+          <div className="bg-[#201245] rounded-2xl border border-[#3e2070] p-4 sm:p-5 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between gap-3 text-white">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-[#24124a] text-[#38bdf8] border border-[#441f7e] flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-[#311b5e] text-[#38bdf8] border border-[#552c96] flex items-center justify-center shrink-0 shadow-xs">
                 <FileSpreadsheet className="w-5 h-5" />
               </div>
               <div className="min-w-0">
@@ -985,9 +985,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           </div>
 
           {/* Card 3: Free Previous Year Papers */}
-          <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-4 sm:p-5 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between gap-3 text-white">
+          <div className="bg-[#201245] rounded-2xl border border-[#3e2070] p-4 sm:p-5 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between gap-3 text-white">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-[#24124a] text-[#10b981] border border-[#441f7e] flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-[#311b5e] text-[#10b981] border border-[#552c96] flex items-center justify-center shrink-0 shadow-xs">
                 <Award className="w-5 h-5" />
               </div>
               <div className="min-w-0">

@@ -104,9 +104,9 @@ export const TeacherOverview = ({ onNavigateTab }) => {
         </div>
 
         {/* Right Quick Actions Card */}
-        <div className="lg:col-span-4 bg-[#13092c] rounded-2xl border border-[#2e1659] p-3.5 sm:p-4 shadow-xl flex flex-col justify-between text-white">
+        <div className="lg:col-span-4 bg-[#201245] rounded-2xl border border-[#3e2070] p-3.5 sm:p-4 shadow-xl flex flex-col justify-between text-white">
           <div className="flex items-center justify-between mb-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-[#24124a] text-pink-200 border border-[#441f7e] font-bold text-[11px] uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-[#311b5e] text-pink-200 border border-[#552c96] font-bold text-[11px] uppercase tracking-wider">
               Faculty Shortcuts
             </span>
           </div>
@@ -115,7 +115,7 @@ export const TeacherOverview = ({ onNavigateTab }) => {
             <button
               type="button"
               onClick={() => onNavigateTab('question_bank')}
-              className="px-2.5 py-2 rounded-xl bg-[#1a0f36] hover:bg-[#25154d] border border-[#2e1659] text-pink-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95"
+              className="px-2.5 py-2 rounded-xl bg-[#27184e] hover:bg-[#351e66] border border-[#3e2070] text-pink-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95"
             >
               <HelpCircle className="w-3.5 h-3.5 text-[#e0469b] shrink-0" />
               <span className="truncate">Add Question</span>
@@ -124,7 +124,7 @@ export const TeacherOverview = ({ onNavigateTab }) => {
             <button
               type="button"
               onClick={() => onNavigateTab('exams')}
-              className="px-2.5 py-2 rounded-xl bg-[#1a0f36] hover:bg-[#25154d] border border-[#2e1659] text-blue-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95"
+              className="px-2.5 py-2 rounded-xl bg-[#27184e] hover:bg-[#351e66] border border-[#3e2070] text-blue-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95"
             >
               <FileSpreadsheet className="w-3.5 h-3.5 text-[#38bdf8] shrink-0" />
               <span className="truncate">Create Exam</span>
@@ -133,7 +133,7 @@ export const TeacherOverview = ({ onNavigateTab }) => {
             <button
               type="button"
               onClick={() => onNavigateTab('students')}
-              className="px-2.5 py-2 rounded-xl bg-[#1a0f36] hover:bg-[#25154d] border border-[#2e1659] text-purple-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95"
+              className="px-2.5 py-2 rounded-xl bg-[#27184e] hover:bg-[#351e66] border border-[#3e2070] text-purple-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95"
             >
               <Users className="w-3.5 h-3.5 text-[#a855f7] shrink-0" />
               <span className="truncate">Students</span>
@@ -142,7 +142,7 @@ export const TeacherOverview = ({ onNavigateTab }) => {
             <button
               type="button"
               onClick={() => onNavigateTab('results')}
-              className="px-2.5 py-2 rounded-xl bg-[#1a0f36] hover:bg-[#25154d] border border-[#2e1659] text-emerald-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95"
+              className="px-2.5 py-2 rounded-xl bg-[#27184e] hover:bg-[#351e66] border border-[#3e2070] text-emerald-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95"
             >
               <BarChart3 className="w-3.5 h-3.5 text-[#10b981] shrink-0" />
               <span className="truncate">Reports</span>
@@ -154,9 +154,9 @@ export const TeacherOverview = ({ onNavigateTab }) => {
       {/* 2. Four Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1 */}
-        <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-4 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between text-white">
+        <div className="bg-[#201245] rounded-2xl border border-[#3e2070] p-4 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between text-white">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-[#24124a] text-[#e0469b] flex items-center justify-center border border-[#441f7e]">
+            <div className="w-11 h-11 rounded-2xl bg-[#311b5e] text-[#e0469b] flex items-center justify-center border border-[#552c96]">
               <Users className="w-5 h-5" />
             </div>
             <div>
@@ -170,9 +170,9 @@ export const TeacherOverview = ({ onNavigateTab }) => {
         </div>
 
         {/* Metric 2 */}
-        <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-4 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between text-white">
+        <div className="bg-[#201245] rounded-2xl border border-[#3e2070] p-4 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between text-white">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-[#24124a] text-[#38bdf8] flex items-center justify-center border border-[#441f7e]">
+            <div className="w-11 h-11 rounded-2xl bg-[#311b5e] text-[#38bdf8] flex items-center justify-center border border-[#552c96]">
               <FileSpreadsheet className="w-5 h-5" />
             </div>
             <div>
@@ -186,9 +186,9 @@ export const TeacherOverview = ({ onNavigateTab }) => {
         </div>
 
         {/* Metric 3 */}
-        <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-4 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between text-white">
+        <div className="bg-[#201245] rounded-2xl border border-[#3e2070] p-4 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between text-white">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-[#24124a] text-[#a855f7] flex items-center justify-center border border-[#441f7e]">
+            <div className="w-11 h-11 rounded-2xl bg-[#311b5e] text-[#a855f7] flex items-center justify-center border border-[#552c96]">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
@@ -202,9 +202,9 @@ export const TeacherOverview = ({ onNavigateTab }) => {
         </div>
 
         {/* Metric 4 */}
-        <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-4 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between text-white">
+        <div className="bg-[#201245] rounded-2xl border border-[#3e2070] p-4 shadow-xl hover:border-[#7e2dbf]/60 transition-all flex items-center justify-between text-white">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-[#24124a] text-[#10b981] flex items-center justify-center border border-[#441f7e]">
+            <div className="w-11 h-11 rounded-2xl bg-[#311b5e] text-[#10b981] flex items-center justify-center border border-[#552c96]">
               <HelpCircle className="w-5 h-5" />
             </div>
             <div>
@@ -221,10 +221,10 @@ export const TeacherOverview = ({ onNavigateTab }) => {
       {/* 3. Two Columns: Recent Exams & Subject Performance */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Exams Created */}
-        <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-6 shadow-xl flex flex-col justify-between text-white">
+        <div className="bg-[#201245] rounded-2xl border border-[#3e2070] p-6 shadow-xl flex flex-col justify-between text-white">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#24124a] text-pink-200 border border-[#441f7e] font-bold text-xs uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#311b5e] text-pink-200 border border-[#552c96] font-bold text-xs uppercase tracking-wider">
                 Recent Exams Created
               </span>
               <button
@@ -243,7 +243,7 @@ export const TeacherOverview = ({ onNavigateTab }) => {
                 </div>
               ) : (
                 (data?.recent_exams || []).map((exam) => (
-                  <div key={exam.id} className="p-3.5 bg-[#1a0f36] border border-[#2e1659] rounded-2xl flex items-center justify-between hover:bg-[#25154d] transition-all">
+                  <div key={exam.id} className="p-3.5 bg-[#27184e] border border-[#3e2070] rounded-2xl flex items-center justify-between hover:bg-[#351e66] transition-all">
                     <div>
                       <p className="text-xs font-bold text-white">{exam.title}</p>
                       <p className="text-[11px] text-slate-400 mt-0.5 font-medium">
@@ -253,7 +253,7 @@ export const TeacherOverview = ({ onNavigateTab }) => {
                     <div className="text-right">
                       <span className="text-xs font-bold text-pink-300 font-mono">{exam.attempts_count || 0} attempts</span>
                       <span className={`block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        exam.status === 'published' ? 'bg-[#24124a] text-[#10b981] border border-[#10b981]/40' : 'bg-slate-800 text-slate-300'
+                        exam.status === 'published' ? 'bg-[#311b5e] text-[#10b981] border border-[#10b981]/40' : 'bg-slate-800 text-slate-300'
                       }`}>
                         {exam.status.toUpperCase()}
                       </span>
@@ -266,10 +266,10 @@ export const TeacherOverview = ({ onNavigateTab }) => {
         </div>
 
         {/* Subject Performance */}
-        <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-6 shadow-xl flex flex-col justify-between text-white">
+        <div className="bg-[#201245] rounded-2xl border border-[#3e2070] p-6 shadow-xl flex flex-col justify-between text-white">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#24124a] text-emerald-200 border border-[#441f7e] font-bold text-xs uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#311b5e] text-emerald-200 border border-[#552c96] font-bold text-xs uppercase tracking-wider">
                 <TrendingUp className="w-3.5 h-3.5 text-[#10b981]" />
                 <span>Subject Accuracy &amp; Proficiency</span>
               </span>
@@ -287,7 +287,7 @@ export const TeacherOverview = ({ onNavigateTab }) => {
                       <span className="font-bold text-slate-200">{sub.subject_name}</span>
                       <span className="font-bold text-pink-300 font-mono">{sub.accuracy || 0}% accuracy</span>
                     </div>
-                    <div className="h-2.5 bg-[#0a0418] rounded-full overflow-hidden p-0.5 border border-[#2e1659]">
+                    <div className="h-2.5 bg-[#150a2e] rounded-full overflow-hidden p-0.5 border border-[#3e2070]">
                       <div
                         className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-[#2b27cf] via-[#7e2dbf] to-[#e0469b]"
                         style={{

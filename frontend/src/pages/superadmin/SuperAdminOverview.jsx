@@ -137,9 +137,9 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
       {/* 2. Top Metric Cards (Row 1: 4 Midnight Purple Boxes with Neon Accents) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Total Students */}
-        <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-5 sm:p-6 shadow-xl hover:border-[#7e2dbf]/70 hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
+        <div className="bg-[#201245] rounded-2xl border border-[#3e2070] p-5 sm:p-6 shadow-xl hover:border-[#7e2dbf]/70 hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
           <div className="flex items-center gap-3.5">
-            <div className="w-13 h-13 rounded-2xl bg-[#24124a] text-[#e0469b] border border-[#441f7e] flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
+            <div className="w-13 h-13 rounded-2xl bg-[#311b5e] text-[#e0469b] border border-[#552c96] flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
               <Users className="w-6.5 h-6.5" />
             </div>
             <div>
@@ -154,14 +154,14 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             <svg className="w-14 h-7 text-[#e0469b] stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 15 Q 15 5 25 10 T 50 3" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-[11px] font-black text-[#e0469b] mt-1 bg-[#24124a] px-2 py-0.5 rounded-lg border border-[#441f7e]">↑ 12%</span>
+            <span className="text-[11px] font-black text-[#e0469b] mt-1 bg-[#311b5e] px-2 py-0.5 rounded-lg border border-[#552c96]">↑ 12%</span>
           </div>
         </div>
 
         {/* Registered Schools */}
-        <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-5 sm:p-6 shadow-xl hover:border-[#7e2dbf]/70 hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
+        <div className="bg-[#201245] rounded-2xl border border-[#3e2070] p-5 sm:p-6 shadow-xl hover:border-[#7e2dbf]/70 hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
           <div className="flex items-center gap-3.5">
-            <div className="w-13 h-13 rounded-2xl bg-[#24124a] text-[#38bdf8] border border-[#441f7e] flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
+            <div className="w-13 h-13 rounded-2xl bg-[#311b5e] text-[#38bdf8] border border-[#552c96] flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
               <Building2 className="w-6.5 h-6.5" />
             </div>
             <div>
@@ -176,14 +176,14 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             <svg className="w-14 h-7 text-[#38bdf8] stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 18 Q 12 12 25 8 T 50 2" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-[11px] font-black text-[#38bdf8] mt-1 bg-[#24124a] px-2 py-0.5 rounded-lg border border-[#441f7e]">↑ 18%</span>
+            <span className="text-[11px] font-black text-[#38bdf8] mt-1 bg-[#311b5e] px-2 py-0.5 rounded-lg border border-[#552c96]">↑ 18%</span>
           </div>
         </div>
 
         {/* Total Exams */}
-        <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-5 sm:p-6 shadow-xl hover:border-[#7e2dbf]/70 hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
+        <div className="bg-[#201245] rounded-2xl border border-[#3e2070] p-5 sm:p-6 shadow-xl hover:border-[#7e2dbf]/70 hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
           <div className="flex items-center gap-3.5">
-            <div className="w-13 h-13 rounded-2xl bg-[#24124a] text-[#a855f7] border border-[#441f7e] flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
+            <div className="w-13 h-13 rounded-2xl bg-[#311b5e] text-[#a855f7] border border-[#552c96] flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
               <FileSpreadsheet className="w-6.5 h-6.5" />
             </div>
             <div>
@@ -198,14 +198,14 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             <svg className="w-14 h-7 text-[#a855f7] stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 16 Q 15 14 30 6 T 50 2" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-[11px] font-black text-[#a855f7] mt-1 bg-[#24124a] px-2 py-0.5 rounded-lg border border-[#441f7e]">↑ 50%</span>
+            <span className="text-[11px] font-black text-[#a855f7] mt-1 bg-[#311b5e] px-2 py-0.5 rounded-lg border border-[#552c96]">↑ 50%</span>
           </div>
         </div>
 
         {/* Questions in Bank */}
-        <div className="bg-[#13092c] rounded-2xl border border-[#2e1659] p-5 sm:p-6 shadow-xl hover:border-[#7e2dbf]/70 hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
+        <div className="bg-[#201245] rounded-2xl border border-[#3e2070] p-5 sm:p-6 shadow-xl hover:border-[#7e2dbf]/70 hover:shadow-2xl transition-all duration-200 flex items-center justify-between text-white group hover:-translate-y-1">
           <div className="flex items-center gap-3.5">
-            <div className="w-13 h-13 rounded-2xl bg-[#24124a] text-[#2dd4bf] border border-[#441f7e] flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
+            <div className="w-13 h-13 rounded-2xl bg-[#311b5e] text-[#2dd4bf] border border-[#552c96] flex items-center justify-center shadow-md group-hover:scale-110 transition-transform shrink-0">
               <FileText className="w-6.5 h-6.5" />
             </div>
             <div>
@@ -220,7 +220,7 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             <svg className="w-14 h-7 text-[#2dd4bf] stroke-current fill-none" viewBox="0 0 50 20">
               <path d="M 0 18 Q 15 10 30 12 T 50 4" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
-            <span className="text-[11px] font-black text-[#2dd4bf] mt-1 bg-[#24124a] px-2 py-0.5 rounded-lg border border-[#441f7e]">↑ 33%</span>
+            <span className="text-[11px] font-black text-[#2dd4bf] mt-1 bg-[#311b5e] px-2 py-0.5 rounded-lg border border-[#552c96]">↑ 33%</span>
           </div>
         </div>
       </div>
@@ -228,10 +228,10 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
       {/* 3. Performance & Analytics Section (Dark Midnight Violet Boxes) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Chart: Assigned vs Completed Participation Trend (7 Cols) */}
-        <div className="lg:col-span-7 bg-[#13092c] rounded-2xl border border-[#2e1659] p-6 shadow-xl text-white flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-[#201245] rounded-2xl border border-[#3e2070] p-6 shadow-xl text-white flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#24124a] text-pink-200 border border-[#441f7e] font-bold text-xs uppercase tracking-wider backdrop-blur-xs">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#311b5e] text-pink-200 border border-[#552c96] font-bold text-xs uppercase tracking-wider backdrop-blur-xs">
                 Participation YoY Growth
               </span>
               <div className="flex items-center gap-3 text-xs sm:text-sm font-bold text-slate-300">
@@ -285,16 +285,16 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
         </div>
 
         {/* Right Chart: Subject Accuracy Breakdown (5 Cols) */}
-        <div className="lg:col-span-5 bg-[#13092c] rounded-2xl border border-[#2e1659] p-6 shadow-xl text-white flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-[#201245] rounded-2xl border border-[#3e2070] p-6 shadow-xl text-white flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#24124a] text-pink-200 border border-[#441f7e] font-bold text-xs uppercase tracking-wider backdrop-blur-xs">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#311b5e] text-pink-200 border border-[#552c96] font-bold text-xs uppercase tracking-wider backdrop-blur-xs">
                 Subject Accuracy
               </span>
               <button
                 type="button"
                 onClick={() => onNavigateTab('results')}
-                className="text-xs sm:text-sm font-bold text-pink-300 hover:text-white hover:underline cursor-pointer bg-[#24124a] px-3 py-1 rounded-xl border border-[#441f7e] transition-colors"
+                className="text-xs sm:text-sm font-bold text-pink-300 hover:text-white hover:underline cursor-pointer bg-[#311b5e] px-3 py-1 rounded-xl border border-[#552c96] transition-colors"
               >
                 Details →
               </button>
@@ -315,7 +315,7 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
                     <span className="text-slate-200 font-semibold">{sub.name}</span>
                     <span className="font-mono text-white font-black">{sub.accuracy}%</span>
                   </div>
-                  <div className="h-2.5 rounded-full bg-[#0a0418] overflow-hidden p-0.5 border border-[#2e1659]">
+                  <div className="h-2.5 rounded-full bg-[#150a2e] overflow-hidden p-0.5 border border-[#3e2070]">
                     <div
                       className={`h-full rounded-full transition-all duration-500 shadow-sm ${sub.color}`}
                       style={{ width: `${sub.accuracy}%` }}
@@ -326,7 +326,7 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-[#2e1659] flex items-center justify-between text-xs sm:text-sm font-semibold text-slate-300">
+          <div className="mt-6 pt-4 border-t border-[#3e2070] flex items-center justify-between text-xs sm:text-sm font-semibold text-slate-300">
             <span>Overall Platform Accuracy</span>
             <span className="font-black text-[#e0469b] font-mono text-base">{metrics.avg_score ?? 85}%</span>
           </div>
@@ -336,15 +336,15 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
       {/* 4. Bottom Section: Submissions & Activity Logs */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Recent Submissions (7 Cols) */}
-        <div className="lg:col-span-7 bg-[#13092c] rounded-2xl border border-[#2e1659] p-6 shadow-xl text-white">
+        <div className="lg:col-span-7 bg-[#201245] rounded-2xl border border-[#3e2070] p-6 shadow-xl text-white">
           <div className="flex items-center justify-between mb-4">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#24124a] text-pink-200 border border-[#441f7e] font-bold text-xs uppercase tracking-wider backdrop-blur-xs">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#311b5e] text-pink-200 border border-[#552c96] font-bold text-xs uppercase tracking-wider backdrop-blur-xs">
               Candidate Submissions
             </span>
             <button
               type="button"
               onClick={() => onNavigateTab('results')}
-              className="text-xs font-bold text-pink-300 hover:text-white hover:underline cursor-pointer bg-[#24124a] px-3 py-1 rounded-xl border border-[#441f7e] transition-colors"
+              className="text-xs font-bold text-pink-300 hover:text-white hover:underline cursor-pointer bg-[#311b5e] px-3 py-1 rounded-xl border border-[#552c96] transition-colors"
             >
               View All Results →
             </button>
@@ -352,7 +352,7 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
 
           <div className="space-y-2.5 mt-3">
             {candidateSubmissions.map((cand, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 rounded-2xl bg-[#1a0f36] hover:bg-[#25154d] border border-[#2e1659] transition-all">
+              <div key={idx} className="flex items-center justify-between p-3 rounded-2xl bg-[#27184e] hover:bg-[#351e66] border border-[#3e2070] transition-all">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-9 h-9 rounded-xl bg-gradient-to-r from-[#2b27cf] to-[#e0469b] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-md">
                     {cand.initials || (cand.student_name ? cand.student_name.charAt(0) : 'S')}
@@ -370,7 +370,7 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
                   <span className="text-[11px] text-slate-400 font-medium">
                     {cand.time || 'Today'}
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#24124a] text-[#10b981] border border-[#10b981]/40">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#311b5e] text-[#10b981] border border-[#10b981]/40">
                     PASSED
                   </span>
                 </div>
@@ -380,16 +380,16 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
         </div>
 
         {/* Audit Activity Summary (5 Cols) */}
-        <div className="lg:col-span-5 bg-[#13092c] rounded-2xl border border-[#2e1659] p-6 shadow-xl text-white flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-[#201245] rounded-2xl border border-[#3e2070] p-6 shadow-xl text-white flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#24124a] text-pink-200 border border-[#441f7e] font-bold text-xs uppercase tracking-wider backdrop-blur-xs">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#311b5e] text-pink-200 border border-[#552c96] font-bold text-xs uppercase tracking-wider backdrop-blur-xs">
                 System Audit Trail
               </span>
               <button
                 type="button"
                 onClick={() => onNavigateTab('activity_logs')}
-                className="text-xs font-bold text-pink-300 hover:text-white hover:underline cursor-pointer bg-[#24124a] px-3 py-1 rounded-xl border border-[#441f7e] transition-colors"
+                className="text-xs font-bold text-pink-300 hover:text-white hover:underline cursor-pointer bg-[#311b5e] px-3 py-1 rounded-xl border border-[#552c96] transition-colors"
               >
                 Full Logs →
               </button>
@@ -397,12 +397,12 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
 
             <div className="space-y-2.5 mt-3">
               {recentLogs.slice(0, 4).map((log, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-[#1a0f36] hover:bg-[#25154d] border border-[#2e1659] text-xs transition-all">
+                <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-[#27184e] hover:bg-[#351e66] border border-[#3e2070] text-xs transition-all">
                   <div className="min-w-0 flex-1 pr-2">
                     <p className="font-bold text-white truncate text-xs">{log.action}</p>
                     <p className="text-[11px] text-slate-400 truncate">{log.user || log.user_name || 'System'}</p>
                   </div>
-                  <span className="text-[10px] font-mono text-pink-200 bg-[#24124a] px-2 py-0.5 rounded-md border border-[#441f7e] shrink-0">
+                  <span className="text-[10px] font-mono text-pink-200 bg-[#311b5e] px-2 py-0.5 rounded-md border border-[#552c96] shrink-0">
                     {log.module}
                   </span>
                 </div>
