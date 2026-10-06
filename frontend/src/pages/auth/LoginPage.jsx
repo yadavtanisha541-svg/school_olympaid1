@@ -46,17 +46,16 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col justify-between items-center py-6 sm:py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-[#fff9f2]">
-      {/* Light Luxury Theme Ambient Background Orbs */}
-      <div className="absolute top-[-10%] left-[-8%] w-[480px] h-[480px] rounded-full bg-gradient-to-br from-[#edd6ed]/60 via-[#deb8de]/30 to-transparent blur-3xl pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-8%] w-[520px] h-[520px] rounded-full bg-gradient-to-tl from-[#fae8d8]/70 via-[#f9dfce]/40 to-transparent blur-3xl pointer-events-none" />
-      <div className="absolute top-[35%] right-[10%] w-[320px] h-[320px] rounded-full bg-[#fbebc8]/40 blur-3xl pointer-events-none" />
+    <div className="min-h-screen w-full flex flex-col justify-between items-center py-6 sm:py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gradient-to-b from-[#b93787] via-[#6e32a0] to-[#2355c8]">
+      {/* Ambient Lighting Accents */}
+      <div className="absolute top-[-10%] left-[-8%] w-[480px] h-[480px] rounded-full bg-pink-400/20 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-8%] w-[520px] h-[520px] rounded-full bg-blue-400/20 blur-3xl pointer-events-none" />
 
-      {/* Decorative Subtle Background Grid / Rings */}
+      {/* Decorative Subtle Background Dots */}
       <div
-        className="absolute inset-0 opacity-[0.04] pointer-events-none"
+        className="absolute inset-0 opacity-[0.06] pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(#4e2a4a 1.2px, transparent 1.2px)`,
+          backgroundImage: `radial-gradient(#ffffff 1.2px, transparent 1.2px)`,
           backgroundSize: '28px 28px'
         }}
       />
@@ -66,9 +65,9 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
         <button
           type="button"
           onClick={handleGoHome}
-          className="inline-flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2 rounded-2xl bg-white/85 hover:bg-white border border-[#deb8de]/80 text-[#4e2a4a] hover:text-[#6d3a68] text-xs font-bold shadow-2xs hover:shadow-xs backdrop-blur-md transition-all cursor-pointer group active:scale-95"
+          className="inline-flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-bold shadow-xs backdrop-blur-md transition-all cursor-pointer group active:scale-95"
         >
-          <ArrowLeft className="w-4 h-4 text-[#6d3a68] group-hover:-translate-x-0.5 transition-transform" />
+          <ArrowLeft className="w-4 h-4 text-white group-hover:-translate-x-0.5 transition-transform" />
           <span>← Back to Website</span>
         </button>
       </div>
@@ -76,30 +75,30 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
       <div className="w-full max-w-md relative z-10 my-auto">
         {/* Branding Header */}
         <div className="text-center mb-7 flex flex-col items-center">
-          <div className="mb-3 transform hover:scale-105 transition-transform duration-200 cursor-pointer" onClick={handleGoHome} title="Go to Home">
+          <div className="mb-3 transform hover:scale-105 transition-transform duration-200 cursor-pointer p-2 rounded-2xl bg-white/90 backdrop-blur-sm shadow-md" onClick={handleGoHome} title="Go to Home">
             <OlympiadHubLogo size="lg" />
           </div>
-          <p className="mt-2 text-xs sm:text-sm text-[#6d3a68] font-semibold tracking-wide">
+          <p className="mt-2 text-xs sm:text-sm text-pink-100 font-bold tracking-wide drop-shadow-xs">
             National Online Examination &amp; Olympiad Assessment System
           </p>
         </div>
 
-        {/* Login Form directly on the background (No outer box container) */}
+        {/* Login Form Container */}
         <div className="w-full px-2 sm:px-4">
           <form className="space-y-5" onSubmit={handleSubmit}>
             {error && (
-              <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium flex items-start gap-2.5 animate-shake">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-2xl bg-rose-500/90 border border-white/20 text-white text-xs font-bold flex items-start gap-2.5 animate-shake shadow-lg backdrop-blur-md">
+                <AlertCircle className="w-4 h-4 text-white shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
 
             <div>
-              <label className="block text-[11px] font-extrabold text-[#4e2a4a] uppercase tracking-wider mb-2">
+              <label className="block text-[11px] font-extrabold text-white uppercase tracking-wider mb-2 drop-shadow-xs">
                 Login ID
               </label>
               <div className="relative rounded-2xl">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#6d3a68]">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-indigo-600">
                   <User className="h-4.5 w-4.5" />
                 </div>
                 <input
@@ -107,18 +106,18 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                   value={loginId}
                   onChange={(e) => setLoginId(e.target.value)}
                   placeholder="e.g. ADMIN001, TCH101, STU1001"
-                  className="block w-full pl-11 pr-4 h-12 bg-white/85 hover:bg-white focus:bg-white border border-[#deb8de]/80 focus:border-[#6d3a68] focus:ring-4 focus:ring-[#6d3a68]/15 rounded-2xl text-[#2a1727] placeholder-[#a890a5] text-xs sm:text-sm font-semibold transition-all focus:outline-none shadow-xs"
+                  className="block w-full pl-11 pr-4 h-12 bg-white text-slate-900 placeholder-slate-400 border border-white/40 focus:border-indigo-400 focus:ring-4 focus:ring-white/30 rounded-2xl text-xs sm:text-sm font-bold transition-all focus:outline-none shadow-md"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[11px] font-extrabold text-[#4e2a4a] uppercase tracking-wider mb-2">
+              <label className="block text-[11px] font-extrabold text-white uppercase tracking-wider mb-2 drop-shadow-xs">
                 Password
               </label>
               <div className="relative rounded-2xl">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#6d3a68]">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-indigo-600">
                   <Lock className="h-4.5 w-4.5" />
                 </div>
                 <input
@@ -126,13 +125,13 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="block w-full pl-11 pr-11 h-12 bg-white/85 hover:bg-white focus:bg-white border border-[#deb8de]/80 focus:border-[#6d3a68] focus:ring-4 focus:ring-[#6d3a68]/15 rounded-2xl text-[#2a1727] placeholder-[#a890a5] text-xs sm:text-sm font-semibold transition-all focus:outline-none shadow-xs"
+                  className="block w-full pl-11 pr-11 h-12 bg-white text-slate-900 placeholder-slate-400 border border-white/40 focus:border-indigo-400 focus:ring-4 focus:ring-white/30 rounded-2xl text-xs sm:text-sm font-bold transition-all focus:outline-none shadow-md"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#a890a5] hover:text-[#6d3a68] cursor-pointer transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-indigo-600 cursor-pointer transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -145,12 +144,12 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded text-[#4e2a4a] border-[#deb8de] focus:ring-[#6d3a68] accent-[#4e2a4a]"
+                  className="w-4 h-4 rounded text-indigo-600 border-white/40 focus:ring-white accent-indigo-600"
                 />
-                <span className="text-xs text-[#4e2a4a] font-semibold">Remember me</span>
+                <span className="text-xs text-white font-bold drop-shadow-xs">Remember me</span>
               </label>
 
-              <span className="text-[11px] text-[#8c4e8b] font-medium">
+              <span className="text-[11px] text-pink-200 font-semibold drop-shadow-xs">
                 Managed by Admin
               </span>
             </div>
@@ -158,18 +157,18 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 sm:h-12.5 mt-2 rounded-2xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-extrabold text-xs sm:text-sm shadow-md shadow-[#4e2a4a]/20 hover:shadow-lg hover:shadow-[#4e2a4a]/30 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full h-12 sm:h-12.5 mt-2 rounded-2xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-black text-xs sm:text-sm shadow-lg hover:shadow-xl active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 border border-white/30"
             >
               <span>{loading ? 'Authenticating...' : 'Sign In to Dashboard'}</span>
-              {!loading && <ArrowRight className="w-4 h-4 text-[#e7b84b]" />}
+              {!loading && <ArrowRight className="w-4 h-4 text-white" />}
             </button>
           </form>
 
           {/* Additional Quick Help */}
           <div className="mt-7 text-center">
-            <p className="text-xs text-[#8c4e8b] font-medium">
+            <p className="text-xs text-pink-100 font-semibold drop-shadow-xs">
               Don't have login credentials?{' '}
-              <span className="text-[#4e2a4a] font-bold">Contact your School Coordinator</span>
+              <span className="text-white font-black underline underline-offset-2 cursor-pointer">Contact your School Coordinator</span>
             </p>
           </div>
         </div>
