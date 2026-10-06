@@ -10,9 +10,11 @@ export const StudentProfilePage = () => {
   const fileInputRef = useRef(null);
 
   const [profileForm, setProfileForm] = useState({
-    full_name: user?.full_name || '',
+    full_name: user?.full_name || user?.name || '',
     email: user?.email || '',
     phone: user?.phone || '',
+    school_name: user?.school_name || user?.school || '',
+    class_name: user?.class_name || user?.class || user?.grade || 'Class 6',
     avatar: user?.avatar || ''
   });
   const [passwordForm, setPasswordForm] = useState({
@@ -66,13 +68,18 @@ export const StudentProfilePage = () => {
     setSavingProfile(true);
     setFeedback({ type: '', message: '' });
     try {
-      await apiClient.post('/auth/update-profile', profileForm);
+      const updatedData = {
+        ...profileForm,
+        school: profileForm.school_name,
+        class: profileForm.class_name
+      };
+      await apiClient.post('/auth/update-profile', updatedData);
       if (updateUser) {
-        updateUser({ ...user, ...profileForm });
+        updateUser({ ...user, ...updatedData });
       } else {
-        setUser({ ...user, ...profileForm });
+        setUser({ ...user, ...updatedData });
       }
-      setFeedback({ type: 'success', message: 'Profile & picture updated successfully!' });
+      setFeedback({ type: 'success', message: 'Profile & School details updated successfully!' });
     } catch (err) {
       setFeedback({ type: 'error', message: err.message });
     } finally {
@@ -108,10 +115,10 @@ export const StudentProfilePage = () => {
             ? 'Super Administrator Profile & Security'
             : user?.role === 'teacher'
             ? 'Faculty Profile & Security'
-            : 'Account Profile & Security'}
+            : 'Student Profile & School Details'}
         </h2>
         <p className="text-xs text-slate-500 mt-1">
-          Manage your personal details, profile picture, contact details, and update your security credentials.
+          Manage your personal details, school name, profile picture, and security credentials.
         </p>
       </div>
 
@@ -168,7 +175,7 @@ export const StudentProfilePage = () => {
                     ? 'Super Administrator'
                     : user?.role === 'teacher'
                     ? (user?.designation || 'Faculty Member')
-                    : (user?.class_name || 'Class 10 Student')}
+                    : (profileForm.class_name || user?.class_name || 'Class 6 Student')}
                 </Badge>
               </div>
             </div>
@@ -207,18 +214,45 @@ export const StudentProfilePage = () => {
         </div>
 
         <form onSubmit={handleUpdateProfile} className="space-y-4 pt-6 text-xs">
-          <div>
-            <label className="block font-bold text-slate-700 uppercase mb-1">Full Name</label>
-            <input
-              type="text"
-              required
-              value={profileForm.full_name}
-              onChange={(e) => setProfileForm({ ...profileForm, full_name: e.target.value })}
-              className="w-full px-3.5 py-2.5 border rounded-xl"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-bold text-slate-700 uppercase mb-1">Full Name</label>
+              <input
+                type="text"
+                required
+                value={profileForm.full_name}
+                onChange={(e) => setProfileForm({ ...profileForm, full_name: e.target.value })}
+                className="w-full px-3.5 py-2.5 border rounded-xl"
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-slate-700 uppercase mb-1">School Name</label>
+              <input
+                type="text"
+                required
+                placeholder="Enter your school name (e.g. Delhi Public School)"
+                value={profileForm.school_name}
+                onChange={(e) => setProfileForm({ ...profileForm, school_name: e.target.value })}
+                className="w-full px-3.5 py-2.5 border border-indigo-200 rounded-xl bg-indigo-50/20 font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition-colors"
+              />
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block font-bold text-slate-700 uppercase mb-1">Class / Grade</label>
+              <select
+                value={profileForm.class_name}
+                onChange={(e) => setProfileForm({ ...profileForm, class_name: e.target.value })}
+                className="w-full px-3.5 py-2.5 border rounded-xl bg-white font-bold"
+              >
+                {[...Array(12)].map((_, i) => (
+                  <option key={i + 1} value={`Class ${i + 1}`}>{`Class ${i + 1}`}</option>
+                ))}
+              </select>
+            </div>
+
             <div>
               <label className="block font-bold text-slate-700 uppercase mb-1">Email Address</label>
               <input
@@ -228,6 +262,7 @@ export const StudentProfilePage = () => {
                 className="w-full px-3.5 py-2.5 border rounded-xl"
               />
             </div>
+
             <div>
               <label className="block font-bold text-slate-700 uppercase mb-1">Phone Number</label>
               <input

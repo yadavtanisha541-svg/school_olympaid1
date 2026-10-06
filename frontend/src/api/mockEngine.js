@@ -580,6 +580,7 @@ export const mockEngine = {
           };
         } else if (foundUser) {
           const uName = foundUser.full_name || foundUser.name || rawLoginId;
+          const uSchool = foundUser.school_name || foundUser.school || 'Delhi Public School';
           user = {
             ...foundUser,
             name: uName,
@@ -589,7 +590,8 @@ export const mockEngine = {
             role: foundUser.role || 'student',
             class: foundUser.class_name || foundUser.class || foundUser.grade || 'Class 6',
             class_name: foundUser.class_name || foundUser.class || foundUser.grade || 'Class 6',
-            school: foundUser.school_name || foundUser.school || 'Independent Candidate',
+            school: uSchool,
+            school_name: uSchool,
             email: foundUser.email || (rawLoginId.includes('@') ? rawLoginId : `${rawLoginId || 'student'}@olympiadhub.com`)
           };
         } else {
@@ -610,7 +612,8 @@ export const mockEngine = {
             class: body.class || 'Class 6',
             class_name: body.class || 'Class 6',
             grade: body.class || 'Class 6',
-            school: 'Independent Candidate',
+            school: body.school_name || body.school || 'Delhi Public School',
+            school_name: body.school_name || body.school || 'Delhi Public School',
             permissions: []
           };
         }
@@ -623,6 +626,41 @@ export const mockEngine = {
             user
           }
         };
+      }
+
+      if (sub === 'update-profile') {
+        const savedUserRaw = sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user');
+        let currentUser = savedUserRaw ? JSON.parse(savedUserRaw) : {};
+        const updatedUser = {
+          ...currentUser,
+          ...body,
+          name: body.full_name || body.name || currentUser.name,
+          full_name: body.full_name || body.name || currentUser.full_name,
+          school: body.school_name || body.school || currentUser.school_name || currentUser.school,
+          school_name: body.school_name || body.school || currentUser.school_name || currentUser.school,
+          class: body.class_name || body.class || currentUser.class_name || currentUser.class,
+          class_name: body.class_name || body.class || currentUser.class_name || currentUser.class
+        };
+        sessionStorage.setItem('olympiadhub_user', JSON.stringify(updatedUser));
+        localStorage.setItem('olympiadhub_user', JSON.stringify(updatedUser));
+
+        // Update in users table too
+        try {
+          const allUsers = getDb('users') || [];
+          const idx = allUsers.findIndex(u => String(u.id) === String(updatedUser.id) || u.login_id === updatedUser.login_id);
+          if (idx !== -1) {
+            allUsers[idx] = { ...allUsers[idx], ...updatedUser };
+          } else {
+            allUsers.push(updatedUser);
+          }
+          saveDb('users', allUsers);
+        } catch (e) {}
+
+        return { success: true, message: 'Profile updated successfully', data: updatedUser };
+      }
+
+      if (sub === 'change-password') {
+        return { success: true, message: 'Password changed successfully' };
       }
 
       if (sub === 'me') {
@@ -638,6 +676,10 @@ export const mockEngine = {
               .join(' ');
             user.name = cleanName;
             user.full_name = cleanName;
+          }
+          if (!user.school_name && !user.school) {
+            user.school = 'Delhi Public School';
+            user.school_name = 'Delhi Public School';
           }
         }
         return { success: true, data: user || initialStore.users[0] };

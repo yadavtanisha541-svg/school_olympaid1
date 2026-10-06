@@ -554,7 +554,8 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       student_name: user?.full_name || user?.name || 'Candidate',
       student_login_id: user?.login_id || 'STU-001',
       student_email: user?.email || '',
-      student_school: user?.school_name || 'Independent Candidate',
+      student_school: user?.school_name || user?.school || 'Delhi Public School',
+      school_name: user?.school_name || user?.school || 'Delhi Public School',
       class_name: user?.class_name || selectedGrade,
       questions: formattedQuestions
     };

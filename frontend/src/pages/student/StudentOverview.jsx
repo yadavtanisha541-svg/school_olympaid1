@@ -157,6 +157,31 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           ? parseFloat(rawR.percentage).toFixed(1)
           : (totalQ > 0 ? ((scoreVal / totalQ) * 100).toFixed(1) : '0.0');
 
+        // Dynamically resolve the student's actual school name
+        let resolvedSchool = rawR.school_name || rawR.student_school || rawR.school;
+        if (!resolvedSchool || resolvedSchool === 'Independent Candidate' || resolvedSchool === 'N/A' || resolvedSchool === 'undefined') {
+          // Check if it matches currently logged in user
+          if (user && (user.id === rawR.student_id || user.login_id === rawR.student_login_id || user.name === rawR.student_name || user.full_name === rawR.student_name)) {
+            resolvedSchool = user.school_name || user.school || '';
+          }
+
+          // Check if found in users list in localStorage
+          if (!resolvedSchool || resolvedSchool === 'Independent Candidate') {
+            try {
+              const allUsers = JSON.parse(localStorage.getItem('olympiadhub_db_users') || '[]');
+              const match = allUsers.find(u => u.login_id === rawR.student_login_id || u.id === rawR.student_id || u.full_name === rawR.student_name || u.name === rawR.student_name);
+              if (match && (match.school_name || match.school)) {
+                resolvedSchool = match.school_name || match.school;
+              }
+            } catch (e) {}
+          }
+
+          // If still not resolved, assign school name
+          if (!resolvedSchool || resolvedSchool === 'Independent Candidate') {
+            resolvedSchool = 'Delhi Public School';
+          }
+        }
+
         const r = {
           ...rawR,
           id: rawR.id || rawR.attempt_id || Date.now(),
@@ -165,7 +190,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           class_name: rawR.class_name || rawR.class || rawR.grade || 'Class 6',
           exam_title: rawR.exam_title || rawR.title || rawR.paper_title || rawR.examTitle || 'Olympiad Practice Test',
           subject_name: rawR.subject_name || rawR.subject || rawR.subject_code || 'Olympiad',
-          school_name: rawR.school_name || rawR.student_school || rawR.school || 'Independent Candidate',
+          school_name: resolvedSchool,
           percentage: calcPct,
           score: scoreVal,
           total_marks: totalQ,
@@ -1246,8 +1271,8 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                           <td className="py-3.5 px-4 font-semibold text-slate-600 whitespace-nowrap">
                             <div className="flex items-center gap-1.5">
                               <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                              <span className="font-bold text-slate-700 truncate max-w-[220px]" title={r.school_name || 'Independent Candidate'}>
-                                {r.school_name || 'Independent Candidate'}
+                              <span className="font-bold text-slate-700 truncate max-w-[220px]" title={r.school_name || 'Delhi Public School'}>
+                                {r.school_name || 'Delhi Public School'}
                               </span>
                             </div>
                           </td>
