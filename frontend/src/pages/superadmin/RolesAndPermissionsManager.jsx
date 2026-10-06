@@ -482,10 +482,10 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
   return (
     <div className="space-y-6 pb-20 font-sans">
       {/* 1. Top Header (Clean Direct Background Header without Box Container) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-1">
-        <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 text-pink-700 text-xs font-bold border border-pink-200">
-            <ShieldCheck className="w-4 h-4 text-pink-600" />
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-slate-100">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-pink-50 text-pink-700 text-xs font-bold border border-pink-200">
+            <ShieldCheck className="w-3.5 h-3.5 text-pink-600" />
             <span>Role-Based Access Control (RBAC) Studio</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
@@ -496,11 +496,11 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 flex-wrap sm:flex-nowrap">
           <button
             type="button"
             onClick={() => setShowAddModal(true)}
-            className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
           >
             <Plus className="w-4 h-4 text-pink-600" />
             <span>Add Capability</span>
@@ -510,7 +510,7 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
             type="button"
             disabled={isSaving}
             onClick={handleSavePermissions}
-            className={`px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer ${
+            className={`px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
               saveSuccess
                 ? 'bg-emerald-600 text-white'
                 : 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white'
