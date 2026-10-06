@@ -49,7 +49,8 @@ import {
   Brain,
   Cpu,
   Globe,
-  Palette
+  Palette,
+  Languages
 } from 'lucide-react';
 
 const CLASSES_LIST = [

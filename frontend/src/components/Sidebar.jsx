@@ -41,7 +41,8 @@ import {
   Sparkles,
   Palette,
   Video,
-  ShieldCheck
+  ShieldCheck,
+  Languages
 } from 'lucide-react';
 
 export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic }) => {
@@ -304,7 +305,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
                   {/* Clean Sub-items for all 6 core Olympiad subjects */}
                   {studentAccordions.content && (
-                    <div className="pl-6 pr-2 py-1 space-y-1">
+                    <div className="pl-3.5 pr-1 py-1 space-y-1">
                       {[
                         { id: 'content_imo', label: 'IMO (Mathematics)', icon: Calculator },
                         { id: 'content_iso', label: 'ISO / NSO (Science)', icon: Rocket },
@@ -323,14 +324,14 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                               onSelectTab(sub.id);
                               if (onClose) onClose();
                             }}
-                            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
+                            className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                               isSubActive
                                 ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                                 : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                             }`}
                           >
                             <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-pink-300' : 'text-blue-300'}`} />
-                            <span>{sub.label}</span>
+                            <span className="truncate">{sub.label}</span>
                           </button>
                         );
                       })}
@@ -378,21 +379,21 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
                   {/* Clean Sub-items */}
                   {studentAccordions.performance && (
-                    <div className="pl-6 pr-2 py-1 space-y-1">
+                    <div className="pl-3.5 pr-1 py-1 space-y-1">
                       <button
                         type="button"
                         onClick={() => {
                           onSelectTab('performance');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'performance'
                             ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
                         <BarChart3 className="w-4 h-4 text-purple-300 shrink-0" />
-                        <span>Statistics &amp; Reports</span>
+                        <span className="truncate">Statistics &amp; Reports</span>
                       </button>
                       <button
                         type="button"
@@ -400,14 +401,14 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('analysis');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'analysis' || currentTab === 'exam_solutions'
                             ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
                         <TrendingUp className="w-4 h-4 text-blue-300 shrink-0" />
-                        <span>Analysis</span>
+                        <span className="truncate">Analysis</span>
                       </button>
                     </div>
                   )}
@@ -457,21 +458,21 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
                   {/* Clean Sub-items */}
                   {studentAccordions.account && (
-                    <div className="pl-6 pr-2 py-1 space-y-1">
+                    <div className="pl-3.5 pr-1 py-1 space-y-1">
                       <button
                         type="button"
                         onClick={() => {
                           onSelectTab('profile');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'profile'
                             ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
                         <User className="w-4 h-4 text-purple-300 shrink-0" />
-                        <span>My Profile</span>
+                        <span className="truncate">My Profile</span>
                       </button>
                       <button
                         type="button"
@@ -479,14 +480,14 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('my_orders');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'my_orders'
                             ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
                         <CreditCard className="w-4 h-4 text-blue-300 shrink-0" />
-                        <span>My Orders</span>
+                        <span className="truncate">My Orders</span>
                       </button>
                       <button
                         type="button"
@@ -494,14 +495,14 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('my_wallet');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'my_wallet'
                             ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
                         <Wallet className="w-4 h-4 text-emerald-300 shrink-0" />
-                        <span>My Wallet</span>
+                        <span className="truncate">My Wallet</span>
                       </button>
                     </div>
                   )}
@@ -534,7 +535,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
                   {/* Info Sub-items */}
                   {studentAccordions.info && (
-                    <div className="pl-6 pr-2 py-1 space-y-1">
+                    <div className="pl-3.5 pr-1 py-1 space-y-1">
                       {[
                         { id: 'info_datesheet', label: 'Date Sheet', icon: Calendar },
                         { id: 'info_awards', label: 'Awards', icon: Trophy }
@@ -549,14 +550,14 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                               onSelectTab(sub.id);
                               if (onClose) onClose();
                             }}
-                            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
+                            className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                               isSubActive
                                 ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                                 : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                             }`}
                           >
                             <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-pink-300' : 'text-blue-300'}`} />
-                            <span>{sub.label}</span>
+                            <span className="truncate">{sub.label}</span>
                           </button>
                         );
                       })}
@@ -584,21 +585,21 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
                   {/* Clean Sub-items */}
                   {studentAccordions.freeZone && (
-                    <div className="pl-6 pr-2 py-1 space-y-1">
+                    <div className="pl-3.5 pr-1 py-1 space-y-1">
                       <button
                         type="button"
                         onClick={() => {
                           onSelectTab('free_sample_papers');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'free_sample_papers'
                             ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
                         <FileText className="w-4 h-4 text-purple-300 shrink-0" />
-                        <span>Sample Papers &amp; OMR</span>
+                        <span className="truncate">Sample Papers &amp; OMR</span>
                       </button>
                       <button
                         type="button"
@@ -606,14 +607,14 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('free_past_papers');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[14px] transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                           currentTab === 'free_past_papers'
                             ? 'bg-gradient-to-r from-[#1d4ed8]/40 via-[#7c3aed]/40 to-[#db2777]/40 text-pink-100 font-bold border border-indigo-400/50 shadow-xs'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
                         <FileSpreadsheet className="w-4 h-4 text-blue-300 shrink-0" />
-                        <span>Previous Year Papers</span>
+                        <span className="truncate">Previous Year Papers</span>
                       </button>
                     </div>
                   )}
