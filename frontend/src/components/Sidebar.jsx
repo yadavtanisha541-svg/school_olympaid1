@@ -77,28 +77,40 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
     }));
   };
 
+  // Listen for live role permissions update to refresh sidebar in real-time
+  const [, setPermTick] = useState(0);
+  useEffect(() => {
+    const handlePermUpdate = () => setPermTick(t => t + 1);
+    window.addEventListener('role-permissions-updated', handlePermUpdate);
+    window.addEventListener('storage', handlePermUpdate);
+    return () => {
+      window.removeEventListener('role-permissions-updated', handlePermUpdate);
+      window.removeEventListener('storage', handlePermUpdate);
+    };
+  }, []);
+
   const superAdminNav = [
-    { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'payment_bank_manager', label: 'Payment, QR & Orders', icon: CreditCard },
-    { id: 'online_classes_manager', label: 'Online Classes Studio', icon: Video },
-    { id: 'skill_programs_manager', label: 'Skill Programs Studio', icon: Rocket },
-    { id: 'superadmin_packages', label: 'Subject Model Tests & Packages', icon: BookOpen },
-    { id: 'applicant_leads', label: 'New Applicant Leads', icon: UserCheck },
-    { id: 'coordinators', label: 'Coordinator Applicants', icon: UserCheck },
-    { id: 'workbook_orders', label: 'Workbook Orders', icon: ShoppingBag },
-    { id: 'students', label: 'Student Management', icon: Users },
-    { id: 'roles_permissions', label: 'Roles & Permissions', icon: ShieldCheck },
-    { id: 'academic', label: 'Disciplines & Subjects', icon: Layers },
-    { id: 'subject_content', label: 'Subject & Class Content', icon: BookOpen },
-    { id: 'revision_vault', label: 'Revision Vault & Bookmarks', icon: Bookmark },
-    { id: 'free_quizzes_manager', label: 'FREE Quizzes Manager', icon: HelpCircle },
-    { id: 'faqs_key_info', label: 'FAQs & Key Info Manager', icon: HelpCircle },
-    { id: 'test_generator_manager', label: 'Sample & Past Papers', icon: Sparkles },
-    { id: 'results', label: 'Exam Results & Reports', icon: FileCheck2 },
-    { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy },
-    { id: 'certificates', label: 'Certificates Manager', icon: Award },
-    { id: 'activity_logs', label: 'Audit Activity Logs', icon: Activity },
-    { id: 'settings', label: 'System Settings', icon: Settings }
+    { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, perm: 'access_superadmin_dashboard' },
+    { id: 'payment_bank_manager', label: 'Payment, QR & Orders', icon: CreditCard, perm: 'manage_payments_qr' },
+    { id: 'online_classes_manager', label: 'Online Classes Studio', icon: Video, perm: 'manage_online_classes' },
+    { id: 'skill_programs_manager', label: 'Skill Programs Studio', icon: Rocket, perm: 'manage_skill_programs' },
+    { id: 'superadmin_packages', label: 'Subject Model Tests & Packages', icon: BookOpen, perm: 'manage_superadmin_packages' },
+    { id: 'applicant_leads', label: 'New Applicant Leads', icon: UserCheck, perm: 'manage_applicant_leads' },
+    { id: 'coordinators', label: 'Coordinator Applicants', icon: UserCheck, perm: 'manage_coordinators' },
+    { id: 'workbook_orders', label: 'Workbook Orders', icon: ShoppingBag, perm: 'manage_workbook_orders' },
+    { id: 'students', label: 'Student Management', icon: Users, perm: 'manage_students' },
+    { id: 'roles_permissions', label: 'Roles & Permissions', icon: ShieldCheck, perm: 'manage_roles_permissions' },
+    { id: 'academic', label: 'Disciplines & Subjects', icon: Layers, perm: 'manage_academic_structure' },
+    { id: 'subject_content', label: 'Subject & Class Content', icon: BookOpen, perm: 'manage_subject_content' },
+    { id: 'revision_vault', label: 'Revision Vault & Bookmarks', icon: Bookmark, perm: 'manage_revision_vault' },
+    { id: 'free_quizzes_manager', label: 'FREE Quizzes Manager', icon: HelpCircle, perm: 'manage_free_quizzes' },
+    { id: 'faqs_key_info', label: 'FAQs & Key Info Manager', icon: HelpCircle, perm: 'manage_faqs_keyinfo' },
+    { id: 'test_generator_manager', label: 'Sample & Past Papers', icon: Sparkles, perm: 'manage_test_generator' },
+    { id: 'results', label: 'Exam Results & Reports', icon: FileCheck2, perm: 'publish_exam_results' },
+    { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy, perm: 'manage_leaderboard' },
+    { id: 'certificates', label: 'Certificates Manager', icon: Award, perm: 'manage_certificates' },
+    { id: 'activity_logs', label: 'Audit Activity Logs', icon: Activity, perm: 'audit_activity_logs' },
+    { id: 'settings', label: 'System Settings', icon: Settings, perm: 'manage_system_settings' }
   ];
 
   const teacherNav = [
@@ -149,21 +161,23 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           )}
 
           {/* Top Dashboard Button */}
-          <button
-            type="button"
-            onClick={() => {
-              onSelectTab('overview');
-              if (onClose) onClose();
-            }}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer ${
-              currentTab === 'overview'
-                ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
-                : 'text-slate-200 hover:bg-[#1a264e] hover:text-white font-semibold'
-            }`}
-          >
-            <LayoutDashboard className={`w-5 h-5 shrink-0 ${currentTab === 'overview' ? 'text-white' : 'text-blue-300'}`} />
-            <span>Dashboard</span>
-          </button>
+          {(!user || user?.role !== 'superadmin' || hasPermission('access_superadmin_dashboard')) && (
+            <button
+              type="button"
+              onClick={() => {
+                onSelectTab('overview');
+                if (onClose) onClose();
+              }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer ${
+                currentTab === 'overview'
+                  ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
+                  : 'text-slate-200 hover:bg-[#1a264e] hover:text-white font-semibold'
+              }`}
+            >
+              <LayoutDashboard className={`w-5 h-5 shrink-0 ${currentTab === 'overview' ? 'text-white' : 'text-blue-300'}`} />
+              <span>Dashboard</span>
+            </button>
+          )}
 
           {/* ========================================================================= */}
           {/* 1. SUPERADMIN NAV                                                         */}
@@ -176,28 +190,31 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                 </p>
               </div>
 
-              {superAdminNav.filter(i => i.id !== 'overview').map((item) => {
-                const Icon = item.icon;
-                const isActive = currentTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => {
-                      onSelectTab(item.id);
-                      if (onClose) onClose();
-                    }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer text-left ${
-                      isActive
-                        ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
-                        : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
-                    }`}
-                  >
-                    <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-blue-300'}`} />
-                    <span className="truncate">{item.label}</span>
-                  </button>
-                );
-              })}
+              {superAdminNav
+                .filter(i => i.id !== 'overview')
+                .filter(item => !item.perm || hasPermission(item.perm))
+                .map((item) => {
+                  const Icon = item.icon;
+                  const isActive = currentTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        onSelectTab(item.id);
+                        if (onClose) onClose();
+                      }}
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer text-left ${
+                        isActive
+                          ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white font-bold shadow-lg shadow-indigo-950/40 border border-indigo-300/40'
+                          : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
+                      }`}
+                    >
+                      <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-blue-300'}`} />
+                      <span className="truncate">{item.label}</span>
+                    </button>
+                  );
+                })}
             </div>
           )}
 

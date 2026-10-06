@@ -85,11 +85,22 @@ export const AuthProvider = ({ children }) => {
 
   const hasPermission = (permCode) => {
     if (!user) return false;
+    try {
+      const savedMapStr = localStorage.getItem('olympiadhub_role_permissions_map_v2');
+      if (savedMapStr) {
+        const savedMap = JSON.parse(savedMapStr);
+        const roleKey = user.role === 'superadmin' ? 'superadmin' : user.role === 'student' ? 'student' : user.role;
+        if (savedMap && savedMap[roleKey] && savedMap[roleKey][permCode] !== undefined) {
+          return Boolean(savedMap[roleKey][permCode]);
+        }
+      }
+    } catch (e) {}
+
     if (user.role === 'superadmin') return true;
     if (Array.isArray(user.permissions)) {
       return user.permissions.includes('all') || user.permissions.includes(permCode);
     }
-    return false;
+    return true;
   };
 
   const isRole = (role) => {
