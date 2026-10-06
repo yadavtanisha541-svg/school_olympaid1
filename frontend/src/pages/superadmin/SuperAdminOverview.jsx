@@ -34,12 +34,25 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [liveStudentsCount, setLiveStudentsCount] = useState(0);
+
+  const calculateLiveStudents = () => {
+    try {
+      const users = JSON.parse(localStorage.getItem('olympiadhub_db_users') || '[]');
+      const count = users.filter((u) => u.role === 'student' || (!u.role && !u.is_teacher && !u.is_superadmin)).length;
+      if (count >= 0) setLiveStudentsCount(count);
+    } catch (e) {}
+  };
+
   const fetchDashboard = async () => {
     try {
       setLoading(true);
       const res = await apiClient.get('/analytics/superadmin');
       if (res.success && res.data) {
         setData(res.data);
+        if (res.data?.metrics?.total_students !== undefined) {
+          setLiveStudentsCount(res.data.metrics.total_students);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -49,10 +62,28 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
   };
 
   useEffect(() => {
+    calculateLiveStudents();
     fetchDashboard();
+
+    const handleUpdate = () => {
+      calculateLiveStudents();
+      fetchDashboard();
+    };
+
+    window.addEventListener('students-updated', handleUpdate);
+    window.addEventListener('olympiadhub-data-updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('students-updated', handleUpdate);
+      window.removeEventListener('olympiadhub-data-updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
   }, []);
 
   const metrics = data?.metrics || {};
+  const currentTotalStudents = (metrics.total_students !== undefined && metrics.total_students > 0)
+    ? metrics.total_students
+    : liveStudentsCount;
 
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -100,8 +131,8 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
     <div className="space-y-6 pb-12 font-sans">
       {/* 1. Hero Greeting Banner (Navy Blue -> Purple -> Wine/Crimson Theme Gradient) */}
       <div className="bg-gradient-to-r from-blue-200/95 via-indigo-200/90 to-rose-200/95 border-2 border-indigo-400/90 rounded-3xl p-5 sm:p-6 shadow-sm relative overflow-hidden text-slate-900">
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-          <div className="flex items-center gap-4 min-w-0">
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+          <div className="flex items-start sm:items-center gap-4 min-w-0">
             <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-400 via-orange-400 to-rose-400 text-slate-900 shadow-xs flex items-center justify-center shrink-0 border border-white/50">
               <Trophy className="w-7 h-7 fill-slate-900 text-slate-900" />
             </div>
@@ -115,10 +146,33 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
               <p className="text-xs sm:text-sm text-slate-800 font-semibold truncate mt-0.5">
                 Monitor candidates, academic metrics, and live examination activities.
               </p>
+
+              {/* LIVE REGISTERED STUDENTS COUNTER BADGE INSIDE FRONT BANNER */}
+              <div className="mt-3 flex items-center flex-wrap gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => onNavigateTab && onNavigateTab('students')}
+                  className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-white/95 hover:bg-white border-2 border-rose-400 text-slate-900 shadow-xs transition-all hover:scale-[1.02] cursor-pointer"
+                  title="Click to view all registered students"
+                >
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
+                  <Users className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span className="text-xs font-bold text-slate-700">Total Registered Students:</span>
+                  <span className="font-black text-rose-700 font-mono text-sm sm:text-base bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200">
+                    {currentTotalStudents}
+                  </span>
+                  <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+                    Live Auto-Sync
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="text-left sm:text-right shrink-0">
+          <div className="text-left lg:text-right shrink-0">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 border border-indigo-300 rounded-xl text-xs font-bold text-indigo-950 shadow-2xs">
               <Calendar className="w-3.5 h-3.5 text-indigo-600" />
               <span>{formattedDateStr}</span>
@@ -145,7 +199,7 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             <div>
               <p className="text-xs sm:text-sm font-bold text-rose-950">Total Students</p>
               <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mt-0.5 font-mono">
-                {metrics.total_students ?? 2}
+                {currentTotalStudents}
               </h3>
               <p className="text-xs text-slate-700 font-semibold mt-0.5">Enrolled candidates</p>
             </div>

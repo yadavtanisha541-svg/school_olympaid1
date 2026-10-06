@@ -242,6 +242,39 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
     }
   };
 
+  // Total Registered / Enrolled Students (Real-time live dynamic count)
+  const [totalLiveStudents, setTotalLiveStudents] = useState(0);
+
+  const calculateLiveStudents = () => {
+    try {
+      const users = JSON.parse(localStorage.getItem('olympiadhub_db_users') || '[]');
+      const count = users.filter((u) => u.role === 'student' || (!u.role && !u.is_teacher && !u.is_superadmin)).length;
+      if (count > 0) setTotalLiveStudents(count);
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    calculateLiveStudents();
+    apiClient.get('/users/students').then((res) => {
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        setTotalLiveStudents(res.data.length);
+      }
+    }).catch(() => {});
+
+    const handleStudentsUpdated = () => {
+      calculateLiveStudents();
+    };
+
+    window.addEventListener('students-updated', handleStudentsUpdated);
+    window.addEventListener('olympiadhub-data-updated', handleStudentsUpdated);
+    window.addEventListener('storage', handleStudentsUpdated);
+    return () => {
+      window.removeEventListener('students-updated', handleStudentsUpdated);
+      window.removeEventListener('olympiadhub-data-updated', handleStudentsUpdated);
+      window.removeEventListener('storage', handleStudentsUpdated);
+    };
+  }, []);
+
   useEffect(() => {
     fetchDashboard();
     fetchResultsStream(true);
@@ -686,11 +719,26 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               Keep learning, keep growing. Your next big achievement is near!
             </p>
 
-            {/* Bottom Row: Date Pill */}
-            <div className="pt-1 flex items-center flex-wrap gap-3">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/85 backdrop-blur-xs border border-indigo-100 rounded-xl text-xs font-bold text-indigo-950 shadow-2xs">
+            {/* Bottom Row: Date Pill & Live Enrolled Students Counter */}
+            <div className="pt-2 flex items-center flex-wrap gap-2.5">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 backdrop-blur-xs border border-indigo-200 rounded-xl text-xs font-bold text-indigo-950 shadow-2xs">
                 <Calendar className="w-3.5 h-3.5 text-indigo-500" />
                 <span>Today: {formattedDateStr}</span>
+              </div>
+
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 bg-white/95 backdrop-blur-xs border-2 border-indigo-300 rounded-xl text-xs font-bold text-slate-800 shadow-2xs" title="Total active registered candidates in OlympiadHub">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <Users className="w-4 h-4 text-indigo-600 shrink-0" />
+                <span className="text-slate-700 font-bold">Total Enrolled Students:</span>
+                <span className="font-black text-indigo-700 font-mono text-sm bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-200">
+                  {totalLiveStudents > 0 ? totalLiveStudents : 1}
+                </span>
+                <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+                  Live Active
+                </span>
               </div>
             </div>
           </div>

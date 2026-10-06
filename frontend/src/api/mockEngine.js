@@ -535,6 +535,12 @@ function getDb(table) {
 function saveDb(table, data) {
   try {
     localStorage.setItem(STORAGE_PREFIX + table, JSON.stringify(data));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table, data } }));
+      if (table === 'users') {
+        window.dispatchEvent(new CustomEvent('students-updated', { detail: { data } }));
+      }
+    }
   } catch (e) {
     console.warn('LocalStorage save failed:', e);
   }
@@ -2669,15 +2675,42 @@ export const mockEngine = {
         };
       }
 
+      const users = getDb('users') || [];
+      const studentsList = users.filter((u) => u.role === 'student' || (!u.role && !u.is_teacher && !u.is_superadmin));
+      const teachersList = users.filter((u) => u.role === 'teacher' || u.is_teacher);
+      const examsList = getDb('exams') || getDb('exam_papers') || [];
+      const questionsList = getDb('questions') || [];
+      const resultsList = getDb('results') || [];
+
       return {
         success: true,
         data: {
-          total_students: 1250,
-          total_exams: 48,
+          metrics: {
+            total_students: studentsList.length,
+            total_teachers: teachersList.length,
+            total_exams: examsList.length || 6,
+            active_exams: examsList.filter((e) => e.status === 'published').length || 6,
+            total_questions: questionsList.length || 180,
+            total_attempts: resultsList.length || 1,
+            avg_score: 84.5,
+            pass_percentage: 92.3
+          },
+          total_students: studentsList.length,
+          total_exams: examsList.length || 6,
           total_quizzes: 24,
           total_revenue: 148500,
-          active_tests: 12,
-          average_score: 82.4
+          active_tests: 6,
+          average_score: 84.5,
+          subject_performance: [
+            { subject_name: 'Mathematics (IMO)', accuracy: 88.4, color: '#3b82f6' },
+            { subject_name: 'Science (NSO/ISO)', accuracy: 84.2, color: '#8b5cf6' },
+            { subject_name: 'English (IEO)', accuracy: 89.1, color: '#06b6d4' },
+            { subject_name: 'Cyber & AI (ICO)', accuracy: 91.5, color: '#ec4899' }
+          ],
+          recent_results: resultsList.slice(0, 5),
+          recent_logs: [
+            { action: 'User Login', module: 'Auth', user: 'Super Administrator', ip: '127.0.0.1', time: new Date().toISOString().replace('T', ' ').substring(0, 19) }
+          ]
         }
       };
     }

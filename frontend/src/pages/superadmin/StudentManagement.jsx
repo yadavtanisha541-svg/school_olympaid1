@@ -520,6 +520,7 @@ export const StudentManagement = () => {
           setStudents([newStu, ...students]);
           setFeedback({ type: 'success', message: `Student "${formData.full_name}" added successfully.` });
           setViewMode('list');
+          window.dispatchEvent(new CustomEvent('students-updated'));
           fetchStudents();
         } else {
           setFeedback({ type: 'error', message: res.message || 'Failed to add student.' });
@@ -600,6 +601,7 @@ export const StudentManagement = () => {
       setSelectedIds((prev) => prev.filter((id) => id !== targetId));
       setDeleteModalStudent(null);
       setFeedback({ type: 'success', message: `Student ${targetName} deleted successfully.` });
+      window.dispatchEvent(new CustomEvent('students-updated'));
       if (viewMode === 'profile' || viewMode === 'edit') {
         setViewMode('list');
       }
