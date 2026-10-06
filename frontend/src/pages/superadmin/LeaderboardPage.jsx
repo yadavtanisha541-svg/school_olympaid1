@@ -120,8 +120,24 @@ export const LeaderboardPage = () => {
                   >
                     <td className="py-3.5 px-4 font-bold">{getRankBadge(item.rank)}</td>
                     <td className="py-3.5 px-4">
-                      <p className="font-bold text-slate-900">{item.student_name}</p>
-                      <p className="text-[11px] font-mono text-slate-400">{item.student_login_id}</p>
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
+                          {((item.student_name || item.name || 'S')).charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-900 text-[13px]">
+                            {item.student_name || item.name || item.full_name || 'Student Candidate'}
+                          </p>
+                          <p className="text-[11px] font-mono text-slate-500">
+                            {item.student_login_id || item.login_id || `ID: #${item.student_id || 'STU'}`}
+                          </p>
+                          {(item.school || item.school_name) && (
+                            <p className="text-[10px] text-slate-400 truncate max-w-[200px]">
+                              {item.school || item.school_name}
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     </td>
                     <td className="py-3.5 px-4">
                       <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#f4ebf4] text-[#6d3a68] border border-[#edd6ed]">

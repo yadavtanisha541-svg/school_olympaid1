@@ -129,17 +129,25 @@ class LeaderboardController {
         $results = [];
         foreach ($rawRows as $idx => $r) {
             $pct = round((float)($r['percentage_num'] ?? 0));
+            $fullName = ucwords(trim($r['name'] ?? 'Student Candidate'));
             $results[] = [
                 'rank' => $idx + 1,
                 'student_id' => (int)$r['student_id'],
-                'name' => ucwords(trim($r['name'])),
+                'student_name' => $fullName,
+                'name' => $fullName,
+                'student_login_id' => $r['login_id'] ?? '',
+                'login_id' => $r['login_id'] ?? '',
                 'school' => $r['school'],
+                'school_name' => $r['school'],
                 'city' => $r['city'],
                 'class_name' => $r['class_name'],
                 'subject' => $r['subject'],
                 'percentage' => $pct . '%',
                 'percentage_num' => $pct,
+                'avg_percentage' => $pct,
                 'score' => (float)$r['score'],
+                'total_points' => (float)$r['score'],
+                'total_exams_attempted' => 1,
                 'submitted_at' => $r['submitted_at']
             ];
         }

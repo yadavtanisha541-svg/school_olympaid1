@@ -2360,13 +2360,69 @@ export const mockEngine = {
     }
 
     if (root === 'leaderboard') {
+      const results = getDb('results') || [];
+      const localKeys = [
+        'olympiadhub_last_submitted_exam',
+        'olympiadhub_student_attempts',
+        'olympiadhub_db_results',
+        'test_generator_attempts',
+        'student_test_attempts'
+      ];
+      let allAtts = [];
+      localKeys.forEach(k => {
+        try {
+          const raw = localStorage.getItem(k);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) allAtts.push(...parsed);
+            else if (parsed && typeof parsed === 'object') allAtts.push(parsed);
+          }
+        } catch (e) {}
+      });
+      if (Array.isArray(results)) allAtts.push(...results);
+
+      const dynamicList = allAtts.map((a, idx) => {
+        const sName = a.student_name || a.name || a.full_name || a.studentName || 'Student Candidate';
+        const sLogin = a.student_login_id || a.login_id || a.student_id || `SKILL-STU-${1000 + idx}`;
+        const sClass = a.class_name || a.grade || a.class || 'Class 10';
+        const sSchool = a.school_name || a.school || a.student_school || 'Delhi Public School';
+        const sScore = parseFloat(a.score !== undefined ? a.score : (a.correct_count || 10));
+        const sPct = parseFloat(a.percentage !== undefined ? a.percentage : 85);
+        return {
+          rank: idx + 1,
+          student_id: a.student_id || idx + 1,
+          student_name: sName,
+          name: sName,
+          student_login_id: sLogin,
+          login_id: sLogin,
+          school: sSchool,
+          school_name: sSchool,
+          class_name: sClass,
+          exam_title: a.exam_title || a.title || 'National Olympiad Examination',
+          total_exams_attempted: 1,
+          total_points: sScore,
+          score: sScore,
+          percentage: sPct,
+          avg_percentage: sPct,
+          time_spent_seconds: a.time_spent_seconds || 1200
+        };
+      });
+
+      const defaultToppers = [
+        { rank: 1, student_name: 'Ananya Verma', name: 'Ananya Verma', student_login_id: 'SKILL-STU-1001', login_id: 'SKILL-STU-1001', school: 'DPS RK Puram, New Delhi', school_name: 'DPS RK Puram, New Delhi', class_name: 'Class 10', exam_title: 'International Mathematics Olympiad (IMO)', total_exams_attempted: 5, total_points: 98, score: 98, percentage: 98, avg_percentage: 98, percentile: 99.8, time_spent_seconds: 1420 },
+        { rank: 2, student_name: 'Kabir Patel', name: 'Kabir Patel', student_login_id: 'SKILL-STU-1002', login_id: 'SKILL-STU-1002', school: 'National Public School, Bangalore', school_name: 'National Public School, Bangalore', class_name: 'Class 9', exam_title: 'National Science Olympiad (NSO)', total_exams_attempted: 4, total_points: 95, score: 95, percentage: 95, avg_percentage: 95, percentile: 99.1, time_spent_seconds: 1560 },
+        { rank: 3, student_name: 'Aarav Sharma', name: 'Aarav Sharma', student_login_id: 'SKILL-STU-1003', login_id: 'SKILL-STU-1003', school: 'St. Xavier School, Jaipur', school_name: 'St. Xavier School, Jaipur', class_name: 'Class 10', exam_title: 'International Cyber Olympiad (ICO)', total_exams_attempted: 4, total_points: 94, score: 94, percentage: 94, avg_percentage: 94, percentile: 98.7, time_spent_seconds: 1680 },
+        { rank: 4, student_name: 'Riya Sen', name: 'Riya Sen', student_login_id: 'SKILL-STU-1004', login_id: 'SKILL-STU-1004', school: 'Modern School, Barakhamba', school_name: 'Modern School, Barakhamba', class_name: 'Class 8', exam_title: 'International English Olympiad (IEO)', total_exams_attempted: 3, total_points: 91, score: 91, percentage: 91, avg_percentage: 91, percentile: 97.5, time_spent_seconds: 1800 },
+        { rank: 5, student_name: 'Vihaan Gupta', name: 'Vihaan Gupta', student_login_id: 'SKILL-STU-1005', login_id: 'SKILL-STU-1005', school: 'DAV Public School, Pune', school_name: 'DAV Public School, Pune', class_name: 'Class 7', exam_title: 'General Knowledge Olympiad (IGKO)', total_exams_attempted: 3, total_points: 89, score: 89, percentage: 89, avg_percentage: 89, percentile: 96.2, time_spent_seconds: 1750 }
+      ];
+
+      const merged = dynamicList.length > 0 ? dynamicList : defaultToppers;
+      merged.sort((a, b) => (b.score || b.total_points || 0) - (a.score || a.total_points || 0));
+      merged.forEach((item, idx) => { item.rank = idx + 1; });
+
       return {
         success: true,
-        data: [
-          { rank: 1, student_name: 'Ananya Verma', school: 'DPS RK Puram', score: 98, percentile: 99.8 },
-          { rank: 2, student_name: 'Kabir Patel', school: 'National Public School', score: 95, percentile: 99.1 },
-          { rank: 3, student_name: 'Aarav Sharma', school: 'St. Xavier School', score: 94, percentile: 98.7 }
-        ]
+        data: merged
       };
     }
 
