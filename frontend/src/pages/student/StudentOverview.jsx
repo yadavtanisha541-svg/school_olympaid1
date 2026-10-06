@@ -1158,29 +1158,31 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       <div className="pt-2 space-y-4">
         {/* Section Header */}
         <div className="space-y-0.5">
-          <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-slate-700" />
+          <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-amber-400 via-orange-400 to-amber-300 flex items-center justify-center text-slate-900 shadow-2xs shrink-0">
+              <Trophy className="w-4 h-4 fill-slate-900 text-slate-900" />
+            </div>
             <span>Live Student Exam Results &amp; Percentages</span>
           </h2>
-          <p className="text-[11px] text-slate-500 font-medium">
+          <p className="text-[11px] text-slate-500 font-semibold pl-9.5">
             Real-time student performance feed, test scores, and subject-wise percentages.
           </p>
         </div>
 
-        {/* LIVE STUDENTS RESULTS TABLE (Clean Neutral Card) */}
+        {/* LIVE STUDENTS RESULTS TABLE (Colorful Header Card) */}
         <div className="space-y-3">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden text-slate-800">
+          <div className="bg-white rounded-3xl border border-indigo-100/80 shadow-xs overflow-hidden text-slate-800">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 text-[10px] uppercase font-bold tracking-wider">
+                <thead className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white text-[10px] sm:text-[11px] uppercase font-black tracking-wider shadow-xs">
                   <tr>
-                    <th className="py-3.5 px-3 w-10 text-center">#</th>
-                    <th className="py-3.5 px-4">Student</th>
-                    <th className="py-3.5 px-3">Class</th>
-                    <th className="py-3.5 px-4">Test Title &amp; Subject</th>
-                    <th className="py-3.5 px-4">School</th>
-                    <th className="py-3.5 px-4">Percentage</th>
-                    <th className="py-3.5 px-4 text-right">Status</th>
+                    <th className="py-3.5 px-3 w-10 text-center text-white/90">#</th>
+                    <th className="py-3.5 px-4 text-white">Student</th>
+                    <th className="py-3.5 px-3 text-white/90">Class</th>
+                    <th className="py-3.5 px-4 text-white">Test Title &amp; Subject</th>
+                    <th className="py-3.5 px-4 text-white">School</th>
+                    <th className="py-3.5 px-4 text-white">Percentage</th>
+                    <th className="py-3.5 px-4 text-right text-white">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
