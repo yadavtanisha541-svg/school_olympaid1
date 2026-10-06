@@ -525,8 +525,8 @@ export const StudentMyContentPage = ({
                 </div>
               </div>
 
-              {/* Mock Tests Cards Grid (Exact design from user's image) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+              {/* Mock Tests Cards Grid (Exact modern design from Image 1) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {subjectPapers.map((paper) => {
                   const result = myTestResults.find(
                     r => (r.exam_id && (r.exam_id === paper.id || String(r.exam_id) === String(paper.id))) ||
@@ -537,55 +537,70 @@ export const StudentMyContentPage = ({
                   return (
                     <div
                       key={paper.id}
-                      className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm hover:shadow-md hover:border-[#859900] transition-all overflow-hidden flex flex-col justify-between"
+                      className="bg-white rounded-3xl border-2 border-slate-200/90 hover:border-purple-400 p-6 shadow-xs hover:shadow-xl transition-all duration-200 flex flex-col justify-between space-y-5 group relative overflow-hidden"
                     >
-                      {/* Top Olive Green Header */}
-                      <div className="bg-[#859900] text-white p-3.5 sm:p-4 text-center min-h-[72px] flex items-center justify-center">
-                        <h4 className="font-bold text-xs sm:text-sm leading-snug">
-                          {paper.title}
-                        </h4>
+                      {/* Top: Icon + Title + Class */}
+                      <div className="space-y-3">
+                        <div className="w-12 h-12 rounded-2xl bg-purple-100/90 border border-purple-200 text-purple-700 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform shrink-0">
+                          <FileText className="w-6 h-6 stroke-[2.2]" />
+                        </div>
+
+                        <div>
+                          <h4 className="font-black text-slate-900 text-base sm:text-lg tracking-tight leading-snug group-hover:text-purple-900 transition-colors">
+                            {paper.title}
+                          </h4>
+                          <p className="text-xs sm:text-sm font-bold text-slate-500 mt-0.5">
+                            {paper.class_name || studentClass}
+                          </p>
+                        </div>
                       </div>
 
-                      {/* Card Body */}
-                      <div className="p-4 space-y-3">
-                        {/* Row 1: Status */}
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-bold text-slate-700">Status:</span>
+                      {/* Middle: Status & Score Containers (Exact Image 1 layout) */}
+                      <div className="space-y-2.5">
+                        {/* Row 1: Status Box */}
+                        <div className="bg-rose-50/80 border border-rose-100/90 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
+                            <span className="text-xs font-bold text-slate-700">Status:</span>
+                          </div>
                           {isCompleted ? (
-                            <span className="px-2.5 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-black uppercase tracking-wider">
+                            <span className="px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-black uppercase tracking-wider">
                               COMPLETED
                             </span>
                           ) : (
-                            <span className="px-2.5 py-0.5 rounded bg-[#d9534f] text-white text-[11px] font-black uppercase tracking-wider">
+                            <span className="px-3 py-0.5 rounded-full bg-rose-100 text-rose-600 text-[11px] font-black uppercase tracking-wider">
                               UNATTEMPTED
                             </span>
                           )}
                         </div>
 
-                        {/* Row 2: Last Score */}
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-bold text-slate-700">Last Score:</span>
+                        {/* Row 2: Last Score Box */}
+                        <div className="bg-emerald-50/80 border border-emerald-100/90 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                            <span className="text-xs font-bold text-slate-700">Last Score:</span>
+                          </div>
                           {isCompleted ? (
-                            <span className="px-2.5 py-0.5 rounded bg-[#8cb82b] text-white text-[11px] font-black">
+                            <span className="px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-black">
                               {result.score} / {result.total_marks || paper.total_marks || 60} ({Math.round(result.percentage || 0)}%)
                             </span>
                           ) : (
-                            <span className="px-2.5 py-0.5 rounded bg-[#8cb82b] text-white text-[11px] font-black">
+                            <span className="px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-black">
                               none
                             </span>
                           )}
                         </div>
                       </div>
 
-                      {/* Card Footer: OPEN Button */}
-                      <div className="p-4 pt-0">
+                      {/* Card Footer: Open Test Button */}
+                      <div className="pt-2 flex justify-end">
                         <button
                           type="button"
                           onClick={() => setSelectedPaperForInstructions(paper)}
-                          className="w-full py-2.5 bg-[#859900] hover:bg-[#738400] text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs hover:shadow flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
+                          className="inline-flex items-center gap-2 px-5 py-2 rounded-xl border-2 border-purple-500 text-purple-700 hover:bg-purple-600 hover:text-white font-black text-xs sm:text-sm shadow-2xs hover:shadow-md transition-all cursor-pointer active:scale-95"
                         >
-                          <span>OPEN</span>
-                          <ChevronRight className="w-4 h-4" />
+                          <span>Open Test</span>
+                          <ArrowRight className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
