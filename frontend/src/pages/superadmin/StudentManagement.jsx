@@ -360,9 +360,11 @@ export const StudentManagement = () => {
     setActionLoading(true);
     try {
       await apiClient.post('/users/bulk-delete', { ids: selectedIds });
-      setStudents((prev) => prev.filter((s) => !selectedIds.includes(s.id)));
+      const idsStr = selectedIds.map(String);
+      setStudents((prev) => prev.filter((s) => !idsStr.includes(String(s.id)) && !idsStr.includes(String(s.login_id)) && !idsStr.includes(String(s.student_id))));
       setFeedback({ type: 'success', message: `${selectedIds.length} student(s) deleted successfully.` });
       setSelectedIds([]);
+      window.dispatchEvent(new CustomEvent('students-updated'));
       fetchStudents();
     } catch (err) {
       console.error('Bulk delete error:', err);
@@ -602,12 +604,13 @@ export const StudentManagement = () => {
   const handleDeleteStudent = async (student) => {
     if (!student) return;
     const targetId = student.id;
-    const targetName = student.full_name || 'Student';
+    const targetLogin = student.login_id || student.student_id;
+    const targetName = student.full_name || student.name || 'Student';
     setActionLoading(true);
     try {
       await apiClient.delete(`/users/${targetId}`);
-      setStudents((prev) => prev.filter((s) => s.id !== targetId));
-      setSelectedIds((prev) => prev.filter((id) => id !== targetId));
+      setStudents((prev) => prev.filter((s) => String(s.id) !== String(targetId) && String(s.login_id) !== String(targetLogin) && String(s.student_id) !== String(targetLogin)));
+      setSelectedIds((prev) => prev.filter((id) => String(id) !== String(targetId) && String(id) !== String(targetLogin)));
       setDeleteModalStudent(null);
       setFeedback({ type: 'success', message: `Student ${targetName} deleted successfully.` });
       window.dispatchEvent(new CustomEvent('students-updated'));
