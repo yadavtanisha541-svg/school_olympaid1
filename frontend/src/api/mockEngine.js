@@ -928,25 +928,6 @@ function getDb(table) {
       localStorage.setItem(STORAGE_PREFIX + table, JSON.stringify(initialStore.academic_classes));
       return initialStore.academic_classes;
     }
-    if (table === 'users') {
-      let currentUsers = Array.isArray(parsed) ? parsed : [];
-      const existingKeys = new Set(
-        currentUsers.map(u => String(u.login_id || u.student_id || u.id || u.email).toLowerCase())
-      );
-      let hasChanges = false;
-      initialStore.users.forEach(initUser => {
-        const initKey = String(initUser.login_id || initUser.student_id || initUser.id || initUser.email).toLowerCase();
-        if (!existingKeys.has(initKey)) {
-          currentUsers.push(initUser);
-          existingKeys.add(initKey);
-          hasChanges = true;
-        }
-      });
-      if (hasChanges) {
-        localStorage.setItem(STORAGE_PREFIX + table, JSON.stringify(currentUsers));
-      }
-      return currentUsers;
-    }
     return parsed;
   } catch (e) {
     return initialStore[table] || [];
@@ -3308,8 +3289,13 @@ export const mockEngine = {
 
       // Bulk delete (POST /users/bulk-delete)
       if (method === 'POST' && sub === 'bulk-delete') {
-        const idsToDelete = Array.isArray(body.ids) ? body.ids.map(String) : [];
-        users = users.filter((u) => !idsToDelete.includes(String(u.id)));
+        const idsToDelete = Array.isArray(body.ids) ? body.ids.map(id => String(id).toLowerCase()) : [];
+        users = users.filter((u) => {
+          const uId = String(u.id).toLowerCase();
+          const uLogin = String(u.login_id || '').toLowerCase();
+          const uStudentId = String(u.student_id || '').toLowerCase();
+          return !idsToDelete.includes(uId) && !idsToDelete.includes(uLogin) && !idsToDelete.includes(uStudentId);
+        });
         saveDb('users', users);
         return { success: true, message: `${idsToDelete.length} user(s) deleted successfully` };
       }
@@ -3403,7 +3389,13 @@ export const mockEngine = {
 
       // Delete user (DELETE /users/:id)
       if (method === 'DELETE' && sub) {
-        users = users.filter((u) => String(u.id) !== String(sub) && u.login_id !== String(sub));
+        const target = String(sub).toLowerCase();
+        users = users.filter((u) => {
+          const uId = String(u.id).toLowerCase();
+          const uLogin = String(u.login_id || '').toLowerCase();
+          const uStudentId = String(u.student_id || '').toLowerCase();
+          return uId !== target && uLogin !== target && uStudentId !== target;
+        });
         saveDb('users', users);
         return { success: true, message: 'User deleted successfully' };
       }
