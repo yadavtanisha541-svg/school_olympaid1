@@ -31,7 +31,9 @@ import {
   Check,
   HelpCircle,
   MessageSquare,
-  AlertCircle
+  AlertCircle,
+  Download,
+  Upload
 } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
@@ -116,6 +118,107 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
     meeting_link: 'https://meet.google.com/oly-live',
     max_capacity: 50
   });
+
+  // Import / Export State
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importText, setImportText] = useState('');
+  const [importLoading, setImportLoading] = useState(false);
+
+  const handleDownloadClassesTemplate = () => {
+    const headers = ['title', 'class_name', 'subject', 'price', 'original_price', 'badge_text', 'package_type', 'status'];
+    const sample = [
+      'Master Reasoning & Problem Solving 2026', 'Class 6', 'Reasoning (ISSO)', '2499', '3499', 'Bestseller', 'self_paced', 'active'
+    ];
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), sample.map(s => `"${s}"`).join(',')].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'online_classes_template.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportClassesCSV = () => {
+    if (!packages || packages.length === 0) {
+      alert('No course packages available to export.');
+      return;
+    }
+    const headers = ['ID', 'Package Title', 'Class', 'Subject', 'Price (INR)', 'Original Price', 'Badge', 'Type', 'Status'];
+    const rows = packages.map(p => [
+      p.id || '',
+      `"${(p.title || '').toString().replace(/"/g, '""')}"`,
+      `"${(p.class_name || '').toString().replace(/"/g, '""')}"`,
+      `"${(p.subject || '').toString().replace(/"/g, '""')}"`,
+      p.price || 0,
+      p.original_price || 0,
+      `"${(p.badge_text || '').toString().replace(/"/g, '""')}"`,
+      p.package_type || 'self_paced',
+      p.status || 'active'
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `online_classes_packages_export_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setFeedback({ type: 'success', message: `Successfully exported ${packages.length} course packages to CSV!` });
+  };
+
+  const handleImportSubmit = () => {
+    if (!importText.trim()) {
+      alert('Please paste CSV or JSON data to import.');
+      return;
+    }
+    setImportLoading(true);
+    try {
+      let imported = [];
+      const trimmed = importText.trim();
+      if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+        const parsed = JSON.parse(trimmed);
+        imported = Array.isArray(parsed) ? parsed : [parsed];
+      } else {
+        const lines = trimmed.split('\n').map(l => l.trim()).filter(Boolean);
+        if (lines.length < 2) throw new Error('CSV must contain a header row and at least 1 record.');
+        const headers = lines[0].split(',').map(h => h.replace(/^["']|["']$/g, '').trim().toLowerCase());
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.replace(/^["']|["']$/g, '').trim());
+          const obj = {};
+          headers.forEach((h, idx) => {
+            obj[h] = values[idx] || '';
+          });
+          imported.push({
+            id: `cls_pkg_${Date.now()}_${i}`,
+            title: obj.title || 'Special Online Concept Masterclass',
+            class_name: obj.class_name || 'Class 6',
+            subject: obj.subject || 'Reasoning (ISSO)',
+            price: Number(obj.price) || 2499,
+            original_price: Number(obj.original_price) || 3499,
+            badge_text: obj.badge_text || 'Featured',
+            package_type: obj.package_type || 'self_paced',
+            status: obj.status || 'active',
+            header_color: '#80497D'
+          });
+        }
+      }
+      if (imported.length === 0) throw new Error('No valid class packages found.');
+      const updated = [...imported, ...packages];
+      setPackages(updated);
+      try {
+        localStorage.setItem('olympiadhub_online_packages_v1', JSON.stringify(updated));
+      } catch (e) {}
+      setShowImportModal(false);
+      setImportText('');
+      setFeedback({ type: 'success', message: `Successfully imported ${imported.length} new course packages!` });
+    } catch (err) {
+      alert(err.message || 'Failed to parse import data.');
+    } finally {
+      setImportLoading(false);
+    }
+  };
 
   // Bank & Payment Settings State
   const [bankSettings, setBankSettings] = useState({
@@ -444,7 +547,31 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+          <Button
+            variant="secondary"
+            size="md"
+            icon={Download}
+            onClick={handleDownloadClassesTemplate}
+          >
+            Template
+          </Button>
+          <Button
+            variant="secondary"
+            size="md"
+            icon={Upload}
+            onClick={() => setShowImportModal(true)}
+          >
+            Import CSV
+          </Button>
+          <Button
+            variant="secondary"
+            size="md"
+            icon={Download}
+            onClick={handleExportClassesCSV}
+          >
+            Export CSV
+          </Button>
           <Button
             variant="secondary"
             size="md"
@@ -1665,6 +1792,57 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
                 <Button variant="primary" size="sm" type="submit" loading={actionLoading}>Save Lecture</Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Classes Import Modal */}
+      {showImportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 animate-in fade-in zoom-in duration-150">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-black text-[#422240] flex items-center gap-2">
+                <Upload className="w-5 h-5 text-[#80497D]" />
+                <span>Import Course Packages (CSV / JSON)</span>
+              </h3>
+              <button onClick={() => setShowImportModal(false)} className="text-slate-400 hover:text-slate-600 font-bold cursor-pointer">✕</button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1.5">Choose CSV File</label>
+                <input
+                  type="file"
+                  accept=".csv,.json"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (evt) => setImportText(evt.target.result);
+                    reader.readAsText(file);
+                  }}
+                  className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-[#80497D] hover:file:bg-purple-100 cursor-pointer"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1.5">Or Paste Raw CSV / JSON Data</label>
+                <textarea
+                  rows={5}
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                  placeholder="title,class_name,subject,price,original_price,badge_text,package_type,status&#10;Master Reasoning 2026,Class 6,Reasoning (ISSO),2499,3499,Bestseller,self_paced,active"
+                  className="w-full px-3 py-2 font-mono text-[11px] border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-[#80497D]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <Button variant="secondary" size="sm" onClick={() => setShowImportModal(false)}>Cancel</Button>
+                <Button variant="primary" size="sm" loading={importLoading} onClick={handleImportSubmit}>
+                  Upload &amp; Save Packages
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}

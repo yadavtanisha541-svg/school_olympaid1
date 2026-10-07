@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { apiClient } from '../../api/client';
-import { Trophy, Medal, Award, Search, Filter, Crown } from 'lucide-react';
+import { Trophy, Medal, Award, Search, Filter, Crown, Download } from 'lucide-react';
 import { Badge } from '../../components/Badge';
+import { Button } from '../../components/Button';
 
 export const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState([]);
@@ -24,6 +25,35 @@ export const LeaderboardPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleExportCSV = () => {
+    if (!leaderboard || leaderboard.length === 0) {
+      alert('No leaderboard data to export.');
+      return;
+    }
+
+    const headers = ['Rank', 'Candidate Name', 'Student ID', 'School', 'Class', selectedExamId ? 'Exam' : 'Exams Attempted', selectedExamId ? 'Score' : 'Total Points', selectedExamId ? 'Percentage (%)' : 'Avg Score (%)', 'Time Taken'];
+    const rows = leaderboard.map(item => [
+      item.rank || '',
+      `"${(item.student_name || item.name || 'Student Candidate').toString().replace(/"/g, '""')}"`,
+      `"${(item.student_login_id || item.login_id || item.student_id || '').toString().replace(/"/g, '""')}"`,
+      `"${(item.school || item.school_name || '').toString().replace(/"/g, '""')}"`,
+      `"${(item.class_name || '').toString().replace(/"/g, '""')}"`,
+      `"${(selectedExamId ? item.exam_title : `${item.total_exams_attempted || 0} exams`).toString().replace(/"/g, '""')}"`,
+      parseFloat(selectedExamId ? item.score : item.total_points || 0).toFixed(1),
+      parseFloat(selectedExamId ? item.percentage : item.avg_percentage || 0).toFixed(1),
+      item.time_spent_seconds ? `${Math.floor(item.time_spent_seconds / 60)}m ${item.time_spent_seconds % 60}s` : 'N/A'
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `olympiad_leaderboard_export_${selectedExamId ? `exam_${selectedExamId}` : 'overall'}_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   useEffect(() => {
@@ -77,17 +107,28 @@ export const LeaderboardPage = () => {
           </p>
         </div>
 
-        {/* Exam Selector */}
-        <select
-          value={selectedExamId}
-          onChange={(e) => setSelectedExamId(e.target.value)}
-          className="px-4 py-2 bg-[#faf5fa] border border-[#edd6ed] rounded-xl text-xs font-bold text-[#4e2a4a] shadow-xs focus:outline-none focus:border-[#6d3a68] cursor-pointer"
-        >
-          <option value="">All-India Overall Championship</option>
-          {exams.map((ex) => (
-            <option key={ex.id} value={ex.id}>{ex.title}</option>
-          ))}
-        </select>
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Exam Selector */}
+          <select
+            value={selectedExamId}
+            onChange={(e) => setSelectedExamId(e.target.value)}
+            className="px-4 py-2 bg-[#faf5fa] border border-[#edd6ed] rounded-xl text-xs font-bold text-[#4e2a4a] shadow-xs focus:outline-none focus:border-[#6d3a68] cursor-pointer"
+          >
+            <option value="">All-India Overall Championship</option>
+            {exams.map((ex) => (
+              <option key={ex.id} value={ex.id}>{ex.title}</option>
+            ))}
+          </select>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={Download}
+            onClick={handleExportCSV}
+          >
+            Export Leaderboard (CSV)
+          </Button>
+        </div>
       </div>
 
       {/* Leaderboard Table */}

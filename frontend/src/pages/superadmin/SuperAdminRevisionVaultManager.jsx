@@ -17,7 +17,10 @@ import {
   X,
   Layers,
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  Download,
+  Upload,
+  FileText
 } from 'lucide-react';
 
 const SUBJECT_OPTIONS = [
@@ -55,6 +58,146 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
   const [selectedClass, setSelectedClass] = useState('All');
   const [selectedSubject, setSelectedSubject] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Import Modal State
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importText, setImportText] = useState('');
+  const [importing, setImporting] = useState(false);
+
+  // Export to CSV
+  const handleExportCSV = () => {
+    if (!items || items.length === 0) {
+      alert('No revision vault questions to export.');
+      return;
+    }
+    const headers = ['ID', 'Class', 'Subject', 'Subject Code', 'Question Text', 'Option A', 'Option B', 'Option C', 'Option D', 'Correct Option (A-D)', 'Tags', 'Difficulty', 'Explanation', 'Status'];
+    const rows = items.map((i) => [
+      i.id || '',
+      `"${(i.class_name || 'Class 6').replace(/"/g, '""')}"`,
+      `"${(i.subject || 'Mathematics (IMO)').replace(/"/g, '""')}"`,
+      `"${(i.subject_code || 'IMO').replace(/"/g, '""')}"`,
+      `"${(i.question_text || '').replace(/"/g, '""')}"`,
+      `"${(i.option_a || '').replace(/"/g, '""')}"`,
+      `"${(i.option_b || '').replace(/"/g, '""')}"`,
+      `"${(i.option_c || '').replace(/"/g, '""')}"`,
+      `"${(i.option_d || '').replace(/"/g, '""')}"`,
+      `"${(i.correct_option || 'A').replace(/"/g, '""')}"`,
+      `"${(i.tags || '').replace(/"/g, '""')}"`,
+      `"${(i.difficulty || 'Intermediate').replace(/"/g, '""')}"`,
+      `"${(i.explanation || '').replace(/"/g, '""')}"`,
+      `"${(i.status || 'active').replace(/"/g, '""')}"`
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `OlympiadHub_Revision_Vault_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setSuccessMsg(`Exported ${items.length} revision questions to CSV successfully.`);
+  };
+
+  // Download Sample Template
+  const handleDownloadTemplate = () => {
+    const templateHeaders = ['Class', 'Subject', 'Subject Code', 'Question Text', 'Option A', 'Option B', 'Option C', 'Option D', 'Correct Option (A-D)', 'Tags', 'Difficulty', 'Explanation', 'Status'];
+    const sampleRow = [
+      '"Class 6"',
+      '"Mathematics (IMO)"',
+      '"IMO"',
+      '"Find the sum of all prime numbers between 20 and 35."',
+      '"83"',
+      '"87"',
+      '"79"',
+      '"89"',
+      '"A"',
+      '"Tricky Question, Formula Rule"',
+      '"Intermediate"',
+      '"The prime numbers between 20 and 35 are 23, 29, and 31. Sum = 23 + 29 + 31 = 83."',
+      '"active"'
+    ];
+    const csvContent = 'data:text/csv;charset=utf-8,' + [templateHeaders.join(','), sampleRow.join(',')].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'Revision_Vault_Import_Template.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Handle CSV/JSON File Import
+  const handleImportFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const content = ev.target?.result || '';
+      await processImportData(content);
+    };
+    reader.readAsText(file);
+  };
+
+  const processImportData = async (rawText) => {
+    try {
+      setImporting(true);
+      let parsedItems = [];
+      if (rawText.trim().startsWith('[') || rawText.trim().startsWith('{')) {
+        const json = JSON.parse(rawText);
+        parsedItems = Array.isArray(json) ? json : [json];
+      } else {
+        const lines = rawText.split(/\r?\n/).filter(l => l.trim().length > 0);
+        if (lines.length <= 1) {
+          alert('CSV file is empty or missing data rows.');
+          setImporting(false);
+          return;
+        }
+        for (let i = 1; i < lines.length; i++) {
+          const parts = lines[i].split(',').map(p => p.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+          if (parts.length >= 5) {
+            parsedItems.push({
+              class_name: parts[0] || 'Class 6',
+              subject: parts[1] || 'Mathematics (IMO)',
+              subject_code: parts[2] || 'IMO',
+              question_text: parts[3] || '',
+              option_a: parts[4] || '',
+              option_b: parts[5] || '',
+              option_c: parts[6] || '',
+              option_d: parts[7] || '',
+              correct_option: parts[8] || 'A',
+              tags: parts[9] || 'Important',
+              difficulty: parts[10] || 'Intermediate',
+              explanation: parts[11] || '',
+              status: parts[12] || 'active'
+            });
+          }
+        }
+      }
+
+      if (parsedItems.length === 0) {
+        alert('No valid revision questions found in file.');
+        setImporting(false);
+        return;
+      }
+
+      let count = 0;
+      for (const item of parsedItems) {
+        if (!item.question_text) continue;
+        await apiClient.post('/revision-vault', item);
+        count++;
+      }
+
+      setIsImportModalOpen(false);
+      setImportText('');
+      setSuccessMsg(`Successfully imported ${count} revision questions!`);
+      fetchItems();
+    } catch (err) {
+      console.error('Import error:', err);
+      alert('Failed to parse or import data. Please check format.');
+    } finally {
+      setImporting(false);
+    }
+  };
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -275,23 +418,50 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0 flex-wrap">
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+          <button
+            type="button"
+            onClick={handleDownloadTemplate}
+            className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
+            title="Download CSV Template"
+          >
+            <FileText className="w-4 h-4 text-indigo-600" />
+            <span>Template</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsImportModalOpen(true)}
+            className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-indigo-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-indigo-200 shadow-2xs"
+            title="Import questions from CSV / Excel"
+          >
+            <Upload className="w-4 h-4 text-indigo-600" />
+            <span>Import CSV</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-emerald-50 text-emerald-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-200 shadow-2xs"
+            title="Export revision questions to CSV"
+          >
+            <Download className="w-4 h-4 text-emerald-600" />
+            <span>Export CSV</span>
+          </button>
           <button
             type="button"
             onClick={handleResetDefaults}
-            className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
+            className="px-3 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
             title="Reset Default Questions"
           >
             <RotateCcw className="w-4 h-4 text-[#16327a]" />
-            <span>Reset Defaults</span>
+            <span>Reset</span>
           </button>
           <button
             type="button"
             onClick={handleOpenCreateModal}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30"
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Revision Question</span>
+            <span>Add Question</span>
           </button>
         </div>
       </div>
@@ -747,6 +917,82 @@ export const SuperAdminRevisionVaultManager = ({ onNavigateTab }) => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* CSV / JSON Import Modal */}
+      {isImportModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <Upload className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base">Import Revision Vault Questions</h3>
+                  <p className="text-xs text-slate-500">Upload CSV file or paste formatted CSV / JSON data</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsImportModalOpen(false)}
+                className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* File Upload Zone */}
+            <div className="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/40 rounded-2xl p-5 text-center transition-colors">
+              <Upload className="w-7 h-7 text-indigo-500 mx-auto mb-2" />
+              <p className="text-xs font-bold text-slate-700">Choose a CSV or JSON file from your computer</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">Supports standard Olympiad revision questions &amp; solutions</p>
+              <div className="mt-3 flex items-center justify-center gap-3">
+                <label className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer transition-all">
+                  Browse File
+                  <input type="file" accept=".csv, .json, text/csv, application/json" className="hidden" onChange={handleImportFile} />
+                </label>
+                <button
+                  type="button"
+                  onClick={handleDownloadTemplate}
+                  className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl shadow-2xs cursor-pointer"
+                >
+                  Download Template
+                </button>
+              </div>
+            </div>
+
+            {/* Paste Data Textarea */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Or Paste CSV / JSON Content Directly:</label>
+              <textarea
+                rows={5}
+                value={importText}
+                onChange={(e) => setImportText(e.target.value)}
+                placeholder='Class,Subject,Subject Code,Question Text,Option A,Option B,Option C,Option D,Correct Option (A-D),Tags,Difficulty,Explanation,Status&#10;"Class 6","Mathematics (IMO)","IMO","Sum of prime numbers between 20 and 35?","83","87","79","89","A","Formula Rule","Intermediate","23 + 29 + 31 = 83","active"'
+                className="w-full p-3 font-mono text-[11px] bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setIsImportModalOpen(false)}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={importing || !importText.trim()}
+                onClick={() => processImportData(importText)}
+                className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs disabled:opacity-50"
+              >
+                {importing ? 'Importing...' : 'Parse & Import Now'}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -29,7 +29,9 @@ import {
   AlertCircle,
   Copy,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Download,
+  Upload
 } from 'lucide-react';
 
 const DEFAULT_PROGRAMS_INITIAL = {
@@ -433,9 +435,114 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
     showToast('Program removed successfully.');
   };
 
-  const handleResetDefaults = () => {
-    saveProgramsToStorage(DEFAULT_PROGRAMS_INITIAL);
-    showToast('Skill Development Programs reset to default.');
+  // Import / Export State
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importText, setImportText] = useState('');
+  const [importLoading, setImportLoading] = useState(false);
+
+  const handleDownloadProgramsTemplate = () => {
+    const headers = ['code', 'name', 'shortTitle', 'price', 'originalPrice', 'eligibility', 'quote'];
+    const sample = [
+      'RSDP', 'Reasoning Skill Development Program', 'RSDP (Reasoning)', '649', '999', '1st Graders to 10th Graders', 'Children must be taught how to think, not what to think.'
+    ];
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), sample.map(s => `"${s}"`).join(',')].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'skill_programs_template.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportProgramsCSV = () => {
+    const keys = Object.keys(programs);
+    if (keys.length === 0) {
+      showToast('No skill programs available to export.');
+      return;
+    }
+    const headers = ['Program Key', 'Code', 'Name', 'Short Title', 'Price', 'Original Price', 'Eligibility', 'Quote'];
+    const rows = keys.map(k => {
+      const p = programs[k];
+      return [
+        k,
+        p.code || '',
+        `"${(p.name || '').toString().replace(/"/g, '""')}"`,
+        `"${(p.shortTitle || '').toString().replace(/"/g, '""')}"`,
+        p.price || 0,
+        p.originalPrice || 0,
+        `"${(p.eligibility || '').toString().replace(/"/g, '""')}"`,
+        `"${(p.quote || '').toString().replace(/"/g, '""')}"`
+      ];
+    });
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `skill_programs_export_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast(`✓ Exported ${keys.length} Skill Development Programs to CSV!`);
+  };
+
+  const handleImportProgramsSubmit = () => {
+    if (!importText.trim()) {
+      alert('Please paste CSV or JSON data to import.');
+      return;
+    }
+    setImportLoading(true);
+    try {
+      let imported = {};
+      const trimmed = importText.trim();
+      if (trimmed.startsWith('{')) {
+        imported = JSON.parse(trimmed);
+      } else if (trimmed.startsWith('[')) {
+        const arr = JSON.parse(trimmed);
+        arr.forEach((item, idx) => {
+          const k = (item.code || `prog_${idx}`).toLowerCase().replace(/[^a-z0-9]/g, '');
+          imported[k] = item;
+        });
+      } else {
+        const lines = trimmed.split('\n').map(l => l.trim()).filter(Boolean);
+        if (lines.length < 2) throw new Error('CSV must contain a header row and at least 1 record.');
+        const headers = lines[0].split(',').map(h => h.replace(/^["']|["']$/g, '').trim().toLowerCase());
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.replace(/^["']|["']$/g, '').trim());
+          const obj = {};
+          headers.forEach((h, idx) => {
+            obj[h] = values[idx] || '';
+          });
+          const k = (obj.code || `prog_${i}`).toLowerCase().replace(/[^a-z0-9]/g, '');
+          imported[k] = {
+            id: `prog_${k}`,
+            code: (obj.code || 'SDP').toUpperCase(),
+            name: obj.name || 'Skill Development Program',
+            shortTitle: obj.shorttitle || obj.short_title || obj.name,
+            price: Number(obj.price) || 649,
+            originalPrice: Number(obj.originalprice || obj.original_price) || 999,
+            eligibility: obj.eligibility || '1st to 10th Graders',
+            quote: obj.quote || '',
+            accentColor: '#7c3aed',
+            badgeColor: 'bg-purple-600',
+            introParagraphs: ['Structured diagnostic skill curriculum designed to build problem-solving proficiency.'],
+            whyReasons: ['Exclusively structured for Olympiad excellence.'],
+            skillsCovered: [{ classNum: 1, text: 'Core foundation logic and visual exercises' }]
+          };
+        }
+      }
+
+      const updated = { ...programs, ...imported };
+      saveProgramsToStorage(updated);
+      setShowImportModal(false);
+      setImportText('');
+      showToast(`✓ Successfully imported ${Object.keys(imported).length} skill development programs!`);
+    } catch (err) {
+      alert(err.message || 'Failed to parse import data.');
+    } finally {
+      setImportLoading(false);
+    }
   };
 
   // Helper for Skills Covered list management
@@ -527,20 +634,44 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+              <button
+                type="button"
+                onClick={handleDownloadProgramsTemplate}
+                className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
+              >
+                <Download className="w-4 h-4 text-[#16327a]" />
+                <span>Template</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowImportModal(true)}
+                className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
+              >
+                <Upload className="w-4 h-4 text-[#16327a]" />
+                <span>Import CSV</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleExportProgramsCSV}
+                className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
+              >
+                <Download className="w-4 h-4 text-[#16327a]" />
+                <span>Export CSV</span>
+              </button>
               <button
                 type="button"
                 onClick={handleResetDefaults}
-                className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
+                className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
                 title="Reset Defaults"
               >
-                <RotateCcw className="w-4 h-4 text-[#16327a]" />
-                <span>Reset Defaults</span>
+                <RotateCcw className="w-4 h-4 text-slate-500" />
+                <span>Reset</span>
               </button>
               <button
                 type="button"
                 onClick={handleOpenNew}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30"
               >
                 <Plus className="w-4 h-4" />
                 <span>Create New Program</span>
@@ -1268,6 +1399,68 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
               <CheckCircle2 className="w-5 h-5" />
               <span>Save &amp; Publish Program Live</span>
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Skill Programs Import Modal */}
+      {showImportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 animate-in fade-in zoom-in duration-150">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-black text-[#422240] flex items-center gap-2">
+                <Upload className="w-5 h-5 text-[#7c3aed]" />
+                <span>Import Skill Development Programs (CSV / JSON)</span>
+              </h3>
+              <button onClick={() => setShowImportModal(false)} className="text-slate-400 hover:text-slate-600 font-bold cursor-pointer">✕</button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1.5">Choose CSV File</label>
+                <input
+                  type="file"
+                  accept=".csv,.json"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (evt) => setImportText(evt.target.result);
+                    reader.readAsText(file);
+                  }}
+                  className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-[#7c3aed] hover:file:bg-purple-100 cursor-pointer"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1.5">Or Paste Raw CSV / JSON Data</label>
+                <textarea
+                  rows={5}
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                  placeholder="code,name,shortTitle,price,originalPrice,eligibility,quote&#10;RSDP,Reasoning Skill Development,RSDP,649,999,1st to 10th Graders,Children must be taught how to think."
+                  className="w-full px-3 py-2 font-mono text-[11px] border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-[#7c3aed]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowImportModal(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleImportProgramsSubmit}
+                  disabled={importLoading}
+                  className="px-5 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:opacity-90 transition-opacity cursor-pointer shadow-sm disabled:opacity-50"
+                >
+                  {importLoading ? 'Importing...' : 'Upload & Save Programs'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

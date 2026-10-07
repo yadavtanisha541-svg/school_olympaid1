@@ -34,7 +34,9 @@ import {
   Info,
   Clock,
   Award,
-  AlertCircle
+  AlertCircle,
+  Download,
+  Upload
 } from 'lucide-react';
 
 export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
@@ -184,6 +186,96 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
     const filtered = faqsList.filter(item => item.id !== id);
     saveFaqsList(filtered);
     showToast('FAQ deleted successfully.');
+  };
+
+  // FAQ Import & Export Handlers
+  const [showFaqImportModal, setShowFaqImportModal] = useState(false);
+  const [faqImportText, setFaqImportText] = useState('');
+  const [faqImportLoading, setFaqImportLoading] = useState(false);
+
+  const handleDownloadFaqsTemplate = () => {
+    const headers = ['category', 'question', 'answer', 'enabled'];
+    const sample = [
+      'General & Venue', 'How can a student enroll for the Olympiad?', 'Students can enroll directly through the online student portal or through their affiliated school.', 'true'
+    ];
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), sample.map(s => `"${s}"`).join(',')].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'faqs_import_template.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportFaqsCSV = () => {
+    if (!faqsList || faqsList.length === 0) {
+      showToast('No FAQs available to export', 'error');
+      return;
+    }
+    const headers = ['ID', 'Category', 'Question', 'Answer', 'Enabled', 'Order'];
+    const rows = faqsList.map(f => [
+      f.id || '',
+      `"${(f.category || 'General').toString().replace(/"/g, '""')}"`,
+      `"${(f.q || '').toString().replace(/"/g, '""')}"`,
+      `"${(f.a || '').toString().replace(/"/g, '""')}"`,
+      f.enabled !== false ? 'true' : 'false',
+      f.order || 1
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `olympiadhub_faqs_export_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast(`Successfully exported ${faqsList.length} FAQs to CSV!`);
+  };
+
+  const handleImportFaqsSubmit = () => {
+    if (!faqImportText.trim()) {
+      showToast('Please paste CSV or JSON FAQ data to import', 'error');
+      return;
+    }
+    setFaqImportLoading(true);
+    try {
+      let imported = [];
+      const trimmed = faqImportText.trim();
+      if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+        const parsed = JSON.parse(trimmed);
+        imported = Array.isArray(parsed) ? parsed : [parsed];
+      } else {
+        const lines = trimmed.split('\n').map(l => l.trim()).filter(Boolean);
+        if (lines.length < 2) throw new Error('CSV must contain a header row and at least 1 FAQ item.');
+        const headers = lines[0].split(',').map(h => h.replace(/^["']|["']$/g, '').trim().toLowerCase());
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.replace(/^["']|["']$/g, '').trim());
+          const obj = {};
+          headers.forEach((h, idx) => {
+            obj[h] = values[idx] || '';
+          });
+          imported.push({
+            id: `faq_imp_${Date.now()}_${i}`,
+            category: obj.category || 'General & Venue',
+            q: obj.question || obj.q || 'Sample Question?',
+            a: obj.answer || obj.a || 'Sample Answer.',
+            enabled: obj.enabled !== 'false' && obj.enabled !== false,
+            order: faqsList.length + i
+          });
+        }
+      }
+      if (imported.length === 0) throw new Error('No valid FAQs found.');
+      const updated = [...faqsList, ...imported];
+      saveFaqsList(updated);
+      setShowFaqImportModal(false);
+      setFaqImportText('');
+      showToast(`Successfully imported ${imported.length} new FAQs!`);
+    } catch (err) {
+      showToast(err.message || 'Failed to parse FAQ import data', 'error');
+    } finally {
+      setFaqImportLoading(false);
+    }
   };
 
   // -------------------------------------------------------------
@@ -601,17 +693,43 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
                 </p>
               </div>
 
-              <button
-                onClick={() => {
-                  setFaqForm({ id: '', category: 'General & Venue', q: '', a: '', enabled: true });
-                  setEditingFaq(null);
-                  setIsAddingFaq(true);
-                }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-sm w-fit"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add New FAQ Question</span>
-              </button>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <button
+                  type="button"
+                  onClick={handleDownloadFaqsTemplate}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#6d3a68] bg-[#f4ebf4] hover:bg-[#ebdceb] border border-[#edd6ed] transition-colors cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5 text-[#6d3a68]" />
+                  <span>Template</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowFaqImportModal(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#6d3a68] bg-[#f4ebf4] hover:bg-[#ebdceb] border border-[#edd6ed] transition-colors cursor-pointer"
+                >
+                  <Upload className="w-3.5 h-3.5 text-[#6d3a68]" />
+                  <span>Import FAQs</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleExportFaqsCSV}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#6d3a68] bg-[#f4ebf4] hover:bg-[#ebdceb] border border-[#edd6ed] transition-colors cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5 text-[#6d3a68]" />
+                  <span>Export FAQs</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setFaqForm({ id: '', category: 'General & Venue', q: '', a: '', enabled: true });
+                    setEditingFaq(null);
+                    setIsAddingFaq(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white hover:bg-[#5c3158] transition-colors cursor-pointer shadow-sm w-fit"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add New FAQ Question</span>
+                </button>
+              </div>
             </div>
 
             {/* Filter Bar */}
@@ -771,6 +889,68 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
                 </div>
               ))}
             </div>
+
+            {/* FAQ Bulk Import Modal */}
+            {showFaqImportModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+                <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 animate-in fade-in zoom-in duration-150">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-base font-black text-[#4e2a4a] flex items-center gap-2">
+                      <Upload className="w-5 h-5 text-[#6d3a68]" />
+                      <span>Import FAQs (CSV or JSON)</span>
+                    </h3>
+                    <button onClick={() => setShowFaqImportModal(false)} className="text-slate-400 hover:text-slate-600 font-bold cursor-pointer">✕</button>
+                  </div>
+
+                  <div className="space-y-4 text-xs">
+                    <div>
+                      <label className="block font-bold text-slate-700 uppercase mb-1.5">Choose CSV File</label>
+                      <input
+                        type="file"
+                        accept=".csv,.json"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = (evt) => setFaqImportText(evt.target.result);
+                          reader.readAsText(file);
+                        }}
+                        className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-[#6d3a68] hover:file:bg-purple-100 cursor-pointer"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 uppercase mb-1.5">Or Paste Raw CSV / JSON Data</label>
+                      <textarea
+                        rows={5}
+                        value={faqImportText}
+                        onChange={(e) => setFaqImportText(e.target.value)}
+                        placeholder="category,question,answer,enabled&#10;General &amp; Venue,How to register?,Online registration is open on the portal.,true"
+                        className="w-full px-3 py-2 font-mono text-[11px] border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowFaqImportModal(false)}
+                        className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleImportFaqsSubmit}
+                        disabled={faqImportLoading}
+                        className="px-5 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:opacity-90 transition-opacity cursor-pointer shadow-sm disabled:opacity-50"
+                      >
+                        {faqImportLoading ? 'Importing...' : 'Upload & Save FAQs'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

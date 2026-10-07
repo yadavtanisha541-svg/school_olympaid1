@@ -201,7 +201,53 @@ export const QuestionBankPage = () => {
   };
 
   const handleDownloadTemplate = () => {
-    window.location.href = '/api/questions-template';
+    const headers = ['class_id', 'subject_id', 'chapter_id', 'difficulty', 'question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_option', 'marks', 'negative_marks', 'explanation'];
+    const sample = [
+      '1', '1', '', 'easy', 'What is the sum of angles in a triangle?', '90°', '180°', '270°', '360°', 'B', '1.00', '0.25', 'The interior angles of a triangle always sum up to 180 degrees.'
+    ];
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), sample.map(s => `"${s}"`).join(',')].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'question_bank_template.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportCSV = () => {
+    if (!questions || questions.length === 0) {
+      alert('No questions available to export.');
+      return;
+    }
+    const headers = ['ID', 'Class', 'Subject', 'Chapter', 'Difficulty', 'Question Text', 'Option A', 'Option B', 'Option C', 'Option D', 'Correct Option', 'Marks', 'Negative Marks', 'Explanation', 'Author'];
+    const rows = questions.map(q => [
+      q.id || '',
+      `"${(q.class_name || q.class_id || '').toString().replace(/"/g, '""')}"`,
+      `"${(q.subject_name || q.subject_id || '').toString().replace(/"/g, '""')}"`,
+      `"${(q.chapter_name || q.chapter_id || '').toString().replace(/"/g, '""')}"`,
+      q.difficulty || 'medium',
+      `"${(q.question_text || '').toString().replace(/"/g, '""')}"`,
+      `"${(q.option_a || '').toString().replace(/"/g, '""')}"`,
+      `"${(q.option_b || '').toString().replace(/"/g, '""')}"`,
+      `"${(q.option_c || '').toString().replace(/"/g, '""')}"`,
+      `"${(q.option_d || '').toString().replace(/"/g, '""')}"`,
+      q.correct_option || 'A',
+      q.marks || 1,
+      q.negative_marks || 0.25,
+      `"${(q.explanation || '').toString().replace(/"/g, '""')}"`,
+      `"${(q.author_name || user?.full_name || 'Super Admin').toString().replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `question_bank_export_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setFeedback({ type: 'success', message: `Successfully exported ${questions.length} questions to CSV!` });
   };
 
   const handleImportSubmit = async () => {
@@ -587,6 +633,14 @@ export const QuestionBankPage = () => {
             onClick={() => setShowImportModal(true)}
           >
             Import CSV
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={Download}
+            onClick={handleExportCSV}
+          >
+            Export CSV
           </Button>
           <Button
             variant="primary"

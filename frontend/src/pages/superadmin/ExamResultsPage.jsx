@@ -20,7 +20,10 @@ import {
   Layers,
   HelpCircle,
   RotateCcw,
-  Sparkles
+  Sparkles,
+  Download,
+  Upload,
+  FileSpreadsheet
 } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
@@ -44,6 +47,131 @@ export const ExamResultsPage = () => {
   const [selectedResult, setSelectedResult] = useState(null);
   const [solutions, setSolutions] = useState([]);
   const [solutionFilter, setSolutionFilter] = useState('all'); // 'all' | 'correct' | 'wrong' | 'unanswered'
+
+  // Import / Export Modal State
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importText, setImportText] = useState('');
+  const [importLoading, setImportLoading] = useState(false);
+  const [feedback, setFeedback] = useState({ type: '', message: '' });
+
+  const handleDownloadTemplate = () => {
+    const headers = ['student_name', 'student_login_id', 'school_name', 'class_name', 'exam_title', 'score', 'total_marks', 'percentage', 'passed', 'submitted_at'];
+    const sample = [
+      'Aarav Sharma', 'STU-001', 'Delhi Public School, R.K. Puram', 'Class 6', 'National Science Olympiad (NSO)', '54', '60', '90.0', '1', new Date().toISOString()
+    ];
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), sample.map(s => `"${s}"`).join(',')].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'exam_results_import_template.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportCSV = () => {
+    if (!results || results.length === 0) {
+      alert('No results available to export.');
+      return;
+    }
+    const headers = ['ID', 'Candidate Name', 'Student ID', 'School Name', 'Class', 'Exam Title', 'Score', 'Total Marks', 'Percentage (%)', 'Result Status', 'Submission Date'];
+    const rows = results.map(r => [
+      r.id || '',
+      `"${(r.student_name || '').toString().replace(/"/g, '""')}"`,
+      `"${(r.student_login_id || '').toString().replace(/"/g, '""')}"`,
+      `"${(r.school_name || '').toString().replace(/"/g, '""')}"`,
+      `"${(r.class_name || '').toString().replace(/"/g, '""')}"`,
+      `"${(r.exam_title || '').toString().replace(/"/g, '""')}"`,
+      r.score || 0,
+      r.total_marks || 60,
+      r.percentage || '0.0',
+      r.passed ? 'PASSED' : 'FAILED',
+      `"${(r.submitted_at || '').toString().replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `olympiad_exam_results_export_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setFeedback({ type: 'success', message: `Successfully exported ${results.length} candidate results to CSV!` });
+  };
+
+  const handleImportSubmit = () => {
+    if (!importText.trim()) {
+      alert('Please paste CSV or JSON result data to import.');
+      return;
+    }
+    setImportLoading(true);
+    try {
+      let imported = [];
+      const trimmed = importText.trim();
+      if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+        const parsed = JSON.parse(trimmed);
+        imported = Array.isArray(parsed) ? parsed : [parsed];
+      } else {
+        const lines = trimmed.split('\n').map(l => l.trim()).filter(Boolean);
+        if (lines.length < 2) throw new Error('CSV must have a header row and at least 1 data row.');
+        const rawHeaders = lines[0].split(',').map(h => h.replace(/^["']|["']$/g, '').trim().toLowerCase());
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.replace(/^["']|["']$/g, '').trim());
+          const obj = {};
+          rawHeaders.forEach((h, idx) => {
+            obj[h] = values[idx] || '';
+          });
+          const totalM = Number(obj.total_marks || obj.total_questions || 60);
+          const sc = Number(obj.score || 0);
+          const pct = obj.percentage || (totalM > 0 ? ((sc / totalM) * 100).toFixed(1) : '0.0');
+          imported.push({
+            id: `res_imp_${Date.now()}_${i}`,
+            student_name: obj.student_name || obj.name || 'Imported Candidate',
+            student_login_id: obj.student_login_id || obj.login_id || `IMP-${i}`,
+            school_name: obj.school_name || obj.school || 'School Candidate',
+            class_name: obj.class_name || obj.class || 'Class 6',
+            exam_title: obj.exam_title || obj.title || 'Offline Olympiad Paper',
+            score: sc,
+            total_marks: totalM,
+            percentage: pct,
+            passed: Number(pct) >= 40,
+            submitted_at: obj.submitted_at || new Date().toISOString()
+          });
+        }
+      }
+
+      if (imported.length === 0) throw new Error('No valid records found in import data.');
+
+      const existingRaw = localStorage.getItem('olympiadhub_student_attempts') || '[]';
+      let existingList = [];
+      try { existingList = JSON.parse(existingRaw); } catch(e) {}
+      const updatedList = [...imported, ...existingList];
+      localStorage.setItem('olympiadhub_student_attempts', JSON.stringify(updatedList));
+      localStorage.setItem('olympiadhub_db_results', JSON.stringify(updatedList));
+      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+
+      setShowImportModal(false);
+      setImportText('');
+      fetchResults();
+      setFeedback({ type: 'success', message: `Successfully imported ${imported.length} exam result records!` });
+    } catch (err) {
+      alert(err.message || 'Failed to parse import data. Please ensure valid CSV or JSON.');
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      setImportText(evt.target.result);
+    };
+    reader.readAsText(file);
+  };
 
   const fetchResults = async () => {
     try {
@@ -554,7 +682,41 @@ export const ExamResultsPage = () => {
             Detailed candidate performance evaluation, question-wise breakdown, and ranking analytics.
           </p>
         </div>
+
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={Download}
+            onClick={handleDownloadTemplate}
+          >
+            Template
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={Upload}
+            onClick={() => setShowImportModal(true)}
+          >
+            Import Results (CSV)
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            icon={Download}
+            onClick={handleExportCSV}
+          >
+            Export Results (CSV)
+          </Button>
+        </div>
       </div>
+
+      {feedback.message && (
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-2xl flex items-center justify-between shadow-xs">
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback({ type: '', message: '' })} className="font-bold ml-4">✕</button>
+        </div>
+      )}
 
       {/* Filter & Search Bar */}
       <div className="bg-white p-4 rounded-2xl border border-[#edd6ed] shadow-2xs space-y-3">
@@ -824,6 +986,51 @@ export const ExamResultsPage = () => {
           </div>
         )}
       </div>
+
+      {/* Bulk Results Import Modal */}
+      {showImportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 animate-in fade-in zoom-in duration-150">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-black text-[#4e2a4a] flex items-center gap-2">
+                <Upload className="w-5 h-5 text-[#6d3a68]" />
+                <span>Import Exam Results / Marks</span>
+              </h3>
+              <button onClick={() => setShowImportModal(false)} className="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1.5">Choose CSV File</label>
+                <input
+                  type="file"
+                  accept=".csv,.json"
+                  onChange={handleFileUpload}
+                  className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-[#6d3a68] hover:file:bg-purple-100 cursor-pointer"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1.5">Or Paste Raw CSV / JSON Data</label>
+                <textarea
+                  rows={5}
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                  placeholder="student_name,student_login_id,school_name,class_name,exam_title,score,total_marks,percentage,passed,submitted_at..."
+                  className="w-full px-3 py-2 font-mono text-[11px] border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-[#6d3a68]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <Button variant="secondary" size="sm" onClick={() => setShowImportModal(false)}>Cancel</Button>
+                <Button variant="primary" size="sm" loading={importLoading} onClick={handleImportSubmit}>
+                  Upload &amp; Save Results
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
