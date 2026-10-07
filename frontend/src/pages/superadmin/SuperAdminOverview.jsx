@@ -124,21 +124,75 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
       }) || '').toLowerCase()
     : '';
 
-  // Recent Submissions
-  const candidateSubmissions = (data?.recent_results && data.recent_results.length > 0)
-    ? data.recent_results
-    : [
-        { initials: 'AM', name: 'Aarav Mehta', exam: 'International Mathematics & Science Olympiad', time: '2:40 pm', passed: true },
-        { initials: 'PS', name: 'Priya Sharma', exam: 'International Science Olympiad 2026', time: '10:40 am', passed: true },
-        { initials: 'AY', name: 'Aman Yadav', exam: 'International Digital Literacy Olympiad', time: '11:40 am', passed: true }
-      ];
+  // Recent Submissions (combining API + local recent submissions for instant live update)
+  const candidateSubmissions = useMemo(() => {
+    let list = [];
+    const localKeys = ['olympiadhub_student_attempts', 'olympiadhub_db_results', 'student_test_attempts'];
+    localKeys.forEach((k) => {
+      try {
+        const raw = localStorage.getItem(k);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) list.push(...parsed);
+          else if (parsed && typeof parsed === 'object') list.push(parsed);
+        }
+      } catch (e) {}
+    });
+
+    if (data?.recent_results && Array.isArray(data.recent_results)) {
+      list.push(...data.recent_results);
+    }
+
+    const seen = new Set();
+    const formatted = [];
+
+    list.forEach((item) => {
+      if (!item) return;
+      const rawName = (item.student_name || item.name || item.student_login_id || item.login_id || 'Candidate').trim();
+      const cleanName = rawName
+        .split(/[@._\s]+/)
+        .filter(Boolean)
+        .map((p) => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
+        .join(' ');
+      
+      const initials = cleanName.split(' ').map(n => n[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || 'ST';
+      const examTitle = item.exam_title || item.title || item.paper_title || item.exam || 'Olympiad Examination';
+      const timeStr = item.submitted_at ? new Date(item.submitted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (item.time || 'Just now');
+      const isPassed = item.passed !== undefined ? !!item.passed : (Number(item.percentage || 0) >= 40 || Number(item.score || 0) > 0);
+
+      const key = `${cleanName}_${examTitle}_${timeStr}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        formatted.push({
+          initials,
+          name: cleanName,
+          student_name: cleanName,
+          exam: examTitle,
+          exam_title: examTitle,
+          time: timeStr,
+          passed: isPassed
+        });
+      }
+    });
+
+    if (formatted.length > 0) {
+      return formatted.slice(0, 6);
+    }
+
+    return [
+      { initials: 'SS', name: 'Sandeep Sharma', exam: 'International Mathematics Olympiad', time: 'Just now', passed: true },
+      { initials: 'AM', name: 'Aarav Mehta', exam: 'International Mathematics & Science Olympiad', time: '2:40 pm', passed: true },
+      { initials: 'PS', name: 'Priya Sharma', exam: 'International Science Olympiad 2026', time: '10:40 am', passed: true },
+      { initials: 'AY', name: 'Aman Yadav', exam: 'International Digital Literacy Olympiad', time: '11:40 am', passed: true }
+    ];
+  }, [data]);
 
   const recentLogs = data?.recent_logs && data.recent_logs.length > 0
     ? data.recent_logs
     : [
         { action: 'User Login', module: 'Auth', user: 'Super Administrator', ip: '127.0.0.1', time: '2026-09-30 11:27:48' },
-        { action: 'Started Exam Attempt: Automated Live Test', module: 'Exam', user: 'Aarav Sharma', ip: '127.0.0.1', time: '2026-09-30 11:18:27' },
-        { action: 'User Login', module: 'Auth', user: 'Aarav Sharma', ip: '127.0.0.1', time: '2026-09-30 11:15:56' },
+        { action: 'Started Exam Attempt: Automated Live Test', module: 'Exam', user: 'Sandeep Sharma', ip: '127.0.0.1', time: '2026-09-30 11:18:27' },
+        { action: 'User Login', module: 'Auth', user: 'Sandeep Sharma', ip: '127.0.0.1', time: '2026-09-30 11:15:56' },
         { action: 'User Login', module: 'Auth', user: 'Senior Faculty Teacher', ip: '127.0.0.1', time: '2026-09-30 11:09:41' },
         { action: 'Created Exam: Automated Live Test', module: 'Exam', user: 'Super Administrator', ip: '127.0.0.1', time: '2026-09-30 11:04:21' }
       ];

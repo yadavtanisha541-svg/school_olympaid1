@@ -207,19 +207,57 @@ export const ExamResultsPage = () => {
         if (!rawR) return;
         const totalQ = Number(rawR.total_marks || rawR.total_questions || rawR.totalQuestions || 60);
         const scoreVal = Number(rawR.score || rawR.earnedScore || 0);
-        const calcPct = rawR.percentage !== undefined && rawR.percentage !== null && !isNaN(Number(rawR.percentage))
-          ? parseFloat(rawR.percentage).toFixed(1)
-          : (totalQ > 0 ? ((scoreVal / totalQ) * 100).toFixed(1) : '0.0');
+        let rawPctVal = rawR.percentage !== undefined && rawR.percentage !== null && !isNaN(Number(rawR.percentage))
+          ? Number(rawR.percentage)
+          : null;
+
+        if (rawPctVal !== null) {
+          while (rawPctVal > 100) {
+            rawPctVal = rawPctVal / 100;
+          }
+        } else {
+          rawPctVal = totalQ > 0 ? (scoreVal / totalQ) * 100 : 0;
+        }
+        const calcPct = Math.min(100, Math.max(0, rawPctVal)).toFixed(1);
+
+        // Resolve clean student name
+        let cleanStudentName = (rawR.student_name || rawR.name || rawR.full_name || rawR.studentName || '').trim();
+        if (!cleanStudentName || cleanStudentName.toLowerCase() === 'student candidate' || cleanStudentName.toLowerCase() === 'candidate' || cleanStudentName.toLowerCase() === (rawR.student_login_id || '').toLowerCase()) {
+          try {
+            const allUsers = JSON.parse(localStorage.getItem('olympiadhub_db_users') || '[]');
+            const match = allUsers.find(u =>
+              String(u.id) === String(rawR.student_id) ||
+              String(u.login_id || '').toLowerCase() === String(rawR.student_login_id || '').toLowerCase()
+            );
+            if (match && (match.full_name || match.name)) {
+              cleanStudentName = match.full_name || match.name;
+            }
+          } catch (e) {}
+        }
+        if (!cleanStudentName || cleanStudentName.toLowerCase() === 'student candidate' || cleanStudentName.toLowerCase() === 'candidate') {
+          const base = rawR.student_login_id || rawR.student_name || 'Student Candidate';
+          cleanStudentName = base.split(/[@._\s]+/).filter(Boolean).map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
+        } else {
+          cleanStudentName = cleanStudentName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+
+        // Resolve clean school name
+        let cleanSchool = (rawR.school_name || rawR.student_school || rawR.school || '').trim();
+        if (!cleanSchool || cleanSchool === 'Independent Candidate' || cleanSchool === 'N/A' || cleanSchool === 'undefined') {
+          cleanSchool = 'Gwalior Glory High School';
+        } else {
+          cleanSchool = cleanSchool.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
 
         const r = {
           ...rawR,
           id: rawR.id || rawR.attempt_id || Date.now(),
-          student_name: rawR.student_name || rawR.name || rawR.full_name || rawR.studentName || 'Student Candidate',
+          student_name: cleanStudentName,
           student_login_id: rawR.student_login_id || rawR.login_id || rawR.studentLoginId || (rawR.student_id ? 'STU-00' + rawR.student_id : 'ID'),
           class_name: rawR.class_name || rawR.class || rawR.grade || 'Class 6',
           exam_title: rawR.exam_title || rawR.title || rawR.paper_title || rawR.examTitle || 'Olympiad Practice Test',
           subject_name: rawR.subject_name || rawR.subject || rawR.subject_code || 'Olympiad',
-          school_name: rawR.school_name || rawR.student_school || rawR.school || 'Independent Candidate',
+          school_name: cleanSchool,
           percentage: calcPct,
           score: scoreVal,
           total_marks: totalQ,

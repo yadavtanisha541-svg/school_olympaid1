@@ -997,8 +997,13 @@ export const mockEngine = {
             permissions: ['all']
           };
         } else if (foundUser) {
-          const uName = foundUser.full_name || foundUser.name || rawLoginId;
-          const uSchool = foundUser.school_name || foundUser.school || 'Delhi Public School';
+          const rawName = foundUser.full_name || foundUser.name || rawLoginId;
+          const uName = rawName
+            .split(/[@._\s]+/)
+            .filter(Boolean)
+            .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
+            .join(' ');
+          const uSchool = foundUser.school_name || foundUser.school || 'Gwalior Glory High School';
           user = {
             ...foundUser,
             name: uName,
@@ -1015,7 +1020,7 @@ export const mockEngine = {
         } else {
           // Capitalize loginId for proper display name (e.g., "sandeep" -> "Sandeep")
           const cleanName = rawLoginId
-            ? rawLoginId.split(/[@._\s]+/).filter(Boolean).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ')
+            ? rawLoginId.split(/[@._\s]+/).filter(Boolean).map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ')
             : 'Candidate Student';
 
           user = {
@@ -1030,10 +1035,14 @@ export const mockEngine = {
             class: body.class || 'Class 6',
             class_name: body.class || 'Class 6',
             grade: body.class || 'Class 6',
-            school: body.school_name || body.school || 'Delhi Public School',
-            school_name: body.school_name || body.school || 'Delhi Public School',
+            school: body.school_name || body.school || 'Gwalior Glory High School',
+            school_name: body.school_name || body.school || 'Gwalior Glory High School',
             permissions: []
           };
+
+          // Save new student to DB users
+          allUsers.push(user);
+          saveDb('users', allUsers);
         }
 
         return {
@@ -2696,17 +2705,32 @@ export const mockEngine = {
         const correctCount = Number(body.correctCount !== undefined ? body.correctCount : (body.correct_count !== undefined ? body.correct_count : score));
         const wrongCount = Number(body.wrongCount !== undefined ? body.wrongCount : (body.incorrect_count !== undefined ? body.incorrect_count : Math.max(0, totalQuestions - correctCount)));
         const unansweredCount = Number(body.unansweredCount !== undefined ? body.unansweredCount : (body.unanswered_count || 0));
-        const percentage = Number(body.percentage !== undefined ? body.percentage : (totalMarks > 0 ? (score / totalMarks) * 100 : 80));
+        
+        let calculatedPercentage = Number(body.percentage !== undefined ? body.percentage : (totalMarks > 0 ? (score / totalMarks) * 100 : 80));
+        while (calculatedPercentage > 100) {
+          calculatedPercentage = calculatedPercentage / 100;
+        }
+        calculatedPercentage = Math.min(100, Math.max(0, calculatedPercentage));
+
+        const rawStudentName = body.student_name || activeUser?.full_name || activeUser?.name || body.student_login_id || activeUser?.login_id || 'Student Candidate';
+        const formattedStudentName = rawStudentName
+          .split(/[@._\s]+/)
+          .filter(Boolean)
+          .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
+          .join(' ');
+        const studentSchool = body.school_name || body.student_school || activeUser?.school_name || activeUser?.school || 'Gwalior Glory High School';
+        const studentLoginId = body.student_login_id || activeUser?.login_id || 'STU-001';
 
         const newRes = {
           id: Date.now(),
           attempt_id: Date.now(),
           user_id: activeUser?.id || body.student_id || 2,
           student_id: activeUser?.id || body.student_id || 2,
-          student_name: activeUser?.full_name || activeUser?.name || body.student_name || 'Candidate',
-          student_login_id: activeUser?.login_id || body.student_login_id || 'STU-001',
+          student_name: formattedStudentName,
+          student_login_id: studentLoginId,
           student_email: activeUser?.email || body.student_email || '',
-          school_name: activeUser?.school_name || activeUser?.school || body.student_school || body.school_name || 'Delhi Public School',
+          school_name: studentSchool,
+          student_school: studentSchool,
           class_name: activeUser?.class_name || activeUser?.class || body.grade || body.class_name || 'Class 6',
           exam_id: body.exam_id || 1,
           exam_title: body.title || body.exam_title || (foundPaper ? foundPaper.title : 'Olympiad Exam'),
@@ -2721,9 +2745,9 @@ export const mockEngine = {
           wrong_count: wrongCount,
           unattempted_count: unansweredCount,
           unanswered_count: unansweredCount,
-          percentage: percentage,
-          accuracy: Number(body.accuracy !== undefined ? body.accuracy : Math.round(percentage)),
-          passed: percentage >= 40,
+          percentage: calculatedPercentage,
+          accuracy: Number(body.accuracy !== undefined ? body.accuracy : Math.round(calculatedPercentage)),
+          passed: calculatedPercentage >= 40,
           percentile: 98.4,
           rank: 1,
           time_taken_seconds: Number(body.timeSpentSeconds || body.time_taken_seconds || 1800),
@@ -2985,17 +3009,32 @@ export const mockEngine = {
         const correctCount = Number(body.correct_count !== undefined ? body.correct_count : (body.correctCount !== undefined ? body.correctCount : Math.round(score / (totalMarks / 10 || 1))));
         const wrongCount = Number(body.incorrect_count !== undefined ? body.incorrect_count : (body.wrongCount !== undefined ? body.wrongCount : Math.max(0, totalQuestions - correctCount)));
         const unansweredCount = Number(body.unanswered_count || body.unansweredCount || 0);
-        const percentage = Number(body.percentage !== undefined ? body.percentage : (totalMarks > 0 ? (score / totalMarks) * 100 : 80));
+
+        let calculatedPercentage = Number(body.percentage !== undefined ? body.percentage : (totalMarks > 0 ? (score / totalMarks) * 100 : 80));
+        while (calculatedPercentage > 100) {
+          calculatedPercentage = calculatedPercentage / 100;
+        }
+        calculatedPercentage = Math.min(100, Math.max(0, calculatedPercentage));
+
+        const rawStudentName = body.student_name || activeUser?.full_name || activeUser?.name || body.student_login_id || activeUser?.login_id || 'Student Candidate';
+        const formattedStudentName = rawStudentName
+          .split(/[@._\s]+/)
+          .filter(Boolean)
+          .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
+          .join(' ');
+        const studentSchool = body.school_name || body.student_school || activeUser?.school_name || activeUser?.school || 'Gwalior Glory High School';
+        const studentLoginId = body.student_login_id || activeUser?.login_id || 'STU-001';
 
         const newRes = {
           id: Date.now(),
           attempt_id: body.attempt_id || Date.now(),
           user_id: activeUser?.id || body.student_id || 2,
           student_id: activeUser?.id || body.student_id || 2,
-          student_name: activeUser?.full_name || activeUser?.name || body.student_name || 'Candidate',
-          student_login_id: activeUser?.login_id || body.student_login_id || 'STU-001',
+          student_name: formattedStudentName,
+          student_login_id: studentLoginId,
           student_email: activeUser?.email || body.student_email || '',
-          school_name: activeUser?.school_name || activeUser?.school || body.student_school || body.school_name || 'Delhi Public School',
+          school_name: studentSchool,
+          student_school: studentSchool,
           class_name: activeUser?.class_name || activeUser?.class || body.grade || body.class_name || 'Class 6',
           exam_id: body.exam_id || 1,
           exam_title: body.exam_title || body.title || (foundPaper ? foundPaper.title : 'Olympiad Exam'),
@@ -3010,9 +3049,9 @@ export const mockEngine = {
           wrong_count: wrongCount,
           unattempted_count: unansweredCount,
           unanswered_count: unansweredCount,
-          percentage: percentage,
-          accuracy: Number(body.accuracy !== undefined ? body.accuracy : Math.round(percentage)),
-          passed: percentage >= 40,
+          percentage: calculatedPercentage,
+          accuracy: Number(body.accuracy !== undefined ? body.accuracy : Math.round(calculatedPercentage)),
+          passed: calculatedPercentage >= 40,
           percentile: 98.4,
           rank: 1,
           time_taken_seconds: Number(body.time_taken_seconds || body.timeSpentSeconds || 1800),

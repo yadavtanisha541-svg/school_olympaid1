@@ -165,8 +165,21 @@ export const SubjectContentPackagesPage = ({
   // Student Attempts Persistence (Per-Paper Score & Status)
   const [studentAttempts, setStudentAttempts] = useState(() => {
     try {
+      const rawMap = localStorage.getItem('olympiadhub_student_attempts_map');
+      if (rawMap) return JSON.parse(rawMap);
       const raw = localStorage.getItem('olympiadhub_student_attempts');
-      return raw ? JSON.parse(raw) : {};
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const map = {};
+          parsed.forEach(item => {
+            if (item.paper_id) map[item.paper_id] = item;
+          });
+          return map;
+        }
+        return parsed;
+      }
+      return {};
     } catch (e) {
       return {};
     }
@@ -433,6 +446,10 @@ export const SubjectContentPackagesPage = ({
     const totalDurationSecs = (Number(liveExamPaper.duration_minutes) || 60) * 60;
     const timeSpentSecs = Math.max(10, totalDurationSecs - timeRemaining);
 
+    const studentName = user?.full_name || user?.name || (user?.login_id ? user.login_id.charAt(0).toUpperCase() + user.login_id.slice(1) : 'Sandeep Sharma');
+    const studentSchool = user?.school_name || user?.school || 'Gwalior Glory High School';
+    const studentLoginId = user?.login_id || user?.student_id || 'STU-001';
+
     const resultObj = {
       score,
       totalMarks,
@@ -446,7 +463,36 @@ export const SubjectContentPackagesPage = ({
 
     setTestResult(resultObj);
 
-    // Persist attempt to localStorage
+    const newAttemptRecord = {
+      id: 'ATT-' + Date.now(),
+      attempt_id: 'ATT-' + Date.now(),
+      paper_id: liveExamPaper.id,
+      paper_title: liveExamPaper.title,
+      title: liveExamPaper.title,
+      subject: liveExamPaper.subject_code || subject.code || 'IMO',
+      subject_code: liveExamPaper.subject_code || subject.code || 'IMO',
+      category: liveExamPaper.category || 'Mock Exam',
+      exam_name: liveExamPaper.title,
+      exam_title: liveExamPaper.title,
+      class_name: selectedClass,
+      score: score,
+      total_marks: totalMarks,
+      percentage: pct,
+      correct_count: correctCount,
+      wrong_count: wrongCount,
+      unattempted_count: unattemptedCount,
+      time_taken_seconds: timeSpentSecs,
+      submitted_at: new Date().toISOString().replace('T', ' ').substring(0, 19),
+      student_id: user?.id || 1,
+      student_name: studentName,
+      student_login_id: studentLoginId,
+      student_email: user?.email || '',
+      student_school: studentSchool,
+      school_name: studentSchool,
+      status: pct >= 40 ? 'Passed' : 'Needs Practice'
+    };
+
+    // 1. Update dict studentAttempts for quick lookup in this component
     const updatedAttempts = {
       ...studentAttempts,
       [liveExamPaper.id]: {
@@ -456,11 +502,29 @@ export const SubjectContentPackagesPage = ({
       }
     };
     setStudentAttempts(updatedAttempts);
+
+    // 2. Persist to storage for dashboards and mock engine
     try {
-      localStorage.setItem('olympiadhub_student_attempts', JSON.stringify(updatedAttempts));
+      localStorage.setItem('olympiadhub_student_attempts_map', JSON.stringify(updatedAttempts));
+      
+      const existingArray = JSON.parse(localStorage.getItem('olympiadhub_student_attempts') || '[]');
+      const safeArray = Array.isArray(existingArray) ? existingArray : [];
+      localStorage.setItem('olympiadhub_student_attempts', JSON.stringify([newAttemptRecord, ...safeArray]));
+
+      const existingResults = JSON.parse(localStorage.getItem('olympiadhub_db_results') || '[]');
+      const safeResults = Array.isArray(existingResults) ? existingResults : [];
+      localStorage.setItem('olympiadhub_db_results', JSON.stringify([newAttemptRecord, ...safeResults]));
     } catch (e) {
       console.warn('Failed to persist student attempt:', e);
     }
+
+    // 3. Post to API client and dispatch events so StudentOverview and SuperAdmin immediately update
+    try {
+      apiClient.post('/test-generator/submit', newAttemptRecord).catch(() => {});
+    } catch (e) {}
+
+    window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: newAttemptRecord }));
+    window.dispatchEvent(new Event('exam-submitted'));
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

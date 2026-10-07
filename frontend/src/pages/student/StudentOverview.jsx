@@ -153,39 +153,70 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
         if (!rawR) return;
         const totalQ = Number(rawR.total_marks || rawR.total_questions || rawR.totalQuestions || 60);
         const scoreVal = Number(rawR.score || rawR.earnedScore || 0);
-        const calcPct = rawR.percentage !== undefined && rawR.percentage !== null && !isNaN(Number(rawR.percentage))
-          ? parseFloat(rawR.percentage).toFixed(1)
-          : (totalQ > 0 ? ((scoreVal / totalQ) * 100).toFixed(1) : '0.0');
+        let rawPctVal = rawR.percentage !== undefined && rawR.percentage !== null && !isNaN(Number(rawR.percentage))
+          ? Number(rawR.percentage)
+          : null;
+
+        if (rawPctVal !== null) {
+          while (rawPctVal > 100) {
+            rawPctVal = rawPctVal / 100;
+          }
+        } else {
+          rawPctVal = totalQ > 0 ? (scoreVal / totalQ) * 100 : 0;
+        }
+        const calcPct = Math.min(100, Math.max(0, rawPctVal)).toFixed(1);
+
+        // Dynamically resolve student name in proper Title Case
+        let cleanStudentName = (rawR.student_name || rawR.name || rawR.full_name || rawR.studentName || '').trim();
+        if (!cleanStudentName || cleanStudentName.toLowerCase() === 'student candidate' || cleanStudentName.toLowerCase() === 'candidate' || cleanStudentName.toLowerCase() === (rawR.student_login_id || '').toLowerCase()) {
+          try {
+            const allUsers = JSON.parse(localStorage.getItem('olympiadhub_db_users') || '[]');
+            const match = allUsers.find(u =>
+              String(u.id) === String(rawR.student_id) ||
+              String(u.login_id || '').toLowerCase() === String(rawR.student_login_id || '').toLowerCase() ||
+              (u.email && rawR.student_email && u.email.toLowerCase() === rawR.student_email.toLowerCase())
+            );
+            if (match && (match.full_name || match.name)) {
+              cleanStudentName = match.full_name || match.name;
+            }
+          } catch (e) {}
+        }
+        if (!cleanStudentName || cleanStudentName.toLowerCase() === 'student candidate' || cleanStudentName.toLowerCase() === 'candidate') {
+          const base = rawR.student_login_id || rawR.student_name || 'Student Candidate';
+          cleanStudentName = base.split(/[@._\s]+/).filter(Boolean).map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
+        } else {
+          cleanStudentName = cleanStudentName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
 
         // Dynamically resolve the student's actual school name
-        let resolvedSchool = rawR.school_name || rawR.student_school || rawR.school;
+        let resolvedSchool = (rawR.school_name || rawR.student_school || rawR.school || '').trim();
+        if (resolvedSchool) {
+          resolvedSchool = resolvedSchool.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
         if (!resolvedSchool || resolvedSchool === 'Independent Candidate' || resolvedSchool === 'N/A' || resolvedSchool === 'undefined') {
-          // Check if it matches currently logged in user
           if (user && (user.id === rawR.student_id || user.login_id === rawR.student_login_id || user.name === rawR.student_name || user.full_name === rawR.student_name)) {
-            resolvedSchool = user.school_name || user.school || '';
+            resolvedSchool = (user.school_name || user.school || '').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
           }
 
-          // Check if found in users list in localStorage
           if (!resolvedSchool || resolvedSchool === 'Independent Candidate') {
             try {
               const allUsers = JSON.parse(localStorage.getItem('olympiadhub_db_users') || '[]');
               const match = allUsers.find(u => u.login_id === rawR.student_login_id || u.id === rawR.student_id || u.full_name === rawR.student_name || u.name === rawR.student_name);
               if (match && (match.school_name || match.school)) {
-                resolvedSchool = match.school_name || match.school;
+                resolvedSchool = (match.school_name || match.school).split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
               }
             } catch (e) {}
           }
 
-          // If still not resolved, assign school name
           if (!resolvedSchool || resolvedSchool === 'Independent Candidate') {
-            resolvedSchool = 'Delhi Public School';
+            resolvedSchool = 'Gwalior Glory High School';
           }
         }
 
         const r = {
           ...rawR,
           id: rawR.id || rawR.attempt_id || Date.now(),
-          student_name: rawR.student_name || rawR.name || rawR.full_name || rawR.studentName || 'Student Candidate',
+          student_name: cleanStudentName,
           student_login_id: rawR.student_login_id || rawR.login_id || rawR.studentLoginId || (rawR.student_id ? 'STU-00' + rawR.student_id : 'ID'),
           class_name: rawR.class_name || rawR.class || rawR.grade || 'Class 6',
           exam_title: rawR.exam_title || rawR.title || rawR.paper_title || rawR.examTitle || 'Olympiad Practice Test',
