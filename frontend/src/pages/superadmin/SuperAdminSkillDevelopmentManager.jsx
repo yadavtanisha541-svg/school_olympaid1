@@ -435,6 +435,11 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
     showToast('Program removed successfully.');
   };
 
+  const handleResetDefaults = () => {
+    saveProgramsToStorage(DEFAULT_PROGRAMS_INITIAL);
+    showToast('✓ Skill Development Programs reset to default.');
+  };
+
   // Import / Export State
   const [showImportModal, setShowImportModal] = useState(false);
   const [importText, setImportText] = useState('');
