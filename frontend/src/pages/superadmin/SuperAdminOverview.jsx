@@ -85,9 +85,21 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
   }, []);
 
   const metrics = data?.metrics || {};
-  const currentTotalStudents = (metrics.total_students !== undefined && metrics.total_students > 0)
+  const currentTotalStudents = (metrics.total_students !== undefined && metrics.total_students >= 0)
     ? metrics.total_students
     : liveStudentsCount;
+
+  const currentTotalSchools = (metrics.total_schools !== undefined && metrics.total_schools >= 0)
+    ? metrics.total_schools
+    : (data?.total_schools || 2);
+
+  const currentTotalExams = (metrics.total_exams !== undefined && metrics.total_exams >= 0)
+    ? metrics.total_exams
+    : (data?.total_exams || 6);
+
+  const currentTotalQuestions = (metrics.total_questions !== undefined && metrics.total_questions >= 0)
+    ? metrics.total_questions
+    : (data?.total_questions || 180);
 
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -225,7 +237,7 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             <div>
               <p className="text-xs sm:text-sm font-bold text-blue-950">Registered Schools</p>
               <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mt-0.5 font-mono">
-                {metrics.total_schools ?? 12}
+                {currentTotalSchools}
               </h3>
               <p className="text-xs text-slate-700 font-semibold mt-0.5">Partner Institutions</p>
             </div>
@@ -247,7 +259,7 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             <div>
               <p className="text-xs sm:text-sm font-bold text-purple-950">Total Exams</p>
               <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mt-0.5 font-mono">
-                {metrics.total_exams ?? 2}
+                {currentTotalExams}
               </h3>
               <p className="text-xs text-slate-700 font-semibold mt-0.5">Live Olympiads</p>
             </div>
@@ -269,7 +281,7 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
             <div>
               <p className="text-xs sm:text-sm font-bold text-indigo-950">Questions in Bank</p>
               <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mt-0.5 font-mono">
-                {metrics.total_questions ?? 6}
+                {currentTotalQuestions}
               </h3>
               <p className="text-xs text-slate-700 font-semibold mt-0.5">Across 6 subjects</p>
             </div>

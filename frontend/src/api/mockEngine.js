@@ -3490,29 +3490,43 @@ export const mockEngine = {
       const users = getDb('users') || [];
       const studentsList = users.filter((u) => u.role === 'student' || (!u.role && !u.is_teacher && !u.is_superadmin));
       const teachersList = users.filter((u) => u.role === 'teacher' || u.is_teacher);
-      const examsList = getDb('exams') || getDb('exam_papers') || [];
+      const schoolsList = getDb('school_registrations') || [];
+      const studentSchools = new Set(users.map(u => (u.school_name || u.school || '').trim()).filter(Boolean));
+      const totalSchoolsCount = schoolsList.length > 0 ? schoolsList.length : Math.max(studentSchools.size, 2);
+      const examsList = getDb('exams') || [];
+      const papersList = getDb('exam_papers') || [];
+      const totalExamsCount = Math.max(examsList.length + papersList.length, papersList.length, 6);
       const questionsList = getDb('questions') || [];
+      const paperQuestions = papersList.reduce((acc, p) => acc + (Array.isArray(p.questions) ? p.questions.length : 0), 0);
+      const totalQuestionsCount = Math.max(questionsList.length + paperQuestions, 180);
       const resultsList = getDb('results') || [];
+      const passedCount = resultsList.filter(r => !!r.passed || parseFloat(r.percentage || 0) >= 40).length;
+      const totalPct = resultsList.reduce((acc, r) => acc + parseFloat(r.percentage || 0), 0);
+      const avgScore = resultsList.length > 0 ? parseFloat((totalPct / resultsList.length).toFixed(1)) : 84.5;
+      const passPercentage = resultsList.length > 0 ? parseFloat(((passedCount / resultsList.length) * 100).toFixed(1)) : 92.3;
 
       return {
         success: true,
         data: {
           metrics: {
             total_students: studentsList.length,
+            total_schools: totalSchoolsCount,
             total_teachers: teachersList.length,
-            total_exams: examsList.length || 6,
-            active_exams: examsList.filter((e) => e.status === 'published').length || 6,
-            total_questions: questionsList.length || 180,
-            total_attempts: resultsList.length || 1,
-            avg_score: 84.5,
-            pass_percentage: 92.3
+            total_exams: totalExamsCount,
+            active_exams: totalExamsCount,
+            total_questions: totalQuestionsCount,
+            total_attempts: resultsList.length,
+            avg_score: avgScore,
+            pass_percentage: passPercentage
           },
           total_students: studentsList.length,
-          total_exams: examsList.length || 6,
+          total_schools: totalSchoolsCount,
+          total_exams: totalExamsCount,
+          total_questions: totalQuestionsCount,
           total_quizzes: 24,
           total_revenue: 148500,
-          active_tests: 6,
-          average_score: 84.5,
+          active_tests: totalExamsCount,
+          average_score: avgScore,
           subject_performance: [
             { subject_name: 'Mathematics (IMO)', accuracy: 88.4, color: '#3b82f6' },
             { subject_name: 'Science (NSO/ISO)', accuracy: 84.2, color: '#8b5cf6' },
