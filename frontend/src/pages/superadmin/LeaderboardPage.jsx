@@ -62,6 +62,22 @@ export const LeaderboardPage = () => {
 
   useEffect(() => {
     fetchLeaderboard();
+
+    const handleSync = () => {
+      fetchLeaderboard();
+    };
+
+    window.addEventListener('exam-submitted', handleSync);
+    window.addEventListener('olympiad-exam-submitted', handleSync);
+    window.addEventListener('olympiadhub-data-updated', handleSync);
+    window.addEventListener('storage', handleSync);
+
+    return () => {
+      window.removeEventListener('exam-submitted', handleSync);
+      window.removeEventListener('olympiad-exam-submitted', handleSync);
+      window.removeEventListener('olympiadhub-data-updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
   }, [selectedExamId]);
 
   const getRankBadge = (rank) => {

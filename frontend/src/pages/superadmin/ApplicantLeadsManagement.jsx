@@ -54,6 +54,20 @@ export const ApplicantLeadsManagement = () => {
 
   useEffect(() => {
     fetchLeads();
+
+    const handleSync = () => {
+      fetchLeads();
+    };
+
+    window.addEventListener('applicant-leads-updated', handleSync);
+    window.addEventListener('olympiadhub-data-updated', handleSync);
+    window.addEventListener('storage', handleSync);
+
+    return () => {
+      window.removeEventListener('applicant-leads-updated', handleSync);
+      window.removeEventListener('olympiadhub-data-updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
   }, []);
 
   const handleStatusChange = async (id, status) => {

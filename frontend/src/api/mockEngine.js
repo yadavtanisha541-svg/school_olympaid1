@@ -831,7 +831,79 @@ const initialStore = {
   orders: [],
   workbook_orders: [],
   coordinator_inquiries: [],
-  school_registrations: [],
+  school_registrations: [
+    {
+      id: 1,
+      registration_number: 'SR-SCH-2026-1001',
+      school_name: 'Delhi Public School, R.K. Puram',
+      principal_name: 'Dr. S. K. Mehta',
+      coordinator_name: 'Mrs. Ritu Singhal',
+      email: 'dpsrkp@olympiadhub.com',
+      phone: '+91 98101 23456',
+      city: 'New Delhi',
+      state: 'Delhi',
+      pincode: '110022',
+      estimated_students: '450',
+      status: 'approved',
+      created_at: '2026-01-10 10:00:00'
+    },
+    {
+      id: 2,
+      registration_number: 'SR-SCH-2026-1002',
+      school_name: 'National Public School, Indiranagar',
+      principal_name: 'Dr. Malathi Narayanan',
+      coordinator_name: 'Mr. Arvind Swamy',
+      email: 'npsindirangar@olympiadhub.com',
+      phone: '+91 98450 98765',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pincode: '560038',
+      estimated_students: '380',
+      status: 'pending',
+      created_at: '2026-02-12 11:30:00'
+    }
+  ],
+  applicant_leads: [
+    {
+      id: 1,
+      applicant_id: 'APP-2026-0001',
+      candidate_name: 'Aarav Sharma',
+      email: 'aarav.sharma@example.com',
+      mobile: '9876543210',
+      class_name: 'Class 6',
+      school_name: 'Delhi Public School',
+      country: 'India',
+      status: 'enrolled',
+      notes: 'Enrolled in Mathematics & Science Olympiads',
+      created_at: '2026-02-15 14:30:00'
+    },
+    {
+      id: 2,
+      applicant_id: 'APP-2026-0002',
+      candidate_name: 'Ananya Verma',
+      email: 'ananya.verma@example.com',
+      mobile: '9811223344',
+      class_name: 'Class 10',
+      school_name: 'DPS RK Puram',
+      country: 'India',
+      status: 'contacted',
+      notes: 'Interested in Cyber & Mathematics Olympiad',
+      created_at: '2026-02-16 11:20:00'
+    },
+    {
+      id: 3,
+      applicant_id: 'APP-2026-0003',
+      candidate_name: 'Kabir Patel',
+      email: 'kabir.patel@example.com',
+      mobile: '9822334455',
+      class_name: 'Class 9',
+      school_name: 'National Public School',
+      country: 'India',
+      status: 'new',
+      notes: 'Requested brochure and sample papers',
+      created_at: '2026-02-18 09:45:00'
+    }
+  ],
   settings: {
     site_name: 'OlympiadHub',
     support_email: 'support@olympiadhub.com',
@@ -888,6 +960,16 @@ function saveDb(table, data) {
       window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table, data } }));
       if (table === 'users') {
         window.dispatchEvent(new CustomEvent('students-updated', { detail: { data } }));
+      }
+      if (table === 'results') {
+        window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: { data } }));
+        window.dispatchEvent(new Event('exam-submitted'));
+      }
+      if (table === 'applicant_leads') {
+        window.dispatchEvent(new CustomEvent('applicant-leads-updated', { detail: { data } }));
+      }
+      if (table === 'school_registrations') {
+        window.dispatchEvent(new CustomEvent('schools-updated', { detail: { data } }));
       }
     }
   } catch (e) {
@@ -1044,8 +1126,311 @@ export const mockEngine = {
         return { success: true, message: 'Logged out' };
       }
 
-      if (sub === 'register-student' || sub === 'register-school') {
-        return { success: true, message: 'Registration submitted successfully!' };
+      if (sub === 'register-student' || sub === 'register') {
+        let users = getDb('users') || [];
+        const classes = getDb('academic_classes') || [];
+        const className = body.className || body.class_name || body.class || body.grade || 'Class 6';
+        const assignedClass = classes.find(c => c.name === className) || {};
+        const studentName = body.fullName || body.full_name || body.name || 'New Student';
+        const autoLoginId = body.login_id || `STU-${new Date().getFullYear()}-${String(users.length + 1).padStart(4, '0')}`;
+        const regNumber = `SR-STU-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+
+        const newUser = {
+          id: Date.now(),
+          role: 'student',
+          login_id: autoLoginId,
+          student_id: autoLoginId,
+          registration_number: regNumber,
+          full_name: studentName,
+          name: studentName,
+          email: body.email || `${autoLoginId.toLowerCase()}@olympiadhub.com`,
+          phone: body.phone || body.parentPhone || '',
+          password: body.password || 'Student@123',
+          confirm_password: body.password || 'Student@123',
+          status: 'active',
+          avatar: body.selectedAvatar || body.avatar || '',
+          school_name: body.schoolName || body.school_name || body.school || 'Independent Candidate',
+          school: body.schoolName || body.school_name || body.school || 'Independent Candidate',
+          school_address: body.schoolAddress || body.school_address || '',
+          school_pincode: body.schoolPincode || body.school_pincode || '',
+          class_id: assignedClass.id || 6,
+          class_name: className,
+          class: className,
+          grade: className,
+          section: body.section || 'A',
+          roll_number: body.roll_number || '1',
+          academic_year: '2026-2027',
+          registration_status: 'Registered',
+          dob: body.dob || '2013-05-15',
+          gender: body.gender || 'Male',
+          father_name: body.parentName || body.father_name || '',
+          mother_name: body.mother_name || '',
+          parent_name: body.parentName || body.father_name || '',
+          parent_phone: body.phone || body.parentPhone || '',
+          parent_email: body.email || '',
+          emergency_contact: body.phone || body.parentPhone || '',
+          address: body.postalAddress || body.address || '',
+          city: body.city || '',
+          state: body.state || '',
+          pincode: body.pincode || '',
+          registered_olympiads: body.selectedOlympiads || body.registered_olympiads || ['Mathematics Olympiad', 'Science Olympiad'],
+          total_amount: body.totalAmount || body.total_amount || 0,
+          created_at: new Date().toISOString()
+        };
+
+        users.unshift(newUser);
+        saveDb('users', users);
+
+        let leads = getDb('applicant_leads') || [];
+        const newLead = {
+          id: Date.now(),
+          applicant_id: `APP-${new Date().getFullYear()}-${String(leads.length + 1).padStart(4, '0')}`,
+          candidate_name: studentName,
+          email: newUser.email,
+          mobile: newUser.phone,
+          class_name: className,
+          school_name: newUser.school_name,
+          country: 'India',
+          status: 'enrolled',
+          type: 'student_registration',
+          notes: `Online Student Registration (ID: ${autoLoginId})`,
+          created_at: new Date().toISOString()
+        };
+        leads.unshift(newLead);
+        saveDb('applicant_leads', leads);
+
+        return {
+          success: true,
+          message: 'Student registered successfully',
+          data: {
+            user: newUser,
+            registration_number: regNumber,
+            login_id: autoLoginId
+          }
+        };
+      }
+
+      if (sub === 'register-school') {
+        let registrations = getDb('school_registrations') || [];
+        const regNum = `SR-SCH-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+        const newSchool = {
+          id: Date.now(),
+          registration_number: regNum,
+          school_name: body.school_name || body.schoolName || 'New School Partner',
+          principal_name: body.principal_name || body.principalName || '',
+          coordinator_name: body.coordinator_name || body.coordinatorName || '',
+          email: body.email || body.schoolEmail || '',
+          phone: body.phone || body.coordinatorPhone || '',
+          address: body.address || '',
+          city: body.city || '',
+          state: body.state || '',
+          pincode: body.pincode || '',
+          estimated_students: body.estimated_students || body.estimatedStudents || '100',
+          status: 'pending',
+          created_at: new Date().toISOString()
+        };
+        registrations.unshift(newSchool);
+        saveDb('school_registrations', registrations);
+
+        let leads = getDb('applicant_leads') || [];
+        const newLead = {
+          id: Date.now(),
+          applicant_id: `APP-SCH-${new Date().getFullYear()}-${String(leads.length + 1).padStart(4, '0')}`,
+          candidate_name: newSchool.principal_name || newSchool.coordinator_name || newSchool.school_name,
+          email: newSchool.email,
+          mobile: newSchool.phone,
+          class_name: 'School / Institution',
+          school_name: newSchool.school_name,
+          country: 'India',
+          status: 'new',
+          type: 'school_registration',
+          notes: `School Partner Application (Estimated: ${newSchool.estimated_students} students)`,
+          created_at: new Date().toISOString()
+        };
+        leads.unshift(newLead);
+        saveDb('applicant_leads', leads);
+
+        return {
+          success: true,
+          message: 'School registration submitted successfully',
+          data: {
+            registration_number: regNum,
+            school: newSchool
+          }
+        };
+      }
+    }
+
+    // APPLICANT LEADS (SUPER ADMIN & PUBLIC FORM)
+    if (root === 'applicant-leads' || (root === 'public' && sub === 'applicant-leads')) {
+      let leads = getDb('applicant_leads') || [];
+      if (method === 'GET') {
+        return { success: true, data: leads };
+      }
+      if (method === 'POST' && (sub === 'status' || subId === 'status' || cleanEndpoint.includes('/status'))) {
+        const targetId = subId === 'status' ? sub : body.id;
+        leads = leads.map(l => {
+          if (String(l.id) === String(targetId) || l.applicant_id === String(targetId)) {
+            return {
+              ...l,
+              status: body.status !== undefined ? body.status : l.status,
+              notes: body.notes !== undefined ? body.notes : l.notes
+            };
+          }
+          return l;
+        });
+        saveDb('applicant_leads', leads);
+        return { success: true, message: 'Applicant lead status updated' };
+      }
+      if (method === 'POST') {
+        const newLead = {
+          id: Date.now(),
+          applicant_id: `APP-${new Date().getFullYear()}-${String(leads.length + 1).padStart(4, '0')}`,
+          candidate_name: body.candidate_name || body.name || body.fullName || 'New Applicant',
+          email: body.email || '',
+          mobile: body.mobile || body.phone || '',
+          class_name: body.class_name || body.className || body.grade || 'Class 6',
+          school_name: body.school_name || body.schoolName || 'School',
+          country: body.country || 'India',
+          status: body.status || 'new',
+          type: body.type || 'direct_lead',
+          notes: body.notes || 'Inquiry received from website banner',
+          created_at: new Date().toISOString()
+        };
+        leads.unshift(newLead);
+        saveDb('applicant_leads', leads);
+        return { success: true, message: 'Lead submitted successfully', data: newLead };
+      }
+      if (method === 'DELETE' && sub) {
+        leads = leads.filter(l => String(l.id) !== String(sub) && l.applicant_id !== String(sub));
+        saveDb('applicant_leads', leads);
+        return { success: true, message: 'Lead deleted successfully' };
+      }
+    }
+
+    // SCHOOL MANAGEMENT
+    if (root === 'schools') {
+      let registrations = getDb('school_registrations') || [];
+      if (method === 'GET') {
+        return { success: true, data: registrations };
+      }
+      if (method === 'POST' && (subId === 'status' || sub === 'status' || cleanEndpoint.includes('/status'))) {
+        const targetId = subId === 'status' ? sub : body.id;
+        registrations = registrations.map(s => {
+          if (String(s.id) === String(targetId) || s.registration_number === String(targetId)) {
+            return { ...s, status: body.status || s.status };
+          }
+          return s;
+        });
+        saveDb('school_registrations', registrations);
+        return { success: true, message: 'School registration status updated' };
+      }
+      if (method === 'DELETE') {
+        const targetId = subId || sub;
+        registrations = registrations.filter(s => String(s.id) !== String(targetId) && s.registration_number !== String(targetId));
+        saveDb('school_registrations', registrations);
+        return { success: true, message: 'School registration deleted' };
+      }
+    }
+
+    // COORDINATOR INQUIRIES
+    if (root === 'coordinator') {
+      let inquiries = getDb('coordinator_inquiries') || [];
+      if (sub === 'inquire' && method === 'POST') {
+        const newInquiry = {
+          id: Date.now(),
+          name: body.name || body.coordinator_name || 'New Coordinator',
+          email: body.email || '',
+          phone: body.phone || '',
+          city: body.city || '',
+          state: body.state || '',
+          school_name: body.school_name || '',
+          experience: body.experience || '',
+          status: 'new',
+          created_at: new Date().toISOString()
+        };
+        inquiries.unshift(newInquiry);
+        saveDb('coordinator_inquiries', inquiries);
+        return { success: true, message: 'Coordinator inquiry submitted successfully', data: newInquiry };
+      }
+      if (sub === 'inquiries' && method === 'GET') {
+        return { success: true, data: inquiries };
+      }
+      if (method === 'POST' && (subId === 'status' || cleanEndpoint.includes('/status'))) {
+        const targetId = sub;
+        inquiries = inquiries.map(i => String(i.id) === String(targetId) ? { ...i, status: body.status || i.status } : i);
+        saveDb('coordinator_inquiries', inquiries);
+        return { success: true, message: 'Coordinator inquiry updated' };
+      }
+      if (method === 'DELETE') {
+        const targetId = subId || sub;
+        inquiries = inquiries.filter(i => String(i.id) !== String(targetId));
+        saveDb('coordinator_inquiries', inquiries);
+        return { success: true, message: 'Coordinator inquiry deleted' };
+      }
+    }
+
+    // WORKBOOKS & ORDERS
+    if (root === 'workbooks') {
+      let orders = getDb('workbook_orders') || [];
+      if (sub === 'order' && method === 'POST') {
+        const newOrder = {
+          id: Date.now(),
+          order_id: `WB-ORD-${Date.now()}`,
+          student_name: body.student_name || body.name || 'Student',
+          email: body.email || '',
+          phone: body.phone || '',
+          address: body.address || '',
+          city: body.city || '',
+          state: body.state || '',
+          pincode: body.pincode || '',
+          items: body.items || [],
+          total_amount: body.total_amount || 0,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        };
+        orders.unshift(newOrder);
+        saveDb('workbook_orders', orders);
+        return { success: true, message: 'Workbook order placed', data: newOrder };
+      }
+      if (sub === 'orders' && method === 'GET') {
+        return { success: true, data: orders };
+      }
+      if (method === 'POST' && (subId === 'status' || cleanEndpoint.includes('/status'))) {
+        const targetId = sub;
+        orders = orders.map(o => String(o.id) === String(targetId) ? { ...o, status: body.status || o.status } : o);
+        saveDb('workbook_orders', orders);
+        return { success: true, message: 'Order status updated' };
+      }
+      if (method === 'DELETE') {
+        const targetId = subId || sub;
+        orders = orders.filter(o => String(o.id) !== String(targetId));
+        saveDb('workbook_orders', orders);
+        return { success: true, message: 'Order deleted' };
+      }
+    }
+
+    // FREE TRIAL
+    if (root === 'free-trial') {
+      if (sub === 'submit' && method === 'POST') {
+        let leads = getDb('applicant_leads') || [];
+        const newLead = {
+          id: Date.now(),
+          applicant_id: `APP-FT-${new Date().getFullYear()}-${String(leads.length + 1).padStart(4, '0')}`,
+          candidate_name: body.name || body.candidate_name || 'Free Trial Student',
+          email: body.email || '',
+          mobile: body.mobile || body.phone || '',
+          class_name: body.class_name || body.className || 'Class 6',
+          school_name: body.school_name || 'Independent Candidate',
+          country: 'India',
+          status: 'new',
+          type: 'free_trial',
+          notes: `Free Trial Experience Completed (Score: ${body.score || 'N/A'})`,
+          created_at: new Date().toISOString()
+        };
+        leads.unshift(newLead);
+        saveDb('applicant_leads', leads);
+        return { success: true, message: 'Free trial submission saved', data: newLead };
       }
     }
 
@@ -2318,6 +2703,65 @@ export const mockEngine = {
         return { success: true, data: filtered };
       }
 
+      if (sub === 'submit' && method === 'POST') {
+        const results = getDb('results') || [];
+        const activeUser = JSON.parse(sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user') || '{}');
+        const allPapers = getDb('exam_papers') || [];
+        const foundPaper = allPapers.find((p) => String(p.id) === String(body.exam_id));
+
+        const totalMarks = Number(body.totalMarks || body.total_marks || (foundPaper ? foundPaper.total_marks : 60));
+        const score = Number(body.score !== undefined ? body.score : Math.round(totalMarks * 0.85));
+        const totalQuestions = Number(body.totalQuestions || body.total_questions || (Array.isArray(body.questions) ? body.questions.length : 10));
+        const correctCount = Number(body.correctCount !== undefined ? body.correctCount : (body.correct_count !== undefined ? body.correct_count : score));
+        const wrongCount = Number(body.wrongCount !== undefined ? body.wrongCount : (body.incorrect_count !== undefined ? body.incorrect_count : Math.max(0, totalQuestions - correctCount)));
+        const unansweredCount = Number(body.unansweredCount !== undefined ? body.unansweredCount : (body.unanswered_count || 0));
+        const percentage = Number(body.percentage !== undefined ? body.percentage : (totalMarks > 0 ? (score / totalMarks) * 100 : 80));
+
+        const newRes = {
+          id: Date.now(),
+          attempt_id: Date.now(),
+          user_id: activeUser?.id || body.student_id || 2,
+          student_id: activeUser?.id || body.student_id || 2,
+          student_name: activeUser?.full_name || activeUser?.name || body.student_name || 'Candidate',
+          student_login_id: activeUser?.login_id || body.student_login_id || 'STU-001',
+          student_email: activeUser?.email || body.student_email || '',
+          school_name: activeUser?.school_name || activeUser?.school || body.student_school || body.school_name || 'Delhi Public School',
+          class_name: activeUser?.class_name || activeUser?.class || body.grade || body.class_name || 'Class 6',
+          exam_id: body.exam_id || 1,
+          exam_title: body.title || body.exam_title || (foundPaper ? foundPaper.title : 'Olympiad Exam'),
+          subject: foundPaper ? (foundPaper.subject_name || foundPaper.subject_code) : (body.subject || 'General Knowledge'),
+          subject_name: foundPaper ? (foundPaper.subject_name || foundPaper.subject_code) : (body.subject || 'General Knowledge'),
+          subject_code: foundPaper ? foundPaper.subject_code : (body.subject_code || 'IGKO'),
+          score: score,
+          total_marks: totalMarks,
+          total_questions: totalQuestions,
+          correct_count: correctCount,
+          incorrect_count: wrongCount,
+          wrong_count: wrongCount,
+          unattempted_count: unansweredCount,
+          unanswered_count: unansweredCount,
+          percentage: percentage,
+          accuracy: Number(body.accuracy !== undefined ? body.accuracy : Math.round(percentage)),
+          passed: percentage >= 40,
+          percentile: 98.4,
+          rank: 1,
+          time_taken_seconds: Number(body.timeSpentSeconds || body.time_taken_seconds || 1800),
+          time_spent_seconds: Number(body.timeSpentSeconds || body.time_taken_seconds || 1800),
+          questions: Array.isArray(body.questions) ? body.questions : [],
+          submitted_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
+        };
+        results.unshift(newRes);
+        saveDb('results', results);
+
+        try {
+          const existingAttempts = JSON.parse(localStorage.getItem('olympiadhub_student_attempts') || '[]');
+          localStorage.setItem('olympiadhub_student_attempts', JSON.stringify([newRes, ...existingAttempts.filter(e => String(e.id || e.attempt_id) !== String(newRes.id))]));
+          localStorage.setItem('olympiadhub_last_submitted_exam', JSON.stringify(newRes));
+        } catch (e) {}
+
+        return { success: true, message: 'Exam submitted successfully', data: newRes };
+      }
+
       if (method === 'POST') {
         const rawQs = Array.isArray(body.questions) ? body.questions : [];
         const normQuestions = rawQs.map((q, idx) => {
@@ -2550,44 +2994,60 @@ export const mockEngine = {
         return { success: true, message: 'Saved' };
       }
       if (sub === 'submit') {
-        const results = getDb('results');
-        const allPapers = getDb('exam_papers');
+        const results = getDb('results') || [];
+        const allPapers = getDb('exam_papers') || [];
         const foundPaper = allPapers.find((p) => String(p.id) === String(body.exam_id));
         const activeUser = JSON.parse(sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user') || '{}');
-        const totalMarks = Number(body.total_marks) || (foundPaper ? foundPaper.total_marks : 60);
+        const totalMarks = Number(body.total_marks || body.totalMarks) || (foundPaper ? foundPaper.total_marks : 60);
         const score = Number(body.score !== undefined ? body.score : Math.round(totalMarks * 0.85));
-        const correctCount = Number(body.correct_count !== undefined ? body.correct_count : Math.round(score / (totalMarks / 10 || 1)));
+        const totalQuestions = Number(body.total_questions || body.totalQuestions) || totalMarks;
+        const correctCount = Number(body.correct_count !== undefined ? body.correct_count : (body.correctCount !== undefined ? body.correctCount : Math.round(score / (totalMarks / 10 || 1))));
+        const wrongCount = Number(body.incorrect_count !== undefined ? body.incorrect_count : (body.wrongCount !== undefined ? body.wrongCount : Math.max(0, totalQuestions - correctCount)));
+        const unansweredCount = Number(body.unanswered_count || body.unansweredCount || 0);
         const percentage = Number(body.percentage !== undefined ? body.percentage : (totalMarks > 0 ? (score / totalMarks) * 100 : 80));
 
         const newRes = {
           id: Date.now(),
-          attempt_id: Date.now(),
+          attempt_id: body.attempt_id || Date.now(),
           user_id: activeUser?.id || body.student_id || 2,
           student_id: activeUser?.id || body.student_id || 2,
           student_name: activeUser?.full_name || activeUser?.name || body.student_name || 'Candidate',
           student_login_id: activeUser?.login_id || body.student_login_id || 'STU-001',
           student_email: activeUser?.email || body.student_email || '',
+          school_name: activeUser?.school_name || activeUser?.school || body.student_school || body.school_name || 'Delhi Public School',
+          class_name: activeUser?.class_name || activeUser?.class || body.grade || body.class_name || 'Class 6',
           exam_id: body.exam_id || 1,
-          exam_title: body.exam_title || (foundPaper ? foundPaper.title : 'Olympiad Exam'),
+          exam_title: body.exam_title || body.title || (foundPaper ? foundPaper.title : 'Olympiad Exam'),
           subject: foundPaper ? (foundPaper.subject_name || foundPaper.subject_code) : (body.subject || 'General Knowledge'),
           subject_name: foundPaper ? (foundPaper.subject_name || foundPaper.subject_code) : (body.subject || 'General Knowledge'),
           subject_code: foundPaper ? foundPaper.subject_code : (body.subject_code || 'IGKO'),
           score: score,
           total_marks: totalMarks,
-          total_questions: Number(body.total_questions) || totalMarks,
+          total_questions: totalQuestions,
           correct_count: correctCount,
-          incorrect_count: Number(body.incorrect_count !== undefined ? body.incorrect_count : Math.max(0, totalMarks - correctCount)),
-          unattempted_count: Number(body.unanswered_count || 0),
+          incorrect_count: wrongCount,
+          wrong_count: wrongCount,
+          unattempted_count: unansweredCount,
+          unanswered_count: unansweredCount,
           percentage: percentage,
           accuracy: Number(body.accuracy !== undefined ? body.accuracy : Math.round(percentage)),
           passed: percentage >= 40,
           percentile: 98.4,
           rank: 1,
-          time_taken_seconds: Number(body.time_taken_seconds || 1800),
+          time_taken_seconds: Number(body.time_taken_seconds || body.timeSpentSeconds || 1800),
+          time_spent_seconds: Number(body.time_taken_seconds || body.timeSpentSeconds || 1800),
+          questions: Array.isArray(body.questions) ? body.questions : [],
           submitted_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
         };
         results.unshift(newRes);
         saveDb('results', results);
+
+        try {
+          const existingAttempts = JSON.parse(localStorage.getItem('olympiadhub_student_attempts') || '[]');
+          localStorage.setItem('olympiadhub_student_attempts', JSON.stringify([newRes, ...existingAttempts.filter(e => String(e.id || e.attempt_id) !== String(newRes.id))]));
+          localStorage.setItem('olympiadhub_last_submitted_exam', JSON.stringify(newRes));
+        } catch (e) {}
+
         return { success: true, message: 'Exam submitted successfully', data: newRes };
       }
     }
@@ -2595,6 +3055,17 @@ export const mockEngine = {
     // RESULTS & LEADERBOARD
     if (root === 'results') {
       const results = getDb('results') || [];
+      if (method === 'POST') {
+        const newRes = {
+          id: Date.now(),
+          attempt_id: body.attempt_id || Date.now(),
+          ...body,
+          submitted_at: body.submitted_at || new Date().toISOString().replace('T', ' ').substring(0, 19)
+        };
+        results.unshift(newRes);
+        saveDb('results', results);
+        return { success: true, message: 'Result saved successfully', data: newRes };
+      }
       if (sub && cleanEndpoint.includes('/solutions')) {
         const attemptId = String(sub).replace('/solutions', '');
         let targetAttempt = null;

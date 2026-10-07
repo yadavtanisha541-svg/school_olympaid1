@@ -47,6 +47,20 @@ export const SchoolManagement = () => {
 
   useEffect(() => {
     fetchSchools();
+
+    const handleSync = () => {
+      fetchSchools();
+    };
+
+    window.addEventListener('schools-updated', handleSync);
+    window.addEventListener('olympiadhub-data-updated', handleSync);
+    window.addEventListener('storage', handleSync);
+
+    return () => {
+      window.removeEventListener('schools-updated', handleSync);
+      window.removeEventListener('olympiadhub-data-updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
   }, []);
 
   const handleStatusChange = async (id, status) => {

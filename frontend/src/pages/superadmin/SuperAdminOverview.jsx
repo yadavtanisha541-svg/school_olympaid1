@@ -72,10 +72,14 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
 
     window.addEventListener('students-updated', handleUpdate);
     window.addEventListener('olympiadhub-data-updated', handleUpdate);
+    window.addEventListener('exam-submitted', handleUpdate);
+    window.addEventListener('olympiad-exam-submitted', handleUpdate);
     window.addEventListener('storage', handleUpdate);
     return () => {
       window.removeEventListener('students-updated', handleUpdate);
       window.removeEventListener('olympiadhub-data-updated', handleUpdate);
+      window.removeEventListener('exam-submitted', handleUpdate);
+      window.removeEventListener('olympiad-exam-submitted', handleUpdate);
       window.removeEventListener('storage', handleUpdate);
     };
   }, []);
