@@ -243,6 +243,15 @@ export const StudentManagement = () => {
 
   useEffect(() => {
     fetchStudents();
+    const handleSync = () => fetchStudents();
+    window.addEventListener('students-updated', handleSync);
+    window.addEventListener('olympiadhub-data-updated', handleSync);
+    window.addEventListener('storage', handleSync);
+    return () => {
+      window.removeEventListener('students-updated', handleSync);
+      window.removeEventListener('olympiadhub-data-updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
   }, [search]);
 
   // Statistics Calculation
