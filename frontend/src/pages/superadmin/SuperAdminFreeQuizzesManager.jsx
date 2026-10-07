@@ -58,6 +58,12 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
   const [selectedSubject, setSelectedSubject] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Modal & Edit State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState('create'); // 'create' | 'edit'
+  const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [saving, setSaving] = useState(false);
+
   // Import Modal State
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [importText, setImportText] = useState('');
