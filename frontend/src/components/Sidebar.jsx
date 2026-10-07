@@ -98,7 +98,6 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
     { id: 'superadmin_packages', label: 'Subject Model Tests & Packages', icon: BookOpen, perm: 'manage_superadmin_packages' },
     { id: 'applicant_leads', label: 'New Applicant Leads', icon: UserCheck, perm: 'manage_applicant_leads' },
     { id: 'coordinators', label: 'Coordinator Applicants', icon: UserCheck, perm: 'manage_coordinators' },
-    { id: 'workbook_orders', label: 'Workbook Orders', icon: ShoppingBag, perm: 'manage_workbook_orders' },
     { id: 'students', label: 'Student Management', icon: Users, perm: 'manage_students' },
     { id: 'roles_permissions', label: 'Roles & Permissions', icon: ShieldCheck, perm: 'manage_roles_permissions' },
     { id: 'academic', label: 'Disciplines & Subjects', icon: Layers, perm: 'manage_academic_structure' },
