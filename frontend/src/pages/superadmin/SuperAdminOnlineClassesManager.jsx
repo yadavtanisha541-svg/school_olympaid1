@@ -531,50 +531,53 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
 
   return (
     <div className="space-y-6 pb-16 font-sans max-w-7xl mx-auto">
-      {/* 1. Seamless Balanced Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="w-14 h-14 rounded-2xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-xs">
-            <Video className="w-7 h-7 text-[#80497D]" />
+      {/* 1. Header Banner & Action Bar */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-[#ebd7eb]/60">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-xs">
+            <Video className="w-6 h-6 sm:w-7 sm:h-7 text-[#80497D]" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#422240] tracking-tight">
               Online Classes &amp; Course Packages Studio
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
               Create, customize, price, and manage interactive concept batches, self-paced recorded packages, and video lectures.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 p-1 bg-slate-100/80 rounded-xl border border-slate-200/80">
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={Download}
+              onClick={handleDownloadClassesTemplate}
+            >
+              Template
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={Upload}
+              onClick={() => setShowImportModal(true)}
+            >
+              Import CSV
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={Download}
+              onClick={handleExportClassesCSV}
+            >
+              Export CSV
+            </Button>
+          </div>
+
           <Button
             variant="secondary"
-            size="md"
-            icon={Download}
-            onClick={handleDownloadClassesTemplate}
-          >
-            Template
-          </Button>
-          <Button
-            variant="secondary"
-            size="md"
-            icon={Upload}
-            onClick={() => setShowImportModal(true)}
-          >
-            Import CSV
-          </Button>
-          <Button
-            variant="secondary"
-            size="md"
-            icon={Download}
-            onClick={handleExportClassesCSV}
-          >
-            Export CSV
-          </Button>
-          <Button
-            variant="secondary"
-            size="md"
+            size="sm"
             icon={Plus}
             onClick={() => setBatchModalOpen(true)}
           >
@@ -582,7 +585,7 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
           </Button>
           <Button
             variant="secondary"
-            size="md"
+            size="sm"
             icon={Video}
             onClick={() => setLectureModalOpen(true)}
           >
@@ -590,11 +593,11 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
           </Button>
           <Button
             variant="primary"
-            size="md"
+            size="sm"
             icon={Plus}
             onClick={handleOpenCreatePackage}
           >
-            Create Course Package
+            + Create Course Package
           </Button>
         </div>
       </div>
