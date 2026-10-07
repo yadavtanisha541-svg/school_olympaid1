@@ -211,6 +211,8 @@ export const UserManagement = ({ mode = 'teachers' }) => {
           message: `${formData.role === 'teacher' ? 'Teacher' : 'Student'} created successfully! Login ID: ${res.data.login_id}`
         });
         setShowCreateModal(false);
+        window.dispatchEvent(new CustomEvent('students-updated'));
+        window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
         fetchData();
       }
     } catch (err) {
@@ -346,12 +348,16 @@ export const UserManagement = ({ mode = 'teachers' }) => {
         setSelectedUserDetail(null);
       }
       setFeedback({ type: 'success', message: `User ${user.full_name || ''} deleted successfully.` });
+      window.dispatchEvent(new CustomEvent('students-updated'));
+      window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
       fetchData();
     } catch (err) {
       console.error('Delete error:', err);
       if (selectedUserDetail && selectedUserDetail.id === user.id) {
         setSelectedUserDetail(null);
       }
+      window.dispatchEvent(new CustomEvent('students-updated'));
+      window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
       fetchData();
     }
   };

@@ -504,13 +504,21 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
 
     const targetPaper = getMatchingPaper(selectedGrade, selectedSubject);
     const token = apiClient.getToken();
+    const cleanStudentName = (user?.full_name || user?.name || user?.login_id || 'Student Candidate')
+      .split(/[@._\s]+/)
+      .filter(Boolean)
+      .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
+      .join(' ');
+    const cleanSchoolName = user?.school_name || user?.school || 'Gwalior Glory High School';
+    const cleanLoginId = user?.login_id || 'STU-001';
+
     const payload = {
       exam_id: targetPaper?.id || null,
       student_id: user?.id || null,
-      student_name: user?.full_name || user?.name || null,
-      student_login_id: user?.login_id || null,
+      student_name: cleanStudentName,
+      student_login_id: cleanLoginId,
       student_email: user?.email || null,
-      student_school: user?.school_name || user?.school || null,
+      student_school: cleanSchoolName,
       student_class: user?.class_name || selectedGrade,
       subject: selectedSubject,
       grade: selectedGrade,
@@ -551,11 +559,11 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       time_taken_seconds: timeSpentSec,
       submitted_at: new Date().toISOString().replace('T', ' ').substring(0, 19),
       student_id: user?.id || 1,
-      student_name: user?.full_name || user?.name || 'Candidate',
-      student_login_id: user?.login_id || 'STU-001',
+      student_name: cleanStudentName,
+      student_login_id: cleanLoginId,
       student_email: user?.email || '',
-      student_school: user?.school_name || user?.school || 'Delhi Public School',
-      school_name: user?.school_name || user?.school || 'Delhi Public School',
+      student_school: cleanSchoolName,
+      school_name: cleanSchoolName,
       class_name: user?.class_name || selectedGrade,
       questions: formattedQuestions
     };

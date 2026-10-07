@@ -316,11 +316,15 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
         subject_code: sessionData?.exam?.subject_code || 'IMO',
         class_name: user?.class_name || sessionData?.exam?.class_name || 'Class 6',
         student_id: user?.id || sessionData?.student?.id || 1,
-        student_name: user?.full_name || user?.name || sessionData?.student?.full_name || 'Student Candidate',
+        student_name: (user?.full_name || user?.name || sessionData?.student?.full_name || sessionData?.student?.name || user?.login_id || 'Student Candidate')
+          .split(/[@._\s]+/)
+          .filter(Boolean)
+          .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
+          .join(' '),
         student_login_id: user?.login_id || sessionData?.student?.login_id || 'STU-001',
         student_email: user?.email || '',
-        student_school: user?.school_name || user?.school || user?.schoolName || 'Delhi Public School',
-        school_name: user?.school_name || user?.school || user?.schoolName || 'Delhi Public School',
+        student_school: user?.school_name || user?.school || user?.schoolName || sessionData?.student?.school_name || 'Gwalior Glory High School',
+        school_name: user?.school_name || user?.school || user?.schoolName || sessionData?.student?.school_name || 'Gwalior Glory High School',
         total_questions: qList.length,
         total_marks: totalMarks,
         score: earnedScore,

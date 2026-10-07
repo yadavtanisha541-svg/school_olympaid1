@@ -490,11 +490,15 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
       time_taken_seconds: timeSpentSec,
       submitted_at: new Date().toISOString().replace('T', ' ').substring(0, 19),
       student_id: user?.id || 1,
-      student_name: user?.full_name || user?.name || 'Candidate',
+      student_name: (user?.full_name || user?.name || user?.login_id || 'Student Candidate')
+        .split(/[@._\s]+/)
+        .filter(Boolean)
+        .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
+        .join(' '),
       student_login_id: user?.login_id || 'STU-001',
       student_email: user?.email || '',
-      student_school: user?.school_name || user?.school || 'Delhi Public School',
-      school_name: user?.school_name || user?.school || 'Delhi Public School',
+      student_school: user?.school_name || user?.school || 'Gwalior Glory High School',
+      school_name: user?.school_name || user?.school || 'Gwalior Glory High School',
       class_name: selectedClass,
       questions: detailedBreakdown
     };

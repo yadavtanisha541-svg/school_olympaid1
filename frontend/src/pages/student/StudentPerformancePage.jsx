@@ -153,7 +153,11 @@ export const StudentPerformancePage = ({ onNavigateTab, onViewResult }) => {
           const score = parseFloat(att.score !== undefined ? att.score : (att.correct_count || 0));
           const correct = parseInt(att.correct_count !== undefined ? att.correct_count : Math.round(score));
           const wrong = parseInt(att.incorrect_count !== undefined ? att.incorrect_count : (att.wrong_count !== undefined ? att.wrong_count : Math.max(0, totalQ - correct)));
-          const pct = parseFloat(att.percentage !== undefined ? att.percentage : (totalQ > 0 ? (score / totalQ) * 100 : 0));
+          let pct = parseFloat(att.percentage !== undefined ? att.percentage : (totalQ > 0 ? (score / totalQ) * 100 : 0));
+          while (pct > 100) {
+            pct = pct / 100;
+          }
+          pct = Math.min(100, Math.max(0, pct));
 
           uniqueAttempts.push({
             id: uid,
