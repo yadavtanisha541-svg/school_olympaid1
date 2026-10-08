@@ -92,7 +92,6 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
   const superAdminNav = [
     { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, perm: 'access_superadmin_dashboard' },
     { id: 'payment_bank_manager', label: 'Payment, QR & Orders', icon: CreditCard, perm: 'manage_payments_qr' },
-    { id: 'online_classes_manager', label: 'Online Classes Studio', icon: Video, perm: 'manage_online_classes' },
     { id: 'skill_programs_manager', label: 'Skill Programs Studio', icon: Rocket, perm: 'manage_skill_programs' },
     { id: 'superadmin_packages', label: 'Subject Model Tests & Packages', icon: BookOpen, perm: 'manage_superadmin_packages' },
     { id: 'applicant_leads', label: 'New Applicant Leads', icon: UserCheck, perm: 'manage_applicant_leads' },
