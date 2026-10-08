@@ -952,11 +952,11 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. SECTION: FEATURED PRACTICE & QUIZ BANNERS (Harmonized 2-Col Grid)      */}
+      {/* 3. SECTION: FEATURED PRACTICE BANNER                                      */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2">
-        {/* Left Banner: Practice Tests & Mock Exams */}
-        <div className="bg-gradient-to-r from-pink-200/95 via-purple-200/90 to-blue-200/95 rounded-3xl border-2 border-pink-400/90 hover:border-pink-500 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-4 text-slate-900">
+      <div className="pt-2">
+        {/* Banner: Practice Tests & Mock Exams */}
+        <div className="bg-gradient-to-r from-pink-200/95 via-purple-200/90 to-blue-200/95 rounded-3xl border-2 border-pink-400/90 hover:border-pink-500 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-slate-900">
           <div className="flex items-start gap-3.5 min-w-0">
             <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 flex items-center justify-center shadow-pink-300 shadow-sm shrink-0 text-white border border-white/40">
               <div className="relative">
@@ -978,7 +978,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2 border-t border-pink-300/60 mt-auto">
+          <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-pink-300/60 shrink-0">
             <span className="text-[11px] font-bold text-pink-900">Class 1 – 12 • All Subjects</span>
             <button
               type="button"
@@ -986,39 +986,6 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               className="px-4 py-2 bg-gradient-to-r from-pink-600 via-rose-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-xs hover:shadow-sm active:scale-95 cursor-pointer shrink-0 flex items-center gap-1.5 border border-pink-600"
             >
               <span>START PRACTICE</span>
-              <ArrowRight className="w-3.5 h-3.5 text-white" />
-            </button>
-          </div>
-        </div>
-
-        {/* Right Banner: Spotlight IGKO Quiz */}
-        <div className="bg-gradient-to-r from-amber-200/95 via-orange-200/90 to-rose-200/95 rounded-3xl border-2 border-amber-400/90 hover:border-amber-500 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-4 text-slate-900">
-          <div className="flex items-start gap-3.5 min-w-0">
-            <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 flex items-center justify-center shadow-amber-300 shadow-sm shrink-0 text-white border border-white/40">
-              <FileText className="w-7 h-7 text-white" />
-            </div>
-
-            <div className="min-w-0 space-y-1">
-              <span className="inline-block px-2.5 py-0.5 rounded-md bg-amber-300/90 text-amber-950 text-[10px] font-black uppercase tracking-wider border border-amber-400">
-                DAILY SPOTLIGHT
-              </span>
-              <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-snug truncate">
-                Spotlight: IGKO Quiz &amp; Knowledge
-              </h3>
-              <p className="text-xs text-slate-700 font-semibold line-clamp-2 leading-relaxed">
-                Test your general knowledge with curated questions and boost Olympiad rank.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-2 border-t border-amber-300/60 mt-auto">
-            <span className="text-[11px] font-bold text-amber-900">Instant Score &amp; Explanations</span>
-            <button
-              type="button"
-              onClick={() => onNavigateTab('free_quizzes')}
-              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-xs hover:shadow-sm active:scale-95 cursor-pointer shrink-0 flex items-center gap-1.5 border border-amber-500"
-            >
-              <span>OPEN QUIZ</span>
               <ArrowRight className="w-3.5 h-3.5 text-white" />
             </button>
           </div>
