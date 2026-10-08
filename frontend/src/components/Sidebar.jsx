@@ -563,22 +563,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
 
 
-                {/* FREE Quizzes */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    onSelectTab('free_quizzes');
-                    if (onClose) onClose();
-                  }}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
-                    currentTab === 'free_quizzes'
-                      ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
-                      : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
-                  }`}
-                >
-                  <HelpCircle className="w-5 h-5 text-slate-400 shrink-0" />
-                  <span>FREE Quizzes</span>
-                </button>
+
               </div>
             </div>
           )}
