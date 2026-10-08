@@ -24,6 +24,8 @@ import {
   BookOpen,
   Sparkles,
   Download,
+  Upload,
+  FileSpreadsheet,
   Printer,
   Flame,
   Percent,
@@ -89,6 +91,273 @@ const PAPER_CATEGORIES = [
   { id: 'mock_test', label: '📝 Mock Test Series' },
   { id: 'test_generator', label: '⚡ Test Generator Pro' }
 ];
+
+// Sample questions format template for 1-click loading in Super Admin
+export const SAMPLE_MOCK_TEST_QUESTIONS = `Q1. If 3x + 15 = 45, what is the value of 2x - 5?
+A) 15
+B) 20
+C) 25
+D) 30
+Correct: A
+Marks: 1
+Section: General Awareness
+Explanation: 3x + 15 = 45 => 3x = 30 => x = 10. Then 2(10) - 5 = 20 - 5 = 15.
+
+Q2. What is the official national currency of Japan?
+A) Yuan
+B) Yen
+C) Won
+D) Ringgit
+Correct: B
+Marks: 1
+Section: General Awareness
+Explanation: The Japanese Yen is the official currency of Japan.
+
+Q3. Who is celebrated as the inventor of the World Wide Web (WWW) in 1989?
+A) Sir Tim Berners-Lee
+B) Bill Gates
+C) Steve Jobs
+D) Alan Turing
+Correct: A
+Marks: 1
+Section: Achievers Section
+Explanation: Sir Tim Berners-Lee invented the World Wide Web while at CERN in 1989.
+
+Q4. Which planet is famously known as the "Red Planet" due to iron oxide on its surface?
+A) Venus
+B) Mars
+C) Jupiter
+D) Mercury
+Correct: B
+Marks: 1
+Section: General Awareness
+Explanation: Mars appears reddish because of pervasive iron oxide minerals on its terrain.`;
+
+// Universal multi-format intelligent question parser (Handles Plain text, Q1..Qn, JSON, and CSV)
+export const parseAnyQuestionsInput = (rawInput, defaultSection = 'General Awareness') => {
+  if (!rawInput || !rawInput.trim()) return [];
+  const text = rawInput.trim();
+
+  // 1. JSON Array or Object
+  if ((text.startsWith('[') && text.endsWith(']')) || (text.startsWith('{') && text.endsWith('}'))) {
+    try {
+      const parsed = JSON.parse(text);
+      const list = Array.isArray(parsed) ? parsed : (parsed.questions || parsed.data || [parsed]);
+      if (Array.isArray(list) && list.length > 0) {
+        return list.map((item, idx) => {
+          let opts = ['', '', '', ''];
+          if (Array.isArray(item.options)) {
+            opts = [item.options[0] || '', item.options[1] || '', item.options[2] || '', item.options[3] || ''];
+          } else {
+            opts = [
+              item.option_a || item.a || item.optA || '',
+              item.option_b || item.b || item.optB || '',
+              item.option_c || item.c || item.optC || '',
+              item.option_d || item.d || item.optD || ''
+            ];
+          }
+          opts = opts.map((o, oIdx) => o ? String(o).trim() : `Option ${String.fromCharCode(65 + oIdx)}`);
+
+          let correct = 0;
+          if (typeof item.correct === 'number') {
+            correct = Math.max(0, Math.min(3, item.correct));
+          } else {
+            const cStr = String(item.correct_option || item.correct || item.answer || item.ans || 'A').toUpperCase().trim();
+            const idxMatch = ['A', 'B', 'C', 'D'].indexOf(cStr);
+            if (idxMatch >= 0) correct = idxMatch;
+            else if (!isNaN(parseInt(cStr))) correct = Math.max(0, Math.min(3, parseInt(cStr) - 1));
+          }
+
+          return {
+            id: Date.now() + idx,
+            section: item.section || defaultSection,
+            q: String(item.q || item.question || item.question_text || item.title || `Question ${idx + 1}`).trim(),
+            options: opts,
+            correct,
+            marks: Number(item.marks || item.points || 1) || 1,
+            explanation: String(item.explanation || item.solution || item.hint || '').trim()
+          };
+        }).filter(q => q.q.length > 0);
+      }
+    } catch (e) {
+      // Fall through to text/csv parser
+    }
+  }
+
+  // 2. CSV format
+  const rawLines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (rawLines.length > 1 && rawLines[0].includes(',') && (rawLines[0].toLowerCase().includes('question') || rawLines[0].toLowerCase().includes('option') || rawLines[0].toLowerCase().includes('class'))) {
+    try {
+      const parseCSVLine = (line) => {
+        const result = [];
+        let curr = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"' && line[i + 1] === '"') {
+            curr += '"';
+            i++;
+          } else if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            result.push(curr.trim());
+            curr = '';
+          } else {
+            curr += char;
+          }
+        }
+        result.push(curr.trim());
+        return result;
+      };
+
+      const parsedCsv = [];
+      for (let i = 1; i < rawLines.length; i++) {
+        const parts = parseCSVLine(rawLines[i]);
+        if (parts.length >= 2) {
+          const qText = parts[0] || parts[3] || parts[4] || '';
+          const optA = parts[1] || parts[5] || 'Option A';
+          const optB = parts[2] || parts[6] || 'Option B';
+          const optC = parts[3] || parts[7] || 'Option C';
+          const optD = parts[4] || parts[8] || 'Option D';
+          let corr = 0;
+          const corrStr = String(parts[5] || parts[9] || '0').toUpperCase().trim();
+          if (['A', 'B', 'C', 'D'].includes(corrStr)) corr = ['A', 'B', 'C', 'D'].indexOf(corrStr);
+          else if (!isNaN(parseInt(corrStr))) corr = Math.max(0, Math.min(3, parseInt(corrStr)));
+
+          if (qText) {
+            parsedCsv.push({
+              id: Date.now() + i,
+              section: parts[10] || defaultSection,
+              q: qText,
+              options: [optA, optB, optC, optD],
+              correct: corr,
+              marks: Number(parts[11]) || 1,
+              explanation: parts[12] || ''
+            });
+          }
+        }
+      }
+      if (parsedCsv.length > 0) return parsedCsv;
+    } catch (err) {
+      // Fallback
+    }
+  }
+
+  // 3. Robust Text Parser (Supports Q1., 1., double-newlines, inline options, and plain single/multi-line questions)
+  let rawBlocks = text.split(/(?:\r?\n\s*\r?\n)|(?=(?:^|\n)\s*(?:Q\d*[\.:\)]|Question\s*\d*[\.:\)]|\d+[\.\)]\s+[A-Z]))/im);
+  rawBlocks = rawBlocks.map(b => b.trim()).filter(Boolean);
+
+  if (rawBlocks.length === 0) {
+    rawBlocks = [text];
+  }
+
+  const results = [];
+
+  rawBlocks.forEach((blk, idx) => {
+    const bLines = blk.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    if (bLines.length === 0) return;
+
+    let questionStatement = '';
+    const options = ['', '', '', ''];
+    let correct = 0;
+    let explanation = '';
+    let marks = 1;
+    let section = defaultSection;
+
+    const remainingLines = [];
+
+    bLines.forEach((l) => {
+      const optMatch = l.match(/^(?:[\(\[]?([A-Da-d1-4])[\.\)\]\:\-]|Option\s+([A-Da-d1-4])[\:\.\-]?)\s*(.+)$/i);
+      const ansMatch = l.match(/^(?:Answer|Ans|Correct(?:\s*Option)?|Key|Right\s*Answer)[\:\s\-]+([A-Da-d1-4]|.+)/i);
+      const expMatch = l.match(/^(?:Explanation|Solution|Hint|Reason|Note)[\:\s\-]+(.+)$/i);
+      const marksMatch = l.match(/^(?:Marks|Mark|Points|Score)[\:\s\-]+(\d+)/i);
+      const secMatch = l.match(/^(?:Section|Sec|Topic|Category)[\:\s\-]+(.+)$/i);
+
+      if (ansMatch) {
+        const val = ansMatch[1].toUpperCase().trim();
+        if (['A', 'B', 'C', 'D'].includes(val)) {
+          correct = ['A', 'B', 'C', 'D'].indexOf(val);
+        } else if (['1', '2', '3', '4'].includes(val)) {
+          correct = parseInt(val) - 1;
+        } else {
+          if (val.includes('B')) correct = 1;
+          else if (val.includes('C')) correct = 2;
+          else if (val.includes('D')) correct = 3;
+          else correct = 0;
+        }
+      } else if (expMatch) {
+        explanation = expMatch[1].trim();
+      } else if (marksMatch) {
+        marks = Number(marksMatch[1]) || 1;
+      } else if (secMatch) {
+        section = secMatch[1].trim();
+      } else if (optMatch) {
+        const optLetter = (optMatch[1] || optMatch[2]).toUpperCase();
+        const optText = optMatch[3].trim();
+        let targetIdx = -1;
+        if (['A', 'B', 'C', 'D'].includes(optLetter)) targetIdx = ['A', 'B', 'C', 'D'].indexOf(optLetter);
+        else if (['1', '2', '3', '4'].includes(optLetter)) targetIdx = parseInt(optLetter) - 1;
+        if (targetIdx >= 0) options[targetIdx] = optText;
+      } else {
+        remainingLines.push(l);
+      }
+    });
+
+    if (remainingLines.length > 0) {
+      let firstLine = remainingLines[0].replace(/^(?:Q\d*[\.:\)]|Question\s*\d*[\.:\)]|\d+[\.\)]|Problem\s*\d*[\.:\)])\s*/i, '').trim();
+      questionStatement = firstLine || remainingLines[0];
+
+      const isOptionsEmpty = options.every(o => !o);
+      if (isOptionsEmpty && remainingLines.length >= 5) {
+        options[0] = remainingLines[1];
+        options[1] = remainingLines[2];
+        options[2] = remainingLines[3];
+        options[3] = remainingLines[4];
+        if (remainingLines.length > 5 && !explanation) {
+          explanation = remainingLines.slice(5).join(' ');
+        }
+      } else if (remainingLines.length > 1) {
+        if (!options.some(o => o.length > 0)) {
+          questionStatement += ' ' + remainingLines.slice(1).join(' ');
+        }
+      }
+    }
+
+    // Check for inline options (e.g. "A) 15 B) 20 C) 25 D) 30")
+    if (options.every(o => !o)) {
+      const inlineMatches = [...questionStatement.matchAll(/(?:^|\s)(?:[\(\[]?([A-D])[\.\)\]\:\-])\s*([^A-D\n\(\[]+)/gi)];
+      if (inlineMatches.length >= 2) {
+        inlineMatches.forEach(m => {
+          const letter = m[1].toUpperCase();
+          const textVal = m[2].trim();
+          const optIdx = ['A', 'B', 'C', 'D'].indexOf(letter);
+          if (optIdx >= 0) options[optIdx] = textVal;
+        });
+        const firstOptIndex = questionStatement.search(/(?:^|\s)(?:[\(\[]?[A-D][\.\)\]\:\-])/i);
+        if (firstOptIndex > 0) {
+          questionStatement = questionStatement.substring(0, firstOptIndex).trim();
+        }
+      }
+    }
+
+    // Assign fallback labels for missing options
+    const finalOptions = options.map((opt, oIdx) => opt ? opt.trim() : `Option ${String.fromCharCode(65 + oIdx)}`);
+
+    if (questionStatement.trim().length > 0) {
+      results.push({
+        id: Date.now() + idx,
+        section: section || defaultSection,
+        q: questionStatement.trim(),
+        options: finalOptions,
+        correct,
+        marks,
+        explanation: explanation.trim()
+      });
+    }
+  });
+
+  return results;
+};
 
 export const SuperAdminPackagesManager = () => {
   const { user } = useAuth();
@@ -434,61 +703,48 @@ export const SuperAdminPackagesManager = () => {
     }
   };
 
-  // Bulk Parse Helper
+  // Bulk Parse Helper with Universal Intelligent Parsing
   const handleParseBulkQuestions = () => {
-    if (!bulkQuestionsInput.trim()) return;
-    const blocks = bulkQuestionsInput.split(/\n(?=Q\d+[\.:\s])/i);
-    const parsed = [];
-    blocks.forEach((blk, idx) => {
-      const lines = blk.trim().split('\n');
-      if (lines.length < 2) return;
-      const qLine = lines[0].replace(/^Q\d+[\.:\s]*/i, '').trim();
-      let optA = '', optB = '', optC = '', optD = '';
-      let correct = 0;
-      let exp = '';
-      let marks = 1;
-      let section = paperSections[0] || 'General Awareness';
-
-      lines.slice(1).forEach((l) => {
-        const tr = l.trim();
-        if (/^A[\)\.:\s]/i.test(tr)) optA = tr.replace(/^A[\)\.:\s]*/i, '').trim();
-        else if (/^B[\)\.:\s]/i.test(tr)) optB = tr.replace(/^B[\)\.:\s]*/i, '').trim();
-        else if (/^C[\)\.:\s]/i.test(tr)) optC = tr.replace(/^C[\)\.:\s]*/i, '').trim();
-        else if (/^D[\)\.:\s]/i.test(tr)) optD = tr.replace(/^D[\)\.:\s]*/i, '').trim();
-        else if (/^Correct[\:\s]*/i.test(tr)) {
-          const ans = tr.replace(/^Correct[\:\s]*/i, '').trim().toUpperCase();
-          if (ans.includes('B')) correct = 1;
-          else if (ans.includes('C')) correct = 2;
-          else if (ans.includes('D')) correct = 3;
-          else correct = 0;
-        } else if (/^Explanation[\:\s]*/i.test(tr)) {
-          exp = tr.replace(/^Explanation[\:\s]*/i, '').trim();
-        } else if (/^Marks[\:\s]*/i.test(tr)) {
-          marks = Number(tr.replace(/^Marks[\:\s]*/i, '').trim()) || 1;
-        } else if (/^Section[\:\s]*/i.test(tr)) {
-          section = tr.replace(/^Section[\:\s]*/i, '').trim();
-        }
-      });
-
-      parsed.push({
-        id: (paperQuestions.length || 0) + idx + 1,
-        section: section || paperSections[0] || 'General Awareness',
-        q: qLine,
-        options: [optA || 'Option A', optB || 'Option B', optC || 'Option C', optD || 'Option D'],
-        correct,
-        marks,
-        explanation: exp
-      });
-    });
+    if (!bulkQuestionsInput.trim()) {
+      showToast('Please paste or type your questions first.', 'info');
+      return;
+    }
+    const defaultSec = paperSections[0] || 'General Awareness';
+    const parsed = parseAnyQuestionsInput(bulkQuestionsInput, defaultSec);
 
     if (parsed.length > 0) {
-      setPaperQuestions([...paperQuestions, ...parsed]);
+      const startId = paperQuestions.length;
+      const mapped = parsed.map((p, i) => ({
+        ...p,
+        id: Date.now() + i,
+        section: p.section || defaultSec
+      }));
+      setPaperQuestions([...paperQuestions, ...mapped]);
       setBulkQuestionsInput('');
       setPaperModalTab('questions');
-      showToast(`✓ Successfully imported ${parsed.length} questions!`);
+      setActiveQuestionIndex(startId); // Focus newly added question
+      showToast(`✓ Successfully imported ${mapped.length} questions!`);
     } else {
-      showToast('Could not parse questions. Please check the sample format.', 'error');
+      showToast('Could not parse questions. Click "Load Sample Format Template" to see the format.', 'error');
     }
+  };
+
+  // Bulk File Upload Helper (.txt, .csv, .json)
+  const handleBulkFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const content = ev.target?.result || '';
+      setBulkQuestionsInput(content);
+      const detected = parseAnyQuestionsInput(content, paperSections[0] || 'General Awareness');
+      if (detected.length > 0) {
+        showToast(`✓ Loaded "${file.name}" (${detected.length} questions detected). Click "Parse & Add" to import.`);
+      } else {
+        showToast(`Loaded "${file.name}". Click "Parse & Add All Questions" below.`);
+      }
+    };
+    reader.readAsText(file);
   };
 
   // Add a blank question
@@ -1102,6 +1358,16 @@ export const SuperAdminPackagesManager = () => {
                     <Plus className="w-4 h-4" />
                     <span>Add Question</span>
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaperModalTab('bulk')}
+                    className="px-3.5 h-9 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-black flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs transition-all"
+                    title="Bulk Import / Paste Multiple Questions"
+                  >
+                    <Upload className="w-3.5 h-3.5 text-purple-600" />
+                    <span>⚡ Bulk Import</span>
+                  </button>
                 </div>
 
                 <div className="shrink-0 text-xs font-bold text-slate-500">
@@ -1116,16 +1382,26 @@ export const SuperAdminPackagesManager = () => {
                   </div>
                   <h3 className="text-base font-black text-slate-800">No Questions Added Yet</h3>
                   <p className="text-xs text-slate-500 max-w-md mx-auto">
-                    Click the button below to add your first question one by one, or use the bulk paste tab.
+                    Add questions one by one manually, or use the fast bulk import tool to paste all questions at once.
                   </p>
-                  <button
-                    type="button"
-                    onClick={handleAddBlankQuestion}
-                    className="px-5 py-2.5 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white font-black text-xs cursor-pointer shadow-md inline-flex items-center gap-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>+ Add First Question</span>
-                  </button>
+                  <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={handleAddBlankQuestion}
+                      className="px-5 py-2.5 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white font-black text-xs cursor-pointer shadow-md inline-flex items-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>+ Add Blank Question</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaperModalTab('bulk')}
+                      className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-xs cursor-pointer shadow-md inline-flex items-center gap-2"
+                    >
+                      <Upload className="w-4 h-4" />
+                      <span>⚡ Fast Bulk Import (Paste / File)</span>
+                    </button>
+                  </div>
                 </div>
               ) : (
                 /* Active Question Editor Card */
@@ -1318,48 +1594,97 @@ export const SuperAdminPackagesManager = () => {
           {/* TAB 3: BULK IMPORT */}
           {paperModalTab === 'bulk' && (
             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
-              <div>
-                <h3 className="text-base font-black text-slate-900">Fast Bulk Questions Import Studio</h3>
-                <p className="text-xs text-slate-500">
-                  Paste multiple questions in text format below to automatically parse and add them all to this mock test.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                <div>
+                  <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-[#859900]" />
+                    <span>Universal Fast Bulk Questions Import</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Paste plain text, Q1..Qn questions, JSON, or CSV to instantly import all questions into this test.
+                  </p>
+                </div>
+
+                {/* Quick Action Toolbar */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setBulkQuestionsInput(SAMPLE_MOCK_TEST_QUESTIONS)}
+                    className="px-3.5 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all"
+                    title="Load 4 Sample Formatted Questions"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                    <span>📋 Load Sample Format Template</span>
+                  </button>
+
+                  <label className="px-3.5 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-900 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all">
+                    <Upload className="w-3.5 h-3.5 text-sky-700" />
+                    <span>📁 Import File (.txt / .csv / .json)</span>
+                    <input
+                      type="file"
+                      accept=".txt,.csv,.json"
+                      onChange={handleBulkFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {bulkQuestionsInput && (
+                    <button
+                      type="button"
+                      onClick={() => setBulkQuestionsInput('')}
+                      className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 font-bold text-xs flex items-center gap-1 cursor-pointer transition-all"
+                      title="Clear text area"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Clear</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
-              <div className="bg-amber-50/70 p-4 rounded-2xl border border-amber-200 text-xs text-amber-900 space-y-2">
-                <span className="font-black text-[11px] block text-amber-800 uppercase tracking-wider">
-                  Sample Paste Format (Supports Q1, Q2, Q3, etc.):
-                </span>
-                <pre className="font-mono text-[11px] bg-white p-3 rounded-xl border border-amber-200 text-slate-800 leading-relaxed overflow-x-auto">
-{`Q1. What is the currency of Japan?
-A) Yuan
-B) Yen
-C) Won
-D) Ringgit
-Correct: B
-Marks: 1
-Section: General Awareness
-Explanation: Yen is the official currency of Japan.
-
-Q2. Who invented the World Wide Web?
-A) Tim Berners-Lee
-B) Bill Gates
-C) Steve Jobs
-D) Alan Turing
-Correct: A
-Marks: 1
-Section: Achievers Section
-Explanation: Sir Tim Berners-Lee invented the WWW at CERN in 1989.`}
-                </pre>
+              {/* Supported Formats Banner */}
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50/50 p-4 rounded-2xl border border-amber-200 text-xs text-amber-900 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-black text-[11px] uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Intelligent Auto-Parser Supports All Formats:</span>
+                  </span>
+                  <span className="text-[10px] bg-amber-200/80 text-amber-900 font-black px-2 py-0.5 rounded-md">
+                    Forgiving &amp; Smart
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2 text-[11px] font-bold">
+                  <span className="bg-white px-2.5 py-1 rounded-lg border border-amber-200 text-slate-800">
+                    ✓ Standard (Q1, A, B, C, D, Correct, Explanation)
+                  </span>
+                  <span className="bg-white px-2.5 py-1 rounded-lg border border-amber-200 text-slate-800">
+                    ✓ Plain Questions (Even without options)
+                  </span>
+                  <span className="bg-white px-2.5 py-1 rounded-lg border border-amber-200 text-slate-800">
+                    ✓ JSON Array
+                  </span>
+                  <span className="bg-white px-2.5 py-1 rounded-lg border border-amber-200 text-slate-800">
+                    ✓ CSV Spreadsheet
+                  </span>
+                </div>
               </div>
 
+              {/* Textarea */}
               <div>
-                <label className="block text-xs font-black text-slate-700 mb-1.5">Paste Questions Here:</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-black text-slate-700">Paste Questions Text Here:</label>
+                  {bulkQuestionsInput.trim() && (
+                    <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      ⚡ ~{parseAnyQuestionsInput(bulkQuestionsInput, paperSections[0] || 'General Awareness').length} questions detected
+                    </span>
+                  )}
+                </div>
                 <textarea
-                  rows={10}
+                  rows={12}
                   value={bulkQuestionsInput}
                   onChange={(e) => setBulkQuestionsInput(e.target.value)}
-                  placeholder="Paste your formatted questions here..."
-                  className="w-full px-4 py-3 rounded-2xl border border-slate-300 text-xs font-mono text-slate-800 outline-none focus:border-[#4e2a4a] leading-relaxed shadow-2xs"
+                  placeholder="Paste your questions here...&#10;&#10;Example:&#10;Q1. If 3x + 15 = 45, what is the value of 2x - 5?&#10;A) 15&#10;B) 20&#10;C) 25&#10;D) 30&#10;Correct: A&#10;&#10;Tip: Even if you paste single plain questions without options, the system will automatically parse them and create editable options for you!"
+                  className="w-full px-4 py-3.5 rounded-2xl border border-slate-300 text-xs font-mono text-slate-800 outline-none focus:border-[#859900] leading-relaxed shadow-2xs bg-slate-50/50"
                 />
               </div>
 
@@ -1367,14 +1692,23 @@ Explanation: Sir Tim Berners-Lee invented the WWW at CERN in 1989.`}
                 <span className="text-xs font-bold text-slate-500">
                   Currently in test: <span className="font-black text-slate-900">{paperQuestions.length}</span> questions
                 </span>
-                <button
-                  type="button"
-                  onClick={handleParseBulkQuestions}
-                  className="px-6 py-2.5 bg-[#00b074] hover:bg-[#009260] text-white rounded-xl text-xs font-black shadow-md cursor-pointer flex items-center gap-2 active:scale-95"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span>Parse &amp; Add All Questions to Test</span>
-                </button>
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setPaperModalTab('questions')}
+                    className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-all"
+                  >
+                    View Questions ({paperQuestions.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleParseBulkQuestions}
+                    className="px-6 py-2.5 bg-[#859900] hover:bg-[#728400] text-white rounded-xl text-xs font-black shadow-md cursor-pointer flex items-center gap-2 active:scale-95 transition-all"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>Parse &amp; Add All Questions to Test</span>
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -2177,6 +2511,16 @@ Explanation: Sir Tim Berners-Lee invented the WWW at CERN in 1989.`}
                           >
                             <HelpCircle className="w-3.5 h-3.5 text-[#859900]" />
                             <span>Questions ({paper.questions?.length || 0})</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditPaper(paper, 'bulk')}
+                            className="px-2.5 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                            title="⚡ Fast Bulk Import Questions into this Mock Test"
+                          >
+                            <Upload className="w-3.5 h-3.5 text-purple-600" />
+                            <span>⚡ Import</span>
                           </button>
 
                           <button

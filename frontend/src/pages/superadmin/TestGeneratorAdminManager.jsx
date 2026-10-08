@@ -118,53 +118,123 @@ Correct: C
 Explanation: The CPU interprets, computes, and processes all software instructions.
 Marks: 1`;
 
-// Intelligent bulk question parser supporting Text, CSV, and JSON
+// Universal multi-format intelligent question parser (Handles Plain text, Q1..Qn, JSON, and CSV)
 const parseBulkQuestions = (rawText) => {
-  const clean = rawText.trim();
-  if (!clean) return [];
+  if (!rawText || !rawText.trim()) return [];
+  const text = rawText.trim();
 
-  // 1. Try JSON Array
-  if ((clean.startsWith('[') && clean.endsWith(']')) || (clean.startsWith('{') && clean.endsWith('}'))) {
+  // 1. JSON Array or Object
+  if ((text.startsWith('[') && text.endsWith(']')) || (text.startsWith('{') && text.endsWith('}'))) {
     try {
-      const parsed = JSON.parse(clean);
-      const arr = Array.isArray(parsed) ? parsed : parsed.questions || [parsed];
+      const parsed = JSON.parse(text);
+      const arr = Array.isArray(parsed) ? parsed : (parsed.questions || parsed.data || [parsed]);
       if (Array.isArray(arr) && arr.length > 0) {
-        return arr.map((item) => {
+        return arr.map((item, idx) => {
           let opts = ['', '', '', ''];
           if (Array.isArray(item.options)) {
             opts = [item.options[0] || '', item.options[1] || '', item.options[2] || '', item.options[3] || ''];
           } else {
-            opts = [item.option_a || item.a || '', item.option_b || item.b || '', item.option_c || item.c || '', item.option_d || item.d || ''];
+            opts = [
+              item.option_a || item.a || item.optA || '',
+              item.option_b || item.b || item.optB || '',
+              item.option_c || item.c || item.optC || '',
+              item.option_d || item.d || item.optD || ''
+            ];
           }
+          opts = opts.map((o, oIdx) => o ? String(o).trim() : `Option ${String.fromCharCode(65 + oIdx)}`);
 
           let corr = 0;
           if (typeof item.correct === 'number') {
-            corr = item.correct;
+            corr = Math.max(0, Math.min(3, item.correct));
           } else {
-            const cStr = String(item.correct_option || item.correct || item.answer || 'A').toUpperCase().trim();
-            const idx = ['A', 'B', 'C', 'D'].indexOf(cStr);
-            corr = idx >= 0 ? idx : 0;
+            const cStr = String(item.correct_option || item.correct || item.answer || item.ans || 'A').toUpperCase().trim();
+            const idxMatch = ['A', 'B', 'C', 'D'].indexOf(cStr);
+            if (idxMatch >= 0) corr = idxMatch;
+            else if (!isNaN(parseInt(cStr))) corr = Math.max(0, Math.min(3, parseInt(cStr) - 1));
           }
 
           return {
-            q: item.q || item.question || item.question_text || '',
+            q: String(item.q || item.question || item.question_text || item.title || `Question ${idx + 1}`).trim(),
             options: opts,
             correct: corr,
-            explanation: item.explanation || item.solution || item.hint || '',
+            explanation: String(item.explanation || item.solution || item.hint || '').trim(),
             marks: parseInt(item.marks || item.points || 1) || 1
           };
-        }).filter(q => q.q.trim().length > 0);
+        }).filter(q => q.q.length > 0);
       }
     } catch (e) {
-      // Fallback to text parser
+      // Fallback
     }
   }
 
-  // 2. Line by line text / question block parser
-  const blocks = clean.split(/(?:\r?\n){2,}|(?=^\s*(?:Q\d*[\.:\)]?|\d+[\.\)]|Question\s*\d*[\.:\)]?)\s*)/im);
+  // 2. CSV format
+  const rawLines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (rawLines.length > 1 && rawLines[0].includes(',') && (rawLines[0].toLowerCase().includes('question') || rawLines[0].toLowerCase().includes('option') || rawLines[0].toLowerCase().includes('class'))) {
+    try {
+      const parseCSVLine = (line) => {
+        const result = [];
+        let curr = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"' && line[i + 1] === '"') {
+            curr += '"';
+            i++;
+          } else if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            result.push(curr.trim());
+            curr = '';
+          } else {
+            curr += char;
+          }
+        }
+        result.push(curr.trim());
+        return result;
+      };
+
+      const parsedCsv = [];
+      for (let i = 1; i < rawLines.length; i++) {
+        const parts = parseCSVLine(rawLines[i]);
+        if (parts.length >= 2) {
+          const qText = parts[0] || parts[3] || parts[4] || '';
+          const optA = parts[1] || parts[5] || 'Option A';
+          const optB = parts[2] || parts[6] || 'Option B';
+          const optC = parts[3] || parts[7] || 'Option C';
+          const optD = parts[4] || parts[8] || 'Option D';
+          let corr = 0;
+          const corrStr = String(parts[5] || parts[9] || '0').toUpperCase().trim();
+          if (['A', 'B', 'C', 'D'].includes(corrStr)) corr = ['A', 'B', 'C', 'D'].indexOf(corrStr);
+          else if (!isNaN(parseInt(corrStr))) corr = Math.max(0, Math.min(3, parseInt(corrStr)));
+
+          if (qText) {
+            parsedCsv.push({
+              q: qText,
+              options: [optA, optB, optC, optD],
+              correct: corr,
+              marks: Number(parts[11]) || 1,
+              explanation: parts[12] || ''
+            });
+          }
+        }
+      }
+      if (parsedCsv.length > 0) return parsedCsv;
+    } catch (err) {
+      // Fallback
+    }
+  }
+
+  // 3. Line by line text / question block parser
+  let rawBlocks = text.split(/(?:\r?\n\s*\r?\n)|(?=(?:^|\n)\s*(?:Q\d*[\.:\)]|Question\s*\d*[\.:\)]|\d+[\.\)]\s+[A-Z]))/im);
+  rawBlocks = rawBlocks.map(b => b.trim()).filter(Boolean);
+
+  if (rawBlocks.length === 0) {
+    rawBlocks = [text];
+  }
+
   const questions = [];
 
-  for (const block of blocks) {
+  for (const block of rawBlocks) {
     const lines = block.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
     if (lines.length === 0) continue;
 
@@ -174,44 +244,84 @@ const parseBulkQuestions = (rawText) => {
     let explanation = '';
     let marks = 1;
 
+    const remainingLines = [];
+
     for (const line of lines) {
-      const qMatch = line.match(/^(?:Q\d*[\.:\)]?|\d+[\.\)]|Question\s*\d*[\.:\)]?)\s*(.+)$/i);
-      const optMatch = line.match(/^([A-D])[\.\)\:\-]\s*(.+)$/i);
-      const ansMatch = line.match(/^(?:Answer|Ans|Correct|Correct\s*Option|Key)[\:\s\-]+([A-D]|\d+)/i);
-      const expMatch = line.match(/^(?:Explanation|Solution|Hint|Reason)[\:\s\-]+(.+)$/i);
-      const marksMatch = line.match(/^(?:Marks|Points|Mark)[\:\s\-]+(\d+)/i);
+      const optMatch = line.match(/^(?:[\(\[]?([A-Da-d1-4])[\.\)\]\:\-]|Option\s+([A-Da-d1-4])[\:\.\-]?)\s*(.+)$/i);
+      const ansMatch = line.match(/^(?:Answer|Ans|Correct(?:\s*Option)?|Key|Right\s*Answer)[\:\s\-]+([A-Da-d1-4]|.+)/i);
+      const expMatch = line.match(/^(?:Explanation|Solution|Hint|Reason|Note)[\:\s\-]+(.+)$/i);
+      const marksMatch = line.match(/^(?:Marks|Mark|Points|Score)[\:\s\-]+(\d+)/i);
 
       if (ansMatch) {
-        const val = ansMatch[1].toUpperCase();
+        const val = ansMatch[1].toUpperCase().trim();
         if (['A', 'B', 'C', 'D'].includes(val)) {
           correct = ['A', 'B', 'C', 'D'].indexOf(val);
-        } else if (!isNaN(parseInt(val))) {
-          correct = Math.max(0, Math.min(3, parseInt(val) - 1));
+        } else if (['1', '2', '3', '4'].includes(val)) {
+          correct = parseInt(val) - 1;
+        } else {
+          if (val.includes('B')) correct = 1;
+          else if (val.includes('C')) correct = 2;
+          else if (val.includes('D')) correct = 3;
+          else correct = 0;
         }
       } else if (expMatch) {
         explanation = expMatch[1].trim();
       } else if (marksMatch) {
         marks = parseInt(marksMatch[1]) || 1;
       } else if (optMatch) {
-        const optLetter = optMatch[1].toUpperCase();
-        const optText = optMatch[2].trim();
-        const idx = ['A', 'B', 'C', 'D'].indexOf(optLetter);
-        if (idx >= 0) options[idx] = optText;
-      } else if (!questionStatement) {
-        questionStatement = qMatch ? qMatch[1].trim() : line;
+        const optLetter = (optMatch[1] || optMatch[2]).toUpperCase();
+        const optText = optMatch[3].trim();
+        let targetIdx = -1;
+        if (['A', 'B', 'C', 'D'].includes(optLetter)) targetIdx = ['A', 'B', 'C', 'D'].indexOf(optLetter);
+        else if (['1', '2', '3', '4'].includes(optLetter)) targetIdx = parseInt(optLetter) - 1;
+        if (targetIdx >= 0) options[targetIdx] = optText;
       } else {
-        if (options.some(o => o.length > 0)) {
-          explanation = explanation ? `${explanation} ${line}` : line;
-        } else {
-          questionStatement = `${questionStatement} ${line}`;
+        remainingLines.push(line);
+      }
+    }
+
+    if (remainingLines.length > 0) {
+      let firstLine = remainingLines[0].replace(/^(?:Q\d*[\.:\)]|Question\s*\d*[\.:\)]|\d+[\.\)]|Problem\s*\d*[\.:\)])\s*/i, '').trim();
+      questionStatement = firstLine || remainingLines[0];
+
+      const isOptionsEmpty = options.every(o => !o);
+      if (isOptionsEmpty && remainingLines.length >= 5) {
+        options[0] = remainingLines[1];
+        options[1] = remainingLines[2];
+        options[2] = remainingLines[3];
+        options[3] = remainingLines[4];
+        if (remainingLines.length > 5 && !explanation) {
+          explanation = remainingLines.slice(5).join(' ');
+        }
+      } else if (remainingLines.length > 1) {
+        if (!options.some(o => o.length > 0)) {
+          questionStatement += ' ' + remainingLines.slice(1).join(' ');
         }
       }
     }
 
+    if (options.every(o => !o)) {
+      const inlineMatches = [...questionStatement.matchAll(/(?:^|\s)(?:[\(\[]?([A-D])[\.\)\]\:\-])\s*([^A-D\n\(\[]+)/gi)];
+      if (inlineMatches.length >= 2) {
+        inlineMatches.forEach(m => {
+          const letter = m[1].toUpperCase();
+          const textVal = m[2].trim();
+          const optIdx = ['A', 'B', 'C', 'D'].indexOf(letter);
+          if (optIdx >= 0) options[optIdx] = textVal;
+        });
+        const firstOptIndex = questionStatement.search(/(?:^|\s)(?:[\(\[]?[A-D][\.\)\]\:\-])/i);
+        if (firstOptIndex > 0) {
+          questionStatement = questionStatement.substring(0, firstOptIndex).trim();
+        }
+      }
+    }
+
+    const finalOptions = options.map((opt, i) => opt ? opt.trim() : `Option ${String.fromCharCode(65 + i)}`);
+
     if (questionStatement.trim()) {
       questions.push({
         q: questionStatement.trim(),
-        options: options.map((opt, i) => opt || `Option ${String.fromCharCode(65 + i)}`),
+        options: finalOptions,
         correct,
         explanation: explanation.trim(),
         marks
@@ -508,6 +618,17 @@ export const TestGeneratorAdminManager = () => {
 
   const handleLoadSampleBulk = () => {
     handleBulkTextChange(SAMPLE_BULK_TEXT);
+  };
+
+  const handleBulkFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const content = ev.target?.result || '';
+      handleBulkTextChange(content);
+    };
+    reader.readAsText(file);
   };
 
   const handleApplyBulkImport = (mode = 'append') => {
@@ -1126,22 +1247,51 @@ export const TestGeneratorAdminManager = () => {
 
               <div className="p-6 space-y-4 overflow-y-auto flex-1">
                 <div className="flex items-center justify-between flex-wrap gap-2 text-xs">
-                  <span className="font-bold text-slate-700">Paste Text, JSON, or Question Blocks:</span>
-                  <button
-                    type="button"
-                    onClick={handleLoadSampleBulk}
-                    className="text-amber-700 font-bold hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Load 5 Sample Olympiad Questions</span>
-                  </button>
+                  <span className="font-bold text-slate-700">Paste Text, JSON, CSV or Questions:</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleLoadSampleBulk}
+                      className="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs flex items-center gap-1 cursor-pointer transition-all"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                      <span>📋 Load Sample Format</span>
+                    </button>
+                    <label className="px-2.5 py-1 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-900 font-bold text-xs flex items-center gap-1 cursor-pointer transition-all">
+                      <Upload className="w-3.5 h-3.5 text-sky-700" />
+                      <span>📁 Import File</span>
+                      <input
+                        type="file"
+                        accept=".txt,.csv,.json"
+                        onChange={handleBulkFileUpload}
+                        className="hidden"
+                      />
+                    </label>
+                    {bulkInputText && (
+                      <button
+                        type="button"
+                        onClick={() => handleBulkTextChange('')}
+                        className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 font-bold text-xs cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5 text-[10px] font-bold text-slate-600 bg-amber-50/70 p-2.5 rounded-xl border border-amber-200">
+                  <span className="text-amber-900 font-black mr-1">Auto-Detects:</span>
+                  <span className="bg-white px-2 py-0.5 rounded border border-amber-200">✓ Q1..Qn with Options</span>
+                  <span className="bg-white px-2 py-0.5 rounded border border-amber-200">✓ Plain Questions (without options)</span>
+                  <span className="bg-white px-2 py-0.5 rounded border border-amber-200">✓ JSON Array</span>
+                  <span className="bg-white px-2 py-0.5 rounded border border-amber-200">✓ CSV</span>
                 </div>
 
                 <textarea
                   rows="12"
                   value={bulkInputText}
                   onChange={(e) => handleBulkTextChange(e.target.value)}
-                  placeholder="Paste your questions here...&#10;&#10;Example Format:&#10;Q1. What is the value of 14 + 18?&#10;A) 28&#10;B) 32&#10;C) 30&#10;D) 34&#10;Correct: B&#10;Explanation: 14 + 18 = 32.&#10;Marks: 1"
+                  placeholder="Paste your questions here...&#10;&#10;Example Format:&#10;Q1. What is 15 + 17?&#10;A) 30&#10;B) 32&#10;C) 34&#10;D) 36&#10;Correct: B&#10;Explanation: 15 + 17 = 32.&#10;&#10;Tip: Plain questions without options are also supported and will generate editable options!"
                   className="w-full p-3.5 rounded-xl border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none bg-slate-50"
                 />
 
