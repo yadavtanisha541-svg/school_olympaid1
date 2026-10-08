@@ -271,6 +271,24 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   const matchingPaper = getMatchingPaper(selectedGrade, selectedSubject);
   const hasMatchingPaper = !!(matchingPaper && Array.isArray(matchingPaper.questions) && matchingPaper.questions.length > 0);
 
+  // Helper to check if a specific Olympiad subject has published questions for the selected grade
+  const isSubjectPublished = (subKey) => {
+    const p = getMatchingPaper(selectedGrade, subKey);
+    return !!(p && Array.isArray(p.questions) && p.questions.length > 0);
+  };
+
+  // Helper to check if a specific Grade has any published questions
+  const isGradePublished = (grade) => {
+    return adminPapers.some((p) => {
+      const pClass = (p.class_name || p.class || p.title || '').toLowerCase();
+      const selGrade = (grade || '').toLowerCase();
+      const pMatch = pClass.match(/\d+/);
+      const selMatch = selGrade.match(/\d+/);
+      const isClassMatch = pMatch && selMatch ? pMatch[0] === selMatch[0] : pClass.includes(selGrade);
+      return isClassMatch && Array.isArray(p.questions) && p.questions.length > 0;
+    });
+  };
+
   // Start exam with Super Admin created Paper
   const handleStartAdminPaper = (paper) => {
     if (!paper || !Array.isArray(paper.questions) || paper.questions.length === 0) {
@@ -306,6 +324,10 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
 
   // Proceed to Instructions
   const handleProceedToInstructions = () => {
+    if (!hasMatchingPaper) {
+      alert(`⚠️ Super Admin ne ${selectedGrade} (${subjectsMap[selectedSubject]?.name || selectedSubject}) ke liye abhi koi questions publish nahi kiye hain.`);
+      return;
+    }
     if (selectedChapters.length === 0) {
       setSelectedChapters(CHAPTERS_BY_SUBJECT[selectedSubject] || []);
     }
@@ -327,22 +349,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     if (targetPaper && Array.isArray(targetPaper.questions) && targetPaper.questions.length > 0) {
       setPdfModalPaper(targetPaper);
     } else {
-      const generated = generateIntelligentOlympiadTest({
-        subject: selectedSubject,
-        grade: selectedGrade,
-        level: selectedLevel,
-        difficulty: selectedDifficulty,
-        questionCount: questionCount || 10,
-        selectedChapters: selectedChapters
-      });
-      setPdfModalPaper({
-        title: `${selectedGrade} ${subjectsMap[selectedSubject]?.name || selectedSubject} - Olympiad Test Paper`,
-        subject: selectedSubject,
-        subject_code: subjectsMap[selectedSubject]?.code || selectedSubject.toUpperCase(),
-        duration_minutes: testDurationMinutes || 15,
-        total_marks: generated.length,
-        questions: generated
-      });
+      alert(`⚠️ No published test paper available for download for ${selectedGrade} ${subjectsMap[selectedSubject]?.name || selectedSubject}.`);
     }
   };
 
@@ -384,38 +391,28 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     };
   }, [isTestRunning, isSubmitted, remainingSeconds]);
 
-  // Handle Start Test - Loads Super Admin authored questions or Intelligently Generates Curated Olympiad Questions
+  // Handle Start Test - Strictly uses Super Admin authored published questions only
   const handleStartTest = () => {
     const targetPaper = getMatchingPaper(selectedGrade, selectedSubject);
 
-    let questionsToUse = [];
-    let dur = testDurationMinutes || 15;
-
-    if (targetPaper && Array.isArray(targetPaper.questions) && targetPaper.questions.length > 0) {
-      questionsToUse = targetPaper.questions.map((q, idx) => ({
-        id: q.id || idx + 1,
-        q: q.q || q.question_text || `Question ${idx + 1}`,
-        options: Array.isArray(q.options) && q.options.length >= 2 
-          ? q.options 
-          : [q.option_a || 'Option A', q.option_b || 'Option B', q.option_c || 'Option C', q.option_d || 'Option D'],
-        correct: typeof q.correct === 'number' 
-          ? q.correct 
-          : (q.correct_option === 'B' ? 1 : q.correct_option === 'C' ? 2 : q.correct_option === 'D' ? 3 : 0),
-        explanation: q.explanation || '',
-        marks: q.marks || 1
-      }));
-      dur = parseInt(targetPaper.duration_minutes) || testDurationMinutes || 15;
-    } else {
-      // Intelligently generate customized Olympiad questions for this class, subject, and chosen chapters
-      questionsToUse = generateIntelligentOlympiadTest({
-        subject: selectedSubject,
-        grade: selectedGrade,
-        level: selectedLevel,
-        difficulty: selectedDifficulty,
-        questionCount: questionCount || 10,
-        selectedChapters: selectedChapters
-      });
+    if (!targetPaper || !Array.isArray(targetPaper.questions) || targetPaper.questions.length === 0) {
+      alert(`⚠️ Super Admin se ${selectedGrade} (${subjectsMap[selectedSubject]?.name || selectedSubject}) ke liye questions publish nahi huye hain.`);
+      return;
     }
+
+    const questionsToUse = targetPaper.questions.map((q, idx) => ({
+      id: q.id || idx + 1,
+      q: q.q || q.question_text || `Question ${idx + 1}`,
+      options: Array.isArray(q.options) && q.options.length >= 2 
+        ? q.options 
+        : [q.option_a || 'Option A', q.option_b || 'Option B', q.option_c || 'Option C', q.option_d || 'Option D'],
+      correct: typeof q.correct === 'number' 
+        ? q.correct 
+        : (q.correct_option === 'B' ? 1 : q.correct_option === 'C' ? 2 : q.correct_option === 'D' ? 3 : 0),
+      explanation: q.explanation || '',
+      marks: q.marks || 1
+    }));
+    const dur = parseInt(targetPaper.duration_minutes) || testDurationMinutes || 15;
 
     setTestQuestions(questionsToUse);
     setQuestionCount(questionsToUse.length);
@@ -1412,31 +1409,31 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                     ✓ Official Super Admin Exam Paper Found
                   </h4>
                   <p className="text-xs text-emerald-800 font-bold mt-0.5">
-                    &quot;{matchingPaper.title}&quot; • {matchingPaper.questions.length} Questions authored by Super Admin
+                    &quot;{matchingPaper.title}&quot; • {matchingPaper.questions.length} Questions published by Super Admin
                   </p>
                 </div>
               </div>
               <span className="px-3 py-1 rounded-xl bg-emerald-200 text-emerald-900 text-[11px] font-black uppercase shrink-0 text-center">
-                Ready to Attempt
+                Published &amp; Ready
               </span>
             </div>
           ) : (
-            <div className="p-4 bg-emerald-50/70 rounded-2xl border-2 border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="p-4 bg-rose-50/70 rounded-2xl border-2 border-rose-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
-                  <Sparkles className="w-6 h-6 text-emerald-600" />
+                <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center shrink-0">
+                  <AlertCircle className="w-6 h-6 text-rose-600" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-black text-emerald-950 uppercase tracking-wide">
-                    ✨ AI Olympiad Question Engine Ready
+                  <h4 className="text-xs font-black text-rose-950 uppercase tracking-wide">
+                    No Questions Published Yet
                   </h4>
-                  <p className="text-xs text-emerald-800 font-medium mt-0.5">
-                    Generating <strong>{questionCount} curated Olympiad MCQs</strong> for <strong>{selectedGrade} ({subjectsMap[selectedSubject]?.name || selectedSubject})</strong> from selected chapters.
+                  <p className="text-xs text-rose-800 font-medium mt-0.5">
+                    Super Admin has not published any questions for <strong>{selectedGrade} ({subjectsMap[selectedSubject]?.name || selectedSubject})</strong> yet.
                   </p>
                 </div>
               </div>
-              <span className="px-3 py-1 rounded-xl bg-emerald-200 text-emerald-900 text-[11px] font-black uppercase shrink-0 text-center">
-                Ready to Generate &amp; Start
+              <span className="px-3 py-1 rounded-xl bg-rose-200 text-rose-900 text-[11px] font-black uppercase shrink-0 text-center">
+                Not Published
               </span>
             </div>
           )}
@@ -1577,15 +1574,15 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
 
               <button
                 type="button"
-                disabled={!hasAgreedInstructions}
+                disabled={!hasAgreedInstructions || !hasMatchingPaper}
                 onClick={handleStartTest}
                 className={`w-full sm:w-auto px-8 py-3 rounded-2xl text-sm font-black uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
-                  hasAgreedInstructions
+                  hasAgreedInstructions && hasMatchingPaper
                     ? 'bg-[#00b074] hover:bg-[#009260] text-white hover:shadow-xl active:scale-95'
                     : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                 }`}
               >
-                <span>{hasMatchingPaper ? 'Start Test Now (Official Paper)' : 'Generate & Start Test Now ⚡'}</span>
+                <span>{hasMatchingPaper ? 'Start Test Now (Official Paper)' : 'No Questions Published Yet'}</span>
                 <Play className="w-4 h-4 fill-current" />
               </button>
             </div>
@@ -1691,20 +1688,29 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                     <span className="text-xs font-black text-slate-700">Choose Your Grade:</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5 flex-1">
-                    {['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((g) => (
-                      <button
-                        key={g}
-                        type="button"
-                        onClick={() => setSelectedGrade(g)}
-                        className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          selectedGrade === g
-                            ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-xs'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                        }`}
-                      >
-                        {g}
-                      </button>
-                    ))}
+                    {['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((g) => {
+                      const isPub = isGradePublished(g);
+                      return (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() => setSelectedGrade(g)}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                            selectedGrade === g
+                              ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-xs'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          <span>{g}</span>
+                          {isPub && (
+                            <span
+                              className={`w-2 h-2 rounded-full ${selectedGrade === g ? 'bg-white' : 'bg-emerald-500'}`}
+                              title="Published test available in this class"
+                            />
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -1730,6 +1736,15 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                       <input type="radio" checked={selectedSubject === 'english'} readOnly className="accent-white" />
                       <span className="font-black font-mono tracking-wider">I E O</span>
                       <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
+                      {isSubjectPublished('english') ? (
+                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
+                          Published
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-bold text-slate-400">
+                          Pending
+                        </span>
+                      )}
                     </button>
 
                     {/* IMO */}
@@ -1745,6 +1760,15 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                       <input type="radio" checked={selectedSubject === 'math'} readOnly className="accent-white" />
                       <span className="font-black font-mono tracking-wider">I M O</span>
                       <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
+                      {isSubjectPublished('math') ? (
+                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
+                          Published
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-bold text-slate-400">
+                          Pending
+                        </span>
+                      )}
                     </button>
 
                     {/* ISO */}
@@ -1760,6 +1784,15 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                       <input type="radio" checked={selectedSubject === 'science'} readOnly className="accent-white" />
                       <span className="font-black font-mono tracking-wider">I S O</span>
                       <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
+                      {isSubjectPublished('science') ? (
+                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
+                          Published
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-bold text-slate-400">
+                          Pending
+                        </span>
+                      )}
                     </button>
 
                     {/* ICSO */}
@@ -1775,6 +1808,15 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                       <input type="radio" checked={selectedSubject === 'cyber'} readOnly className="accent-white" />
                       <span className="font-black font-mono tracking-wider">I C S O</span>
                       <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
+                      {isSubjectPublished('cyber') ? (
+                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
+                          Published
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-bold text-slate-400">
+                          Pending
+                        </span>
+                      )}
                     </button>
 
                     {/* IGKO */}
@@ -1790,6 +1832,15 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                       <input type="radio" checked={selectedSubject === 'gk'} readOnly className="accent-white" />
                       <span className="font-black font-mono tracking-wider">I G K O</span>
                       <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
+                      {isSubjectPublished('gk') ? (
+                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
+                          Published
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-bold text-slate-400">
+                          Pending
+                        </span>
+                      )}
                     </button>
 
                     {/* ISSO / REASONING */}
@@ -1805,6 +1856,15 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                       <input type="radio" checked={selectedSubject === 'reasoning'} readOnly className="accent-white" />
                       <span className="font-black text-xs uppercase tracking-wider">ISSO (Reasoning)</span>
                       <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
+                      {isSubjectPublished('reasoning') ? (
+                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
+                          Published
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-bold text-slate-400">
+                          Pending
+                        </span>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -2063,16 +2123,24 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                     </div>
 
                     {/* Paper Status */}
-                    <div className="flex items-center gap-2 p-2 rounded-xl col-span-2 border bg-emerald-50/70 border-emerald-200">
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 bg-emerald-100 text-emerald-800">
-                        {hasMatchingPaper ? '✓' : '✨'}
+                    <div className={`flex items-center gap-2 p-2 rounded-xl col-span-2 border ${
+                      hasMatchingPaper ? 'bg-emerald-50/90 border-emerald-300' : 'bg-rose-50/70 border-rose-200'
+                    }`}>
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
+                        hasMatchingPaper ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700'
+                      }`}>
+                        {hasMatchingPaper ? '✓' : '✕'}
                       </div>
                       <div className="flex-1 min-w-0 text-left">
-                        <p className="text-[10px] font-bold uppercase text-emerald-800">
-                          {hasMatchingPaper ? 'Admin Verified Paper' : 'AI Olympiad Engine'}
+                        <p className={`text-[10px] font-bold uppercase ${
+                          hasMatchingPaper ? 'text-emerald-800' : 'text-rose-700'
+                        }`}>
+                          {hasMatchingPaper ? 'Official Super Admin Paper' : 'Super Admin Exam Paper'}
                         </p>
-                        <p className="text-xs font-black truncate text-emerald-950">
-                          {hasMatchingPaper ? `Published (${matchingPaper.questions.length} Questions)` : `Ready (${questionCount} Curated MCQs)`}
+                        <p className={`text-xs font-black truncate ${
+                          hasMatchingPaper ? 'text-emerald-950' : 'text-rose-900'
+                        }`}>
+                          {hasMatchingPaper ? `Published (${matchingPaper.questions.length} Questions)` : 'Not Published Yet (0 Questions)'}
                         </p>
                       </div>
                     </div>
@@ -2097,9 +2165,14 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                   <button
                     type="button"
                     onClick={handleProceedToInstructions}
-                    className="w-full py-3 bg-[#6d3a68] hover:bg-[#582d54] text-white rounded-2xl text-sm font-black uppercase tracking-wider transition-all shadow-lg hover:shadow-xl active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                    disabled={!hasMatchingPaper}
+                    className={`w-full py-3 rounded-2xl text-sm font-black uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 ${
+                      hasMatchingPaper 
+                        ? 'bg-[#6d3a68] hover:bg-[#582d54] text-white hover:shadow-xl active:scale-95 cursor-pointer' 
+                        : 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300'
+                    }`}
                   >
-                    <span>Next: View Instructions</span>
+                    <span>{hasMatchingPaper ? 'Next: View Instructions' : 'Awaiting Super Admin Questions'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
