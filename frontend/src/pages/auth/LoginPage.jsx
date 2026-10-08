@@ -219,43 +219,43 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
       />
 
       {/* Top Header Navigation: Back to Website */}
-      <div className="w-full max-w-lg mx-auto flex items-center justify-start relative z-20 mb-3 sm:mb-2">
+      <div className="w-full max-w-[390px] mx-auto flex items-center justify-start relative z-20 mb-2">
         <button
           type="button"
           onClick={handleGoHome}
-          className="inline-flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold shadow-xs transition-all cursor-pointer group active:scale-95"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold shadow-xs transition-all cursor-pointer group active:scale-95"
         >
-          <ArrowLeft className="w-4 h-4 text-slate-600 group-hover:-translate-x-0.5 transition-transform" />
+          <ArrowLeft className="w-3.5 h-3.5 text-slate-600 group-hover:-translate-x-0.5 transition-transform" />
           <span>← Back to Website</span>
         </button>
       </div>
 
-      {/* Center Auth Card with Rich Pink -> Purple -> Blue Brand Gradient (Image 2 Colors Preserved) */}
-      <div className="w-full max-w-md relative z-10 my-auto bg-gradient-to-b from-[#b93787] via-[#6e32a0] to-[#2355c8] rounded-[32px] p-6 sm:p-8 shadow-2xl border-2 border-white/30 text-white">
+      {/* Center Auth Card with Rich Pink -> Purple -> Blue Brand Gradient (Compact Proportioned Height) */}
+      <div className="w-full max-w-[390px] relative z-10 my-auto bg-gradient-to-b from-[#b93787] via-[#6e32a0] to-[#2355c8] rounded-[26px] p-4 sm:p-5 shadow-2xl border-2 border-white/30 text-white">
         {/* Branding Header */}
-        <div className="text-center mb-5 flex flex-col items-center">
+        <div className="text-center mb-3 flex flex-col items-center">
           <div
-            className="mb-2.5 transform hover:scale-105 transition-transform duration-200 cursor-pointer p-2 rounded-2xl bg-white/95 shadow-md"
+            className="mb-1 transform hover:scale-105 transition-transform duration-200 cursor-pointer p-1.5 rounded-xl bg-white/95 shadow-md"
             onClick={handleGoHome}
             title="Go to Home"
           >
-            <OlympiadHubLogo size="lg" />
+            <OlympiadHubLogo size="sm" />
           </div>
-          <p className="mt-1 text-xs sm:text-sm text-pink-100 font-bold tracking-wide drop-shadow-xs">
-            National Online Examination &amp; Olympiad Assessment System
+          <p className="mt-0.5 text-[11px] text-pink-100 font-bold tracking-tight drop-shadow-xs">
+            National Online Examination &amp; Assessment System
           </p>
 
           {/* Clean Segmented Tabs: Sign Up vs Login */}
-          <div className="grid grid-cols-2 gap-1.5 p-1 bg-black/25 backdrop-blur-md rounded-2xl border border-white/20 mt-4 w-full">
+          <div className="grid grid-cols-2 gap-1 p-0.5 bg-black/25 backdrop-blur-md rounded-xl border border-white/20 mt-2.5 w-full">
             <button
               type="button"
               onClick={() => {
                 setAuthMode('signup');
                 setError('');
               }}
-              className={`py-2 px-3 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`py-1.5 px-3 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1 ${
                 authMode === 'signup'
-                  ? 'bg-white text-purple-900 shadow-md scale-100'
+                  ? 'bg-white text-purple-900 shadow-sm scale-100'
                   : 'text-pink-100 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -267,9 +267,9 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                 setAuthMode('login');
                 setError('');
               }}
-              className={`py-2 px-3 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`py-1.5 px-3 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1 ${
                 authMode === 'login'
-                  ? 'bg-white text-purple-900 shadow-md scale-100'
+                  ? 'bg-white text-purple-900 shadow-sm scale-100'
                   : 'text-pink-100 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -280,17 +280,17 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
 
         {/* Auth Form Container */}
         <div className="w-full">
-          <form className="space-y-3.5 sm:space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-2.5" onSubmit={handleSubmit}>
             {error && (
-              <div className="p-3.5 rounded-2xl bg-rose-500/90 border border-white/30 text-white text-xs font-bold flex items-start gap-2.5 animate-shake shadow-lg backdrop-blur-md">
-                <AlertCircle className="w-4 h-4 text-white shrink-0 mt-0.5" />
+              <div className="p-2.5 rounded-xl bg-rose-500/95 border border-white/30 text-white text-[11px] font-bold flex items-start gap-2 animate-shake shadow-md">
+                <AlertCircle className="w-3.5 h-3.5 text-white shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
 
-            {/* Field 1: Register with Mobile Number or Email (Image 1) */}
+            {/* Field 1: Register with Mobile Number or Email */}
             <div>
-              <div className="relative rounded-2xl">
+              <div className="relative rounded-xl">
                 <input
                   type="text"
                   value={identifier}
@@ -300,99 +300,99 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                       ? 'Register with Mobile Number or Email'
                       : 'Enter Mobile Number, Email or Login ID'
                   }
-                  className="block w-full px-4 h-12 bg-white text-slate-900 placeholder-slate-500 border-2 border-white/60 focus:border-indigo-400 focus:ring-4 focus:ring-white/30 rounded-2xl text-xs sm:text-sm font-bold transition-all focus:outline-none shadow-md"
+                  className="block w-full px-3.5 h-10 bg-white text-slate-900 placeholder-slate-500 border border-white/60 focus:border-indigo-400 focus:ring-2 focus:ring-white/30 rounded-xl text-xs font-bold transition-all focus:outline-none shadow-xs"
                   required
                 />
               </div>
             </div>
 
-            {/* Field 2: Password* (Image 1) */}
+            {/* Field 2: Password* */}
             <div>
-              <div className="relative rounded-2xl">
+              <div className="relative rounded-xl">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password*"
-                  className="block w-full px-4 h-12 bg-white text-slate-900 placeholder-slate-500 border-2 border-white/60 focus:border-indigo-400 focus:ring-4 focus:ring-white/30 rounded-2xl text-xs sm:text-sm font-bold transition-all focus:outline-none shadow-md"
+                  className="block w-full px-3.5 h-10 bg-white text-slate-900 placeholder-slate-500 border border-white/60 focus:border-indigo-400 focus:ring-2 focus:ring-white/30 rounded-xl text-xs font-bold transition-all focus:outline-none shadow-xs"
                   required
                 />
               </div>
             </div>
 
-            {/* Field 3: Confirm Password* (Sign Up Mode Only - Image 1) */}
+            {/* Field 3: Confirm Password* (Sign Up Mode Only) */}
             {authMode === 'signup' && (
               <div>
-                <div className="relative rounded-2xl">
+                <div className="relative rounded-xl">
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm Password*"
-                    className="block w-full px-4 h-12 bg-white text-slate-900 placeholder-slate-500 border-2 border-white/60 focus:border-indigo-400 focus:ring-4 focus:ring-white/30 rounded-2xl text-xs sm:text-sm font-bold transition-all focus:outline-none shadow-md"
+                    className="block w-full px-3.5 h-10 bg-white text-slate-900 placeholder-slate-500 border border-white/60 focus:border-indigo-400 focus:ring-2 focus:ring-white/30 rounded-xl text-xs font-bold transition-all focus:outline-none shadow-xs"
                     required
                   />
                 </div>
               </div>
             )}
 
-            {/* Checkbox: Show Password (Image 1) */}
-            <div className="flex items-center justify-between pt-0.5">
-              <label className="flex items-center gap-2 cursor-pointer select-none">
+            {/* Checkbox: Show Password */}
+            <div className="flex items-center justify-between text-[11px] pt-0.5">
+              <label className="flex items-center gap-1.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={showPassword}
                   onChange={(e) => setShowPassword(e.target.checked)}
-                  className="w-4 h-4 rounded text-indigo-600 border-white/50 focus:ring-white accent-indigo-600 cursor-pointer"
+                  className="w-3.5 h-3.5 rounded text-indigo-600 border-white/50 focus:ring-white accent-indigo-600 cursor-pointer"
                 />
-                <span className="text-xs text-white font-bold drop-shadow-xs">Show Password</span>
+                <span className="text-white font-bold drop-shadow-xs">Show Password</span>
               </label>
 
               {authMode === 'login' && (
-                <label className="flex items-center gap-2 cursor-pointer select-none">
+                <label className="flex items-center gap-1.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded text-indigo-600 border-white/50 focus:ring-white accent-indigo-600 cursor-pointer"
+                    className="w-3.5 h-3.5 rounded text-indigo-600 border-white/50 focus:ring-white accent-indigo-600 cursor-pointer"
                   />
-                  <span className="text-xs text-white font-bold drop-shadow-xs">Remember me</span>
+                  <span className="text-white font-bold drop-shadow-xs">Remember me</span>
                 </label>
               )}
             </div>
 
-            {/* OFFICIAL GOOGLE RECAPTCHA WIDGET ("I'm not a robot" - Exact match to Image 1) */}
-            <div className="bg-[#f9f9f9] border border-[#d3d3d3] rounded-2xl p-3 sm:p-3.5 flex items-center justify-between shadow-xs select-none">
+            {/* OFFICIAL GOOGLE RECAPTCHA WIDGET ("I'm not a robot" - Compact & Toggleable) */}
+            <div className="bg-[#f9f9f9] border border-[#d3d3d3] rounded-xl py-1.5 px-3 flex items-center justify-between shadow-2xs select-none">
               <div
                 onClick={handleCaptchaClick}
-                className="flex items-center gap-3 cursor-pointer group flex-1 py-1"
+                className="flex items-center gap-2.5 cursor-pointer group flex-1 py-0.5"
                 title={captchaStatus === 'verified' ? 'Click to uncheck' : 'Click to verify'}
               >
                 {/* Checkbox Box */}
                 <div
-                  className={`w-7 h-7 rounded-md border-2 transition-all flex items-center justify-center shadow-2xs ${
+                  className={`w-6 h-6 rounded border-2 transition-all flex items-center justify-center shadow-2xs shrink-0 ${
                     captchaStatus === 'verified'
                       ? 'border-emerald-500 bg-emerald-50 text-emerald-600'
                       : 'border-[#c1c1c1] group-hover:border-[#999] bg-white text-transparent'
                   }`}
                 >
                   {captchaStatus === 'checking' && (
-                    <span className="w-4.5 h-4.5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                    <span className="w-3.5 h-3.5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                   )}
                   {captchaStatus === 'verified' && (
-                    <Check className="w-5 h-5 text-emerald-600 stroke-[3.5] animate-in zoom-in-75 duration-150" />
+                    <Check className="w-4 h-4 text-emerald-600 stroke-[3.5] animate-in zoom-in-75 duration-150" />
                   )}
                 </div>
 
-                <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-black transition-colors">
+                <span className="text-xs font-bold text-slate-800 group-hover:text-black transition-colors">
                   I'm not a robot
                 </span>
               </div>
 
               {/* Official reCAPTCHA Badge */}
-              <div className="flex flex-col items-center justify-center pl-3 border-l border-slate-200 shrink-0">
-                <div className="w-7 h-7 relative flex items-center justify-center">
-                  <svg viewBox="0 0 48 48" className="w-6.5 h-6.5" fill="none">
+              <div className="flex flex-col items-center justify-center pl-2.5 border-l border-slate-200 shrink-0">
+                <div className="w-5 h-5 relative flex items-center justify-center">
+                  <svg viewBox="0 0 48 48" className="w-5 h-5" fill="none">
                     <path
                       d="M24 6V2L19 7l5 5V8c8.8 0 16 7.2 16 16 0 3.3-1 6.4-2.8 9l2.9 2.9C42.4 32.4 44 28.4 44 24c0-11-9-20-20-20z"
                       fill="#4A90E2"
@@ -407,10 +407,10 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                     />
                   </svg>
                 </div>
-                <span className="text-[8.5px] font-bold text-slate-600 tracking-tight leading-none mt-0.5">
+                <span className="text-[7.5px] font-bold text-slate-600 tracking-tight leading-none mt-0.5">
                   reCAPTCHA
                 </span>
-                <span className="text-[7px] text-slate-400 leading-none mt-0.5">
+                <span className="text-[6.5px] text-slate-400 leading-none mt-0.5">
                   Privacy - Terms
                 </span>
               </div>
@@ -418,25 +418,25 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
 
             {/* Checkboxes from Image 1 (Sign Up Mode) */}
             {authMode === 'signup' && (
-              <div className="space-y-2 pt-1 text-xs">
-                <label className="flex items-start gap-2 cursor-pointer select-none">
+              <div className="space-y-1 text-[11px] pt-0.5">
+                <label className="flex items-start gap-1.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={promoConsent}
                     onChange={(e) => setPromoConsent(e.target.checked)}
-                    className="w-4 h-4 rounded text-indigo-600 border-white/50 focus:ring-white accent-indigo-600 mt-0.5 shrink-0 cursor-pointer"
+                    className="w-3.5 h-3.5 rounded text-indigo-600 border-white/50 focus:ring-white accent-indigo-600 mt-0.5 shrink-0 cursor-pointer"
                   />
                   <span className="text-white font-medium leading-tight drop-shadow-xs">
                     Send me sms/email for promotional offers.
                   </span>
                 </label>
 
-                <label className="flex items-start gap-2 cursor-pointer select-none">
+                <label className="flex items-start gap-1.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={termsConsent}
                     onChange={(e) => setTermsConsent(e.target.checked)}
-                    className="w-4 h-4 rounded text-indigo-600 border-white/50 focus:ring-white accent-indigo-600 mt-0.5 shrink-0 cursor-pointer"
+                    className="w-3.5 h-3.5 rounded text-indigo-600 border-white/50 focus:ring-white accent-indigo-600 mt-0.5 shrink-0 cursor-pointer"
                   />
                   <span className="text-white font-medium leading-tight drop-shadow-xs">
                     I agree to Terms &amp; Conditions.
@@ -445,21 +445,21 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
               </div>
             )}
 
-            {/* Primary Action Button: SIGN UP / SIGN IN (Image 1) */}
+            {/* Primary Action Button: SIGN UP / SIGN IN */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 sm:h-12.5 rounded-2xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-black text-xs sm:text-sm tracking-wider uppercase shadow-lg hover:shadow-xl active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 border border-white/30"
+              className="w-full h-10 sm:h-10.5 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-black text-xs tracking-wider uppercase shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 border border-white/30 mt-1"
             >
               {loading ? (
                 <>
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   <span>Please wait...</span>
                 </>
               ) : (
                 <>
                   <span>{authMode === 'signup' ? 'SIGN UP' : 'SIGN IN'}</span>
-                  <ArrowRight className="w-4 h-4 text-white" />
+                  <ArrowRight className="w-3.5 h-3.5 text-white" />
                 </>
               )}
             </button>
@@ -468,15 +468,15 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
             <button
               type="button"
               onClick={() => setShowGoogleModal(true)}
-              className="w-full h-12 sm:h-12.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs sm:text-sm tracking-wider uppercase shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-3 border border-slate-200"
+              className="w-full h-10 sm:h-10.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs tracking-wider uppercase shadow-xs hover:shadow-sm active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2.5 border border-slate-200"
             >
               <GoogleIcon />
-              <span className="text-[#3c4043] font-black">CONTINUE WITH GOOGLE</span>
+              <span className="text-[#3c4043] font-black text-xs">CONTINUE WITH GOOGLE</span>
             </button>
           </form>
 
-          {/* Bottom Switch Link (Exact match to Image 1) */}
-          <div className="mt-5 text-center">
+          {/* Bottom Switch Link */}
+          <div className="mt-3.5 text-center">
             {authMode === 'signup' ? (
               <p className="text-xs text-pink-100 font-semibold drop-shadow-xs">
                 Already Registered?{' '}
@@ -508,7 +508,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
             )}
 
             {authMode === 'login' && (
-              <div className="mt-3">
+              <div className="mt-2">
                 <button
                   type="button"
                   onClick={() => setShowCoordinatorModal(true)}
