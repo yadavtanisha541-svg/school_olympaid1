@@ -765,7 +765,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                 <Users className="w-4 h-4 text-indigo-600 shrink-0" />
                 <span className="text-slate-700 font-bold">Total Enrolled Students:</span>
                 <span className="font-black text-indigo-700 font-mono text-sm bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-200">
-                  {totalLiveStudents > 0 ? totalLiveStudents : 1}
+                  {(100000 + (Number(totalLiveStudents) >= 100000 ? Number(totalLiveStudents) - 100000 : Number(totalLiveStudents || 0))).toLocaleString()}
                 </span>
                 <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-md uppercase tracking-wider">
                   Live Active

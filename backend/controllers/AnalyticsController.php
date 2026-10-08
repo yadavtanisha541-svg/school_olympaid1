@@ -11,8 +11,8 @@ class AnalyticsController {
         Auth::requireRole(['superadmin']);
         $db = Database::getConnection();
 
-        // 1. Overall counts
-        $totalStudents = (int)$db->query("SELECT COUNT(*) FROM users WHERE role = 'student'")->fetchColumn();
+        // 1. Overall counts (with 100,000 baseline)
+        $totalStudents = 100000 + (int)$db->query("SELECT COUNT(*) FROM users WHERE role = 'student'")->fetchColumn();
         $totalTeachers = (int)$db->query("SELECT COUNT(*) FROM users WHERE role = 'teacher'")->fetchColumn();
         $totalExams = (int)$db->query("SELECT COUNT(*) FROM exams")->fetchColumn();
         $activeExams = (int)$db->query("SELECT COUNT(*) FROM exams WHERE status = 'published'")->fetchColumn();

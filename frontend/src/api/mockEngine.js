@@ -3917,7 +3917,7 @@ export const mockEngine = {
         success: true,
         data: {
           metrics: {
-            total_students: studentsList.length,
+            total_students: 100000 + studentsList.length,
             total_schools: totalSchoolsCount,
             total_teachers: teachersList.length,
             total_exams: totalExamsCount,
@@ -3927,7 +3927,7 @@ export const mockEngine = {
             avg_score: avgScore,
             pass_percentage: passPercentage
           },
-          total_students: studentsList.length,
+          total_students: 100000 + studentsList.length,
           total_schools: totalSchoolsCount,
           total_exams: totalExamsCount,
           total_questions: totalQuestionsCount,

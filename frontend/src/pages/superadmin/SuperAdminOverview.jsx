@@ -85,9 +85,14 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
   }, []);
 
   const metrics = data?.metrics || {};
-  const currentTotalStudents = (metrics.total_students !== undefined && metrics.total_students >= 0)
+  const BASE_STUDENTS_OFFSET = 100000;
+  const rawStudentCount = (metrics.total_students !== undefined && metrics.total_students >= 0)
     ? metrics.total_students
     : liveStudentsCount;
+  const dynamicStudentAdditions = Number(rawStudentCount) >= BASE_STUDENTS_OFFSET 
+    ? Number(rawStudentCount) - BASE_STUDENTS_OFFSET 
+    : Number(rawStudentCount || 0);
+  const currentTotalStudents = (BASE_STUDENTS_OFFSET + dynamicStudentAdditions).toLocaleString();
 
   const currentTotalSchools = (metrics.total_schools !== undefined && metrics.total_schools >= 0)
     ? metrics.total_schools
