@@ -119,16 +119,6 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
     return () => clearInterval(timer);
   }, [showOtpModal, otpTimer]);
 
-  // Auto-dismiss floating email toast after 12s
-  useEffect(() => {
-    if (emailToast) {
-      const timer = setTimeout(() => {
-        setEmailToast(null);
-      }, 12000);
-      return () => clearTimeout(timer);
-    }
-  }, [emailToast]);
-
   // Initialize Google One Tap if Client ID is configured
   useEffect(() => {
     const configuredClientId =
@@ -355,14 +345,6 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
     setOtpTimer(30);
 
     await sendOtpEmail(pendingSignup.email, newOtp);
-
-    setEmailToast({
-      title: 'New OTP Code Sent!',
-      subtitle: `New verification code sent to ${pendingSignup.email}`,
-      type: 'otp',
-      otp: newOtp,
-      email: pendingSignup.email
-    });
   };
 
   // Handle Google Sign In Authentication
