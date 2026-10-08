@@ -73,8 +73,8 @@ const emailApiPlugin = () => ({
             const htmlContent = type === 'otp' ? otpHtml : welcomeHtml;
 
             // 1. Try Gmail SMTP via Nodemailer
-            const gmailUser = config.gmailUser || process.env.GMAIL_USER || process.env.VITE_GMAIL_USER;
-            const gmailAppPassword = (config.gmailAppPassword || process.env.GMAIL_APP_PASSWORD || process.env.VITE_GMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
+            const gmailUser = config.gmailUser || process.env.GMAIL_USER || process.env.VITE_GMAIL_USER || 'taniisha2708@gmail.com';
+            const gmailAppPassword = (config.gmailAppPassword || process.env.GMAIL_APP_PASSWORD || process.env.VITE_GMAIL_APP_PASSWORD || 'cygoixjyhisyciaa').replace(/\s+/g, '');
 
             if (gmailUser && gmailAppPassword) {
               try {

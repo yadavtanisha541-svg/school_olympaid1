@@ -16,8 +16,8 @@ export const getEmailConfig = () => {
 
   return {
     provider: import.meta.env.VITE_EMAIL_PROVIDER || 'gmail_smtp', // 'gmail_smtp' | 'brevo' | 'emailjs' | 'resend'
-    gmailUser: import.meta.env.VITE_GMAIL_USER || '',
-    gmailAppPassword: import.meta.env.VITE_GMAIL_APP_PASSWORD || '',
+    gmailUser: import.meta.env.VITE_GMAIL_USER || 'taniisha2708@gmail.com',
+    gmailAppPassword: import.meta.env.VITE_GMAIL_APP_PASSWORD || 'cygoixjyhisyciaa',
     brevoApiKey: import.meta.env.VITE_BREVO_API_KEY || '',
     brevoSenderEmail: import.meta.env.VITE_BREVO_SENDER_EMAIL || '',
     emailjsServiceId: import.meta.env.VITE_EMAILJS_SERVICE_ID || '',
