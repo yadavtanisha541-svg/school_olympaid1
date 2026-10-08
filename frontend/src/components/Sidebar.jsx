@@ -105,7 +105,6 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
     { id: 'faqs_key_info', label: 'FAQs & Key Info Manager', icon: HelpCircle, perm: 'manage_faqs_keyinfo' },
     { id: 'results', label: 'Exam Results & Reports', icon: FileCheck2, perm: 'publish_exam_results' },
     { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy, perm: 'manage_leaderboard' },
-    { id: 'certificates', label: 'Certificates Manager', icon: Award, perm: 'manage_certificates' },
     { id: 'activity_logs', label: 'Audit Activity Logs', icon: Activity, perm: 'audit_activity_logs' },
     { id: 'settings', label: 'System Settings', icon: Settings, perm: 'manage_system_settings' }
   ];
