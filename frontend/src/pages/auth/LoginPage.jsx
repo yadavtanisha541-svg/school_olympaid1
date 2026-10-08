@@ -309,7 +309,14 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
         setError('Google OAuth popup failed to initialize. Please check client ID.');
       }
     } else {
-      setError('Google Identity Services is loading. Please try again in 2 seconds.');
+      // Auto-load script if not already on window
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.onload = () => {
+        handleContinueWithGoogle();
+      };
+      document.head.appendChild(script);
     }
   };
 
