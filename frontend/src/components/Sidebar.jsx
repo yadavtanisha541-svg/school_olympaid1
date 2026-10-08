@@ -103,7 +103,6 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
     { id: 'revision_vault', label: 'Revision Vault & Bookmarks', icon: Bookmark, perm: 'manage_revision_vault' },
     { id: 'free_quizzes_manager', label: 'FREE Quizzes Manager', icon: HelpCircle, perm: 'manage_free_quizzes' },
     { id: 'faqs_key_info', label: 'FAQs & Key Info Manager', icon: HelpCircle, perm: 'manage_faqs_keyinfo' },
-    { id: 'test_generator_manager', label: 'Sample & Past Papers', icon: Sparkles, perm: 'manage_test_generator' },
     { id: 'results', label: 'Exam Results & Reports', icon: FileCheck2, perm: 'publish_exam_results' },
     { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy, perm: 'manage_leaderboard' },
     { id: 'certificates', label: 'Certificates Manager', icon: Award, perm: 'manage_certificates' },
