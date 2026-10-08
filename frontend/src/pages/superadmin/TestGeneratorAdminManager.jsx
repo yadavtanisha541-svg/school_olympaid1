@@ -444,14 +444,21 @@ export const TestGeneratorAdminManager = () => {
     }
 
     const local = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-    const prefix = paperCategory === 'generator' ? 'TGP' : 'PRAC';
+    const prefix = 'PRAC';
     const newPaperLocal = {
       ...payload,
       id: Date.now(),
       exam_code: `${prefix}-${subObj?.code || 'GEN'}-${Math.floor(1000 + Math.random() * 9000)}`
     };
-    const updatedLocal = [newPaperLocal, ...local];
+    const updatedLocal = [newPaperLocal, ...local.filter(p => p.id !== newPaperLocal.id)];
     localStorage.setItem('admin_generator_papers', JSON.stringify(updatedLocal));
+
+    try {
+      const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+      localStorage.setItem('mock_db_exam_papers', JSON.stringify([newPaperLocal, ...mockDb.filter(p => p.id !== newPaperLocal.id)]));
+    } catch (e) {}
+
+    window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedLocal }));
 
     setShowCreateModal(false);
     fetchPapers();
@@ -476,6 +483,13 @@ export const TestGeneratorAdminManager = () => {
     const local = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
     const updated = local.filter((p) => p.id !== paperId);
     localStorage.setItem('admin_generator_papers', JSON.stringify(updated));
+
+    try {
+      const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+      localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockDb.filter((p) => p.id !== paperId)));
+    } catch (e) {}
+
+    window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updated }));
     fetchPapers();
   };
 
