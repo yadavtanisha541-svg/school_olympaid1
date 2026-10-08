@@ -42,13 +42,26 @@ import {
   Palette,
   Video,
   ShieldCheck,
-  Languages
+  Languages,
+  Lock
 } from 'lucide-react';
+import { isSubjectPurchased, getPurchasedTests } from '../utils/purchaseUtils';
 
 export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic }) => {
   const { user, logout, hasPermission } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [purchasedTests, setPurchasedTests] = useState(() => getPurchasedTests());
   const userMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleSyncPurchases = () => setPurchasedTests(getPurchasedTests());
+    window.addEventListener('olympiadhub-package-purchased', handleSyncPurchases);
+    window.addEventListener('storage', handleSyncPurchases);
+    return () => {
+      window.removeEventListener('olympiadhub-package-purchased', handleSyncPurchases);
+      window.removeEventListener('storage', handleSyncPurchases);
+    };
+  }, []);
 
   // Close user menu on outside click
   useEffect(() => {
@@ -302,15 +315,17 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   {studentAccordions.content && (
                     <div className="pl-3.5 pr-1 py-1 space-y-1">
                       {[
-                        { id: 'content_imo', label: 'IEOM (Mathematics)', icon: Calculator },
-                        { id: 'content_iso', label: 'IEOS (Science)', icon: Rocket },
-                        { id: 'content_ieo', label: 'IEOE (English)', icon: BookOpen },
-                        { id: 'content_igko', label: 'IEOG (General Knowledge)', icon: Globe },
-                        { id: 'content_idlo', label: 'IEOD (Digital Literacy)', icon: Laptop },
-                        { id: 'content_iho', label: 'IEOH (Hindi)', icon: Languages }
+                        { id: 'content_imo', key: 'imo', label: 'IEOM (Mathematics)', icon: Calculator },
+                        { id: 'content_iso', key: 'iso', label: 'IEOS (Science)', icon: Rocket },
+                        { id: 'content_ieo', key: 'ieo', label: 'IEOE (English)', icon: BookOpen },
+                        { id: 'content_igko', key: 'igko', label: 'IEOG (General Knowledge)', icon: Globe },
+                        { id: 'content_idlo', key: 'idlo', label: 'IEOD (Digital Literacy)', icon: Laptop },
+                        { id: 'content_iho', key: 'iho', label: 'IEOH (Hindi)', icon: Languages }
                       ].map((sub) => {
                         const SubIcon = sub.icon;
                         const isSubActive = currentTab === sub.id;
+                        const isUnlocked = isSubjectPurchased(sub.key, user?.class || user?.grade || 'Class 6', purchasedTests);
+
                         return (
                           <button
                             key={sub.id}
@@ -319,14 +334,27 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                               onSelectTab(sub.id);
                               if (onClose) onClose();
                             }}
-                            className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                            className={`w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
                               isSubActive
                                 ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
                                 : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                             }`}
                           >
-                            <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-white' : 'text-slate-400'}`} />
-                            <span className="truncate">{sub.label}</span>
+                            <div className="flex items-center gap-2 min-w-0">
+                              <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-white' : 'text-slate-400'}`} />
+                              <span className="truncate">{sub.label}</span>
+                            </div>
+
+                            {isUnlocked ? (
+                              <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/70 border border-emerald-500/40 px-1.5 py-0.5 rounded shrink-0">
+                                ✓
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold text-amber-300 bg-amber-950/60 border border-amber-500/40 px-1.5 py-0.5 rounded flex items-center gap-0.5 shrink-0">
+                                <Lock className="w-2.5 h-2.5" />
+                                <span>₹99</span>
+                              </span>
+                            )}
                           </button>
                         );
                       })}

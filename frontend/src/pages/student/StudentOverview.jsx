@@ -47,8 +47,11 @@ import {
   Building2,
   Bookmark,
   Palette,
-  GraduationCap
+  GraduationCap,
+  Lock,
+  Plus
 } from 'lucide-react';
+import { isSubjectPurchased, getPurchasedTests } from '../../utils/purchaseUtils';
 
 const CLASS_OPTIONS = [
   'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 
@@ -61,6 +64,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
   const [selectedClass, setSelectedClass] = useState(() => {
     return user?.class || user?.grade || 'Class 6';
   });
+  const [purchasedTests, setPurchasedTests] = useState(() => getPurchasedTests());
   const [data, setData] = useState(null);
   const [availableExams, setAvailableExams] = useState([]);
   const [examPapers, setExamPapers] = useState([]);
@@ -75,6 +79,18 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(() => new Date());
+
+  useEffect(() => {
+    const handleSync = () => {
+      setPurchasedTests(getPurchasedTests());
+    };
+    window.addEventListener('olympiadhub-package-purchased', handleSync);
+    window.addEventListener('storage', handleSync);
+    return () => {
+      window.removeEventListener('olympiadhub-package-purchased', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
+  }, []);
 
   // Synchronize when activeSubjectTab changes externally (e.g. from Sidebar)
   useEffect(() => {
@@ -849,126 +865,261 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. SECTION: OLYMPIAD SUBJECTS (2-3 Mix Pastel Gradient Cards)             */}
+      {/* 2. SECTION: OLYMPIAD SUBJECTS (SHOWS ONLY PURCHASED SUBJECTS)             */}
       {/* ========================================================================= */}
-      <div className="space-y-4 pt-2">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-              <BookOpen className="w-6 h-6 text-indigo-600" />
-              <span>Olympiad Subjects</span>
-            </h2>
-            <p className="text-xs text-slate-500 font-semibold mt-0.5">
-              Explore subject-wise preparation material &amp; practice test series.
-            </p>
-          </div>
+      {(() => {
+        const ALL_DASHBOARD_SUBJECTS = [
+          {
+            key: 'imo',
+            code: 'IMO',
+            title: 'IEOM (Maths)',
+            subtitle: 'Mathematics & Logic',
+            icon: Calculator,
+            cardBg: 'bg-gradient-to-br from-pink-200/95 via-rose-200/85 to-amber-200/85 border-2 border-pink-400/90 hover:border-pink-500 shadow-sm',
+            iconBg: 'bg-gradient-to-tr from-pink-500 via-rose-500 to-amber-500 text-white shadow-pink-300 shadow-sm',
+            linkText: 'text-pink-800 group-hover:text-pink-900'
+          },
+          {
+            key: 'iso',
+            code: 'ISO',
+            title: 'IEOS (Science)',
+            subtitle: 'Science & Discovery',
+            icon: Rocket,
+            cardBg: 'bg-gradient-to-br from-purple-200/95 via-indigo-200/85 to-sky-200/85 border-2 border-purple-400/90 hover:border-purple-500 shadow-sm',
+            iconBg: 'bg-gradient-to-tr from-purple-500 via-indigo-500 to-sky-500 text-white shadow-purple-300 shadow-sm',
+            linkText: 'text-purple-800 group-hover:text-purple-900'
+          },
+          {
+            key: 'idlo',
+            code: 'IDLO',
+            title: 'IEOD (Digital)',
+            subtitle: 'Digital Literacy & AI',
+            icon: Laptop,
+            cardBg: 'bg-gradient-to-br from-cyan-200/95 via-blue-200/85 to-indigo-200/85 border-2 border-blue-400/90 hover:border-blue-500 shadow-sm',
+            iconBg: 'bg-gradient-to-tr from-cyan-500 via-blue-500 to-indigo-500 text-white shadow-blue-300 shadow-sm',
+            linkText: 'text-blue-800 group-hover:text-blue-900'
+          },
+          {
+            key: 'ieo',
+            code: 'IEO',
+            title: 'IEOE (English)',
+            subtitle: 'English & Grammar',
+            icon: BookOpen,
+            cardBg: 'bg-gradient-to-br from-emerald-200/95 via-teal-200/85 to-cyan-200/85 border-2 border-teal-400/90 hover:border-teal-500 shadow-sm',
+            iconBg: 'bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-teal-300 shadow-sm',
+            linkText: 'text-teal-900 group-hover:text-teal-950'
+          },
+          {
+            key: 'igko',
+            code: 'IGKO',
+            title: 'IEOG (GK)',
+            subtitle: 'General Knowledge',
+            icon: Globe,
+            cardBg: 'bg-gradient-to-br from-amber-200/95 via-orange-200/85 to-rose-200/85 border-2 border-amber-400/90 hover:border-amber-500 shadow-sm',
+            iconBg: 'bg-gradient-to-tr from-amber-500 via-orange-500 to-rose-500 text-white shadow-amber-300 shadow-sm',
+            linkText: 'text-amber-900 group-hover:text-amber-950'
+          },
+          {
+            key: 'iho',
+            code: 'IHO',
+            title: 'IEOH (Hindi)',
+            subtitle: 'हिंदी व्याकरण एवं बोध',
+            icon: Languages,
+            cardBg: 'bg-gradient-to-br from-lime-200/95 via-emerald-200/85 to-teal-200/85 border-2 border-emerald-400/90 hover:border-emerald-500 shadow-sm',
+            iconBg: 'bg-gradient-to-tr from-lime-500 via-emerald-500 to-teal-600 text-white shadow-emerald-300 shadow-sm',
+            linkText: 'text-emerald-900 group-hover:text-emerald-950'
+          }
+        ];
 
-          {/* Class Dropdown */}
-          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-indigo-300 transition-colors">
-            <GraduationCap className="w-4 h-4 text-indigo-600 shrink-0" />
-            <span className="text-xs font-bold text-slate-500">Class:</span>
-            <select
-              value={selectedClass}
-              onChange={(e) => setSelectedClass(e.target.value)}
-              aria-label="Select Class"
-              className="text-xs font-black text-slate-800 bg-transparent focus:outline-none cursor-pointer pr-1"
-            >
-              {CLASS_OPTIONS.map((cls) => (
-                <option key={cls} value={cls}>
-                  {cls}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        const purchasedDashboardSubjects = ALL_DASHBOARD_SUBJECTS.filter(sub =>
+          isSubjectPurchased(sub.key, selectedClass, purchasedTests)
+        );
 
-        {/* 6 Colorful 2-3 Mix Pastel Gradient Subject Cards (20% Richer) */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5 w-full">
-          {[
-            {
-              key: 'imo',
-              title: 'IEOM (Maths)',
-              subtitle: 'Mathematics & Logic',
-              icon: Calculator,
-              cardBg: 'bg-gradient-to-br from-pink-200/95 via-rose-200/85 to-amber-200/85 border-2 border-pink-400/90 hover:border-pink-500 shadow-sm',
-              iconBg: 'bg-gradient-to-tr from-pink-500 via-rose-500 to-amber-500 text-white shadow-pink-300 shadow-sm',
-              linkText: 'text-pink-800 group-hover:text-pink-900'
-            },
-            {
-              key: 'iso',
-              title: 'IEOS (Science)',
-              subtitle: 'Science & Discovery',
-              icon: Rocket,
-              cardBg: 'bg-gradient-to-br from-purple-200/95 via-indigo-200/85 to-sky-200/85 border-2 border-purple-400/90 hover:border-purple-500 shadow-sm',
-              iconBg: 'bg-gradient-to-tr from-purple-500 via-indigo-500 to-sky-500 text-white shadow-purple-300 shadow-sm',
-              linkText: 'text-purple-800 group-hover:text-purple-900'
-            },
-            {
-              key: 'idlo',
-              title: 'IEOD (Digital)',
-              subtitle: 'Digital Literacy & AI',
-              icon: Laptop,
-              cardBg: 'bg-gradient-to-br from-cyan-200/95 via-blue-200/85 to-indigo-200/85 border-2 border-blue-400/90 hover:border-blue-500 shadow-sm',
-              iconBg: 'bg-gradient-to-tr from-cyan-500 via-blue-500 to-indigo-500 text-white shadow-blue-300 shadow-sm',
-              linkText: 'text-blue-800 group-hover:text-blue-900'
-            },
-            {
-              key: 'ieo',
-              title: 'IEOE (English)',
-              subtitle: 'English & Grammar',
-              icon: BookOpen,
-              cardBg: 'bg-gradient-to-br from-emerald-200/95 via-teal-200/85 to-cyan-200/85 border-2 border-teal-400/90 hover:border-teal-500 shadow-sm',
-              iconBg: 'bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-teal-300 shadow-sm',
-              linkText: 'text-teal-900 group-hover:text-teal-950'
-            },
-            {
-              key: 'igko',
-              title: 'IEOG (GK)',
-              subtitle: 'General Knowledge',
-              icon: Globe,
-              cardBg: 'bg-gradient-to-br from-amber-200/95 via-orange-200/85 to-rose-200/85 border-2 border-amber-400/90 hover:border-amber-500 shadow-sm',
-              iconBg: 'bg-gradient-to-tr from-amber-500 via-orange-500 to-rose-500 text-white shadow-amber-300 shadow-sm',
-              linkText: 'text-amber-900 group-hover:text-amber-950'
-            },
-            {
-              key: 'iho',
-              title: 'IEOH (Hindi)',
-              subtitle: 'हिंदी व्याकरण एवं बोध',
-              icon: Languages,
-              cardBg: 'bg-gradient-to-br from-lime-200/95 via-emerald-200/85 to-teal-200/85 border-2 border-emerald-400/90 hover:border-emerald-500 shadow-sm',
-              iconBg: 'bg-gradient-to-tr from-lime-500 via-emerald-500 to-teal-600 text-white shadow-emerald-300 shadow-sm',
-              linkText: 'text-emerald-900 group-hover:text-emerald-950'
-            }
-          ].map((sub) => (
-            <div
-              key={sub.key}
-              onClick={() => onNavigateTab && onNavigateTab(`content_${sub.key}`)}
-              className={`${sub.cardBg} rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[200px] group hover:-translate-y-1 text-slate-900`}
-            >
-              {/* Square Icon Container */}
-              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${sub.iconBg} flex items-center justify-center border border-white/40 group-hover:scale-105 transition-transform shrink-0`}>
-                <sub.icon className="w-7 h-7 sm:w-8 sm:h-8" />
-              </div>
-
-              {/* Subject Title & Subtitle */}
-              <div className="space-y-1 my-auto pt-2">
-                <h3 className="font-bold text-slate-900 text-sm sm:text-base tracking-tight leading-snug">
-                  {sub.title}
-                </h3>
-                <p className="text-xs text-slate-700 font-semibold truncate">
-                  {sub.subtitle}
+        return (
+          <div className="space-y-4 pt-2">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+                  <BookOpen className="w-6 h-6 text-indigo-600" />
+                  <span>
+                    {purchasedDashboardSubjects.length > 0
+                      ? `My Enrolled Subjects (${purchasedDashboardSubjects.length})`
+                      : 'Olympiad Subjects'}
+                  </span>
+                </h2>
+                <p className="text-xs text-slate-500 font-semibold mt-0.5">
+                  {purchasedDashboardSubjects.length > 0
+                    ? 'Only your purchased Olympiad test series are shown below. Click to start mock tests.'
+                    : 'Unlock any subject below for ₹99 to access full mock test series and CBT exams.'}
                 </p>
               </div>
 
-              {/* Bottom Action Indicator */}
-              <div className={`w-full pt-2.5 border-t border-black/10 flex items-center justify-between text-xs font-bold ${sub.linkText} transition-colors`}>
-                <span>Explore Series</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              <div className="flex items-center gap-2.5 flex-wrap">
+                {purchasedDashboardSubjects.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => onNavigateTab && onNavigateTab('my_content')}
+                    className="px-3 py-1.5 rounded-xl bg-white border border-indigo-200 hover:border-indigo-400 text-indigo-700 hover:bg-indigo-50 text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Unlock More Subjects</span>
+                  </button>
+                )}
+
+                {/* Class Dropdown */}
+                <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-indigo-300 transition-colors">
+                  <GraduationCap className="w-4 h-4 text-indigo-600 shrink-0" />
+                  <span className="text-xs font-bold text-slate-500">Class:</span>
+                  <select
+                    value={selectedClass}
+                    onChange={(e) => setSelectedClass(e.target.value)}
+                    aria-label="Select Class"
+                    className="text-xs font-black text-slate-800 bg-transparent focus:outline-none cursor-pointer pr-1"
+                  >
+                    {CLASS_OPTIONS.map((cls) => (
+                      <option key={cls} value={cls}>
+                        {cls}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+
+            {purchasedDashboardSubjects.length > 0 ? (
+              /* SHOW ONLY PURCHASED SUBJECTS (Plus a card to unlock more) */
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5 w-full">
+                {purchasedDashboardSubjects.map((sub) => (
+                  <div
+                    key={sub.key}
+                    onClick={() => onNavigateTab && onNavigateTab(`content_${sub.key}`)}
+                    className={`${sub.cardBg} rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[220px] group hover:-translate-y-1 text-slate-900 relative overflow-hidden`}
+                  >
+                    {/* Active Badge */}
+                    <div className="absolute top-2.5 right-2.5">
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black flex items-center gap-1 shadow-2xs">
+                        <Check className="w-2.5 h-2.5 stroke-[3]" />
+                        ACTIVE
+                      </span>
+                    </div>
+
+                    {/* Square Icon Container */}
+                    <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${sub.iconBg} flex items-center justify-center border border-white/40 group-hover:scale-105 transition-transform shrink-0 mt-1`}>
+                      <sub.icon className="w-7 h-7 sm:w-8 sm:h-8" />
+                    </div>
+
+                    {/* Subject Title & Subtitle */}
+                    <div className="space-y-1 my-auto pt-2">
+                      <h3 className="font-bold text-slate-900 text-sm sm:text-base tracking-tight leading-snug">
+                        {sub.title}
+                      </h3>
+                      <p className="text-xs text-slate-700 font-semibold truncate">
+                        {sub.subtitle}
+                      </p>
+                    </div>
+
+                    {/* Bottom Action Indicator */}
+                    <div className={`w-full pt-2.5 border-t border-black/10 flex items-center justify-between text-xs font-bold ${sub.linkText} transition-colors`}>
+                      <span>Start Mock Test</span>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+                  </div>
+                ))}
+
+                {/* Unlock More Subjects Card */}
+                {purchasedDashboardSubjects.length < ALL_DASHBOARD_SUBJECTS.length && (
+                  <div
+                    onClick={() => onNavigateTab && onNavigateTab('my_content')}
+                    className="rounded-3xl p-5 sm:p-6 border-2 border-dashed border-indigo-300 hover:border-indigo-500 bg-white hover:bg-indigo-50/40 shadow-xs hover:shadow-sm transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[220px] group hover:-translate-y-1 text-slate-800"
+                  >
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-indigo-50 group-hover:bg-indigo-100 text-indigo-600 flex items-center justify-center border border-indigo-200 transition-colors shrink-0 mt-1">
+                      <Plus className="w-7 h-7" />
+                    </div>
+
+                    <div className="space-y-1 my-auto pt-2">
+                      <h3 className="font-bold text-slate-900 text-sm sm:text-base tracking-tight leading-snug">
+                        + Add Subject
+                      </h3>
+                      <p className="text-xs text-slate-500 font-medium">
+                        Unlock for ₹99
+                      </p>
+                    </div>
+
+                    <div className="w-full pt-2.5 border-t border-slate-200 flex items-center justify-center text-xs font-bold text-indigo-600 group-hover:text-indigo-800 transition-colors">
+                      <span>Explore Series →</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* ZERO PURCHASED SUBJECTS - PROMPT TO UNLOCK FIRST SUBJECT */
+              <div className="space-y-4">
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 via-orange-50 to-pink-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-slate-800">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                      <Lock className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black text-slate-900">
+                        No Mock Test Series Unlocked Yet
+                      </h4>
+                      <p className="text-xs text-slate-600 font-medium mt-0.5">
+                        Select any Olympiad subject below to unlock the complete 5 mock tests package for Class {selectedClass} for just ₹99!
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onNavigateTab && onNavigateTab('my_content')}
+                    className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs shadow-xs transition-all cursor-pointer shrink-0"
+                  >
+                    View All Test Series
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-5 w-full">
+                  {ALL_DASHBOARD_SUBJECTS.map((sub) => (
+                    <div
+                      key={sub.key}
+                      onClick={() => onNavigateTab && onNavigateTab(`content_${sub.key}`)}
+                      className={`${sub.cardBg} rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col items-center justify-between text-center min-h-[220px] group hover:-translate-y-1 text-slate-900 relative overflow-hidden`}
+                    >
+                      {/* Lock Badge */}
+                      <div className="absolute top-2.5 right-2.5">
+                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-black flex items-center gap-1 shadow-2xs">
+                          <Lock className="w-2.5 h-2.5" />
+                          ₹99
+                        </span>
+                      </div>
+
+                      {/* Square Icon Container */}
+                      <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${sub.iconBg} flex items-center justify-center border border-white/40 group-hover:scale-105 transition-transform shrink-0 mt-1`}>
+                        <sub.icon className="w-7 h-7 sm:w-8 sm:h-8" />
+                      </div>
+
+                      {/* Subject Title & Subtitle */}
+                      <div className="space-y-1 my-auto pt-2">
+                        <h3 className="font-bold text-slate-900 text-sm sm:text-base tracking-tight leading-snug">
+                          {sub.title}
+                        </h3>
+                        <p className="text-xs text-slate-700 font-semibold truncate">
+                          {sub.subtitle}
+                        </p>
+                      </div>
+
+                      {/* Bottom Action Indicator */}
+                      <div className={`w-full pt-2.5 border-t border-black/10 flex items-center justify-between text-xs font-bold ${sub.linkText} transition-colors`}>
+                        <span>Unlock ₹99</span>
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* ========================================================================= */}
       {/* 3. SECTION: FEATURED PRACTICE BANNER                                      */}

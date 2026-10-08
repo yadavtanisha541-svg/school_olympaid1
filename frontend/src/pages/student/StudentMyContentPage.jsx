@@ -24,9 +24,14 @@ import {
   FileText,
   Languages,
   Rocket,
-  GraduationCap
+  GraduationCap,
+  Lock,
+  QrCode,
+  CreditCard,
+  Copy
 } from 'lucide-react';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
+import { isSubjectPurchased, savePurchasedSubject, getPurchasedTests } from '../../utils/purchaseUtils';
 
 const CLASS_OPTIONS = [
   'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 
@@ -47,6 +52,25 @@ export const StudentMyContentPage = ({
 
   const [examPapers, setExamPapers] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Purchased Tests & Unlock State
+  const [purchasedTests, setPurchasedTests] = useState(() => getPurchasedTests());
+  const [purchasingSubject, setPurchasingSubject] = useState(null);
+  const [paymentStep, setPaymentStep] = useState('method'); // 'method' | 'success'
+  const [selectedPayMethod, setSelectedPayMethod] = useState('upi_qr');
+  const [utrNumber, setUtrNumber] = useState('');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [copiedUpi, setCopiedUpi] = useState(false);
+  const [bankSettings, setBankSettings] = useState({
+    upi_id: 'olympiadhub@icici',
+    merchant_name: 'Olympiad Foundation India',
+    bank_name: 'ICICI Bank',
+    account_number: '1029384756',
+    ifsc: 'ICIC0001029',
+    qr_code_url: '',
+    test_pack_price: 99,
+    original_price: 299
+  });
 
   // Active selected subject filter: 'ALL' or 'IGKO', 'IMO', 'ISO', etc.
   const [selectedSubject, setSelectedSubject] = useState(() => {
@@ -130,6 +154,69 @@ export const StudentMyContentPage = ({
       window.removeEventListener('storage', handleSync);
     };
   }, [user]);
+
+  useEffect(() => {
+    apiClient.get('/payment/bank-settings').then(res => {
+      if (res && res.data) {
+        setBankSettings(prev => ({ ...prev, ...res.data }));
+      }
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const handleSyncPurchases = () => {
+      setPurchasedTests(getPurchasedTests());
+    };
+    window.addEventListener('olympiadhub-package-purchased', handleSyncPurchases);
+    window.addEventListener('storage', handleSyncPurchases);
+    return () => {
+      window.removeEventListener('olympiadhub-package-purchased', handleSyncPurchases);
+      window.removeEventListener('storage', handleSyncPurchases);
+    };
+  }, []);
+
+  const handleCopyUpi = () => {
+    const text = bankSettings.upi_id || 'olympiadhub@icici';
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text);
+    }
+    setCopiedUpi(true);
+    setTimeout(() => setCopiedUpi(false), 2000);
+  };
+
+  const handleCompleteMockPurchase = async () => {
+    if (!purchasingSubject) return;
+    setIsProcessingPayment(true);
+    try {
+      const updated = savePurchasedSubject(
+        purchasingSubject.code,
+        purchasingSubject.altCode,
+        studentClass,
+        {
+          order_id: `ORD-MOCK-${Date.now().toString().slice(-6)}`,
+          subject_name: purchasingSubject.title,
+          amount: bankSettings.test_pack_price || 99,
+          payment_method: selectedPayMethod,
+          utr_number: utrNumber || `UPI-TXN-${Date.now().toString().slice(-8)}`
+        }
+      );
+      setPurchasedTests(updated);
+      setPaymentStep('success');
+
+      setTimeout(() => {
+        const boughtCode = purchasingSubject.code;
+        setPaymentStep('method');
+        setPurchasingSubject(null);
+        setOpenedMockSeries(boughtCode);
+        setSelectedSubject(boughtCode);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 1200);
+    } catch (err) {
+      alert('Payment processing failed. Please try again.');
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
 
   // When activeSubjectCode changes from the sidebar (e.g. student clicks IGKO or ISO)
   // We ALWAYS show the Subject Cover first (openedMockSeries = null) as requested!
@@ -332,6 +419,320 @@ export const StudentMyContentPage = ({
     return ALL_SUBJECT_COVERS;
   }, [selectedSubject, ALL_SUBJECT_COVERS]);
 
+  // Dedicated Step 2: Payment & QR Checkout Screen for Mock Test Series
+  if (purchasingSubject) {
+    const sub = purchasingSubject;
+    const upiAmount = bankSettings.test_pack_price || 99;
+    const upiPayUrl = `upi://pay?pa=${bankSettings.upi_id || 'olympiadhub@icici'}&pn=${encodeURIComponent(bankSettings.merchant_name || 'Olympiad Foundation')}&am=${upiAmount}&cu=INR&tn=${encodeURIComponent(`${studentClass} ${sub.code} Mock Series`)}`;
+    const qrImageSrc = bankSettings.qr_code_url || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiPayUrl)}`;
+
+    return (
+      <div className="space-y-6 pb-16 font-sans max-w-5xl mx-auto animate-in fade-in duration-200">
+        {/* Navigation & Header */}
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => {
+              setPurchasingSubject(null);
+              setPaymentStep('method');
+            }}
+            className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-indigo-600 px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4 text-indigo-600" />
+            <span>← Back to Mock Test Covers</span>
+          </button>
+          <span className="text-xs font-bold text-slate-400">Step 2 of 2: Payment Checkout</span>
+        </div>
+
+        {/* Main Card */}
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-3 py-1 rounded-full text-xs font-black bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase tracking-wider">
+                  {studentClass} • {sub.code}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
+                  <Lock className="w-3.5 h-3.5" />
+                  Premium Test Series
+                </span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                Unlock {sub.title}
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+                Scan QR Code with any UPI app to unlock all 5 timed mock tests, CBT interface, and detailed step-by-step solutions.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="px-3.5 py-1.5 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5 shrink-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Instant Auto-Unlock
+              </span>
+            </div>
+          </div>
+
+          {paymentStep === 'success' ? (
+            <div className="py-12 text-center space-y-4 animate-in zoom-in-95 duration-300">
+              <div className="w-20 h-20 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-lg animate-bounce">
+                <CheckCircle2 className="w-10 h-10" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-800">
+                🎉 Payment Verified Successfully!
+              </h3>
+              <p className="text-sm text-slate-500 font-medium max-w-md mx-auto">
+                {studentClass} ({sub.title}) Mock Test Series has been unlocked. Opening mock test papers...
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* LEFT 7 COLS: Big UPI QR Scanner & UPI Details */}
+              <div className="lg:col-span-7 bg-[#faf5fa] rounded-3xl p-6 border border-[#edd6ed] space-y-5">
+                {/* Method Tabs */}
+                <div className="grid grid-cols-2 gap-2 p-1 bg-white rounded-2xl border border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPayMethod('upi_qr')}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                      selectedPayMethod === 'upi_qr'
+                        ? 'bg-[#6d3a68] text-white shadow-sm font-black'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <QrCode className="w-4 h-4" />
+                    <span>UPI QR &amp; Apps</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPayMethod('card')}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                      selectedPayMethod === 'card'
+                        ? 'bg-[#6d3a68] text-white shadow-sm font-black'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span>Direct Bank Transfer</span>
+                  </button>
+                </div>
+
+                {selectedPayMethod === 'upi_qr' ? (
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row items-center gap-5 p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
+                      {/* Dynamic QR Code */}
+                      <div className="p-3 bg-white rounded-2xl shadow-md border-2 border-[#edd6ed] shrink-0 text-center">
+                        <img
+                          src={qrImageSrc}
+                          alt="Scan & Pay UPI QR"
+                          className="w-36 h-36 object-contain rounded-xl mx-auto"
+                        />
+                        <p className="text-[10px] font-black text-[#6d3a68] uppercase tracking-wider mt-2">
+                          Scan to Pay ₹{bankSettings.test_pack_price || 99}
+                        </p>
+                      </div>
+
+                      {/* UPI Details & Supported Apps */}
+                      <div className="space-y-3 flex-1 text-center sm:text-left w-full">
+                        <div>
+                          <h4 className="text-sm font-black text-slate-800">
+                            Scan with any UPI App:
+                          </h4>
+                          <div className="flex items-center justify-center sm:justify-start gap-1.5 flex-wrap mt-1.5">
+                            <span className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-xs font-black text-slate-700">Google Pay</span>
+                            <span className="px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-xs font-black text-indigo-700">PhonePe</span>
+                            <span className="px-2.5 py-1 rounded-lg bg-sky-50 border border-sky-200 text-xs font-black text-sky-700">Paytm</span>
+                            <span className="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-xs font-black text-emerald-700">BHIM UPI</span>
+                          </div>
+                        </div>
+
+                        {/* UPI ID & Copy */}
+                        <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                          <div className="min-w-0 text-left">
+                            <p className="text-[9px] text-slate-400 font-bold uppercase">Official UPI ID</p>
+                            <p className="text-xs font-mono font-bold text-slate-800 truncate">
+                              {bankSettings.upi_id || 'olympiadhub@icici'}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleCopyUpi}
+                            className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer shrink-0 border border-slate-200"
+                          >
+                            {copiedUpi ? (
+                              <>
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                <span className="text-emerald-700">Copied</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3.5 h-3.5" />
+                                <span>Copy</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* UTR Input */}
+                    <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2">
+                      <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                        <span>12-Digit UPI / Bank Reference No (UTR)</span>
+                        <span className="text-[10px] text-slate-400 font-normal">(Optional for Instant Unlock)</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 429182746192"
+                        value={utrNumber}
+                        onChange={(e) => setUtrNumber(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-[#6d3a68] outline-none"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  /* Direct Bank Transfer */
+                  <div className="space-y-4 p-5 rounded-2xl bg-white border border-slate-200 text-xs">
+                    <h4 className="text-xs font-black text-slate-700 uppercase tracking-wider">
+                      Official Bank Account Details
+                    </h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">Account Name</p>
+                        <p className="font-black text-slate-800 mt-0.5">{bankSettings.merchant_name || 'Olympiad Foundation'}</p>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">Bank Name</p>
+                        <p className="font-black text-slate-800 mt-0.5">{bankSettings.bank_name || 'ICICI Bank'}</p>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">Account Number</p>
+                        <p className="font-mono font-black text-slate-800 mt-0.5">{bankSettings.account_number || '1029384756'}</p>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">IFSC Code</p>
+                        <p className="font-mono font-black text-slate-800 mt-0.5">{bankSettings.ifsc || 'ICIC0001029'}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                      <label className="text-xs font-bold text-slate-700">
+                        Transfer Reference / Transaction ID
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Enter IMPS / NEFT / Txn Reference No."
+                        value={utrNumber}
+                        onChange={(e) => setUtrNumber(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-[#6d3a68] outline-none"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* RIGHT 5 COLS: Order Summary & Pay Button */}
+              <div className="lg:col-span-5 flex flex-col justify-between bg-white rounded-3xl p-6 border-2 border-[#edd6ed] shadow-sm space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-base font-black text-[#2e1065] tracking-tight border-b border-slate-100 pb-3">
+                    Order Summary
+                  </h3>
+
+                  <div className="space-y-2.5 text-xs">
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-slate-500 font-semibold">Target Class</span>
+                      <span className="font-black text-slate-800">{studentClass}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-slate-500 font-semibold">Olympiad Test Series</span>
+                      <span className="font-black text-slate-800">{sub.title}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-slate-500 font-semibold">Papers Included</span>
+                      <span className="font-black text-slate-800">5 Full Mock Tests</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-slate-500 font-semibold">Questions / Duration</span>
+                      <span className="font-black text-slate-800">60 MCQs / 60 Mins each</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-slate-500 font-semibold">Detailed Solutions</span>
+                      <span className="font-black text-emerald-600">Included (Step-by-Step)</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-slate-500 font-semibold">All India Rank &amp; Analysis</span>
+                      <span className="font-black text-emerald-600">Instant Report</span>
+                    </div>
+                  </div>
+
+                  {/* Price Box */}
+                  <div className="p-4 rounded-2xl bg-[#faf5fa] border border-[#edd6ed] flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase">Total Payable</p>
+                      <p className="text-xs text-emerald-700 font-bold">Special Offer 67% OFF</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs line-through text-slate-400 font-bold mr-1.5">
+                        ₹{bankSettings.original_price || 299}
+                      </span>
+                      <span className="text-3xl font-black text-[#6d3a68]">
+                        ₹{bankSettings.test_pack_price || 99}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 text-[11px] text-slate-500 font-medium">
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>One-time unlock for all mock tests in this subject</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>Instant access: open papers immediately after payment</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="space-y-2.5 pt-4 border-t border-slate-100">
+                  <button
+                    type="button"
+                    disabled={isProcessingPayment}
+                    onClick={handleCompleteMockPurchase}
+                    className="w-full py-3.5 rounded-2xl bg-[#00b074] hover:bg-[#009260] text-white text-sm font-black uppercase tracking-wider transition-all shadow-lg hover:shadow-xl active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    {isProcessingPayment ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Verifying Payment...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4 stroke-[3]" />
+                        <span>I Have Paid ₹{bankSettings.test_pack_price || 99} - Unlock Now</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPurchasingSubject(null);
+                      setPaymentStep('method');
+                    }}
+                    className="w-full py-2.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+                  >
+                    Cancel &amp; Return to Covers
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // Pre-exam instruction screen (Seamless view with website theme styling)
   if (selectedPaperForInstructions) {
     const paper = selectedPaperForInstructions;
@@ -511,6 +912,7 @@ export const StudentMyContentPage = ({
         /* ========================================================================= */
         (() => {
           const currentSub = ALL_SUBJECT_COVERS.find(s => s.code === openedMockSeries) || ALL_SUBJECT_COVERS[0];
+          const isSubUnlocked = isSubjectPurchased(currentSub.code, studentClass, purchasedTests);
           const subjectPapers = getSubjectPapers(currentSub.code, currentSub.altCode);
 
           return (
@@ -568,88 +970,115 @@ export const StudentMyContentPage = ({
                 </div>
               </div>
 
-              {/* Mock Tests Cards Grid (Colorful 2-3 Mix Pastel Theme) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {subjectPapers.map((paper) => {
-                  const result = myTestResults.find(
-                    r => (r.exam_id && (r.exam_id === paper.id || String(r.exam_id) === String(paper.id))) ||
-                         (r.exam_title && r.exam_title.toLowerCase() === paper.title.toLowerCase())
-                  );
-                  const isCompleted = !!result;
-
-                  return (
-                    <div
-                      key={paper.id}
-                      className={`${currentSub.cardBg || 'bg-gradient-to-br from-purple-50 via-indigo-50 to-sky-50 border-2 border-purple-200'} rounded-3xl p-6 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between space-y-5 group relative overflow-hidden text-slate-900`}
+              {!isSubUnlocked ? (
+                /* Locked Test Series Notice */
+                <div className="bg-white rounded-3xl p-8 sm:p-10 border-2 border-amber-300 shadow-sm text-center space-y-4 max-w-xl mx-auto my-8 animate-in fade-in">
+                  <div className="w-16 h-16 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto shadow-xs">
+                    <Lock className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                      🔒 {currentSub.title} Mock Series is Locked
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1.5 max-w-md mx-auto leading-relaxed">
+                      Purchase the complete {studentClass} test series to unlock all 5 timed mock papers, CBT exam timer, instant scorecards, and step-by-step solutions.
+                    </p>
+                  </div>
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setPurchasingSubject(currentSub)}
+                      className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-sm shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer inline-flex items-center gap-2"
                     >
-                      {/* Top: Icon + Title + Class */}
-                      <div className="space-y-3">
-                        <div className={`w-12 h-12 rounded-2xl ${currentSub.iconBg || 'bg-gradient-to-tr from-purple-500 via-indigo-500 to-sky-500 text-white'} flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0 border border-white/40`}>
-                          <FileText className="w-6 h-6 stroke-[2.2]" />
-                        </div>
+                      <Lock className="w-4 h-4" />
+                      <span>Unlock &amp; Pay ₹{bankSettings.test_pack_price || 99} Now</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Mock Tests Cards Grid (Colorful 2-3 Mix Pastel Theme) */
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  {subjectPapers.map((paper) => {
+                    const result = myTestResults.find(
+                      r => (r.exam_id && (r.exam_id === paper.id || String(r.exam_id) === String(paper.id))) ||
+                           (r.exam_title && r.exam_title.toLowerCase() === paper.title.toLowerCase())
+                    );
+                    const isCompleted = !!result;
 
-                        <div>
-                          <h4 className="font-black text-slate-900 text-base sm:text-lg tracking-tight leading-snug">
-                            {paper.title}
-                          </h4>
-                          <p className="text-xs sm:text-sm font-bold text-slate-500 mt-0.5">
-                            {paper.class_name || studentClass}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Middle: Status & Score Containers */}
-                      <div className="space-y-2.5">
-                        {/* Row 1: Status Box */}
-                        <div className="bg-white/85 border border-black/5 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs backdrop-blur-xs">
-                          <div className="flex items-center gap-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-pink-500 shrink-0" />
-                            <span className="text-xs font-bold text-slate-700">Status:</span>
+                    return (
+                      <div
+                        key={paper.id}
+                        className={`${currentSub.cardBg || 'bg-gradient-to-br from-purple-50 via-indigo-50 to-sky-50 border-2 border-purple-200'} rounded-3xl p-6 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between space-y-5 group relative overflow-hidden text-slate-900`}
+                      >
+                        {/* Top: Icon + Title + Class */}
+                        <div className="space-y-3">
+                          <div className={`w-12 h-12 rounded-2xl ${currentSub.iconBg || 'bg-gradient-to-tr from-purple-500 via-indigo-500 to-sky-500 text-white'} flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0 border border-white/40`}>
+                            <FileText className="w-6 h-6 stroke-[2.2]" />
                           </div>
-                          {isCompleted ? (
-                            <span className="px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-black uppercase tracking-wider">
-                              COMPLETED
-                            </span>
-                          ) : (
-                            <span className="px-3 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200 text-[11px] font-black uppercase tracking-wider">
-                              UNATTEMPTED
-                            </span>
-                          )}
-                        </div>
 
-                        {/* Row 2: Last Score Box */}
-                        <div className="bg-white/85 border border-black/5 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs backdrop-blur-xs">
-                          <div className="flex items-center gap-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 shrink-0" />
-                            <span className="text-xs font-bold text-slate-700">Last Score:</span>
+                          <div>
+                            <h4 className="font-black text-slate-900 text-base sm:text-lg tracking-tight leading-snug">
+                              {paper.title}
+                            </h4>
+                            <p className="text-xs sm:text-sm font-bold text-slate-500 mt-0.5">
+                              {paper.class_name || studentClass}
+                            </p>
                           </div>
-                          {isCompleted ? (
-                            <span className="px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-black">
-                              {result.score} / {result.total_marks || paper.total_marks || 60} ({Math.round(result.percentage || 0)}%)
-                            </span>
-                          ) : (
-                            <span className="px-3 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[11px] font-black">
-                              none
-                            </span>
-                          )}
+                        </div>
+
+                        {/* Middle: Status & Score Containers */}
+                        <div className="space-y-2.5">
+                          {/* Row 1: Status Box */}
+                          <div className="bg-white/85 border border-black/5 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs backdrop-blur-xs">
+                            <div className="flex items-center gap-2">
+                              <span className="w-2.5 h-2.5 rounded-full bg-pink-500 shrink-0" />
+                              <span className="text-xs font-bold text-slate-700">Status:</span>
+                            </div>
+                            {isCompleted ? (
+                              <span className="px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-black uppercase tracking-wider">
+                                COMPLETED
+                              </span>
+                            ) : (
+                              <span className="px-3 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200 text-[11px] font-black uppercase tracking-wider">
+                                UNATTEMPTED
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Row 2: Last Score Box */}
+                          <div className="bg-white/85 border border-black/5 p-2.5 px-3.5 rounded-2xl flex items-center justify-between shadow-2xs backdrop-blur-xs">
+                            <div className="flex items-center gap-2">
+                              <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 shrink-0" />
+                              <span className="text-xs font-bold text-slate-700">Last Score:</span>
+                            </div>
+                            {isCompleted ? (
+                              <span className="px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-black">
+                                {result.score} / {result.total_marks || paper.total_marks || 60} ({Math.round(result.percentage || 0)}%)
+                              </span>
+                            ) : (
+                              <span className="px-3 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[11px] font-black">
+                                none
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Card Footer: Open Test Button */}
+                        <div className="pt-2 flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedPaperForInstructions(paper)}
+                            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl ${currentSub.btnBg || 'bg-gradient-to-r from-purple-600 via-indigo-600 to-sky-500 text-white'} font-black text-xs sm:text-sm shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95`}
+                          >
+                            <span>Open Test</span>
+                            <ArrowRight className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
-
-                      {/* Card Footer: Open Test Button */}
-                      <div className="pt-2 flex justify-end">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedPaperForInstructions(paper)}
-                          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl ${currentSub.btnBg || 'bg-gradient-to-r from-purple-600 via-indigo-600 to-sky-500 text-white'} font-black text-xs sm:text-sm shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95`}
-                        >
-                          <span>Open Test</span>
-                          <ArrowRight className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })()
@@ -703,6 +1132,7 @@ export const StudentMyContentPage = ({
             {visibleCovers.map((sub) => {
               const subPapers = getSubjectPapers(sub.code, sub.altCode);
               const SubIcon = sub.icon;
+              const isUnlocked = isSubjectPurchased(sub.code, studentClass, purchasedTests);
 
               return (
                 <div
@@ -726,10 +1156,18 @@ export const StudentMyContentPage = ({
                         </div>
                       </div>
 
-                      <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full ${sub.countBg} text-xs font-bold shrink-0`}>
-                        <FileText className="w-3.5 h-3.5" />
-                        <span>{subPapers.length} Mock Tests</span>
-                      </div>
+                      {/* Status indicator: Unlocked vs Locked */}
+                      {isUnlocked ? (
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-black shrink-0 shadow-2xs">
+                          <Check className="w-3.5 h-3.5 stroke-[3]" />
+                          <span>UNLOCKED</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-xs font-black shrink-0 shadow-2xs">
+                          <Lock className="w-3.5 h-3.5" />
+                          <span>LOCKED (₹99)</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Title, Subtitle & Description */}
@@ -748,17 +1186,28 @@ export const StudentMyContentPage = ({
 
                   {/* Bottom Action Bar & Highlights (Colorful Pill Tags) */}
                   <div className="pt-4 border-t border-black/5 space-y-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpenedMockSeries(sub.code);
-                        setSelectedSubject(sub.code);
-                      }}
-                      className={`w-full py-3 rounded-xl ${sub.btnBg} font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs active:scale-98 transition-all cursor-pointer`}
-                    >
-                      <span>Start Mock Test</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
+                    {isUnlocked ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenedMockSeries(sub.code);
+                          setSelectedSubject(sub.code);
+                        }}
+                        className={`w-full py-3 rounded-xl ${sub.btnBg} font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs active:scale-98 transition-all cursor-pointer`}
+                      >
+                        <span>Start Mock Test</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setPurchasingSubject(sub)}
+                        className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-98 transition-all cursor-pointer border border-emerald-600"
+                      >
+                        <Lock className="w-4 h-4" />
+                        <span>Unlock &amp; Buy Test Series (₹99)</span>
+                      </button>
+                    )}
 
                     <div className="flex items-center justify-between gap-1.5 flex-wrap">
                       <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 bg-white/90 border border-black/5 px-2 py-0.5 rounded-full shadow-2xs">
