@@ -67,8 +67,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
     programs: true,
     performance: false,
     account: false,
-    info: false,
-    freeZone: false
+    info: false
   });
 
   const toggleStudentAccordion = (sectionKey) => {
@@ -564,60 +563,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   )}
                 </div>
 
-                {/* Free Zone Accordion Header */}
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => toggleStudentAccordion('freeZone')}
-                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-slate-200 hover:bg-[#1a264e] hover:text-white cursor-pointer transition-colors"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Send className="w-5 h-5 text-slate-400 shrink-0" />
-                      <span>Free Zone</span>
-                    </div>
-                    {studentAccordions.freeZone ? (
-                      <ChevronUp className="w-4.5 h-4.5 text-slate-400" />
-                    ) : (
-                      <ChevronDown className="w-4.5 h-4.5 text-slate-400" />
-                    )}
-                  </button>
 
-                  {/* Clean Sub-items */}
-                  {studentAccordions.freeZone && (
-                    <div className="pl-3.5 pr-1 py-1 space-y-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onSelectTab('free_sample_papers');
-                          if (onClose) onClose();
-                        }}
-                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
-                          currentTab === 'free_sample_papers'
-                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
-                            : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
-                        }`}
-                      >
-                        <FileText className="w-4 h-4 text-slate-400 shrink-0" />
-                        <span className="truncate">Sample Papers &amp; OMR</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onSelectTab('free_past_papers');
-                          if (onClose) onClose();
-                        }}
-                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
-                          currentTab === 'free_past_papers'
-                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
-                            : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
-                        }`}
-                      >
-                        <FileSpreadsheet className="w-4 h-4 text-slate-400 shrink-0" />
-                        <span className="truncate">Previous Year Papers</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
 
                 {/* FREE Quizzes */}
                 <button
