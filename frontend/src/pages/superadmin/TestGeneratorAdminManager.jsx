@@ -800,62 +800,15 @@ export const TestGeneratorAdminManager = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
           <form onSubmit={handleSavePaper} className="space-y-6">
             
-            {/* Section 1: Paper Category Selector */}
-            <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 space-y-4 shadow-2xs">
-              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-black text-xs">
-                  1
-                </div>
-                <div>
-                  <h2 className="text-sm font-black text-slate-900">Select Paper Category / Purpose</h2>
-                  <p className="text-xs text-slate-500">Choose whether this paper is for Student Practice Tests or Test Generator.</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                {[
-                  { id: 'practice_test', label: 'Practice Mock Test', desc: 'Appears under Student > Practice Tests', icon: Sparkles, color: 'border-indigo-400 bg-indigo-50/50 text-indigo-900' },
-                  { id: 'generator', label: 'Test Generator Paper', desc: 'Appears under Intelligent Practice Generator', icon: BookOpen, color: 'border-emerald-400 bg-emerald-50/50 text-emerald-900' }
-                ].map((cat) => {
-                  const isSel = paperCategory === cat.id;
-                  const Icon = cat.icon;
-                  return (
-                    <div
-                      key={cat.id}
-                      onClick={() => handleCategoryChangeInModal(cat.id)}
-                      className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${
-                        isSel ? `${cat.color} ring-2 ring-amber-400 shadow-xs` : 'border-slate-200 bg-slate-50/50 hover:bg-slate-100 text-slate-700'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-black text-xs flex items-center gap-2">
-                          <Icon className="w-4 h-4" />
-                          <span>{cat.label}</span>
-                        </span>
-                        <input
-                          type="radio"
-                          name="paper_cat_choice"
-                          checked={isSel}
-                          onChange={() => handleCategoryChangeInModal(cat.id)}
-                          className="w-4 h-4 accent-amber-600 cursor-pointer"
-                        />
-                      </div>
-                      <p className="text-[11px] text-slate-500">{cat.desc}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Section 2: Exam Configuration & Info */}
+            {/* Exam Configuration & Academic Scope */}
             <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 space-y-5 shadow-2xs">
               <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <div className="w-7 h-7 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center font-black text-xs">
-                  2
+                <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center font-black text-xs">
+                  <Sparkles className="w-4 h-4 text-indigo-600" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-black text-slate-900">Exam Details &amp; Academic Scope</h2>
-                  <p className="text-xs text-slate-500">Configure target class, Olympiad subject, exam year, duration, and title.</p>
+                  <h2 className="text-sm font-black text-slate-900">Practice Test Details &amp; Configuration</h2>
+                  <p className="text-xs text-slate-500">Configure target class, Olympiad subject, exam year, duration, and title. Questions will appear in Student Test Generator.</p>
                 </div>
               </div>
 
@@ -1410,30 +1363,7 @@ export const TestGeneratorAdminManager = () => {
         </div>
       </div>
 
-      {/* Category Tabs Bar */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
-        {[
-          { id: 'all', label: 'All Practice Papers', icon: Layers },
-          { id: 'practice_test', label: '🎯 Practice Tests', icon: Sparkles },
-          { id: 'generator', label: '⚡ Test Generator Papers', icon: BookOpen }
-        ].map((tab) => {
-          const isActive = activeCategoryTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveCategoryTab(tab.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                isActive
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:text-slate-900'
-              }`}
-            >
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+
 
       {/* Filter Toolbar */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs p-4 flex items-center justify-between flex-wrap gap-4">

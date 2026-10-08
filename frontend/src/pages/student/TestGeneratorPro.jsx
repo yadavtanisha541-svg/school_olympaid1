@@ -129,13 +129,13 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   const [generatorStep, setGeneratorStep] = useState('configure'); // 'configure' | 'instructions'
   const [hasAgreedInstructions, setHasAgreedInstructions] = useState(true);
 
-  // Fetch Super Admin papers with strict Class & Subject parameters directly from API
-  const fetchAdminPapers = async (grade = selectedGrade, subject = selectedSubject) => {
+  // Fetch Super Admin papers directly from API & localStorage
+  const fetchAdminPapers = async () => {
     setLoadingAdminPapers(true);
     try {
       const token = localStorage.getItem('token');
       let fetched = [];
-      const res = await fetch(`/api/test-generator/admin-papers?class=${encodeURIComponent(grade)}&subject=${encodeURIComponent(subject)}`, {
+      const res = await fetch(`/api/test-generator/admin-papers`, {
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {})
         }
@@ -165,8 +165,8 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   };
 
   useEffect(() => {
-    fetchAdminPapers(selectedGrade, selectedSubject);
-  }, [selectedGrade, selectedSubject]);
+    fetchAdminPapers();
+  }, []);
 
   // Update selected chapters when subject changes
   useEffect(() => {
@@ -212,12 +212,14 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       const subCode = (p.subject_code || p.subject || p.subject_name || '').toLowerCase().trim();
       const currentSub = (subject || '').toLowerCase().trim();
       const subMap = {
-        math: ['imo', 'math', 'mathematics'],
+        math: ['imo', 'math', 'mathematics', 'mathematic'],
         science: ['iso', 'science', 'nso'],
-        cyber: ['ico', 'icso', 'cyber', 'computer', 'computers', 'ai'],
-        english: ['ieo', 'english'],
-        gk: ['igko', 'gk', 'general knowledge'],
-        reasoning: ['lro', 'iro', 'isso', 'reasoning', 'social studies', 'aptitude']
+        cyber: ['ico', 'icso', 'cyber', 'computer', 'computers', 'ai', 'digital', 'idlo', 'it'],
+        digital: ['ico', 'icso', 'cyber', 'computer', 'computers', 'ai', 'digital', 'idlo', 'it'],
+        english: ['ieo', 'english', 'eng'],
+        gk: ['igko', 'gk', 'general knowledge', 'general'],
+        hindi: ['iho', 'hindi'],
+        reasoning: ['lro', 'iro', 'isso', 'reasoning', 'social studies', 'aptitude', 'logical']
       };
       const validCodes = subMap[currentSub] || [currentSub];
       return validCodes.some(
