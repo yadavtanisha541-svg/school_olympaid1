@@ -24,8 +24,7 @@ import {
   Send,
   Inbox,
   RotateCw,
-  Clock,
-  ShieldCheck
+  Clock
 } from 'lucide-react';
 import { OlympiadHubLogo } from '../../components/OlympiadHubLogo';
 import { GOOGLE_CLIENT_ID } from '../../config/googleConfig';
