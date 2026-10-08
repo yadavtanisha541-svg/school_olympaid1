@@ -45,21 +45,33 @@ import {
   Languages,
   Lock
 } from 'lucide-react';
-import { isSubjectPurchased, getPurchasedTests } from '../utils/purchaseUtils';
+import { isSubjectPurchased, getPurchasedTests, getTestPricing } from '../utils/purchaseUtils';
 
 export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic }) => {
   const { user, logout, hasPermission } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [purchasedTests, setPurchasedTests] = useState(() => getPurchasedTests());
+  const [testPricing, setTestPricing] = useState(() => getTestPricing());
   const userMenuRef = useRef(null);
 
   useEffect(() => {
     const handleSyncPurchases = () => setPurchasedTests(getPurchasedTests());
+    const handleSyncPricing = (e) => {
+      if (e?.detail) {
+        setTestPricing(e.detail);
+      } else {
+        setTestPricing(getTestPricing());
+      }
+    };
     window.addEventListener('olympiadhub-package-purchased', handleSyncPurchases);
+    window.addEventListener('olympiadhub-pricing-updated', handleSyncPricing);
     window.addEventListener('storage', handleSyncPurchases);
+    window.addEventListener('storage', handleSyncPricing);
     return () => {
       window.removeEventListener('olympiadhub-package-purchased', handleSyncPurchases);
+      window.removeEventListener('olympiadhub-pricing-updated', handleSyncPricing);
       window.removeEventListener('storage', handleSyncPurchases);
+      window.removeEventListener('storage', handleSyncPricing);
     };
   }, []);
 
@@ -352,7 +364,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                             ) : (
                               <span className="text-[10px] font-bold text-amber-300 bg-amber-950/60 border border-amber-500/40 px-1.5 py-0.5 rounded flex items-center gap-0.5 shrink-0">
                                 <Lock className="w-2.5 h-2.5" />
-                                <span>₹99</span>
+                                <span>₹{testPricing.mock_test_price || 99}</span>
                               </span>
                             )}
                           </button>

@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 import { DetailedSolutionsPage } from './DetailedSolutionsPage';
+import { getTestPricing } from '../../utils/purchaseUtils';
 
 const CHAPTERS_BY_SUBJECT = {
   math: [
@@ -168,23 +169,52 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   const [utrNumber, setUtrNumber] = useState('');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [copiedUpi, setCopiedUpi] = useState(false);
-  const [bankSettings, setBankSettings] = useState({
-    upi_id: 'olympiadhub@icici',
-    merchant_name: 'Olympiad Foundation India',
-    bank_name: 'ICICI Bank',
-    account_number: '1029384756',
-    ifsc: 'ICIC0001029',
-    qr_code_url: '',
-    test_pack_price: 99,
-    original_price: 299
+  const [bankSettings, setBankSettings] = useState(() => {
+    const p = getTestPricing();
+    const effectivePrice = p.practice_test_price || p.mock_test_price || 99;
+    return {
+      upi_id: 'olympiadhub@icici',
+      merchant_name: 'Olympiad Foundation India',
+      bank_name: 'ICICI Bank',
+      account_number: '1029384756',
+      ifsc: 'ICIC0001029',
+      qr_code_url: '',
+      test_pack_price: effectivePrice,
+      practice_test_price: p.practice_test_price || 99,
+      mock_test_price: p.mock_test_price || 99,
+      original_price: p.original_price || 299
+    };
   });
 
   useEffect(() => {
     apiClient.get('/payment/bank-settings').then(res => {
       if (res && res.data) {
-        setBankSettings(prev => ({ ...prev, ...res.data }));
+        setBankSettings(prev => ({
+          ...prev,
+          ...res.data,
+          test_pack_price: res.data.practice_test_price || res.data.test_pack_price || prev.test_pack_price || 99
+        }));
       }
     }).catch(() => {});
+
+    const handlePricingUpdate = (e) => {
+      const p = e?.detail || getTestPricing();
+      const effectivePrice = p.practice_test_price || p.mock_test_price || 99;
+      setBankSettings(prev => ({
+        ...prev,
+        test_pack_price: effectivePrice,
+        practice_test_price: p.practice_test_price || 99,
+        mock_test_price: p.mock_test_price || 99,
+        original_price: p.original_price || 299
+      }));
+    };
+
+    window.addEventListener('olympiadhub-pricing-updated', handlePricingUpdate);
+    window.addEventListener('storage', handlePricingUpdate);
+    return () => {
+      window.removeEventListener('olympiadhub-pricing-updated', handlePricingUpdate);
+      window.removeEventListener('storage', handlePricingUpdate);
+    };
   }, []);
 
   const handleCopyUpi = () => {

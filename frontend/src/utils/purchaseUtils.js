@@ -55,6 +55,70 @@ export const isSubjectPurchased = (subCodeOrKey, studentClass = null, purchasedL
   });
 };
 
+export const DEFAULT_TEST_PRICING = {
+  mock_test_price: 99,
+  practice_test_price: 99,
+  original_price: 299,
+  test_pack_price: 99
+};
+
+export const getTestPricing = () => {
+  try {
+    const saved = localStorage.getItem('olympiadhub_test_pricing');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return {
+        mock_test_price: Number(parsed.mock_test_price) || 99,
+        practice_test_price: Number(parsed.practice_test_price) || 99,
+        original_price: Number(parsed.original_price) || 299,
+        test_pack_price: Number(parsed.mock_test_price) || Number(parsed.test_pack_price) || 99
+      };
+    }
+  } catch (e) {}
+  return { ...DEFAULT_TEST_PRICING };
+};
+
+export const saveTestPricing = (newPricing) => {
+  try {
+    const current = getTestPricing();
+    const mockPrice = Number(newPricing.mock_test_price !== undefined ? newPricing.mock_test_price : current.mock_test_price) || 99;
+    const practicePrice = Number(newPricing.practice_test_price !== undefined ? newPricing.practice_test_price : current.practice_test_price) || 99;
+    const origPrice = Number(newPricing.original_price !== undefined ? newPricing.original_price : current.original_price) || 299;
+
+    const updated = {
+      mock_test_price: mockPrice,
+      practice_test_price: practicePrice,
+      original_price: origPrice,
+      test_pack_price: mockPrice
+    };
+
+    localStorage.setItem('olympiadhub_test_pricing', JSON.stringify(updated));
+
+    // Also sync to mock db bank_settings if stored
+    try {
+      const dbSettings = JSON.parse(localStorage.getItem('olympiadhub_db_bank_settings') || '{}');
+      localStorage.setItem('olympiadhub_db_bank_settings', JSON.stringify({
+        ...dbSettings,
+        test_pack_price: mockPrice,
+        mock_test_price: mockPrice,
+        practice_test_price: practicePrice,
+        original_price: origPrice
+      }));
+    } catch (e) {}
+
+    // Dispatch global event for instantaneous reactive updates
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('olympiadhub-pricing-updated', { detail: updated }));
+      window.dispatchEvent(new Event('storage'));
+    }
+
+    return updated;
+  } catch (e) {
+    console.error('Failed to save test pricing:', e);
+    return getTestPricing();
+  }
+};
+
 export const savePurchasedSubject = (subCode, altCode, studentClass, orderDetails = {}) => {
   const current = getPurchasedTests();
   const rawSub = String(subCode).toLowerCase().trim();
@@ -73,12 +137,15 @@ export const savePurchasedSubject = (subCode, altCode, studentClass, orderDetail
     localStorage.setItem('olympiadhub_purchased_tests', JSON.stringify(updated));
   } catch (e) {}
 
+  const pricing = getTestPricing();
+  const defaultAmount = pricing.mock_test_price || 99;
+
   const orderPayload = {
     order_id: orderDetails.order_id || `ORD-MOCK-${Date.now().toString().slice(-6)}`,
     grade: studentClass || 'All Classes',
     subject: subCode,
     subject_name: orderDetails.subject_name || subCode,
-    amount: orderDetails.amount || 99,
+    amount: orderDetails.amount || defaultAmount,
     payment_method: orderDetails.payment_method || 'upi_qr',
     utr_number: orderDetails.utr_number || `UPI-TXN-${Date.now().toString().slice(-8)}`,
     status: 'completed',

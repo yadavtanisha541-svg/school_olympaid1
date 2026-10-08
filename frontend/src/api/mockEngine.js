@@ -826,7 +826,11 @@ const initialStore = {
     account_number: '50200084920194',
     ifsc_code: 'HDFC0001234',
     account_holder: 'OlympiadHub Education Pvt Ltd',
-    upi_id: 'olympiadhub@hdfcbank'
+    upi_id: 'olympiadhub@hdfcbank',
+    mock_test_price: 99,
+    practice_test_price: 99,
+    test_pack_price: 99,
+    original_price: 299
   },
   orders: [],
   workbook_orders: [],
@@ -3775,13 +3779,98 @@ export const mockEngine = {
     // PAYMENT & SETTINGS
     if (root === 'payment') {
       if (sub === 'bank-settings') {
-        return { success: true, data: getDb('bank_settings') };
+        if (method === 'POST' || method === 'PUT') {
+          const current = getDb('bank_settings') || {};
+          const updated = { ...current, ...body };
+          saveDb('bank_settings', updated);
+
+          // Proactively sync test pricing if included in bank settings
+          if (body.mock_test_price !== undefined || body.practice_test_price !== undefined || body.test_pack_price !== undefined) {
+            try {
+              const currentPricing = JSON.parse(localStorage.getItem('olympiadhub_test_pricing') || '{}');
+              const newPricing = {
+                ...currentPricing,
+                mock_test_price: Number(body.mock_test_price ?? body.test_pack_price ?? currentPricing.mock_test_price ?? 99),
+                practice_test_price: Number(body.practice_test_price ?? currentPricing.practice_test_price ?? 99),
+                original_price: Number(body.original_price ?? currentPricing.original_price ?? 299),
+                test_pack_price: Number(body.mock_test_price ?? body.test_pack_price ?? 99)
+              };
+              localStorage.setItem('olympiadhub_test_pricing', JSON.stringify(newPricing));
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('olympiadhub-pricing-updated', { detail: newPricing }));
+                window.dispatchEvent(new Event('storage'));
+              }
+            } catch (e) {}
+          }
+
+          return { success: true, message: 'Bank settings saved successfully', data: updated };
+        }
+
+        const bankData = getDb('bank_settings') || {};
+        try {
+          const pricing = JSON.parse(localStorage.getItem('olympiadhub_test_pricing') || '{}');
+          return {
+            success: true,
+            data: {
+              ...bankData,
+              mock_test_price: pricing.mock_test_price ?? bankData.mock_test_price ?? 99,
+              practice_test_price: pricing.practice_test_price ?? bankData.practice_test_price ?? 99,
+              test_pack_price: pricing.mock_test_price ?? bankData.test_pack_price ?? 99,
+              original_price: pricing.original_price ?? bankData.original_price ?? 299
+            }
+          };
+        } catch (e) {}
+        return { success: true, data: bankData };
       }
       if (sub === 'orders') {
         return { success: true, data: getDb('orders') };
       }
       if (sub === 'checkout') {
         return { success: true, message: 'Order created', order_id: 'ORD_' + Date.now() };
+      }
+    }
+
+    // TEST PRICING CONFIGURATION (MOCK TESTS & PRACTICE TESTS)
+    if (root === 'pricing') {
+      if (sub === 'tests') {
+        if (method === 'POST' || method === 'PUT') {
+          try {
+            const currentPricing = JSON.parse(localStorage.getItem('olympiadhub_test_pricing') || '{}');
+            const newPricing = {
+              mock_test_price: Number(body.mock_test_price !== undefined ? body.mock_test_price : currentPricing.mock_test_price) || 99,
+              practice_test_price: Number(body.practice_test_price !== undefined ? body.practice_test_price : currentPricing.practice_test_price) || 99,
+              original_price: Number(body.original_price !== undefined ? body.original_price : currentPricing.original_price) || 299,
+              test_pack_price: Number(body.mock_test_price !== undefined ? body.mock_test_price : currentPricing.mock_test_price) || 99
+            };
+            localStorage.setItem('olympiadhub_test_pricing', JSON.stringify(newPricing));
+
+            const bankData = getDb('bank_settings') || {};
+            saveDb('bank_settings', { ...bankData, ...newPricing });
+
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('olympiadhub-pricing-updated', { detail: newPricing }));
+              window.dispatchEvent(new Event('storage'));
+            }
+            return { success: true, message: 'Mock test & practice test pricing updated successfully', data: newPricing };
+          } catch (e) {}
+        }
+
+        try {
+          const pricing = JSON.parse(localStorage.getItem('olympiadhub_test_pricing') || '{}');
+          return {
+            success: true,
+            data: {
+              mock_test_price: pricing.mock_test_price || 99,
+              practice_test_price: pricing.practice_test_price || 99,
+              original_price: pricing.original_price || 299,
+              test_pack_price: pricing.mock_test_price || 99
+            }
+          };
+        } catch (e) {}
+        return {
+          success: true,
+          data: { mock_test_price: 99, practice_test_price: 99, original_price: 299, test_pack_price: 99 }
+        };
       }
     }
 

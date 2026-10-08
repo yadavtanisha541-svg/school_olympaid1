@@ -31,7 +31,7 @@ import {
   Copy
 } from 'lucide-react';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
-import { isSubjectPurchased, savePurchasedSubject, getPurchasedTests } from '../../utils/purchaseUtils';
+import { isSubjectPurchased, savePurchasedSubject, getPurchasedTests, getTestPricing } from '../../utils/purchaseUtils';
 
 const CLASS_OPTIONS = [
   'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 
@@ -61,15 +61,21 @@ export const StudentMyContentPage = ({
   const [utrNumber, setUtrNumber] = useState('');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [copiedUpi, setCopiedUpi] = useState(false);
-  const [bankSettings, setBankSettings] = useState({
-    upi_id: 'olympiadhub@icici',
-    merchant_name: 'Olympiad Foundation India',
-    bank_name: 'ICICI Bank',
-    account_number: '1029384756',
-    ifsc: 'ICIC0001029',
-    qr_code_url: '',
-    test_pack_price: 99,
-    original_price: 299
+  const [bankSettings, setBankSettings] = useState(() => {
+    const p = getTestPricing();
+    const effectivePrice = p.mock_test_price || p.test_pack_price || 99;
+    return {
+      upi_id: 'olympiadhub@icici',
+      merchant_name: 'Olympiad Foundation India',
+      bank_name: 'ICICI Bank',
+      account_number: '1029384756',
+      ifsc: 'ICIC0001029',
+      qr_code_url: '',
+      test_pack_price: effectivePrice,
+      mock_test_price: p.mock_test_price || 99,
+      practice_test_price: p.practice_test_price || 99,
+      original_price: p.original_price || 299
+    };
   });
 
   // Active selected subject filter: 'ALL' or 'IGKO', 'IMO', 'ISO', etc.
@@ -158,9 +164,32 @@ export const StudentMyContentPage = ({
   useEffect(() => {
     apiClient.get('/payment/bank-settings').then(res => {
       if (res && res.data) {
-        setBankSettings(prev => ({ ...prev, ...res.data }));
+        setBankSettings(prev => ({
+          ...prev,
+          ...res.data,
+          test_pack_price: res.data.mock_test_price || res.data.test_pack_price || prev.test_pack_price || 99
+        }));
       }
     }).catch(() => {});
+
+    const handlePricingUpdate = (e) => {
+      const p = e?.detail || getTestPricing();
+      const effectivePrice = p.mock_test_price || p.test_pack_price || 99;
+      setBankSettings(prev => ({
+        ...prev,
+        test_pack_price: effectivePrice,
+        mock_test_price: p.mock_test_price || 99,
+        practice_test_price: p.practice_test_price || 99,
+        original_price: p.original_price || 299
+      }));
+    };
+
+    window.addEventListener('olympiadhub-pricing-updated', handlePricingUpdate);
+    window.addEventListener('storage', handlePricingUpdate);
+    return () => {
+      window.removeEventListener('olympiadhub-pricing-updated', handlePricingUpdate);
+      window.removeEventListener('storage', handlePricingUpdate);
+    };
   }, []);
 
   useEffect(() => {
@@ -1165,7 +1194,7 @@ export const StudentMyContentPage = ({
                       ) : (
                         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-xs font-black shrink-0 shadow-2xs">
                           <Lock className="w-3.5 h-3.5" />
-                          <span>LOCKED (₹99)</span>
+                          <span>LOCKED (₹{bankSettings.test_pack_price || 99})</span>
                         </div>
                       )}
                     </div>
@@ -1205,7 +1234,7 @@ export const StudentMyContentPage = ({
                         className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-98 transition-all cursor-pointer border border-emerald-600"
                       >
                         <Lock className="w-4 h-4" />
-                        <span>Unlock &amp; Buy Test Series (₹99)</span>
+                        <span>Unlock &amp; Buy Test Series (₹{bankSettings.test_pack_price || 99})</span>
                       </button>
                     )}
 

@@ -25,28 +25,37 @@ import {
   RefreshCw,
   ExternalLink,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  Lock,
+  Tag
 } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
+import { getTestPricing, saveTestPricing } from '../../utils/purchaseUtils';
 
 export const SuperAdminPaymentManager = () => {
   const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'settings' | 'preview'
 
   // Bank & UPI Settings State
-  const [bankSettings, setBankSettings] = useState({
-    bank_name: 'State Bank of India',
-    account_holder_name: 'OlympiadHub Official Organization',
-    payee_name: 'OlympiadHub Education',
-    account_number: '398450123984',
-    ifsc_code: 'SBIN0005432',
-    branch_name: 'Central Hub Branch, New Delhi',
-    account_type: 'Current Account',
-    upi_id: 'olympiadhub.edu@okaxis',
-    upi_phone: '+91 98765 43210',
-    upi_qr_url: '',
-    instructions: 'Please transfer the exact total payable amount via UPI / IMPS / NEFT. After completing payment, enter your 12-digit UTR / Transaction Reference Number below to confirm and activate your package immediately.',
-    is_active: 1
+  const [bankSettings, setBankSettings] = useState(() => {
+    const pricing = getTestPricing();
+    return {
+      bank_name: 'State Bank of India',
+      account_holder_name: 'OlympiadHub Official Organization',
+      payee_name: 'OlympiadHub Education',
+      account_number: '398450123984',
+      ifsc_code: 'SBIN0005432',
+      branch_name: 'Central Hub Branch, New Delhi',
+      account_type: 'Current Account',
+      upi_id: 'olympiadhub.edu@okaxis',
+      upi_phone: '+91 98765 43210',
+      upi_qr_url: '',
+      instructions: 'Please transfer the exact total payable amount via UPI / IMPS / NEFT. After completing payment, enter your 12-digit UTR / Transaction Reference Number below to confirm and activate your package immediately.',
+      is_active: 1,
+      mock_test_price: pricing.mock_test_price || 99,
+      practice_test_price: pricing.practice_test_price || 99,
+      original_price: pricing.original_price || 299
+    };
   });
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
@@ -67,6 +76,22 @@ export const SuperAdminPaymentManager = () => {
   useEffect(() => {
     fetchBankSettings();
     fetchOrders();
+
+    const handlePricingUpdate = (e) => {
+      const p = e?.detail || getTestPricing();
+      setBankSettings(prev => ({
+        ...prev,
+        mock_test_price: p.mock_test_price || 99,
+        practice_test_price: p.practice_test_price || 99,
+        original_price: p.original_price || 299
+      }));
+    };
+    window.addEventListener('olympiadhub-pricing-updated', handlePricingUpdate);
+    window.addEventListener('storage', handlePricingUpdate);
+    return () => {
+      window.removeEventListener('olympiadhub-pricing-updated', handlePricingUpdate);
+      window.removeEventListener('storage', handlePricingUpdate);
+    };
   }, []);
 
   const fetchBankSettings = async () => {
@@ -74,7 +99,14 @@ export const SuperAdminPaymentManager = () => {
       setSettingsLoading(true);
       const res = await apiClient.get('/payment/bank-settings');
       if (res?.data) {
-        setBankSettings(res.data);
+        const pricing = getTestPricing();
+        setBankSettings(prev => ({
+          ...prev,
+          ...res.data,
+          mock_test_price: res.data.mock_test_price ?? pricing.mock_test_price ?? 99,
+          practice_test_price: res.data.practice_test_price ?? pricing.practice_test_price ?? 99,
+          original_price: res.data.original_price ?? pricing.original_price ?? 299
+        }));
       }
     } catch (e) {
       console.warn('Bank settings load error:', e);
@@ -104,9 +136,16 @@ export const SuperAdminPaymentManager = () => {
     if (e && e.preventDefault) e.preventDefault();
     setSaveLoading(true);
     try {
+      // Save test pricing synchronously into local storage & dispatch event
+      saveTestPricing({
+        mock_test_price: Number(bankSettings.mock_test_price) || 99,
+        practice_test_price: Number(bankSettings.practice_test_price) || 99,
+        original_price: Number(bankSettings.original_price) || 299
+      });
+
       const res = await apiClient.post('/payment/bank-settings', bankSettings);
       if (res?.success) {
-        setFeedback({ type: 'success', message: 'Bank details, UPI ID & QR settings saved into MySQL successfully!' });
+        setFeedback({ type: 'success', message: 'Bank details, UPI ID, QR code & Test Prices saved successfully!' });
       } else {
         setFeedback({ type: 'error', message: res?.message || 'Failed to save settings.' });
       }
@@ -535,6 +574,89 @@ export const SuperAdminPaymentManager = () => {
           </div>
 
           <form onSubmit={handleSaveBankSettings} className="space-y-6 text-xs max-w-4xl">
+            {/* 0. Mock Test & Practice Test Pricing Settings */}
+            <div className="p-5 bg-gradient-to-br from-emerald-50 via-teal-50 to-sky-50 rounded-2xl border-2 border-emerald-400 space-y-4 shadow-xs">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h3 className="font-black text-emerald-950 text-sm flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-emerald-600" />
+                  <span>Mock Test &amp; Practice Test Pricing Control</span>
+                </h3>
+                <span className="text-[10px] font-bold text-emerald-900 bg-emerald-200/90 px-2.5 py-0.5 rounded-full uppercase">
+                  Live Sync Across All Students
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Mock Test Price */}
+                <div className="bg-white p-4 rounded-xl border border-emerald-300 space-y-2">
+                  <label className="text-[11px] font-black text-slate-800 flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Mock Test Price (₹)</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                    value={bankSettings.mock_test_price}
+                    onChange={(e) => setBankSettings({ ...bankSettings, mock_test_price: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-black text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                  <p className="text-[10px] text-slate-500">Lock badge on student sidebar: 🔒 ₹{bankSettings.mock_test_price || 99}</p>
+                </div>
+
+                {/* Practice Test Price */}
+                <div className="bg-white p-4 rounded-xl border border-emerald-300 space-y-2">
+                  <label className="text-[11px] font-black text-slate-800 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+                    <span>Practice Test Price (₹)</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                    value={bankSettings.practice_test_price}
+                    onChange={(e) => setBankSettings({ ...bankSettings, practice_test_price: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-black text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                  <p className="text-[10px] text-slate-500">Practice test start button: Pay ₹{bankSettings.practice_test_price || 99}</p>
+                </div>
+
+                {/* Original MRP */}
+                <div className="bg-white p-4 rounded-xl border border-emerald-300 space-y-2">
+                  <label className="text-[11px] font-black text-slate-800 flex items-center gap-1.5">
+                    <Tag className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Original MRP (₹)</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={bankSettings.original_price}
+                    onChange={(e) => setBankSettings({ ...bankSettings, original_price: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-bold text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  />
+                  <p className="text-[10px] text-slate-500">Strikethrough: ₹{bankSettings.original_price || 299}</p>
+                </div>
+              </div>
+
+              {/* Quick Presets */}
+              <div className="flex items-center gap-2 flex-wrap pt-1 text-[11px]">
+                <span className="font-bold text-slate-700">Quick Presets:</span>
+                {[49, 79, 99, 149, 199, 299].map(amt => (
+                  <button
+                    key={amt}
+                    type="button"
+                    onClick={() => setBankSettings({ ...bankSettings, mock_test_price: amt, practice_test_price: amt })}
+                    className="px-2.5 py-0.5 rounded-md bg-white border border-emerald-300 text-emerald-900 font-bold hover:bg-emerald-100 transition-colors cursor-pointer"
+                  >
+                    Set Both to ₹{amt}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* 1. UPI & QR Code Settings (Live Customizer) */}
             <div className="p-5 bg-gradient-to-br from-amber-50 to-orange-50/50 rounded-2xl border-2 border-amber-300 space-y-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
