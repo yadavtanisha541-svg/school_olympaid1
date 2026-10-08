@@ -1076,18 +1076,30 @@ function saveDb(table, data) {
     localStorage.setItem(STORAGE_PREFIX + table, JSON.stringify(data));
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table, data } }));
+      window.dispatchEvent(new Event('storage'));
       if (table === 'users') {
         window.dispatchEvent(new CustomEvent('students-updated', { detail: { data } }));
       }
       if (table === 'results') {
         window.dispatchEvent(new CustomEvent('olympiad-exam-submitted', { detail: { data } }));
+        window.dispatchEvent(new CustomEvent('leaderboard-updated', { detail: { data } }));
         window.dispatchEvent(new Event('exam-submitted'));
+        window.dispatchEvent(new Event('results-updated'));
+      }
+      if (table === 'exam_papers') {
+        window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: data }));
+      }
+      if (table === 'exams') {
+        window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: data }));
       }
       if (table === 'applicant_leads') {
         window.dispatchEvent(new CustomEvent('applicant-leads-updated', { detail: { data } }));
       }
       if (table === 'school_registrations') {
         window.dispatchEvent(new CustomEvent('schools-updated', { detail: { data } }));
+      }
+      if (table === 'audit_logs') {
+        window.dispatchEvent(new CustomEvent('audit-logs-updated', { detail: { data } }));
       }
     }
   } catch (e) {
@@ -3106,23 +3118,64 @@ export const mockEngine = {
     // EXAMS
     if (root === 'exams') {
       let exams = getDb('exams');
-      if (method === 'GET' && sub) {
+      if (method === 'GET' && sub && sub !== 'all') {
         const found = exams.find((e) => String(e.id) === String(sub));
         return { success: true, data: found || exams[0] };
       }
       if (method === 'GET') {
         return { success: true, data: exams };
       }
+      if (method === 'POST' && (subId === 'toggle-status' || sub === 'toggle-status')) {
+        const targetId = subId === 'toggle-status' ? sub : body.id;
+        let updatedExam = null;
+        exams = exams.map(e => {
+          if (String(e.id) === String(targetId)) {
+            const nextStatus = e.status === 'published' ? 'draft' : 'published';
+            updatedExam = { ...e, status: nextStatus };
+            return updatedExam;
+          }
+          return e;
+        });
+        saveDb('exams', exams);
+        return { success: true, message: 'Exam status updated', data: updatedExam };
+      }
+      if (method === 'POST' && (subId === 'duplicate' || sub === 'duplicate')) {
+        const targetId = subId === 'duplicate' ? sub : body.id;
+        const orig = exams.find(e => String(e.id) === String(targetId));
+        if (orig) {
+          const dup = {
+            ...orig,
+            id: Date.now(),
+            title: `${orig.title} (Copy)`,
+            created_at: new Date().toISOString()
+          };
+          exams.unshift(dup);
+          saveDb('exams', exams);
+          return { success: true, message: 'Exam duplicated successfully', data: dup };
+        }
+      }
+      if (method === 'PUT' && sub) {
+        let updatedExam = null;
+        exams = exams.map(e => {
+          if (String(e.id) === String(sub)) {
+            updatedExam = { ...e, ...body };
+            return updatedExam;
+          }
+          return e;
+        });
+        saveDb('exams', exams);
+        return { success: true, message: 'Exam updated successfully', data: updatedExam };
+      }
       if (method === 'POST') {
-        const newExam = { id: Date.now(), ...body };
+        const newExam = { id: Date.now(), ...body, created_at: new Date().toISOString() };
         exams.unshift(newExam);
         saveDb('exams', exams);
-        return { success: true, message: 'Exam created', data: newExam };
+        return { success: true, message: 'Exam created successfully', data: newExam };
       }
       if (method === 'DELETE' && sub) {
         exams = exams.filter((e) => String(e.id) !== String(sub));
         saveDb('exams', exams);
-        return { success: true, message: 'Exam deleted' };
+        return { success: true, message: 'Exam deleted successfully' };
       }
     }
 
@@ -3455,7 +3508,25 @@ export const mockEngine = {
       });
       if (Array.isArray(results)) allAtts.push(...results);
 
-      const dynamicList = allAtts.map((a, idx) => {
+      // Deduplicate attempts by unique key
+      const uniqueMap = new Map();
+      allAtts.forEach(a => {
+        if (!a) return;
+        const key = a.id || a.attempt_id || `${a.student_login_id || a.login_id}_${a.exam_id}_${a.submitted_at || a.score}`;
+        if (!uniqueMap.has(key)) {
+          uniqueMap.set(key, a);
+        }
+      });
+      const uniqueAttempts = Array.from(uniqueMap.values());
+
+      const targetExamId = params.exam_id || body.exam_id || '';
+
+      let filteredAttempts = uniqueAttempts;
+      if (targetExamId) {
+        filteredAttempts = uniqueAttempts.filter(a => String(a.exam_id) === String(targetExamId));
+      }
+
+      let dynamicList = filteredAttempts.map((a, idx) => {
         const sName = a.student_name || a.name || a.full_name || a.studentName || 'Student Candidate';
         const sLogin = a.student_login_id || a.login_id || a.student_id || `SKILL-STU-${1000 + idx}`;
         const sClass = a.class_name || a.grade || a.class || 'Class 10';
@@ -3463,8 +3534,9 @@ export const mockEngine = {
         const sScore = parseFloat(a.score !== undefined ? a.score : (a.correct_count || 10));
         const sPct = parseFloat(a.percentage !== undefined ? a.percentage : 85);
         return {
+          id: a.id || idx + 1,
           rank: idx + 1,
-          student_id: a.student_id || idx + 1,
+          student_id: a.student_id || a.user_id || idx + 1,
           student_name: sName,
           name: sName,
           student_login_id: sLogin,
@@ -3472,13 +3544,15 @@ export const mockEngine = {
           school: sSchool,
           school_name: sSchool,
           class_name: sClass,
+          exam_id: a.exam_id || 1,
           exam_title: a.exam_title || a.title || 'National Olympiad Examination',
           total_exams_attempted: 1,
           total_points: sScore,
           score: sScore,
           percentage: sPct,
           avg_percentage: sPct,
-          time_spent_seconds: a.time_spent_seconds || 1200
+          time_spent_seconds: a.time_spent_seconds || a.time_taken_seconds || 1200,
+          submitted_at: a.submitted_at || new Date().toISOString()
         };
       });
 
@@ -3490,9 +3564,28 @@ export const mockEngine = {
         { rank: 5, student_name: 'Vihaan Gupta', name: 'Vihaan Gupta', student_login_id: 'SKILL-STU-1005', login_id: 'SKILL-STU-1005', school: 'DAV Public School, Pune', school_name: 'DAV Public School, Pune', class_name: 'Class 7', exam_title: 'General Knowledge Olympiad (IGKO)', total_exams_attempted: 3, total_points: 89, score: 89, percentage: 89, avg_percentage: 89, percentile: 96.2, time_spent_seconds: 1750 }
       ];
 
-      const merged = dynamicList.length > 0 ? dynamicList : defaultToppers;
-      merged.sort((a, b) => (b.score || b.total_points || 0) - (a.score || a.total_points || 0));
-      merged.forEach((item, idx) => { item.rank = idx + 1; });
+      // Merge real dynamic student submissions with default toppers if list is short
+      let merged = [...dynamicList];
+      if (merged.length < 5 && !targetExamId) {
+        defaultToppers.forEach(dt => {
+          if (!merged.some(m => (m.student_login_id && m.student_login_id === dt.student_login_id) || (m.student_name && m.student_name.toLowerCase() === dt.student_name.toLowerCase()))) {
+            merged.push(dt);
+          }
+        });
+      }
+
+      // Sort strictly: percentage DESC, then score DESC, then time_spent_seconds ASC
+      merged.sort((a, b) => {
+        const pctDiff = (b.percentage || b.avg_percentage || 0) - (a.percentage || a.avg_percentage || 0);
+        if (pctDiff !== 0) return pctDiff;
+        const scoreDiff = (b.score || b.total_points || 0) - (a.score || a.total_points || 0);
+        if (scoreDiff !== 0) return scoreDiff;
+        return (a.time_spent_seconds || 1200) - (b.time_spent_seconds || 1200);
+      });
+
+      merged.forEach((item, idx) => {
+        item.rank = idx + 1;
+      });
 
       return {
         success: true,
