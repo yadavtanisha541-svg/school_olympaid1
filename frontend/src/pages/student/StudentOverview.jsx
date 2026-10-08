@@ -1025,89 +1025,32 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. SECTION: FREE SAMPLE PAPERS & PREVIOUS YEAR PAPERS (20% Richer)        */}
+      {/* 4. SECTION: SPOTLIGHT QUIZ                                               */}
       {/* ========================================================================= */}
       <div className="pt-2">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          
-          {/* Card 1: Spotlight: IGKO Quiz */}
-          <div className="bg-gradient-to-br from-amber-200/95 via-orange-200/85 to-rose-200/85 rounded-2xl border-2 border-amber-400/90 hover:border-amber-500 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all flex items-center justify-between gap-3 text-slate-900">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center shrink-0 shadow-2xs border border-white/30">
-                <FileText className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
-                  Spotlight: IGKO Quiz
-                </h4>
-                <p className="text-[10px] text-slate-700 font-semibold truncate mt-0.5">
-                  Test your knowledge with latest questions.
-                </p>
-              </div>
+        <div className="bg-gradient-to-br from-amber-200/95 via-orange-200/85 to-rose-200/85 rounded-2xl border-2 border-amber-400/90 hover:border-amber-500 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all flex items-center justify-between gap-3 text-slate-900">
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center shrink-0 shadow-2xs border border-white/30">
+              <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-
-            <button
-              type="button"
-              onClick={() => onNavigateTab('free_quizzes')}
-              className="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-amber-500"
-            >
-              <span>Open</span>
-              <ArrowRight className="w-3 h-3 text-white" />
-            </button>
+            <div className="min-w-0">
+              <h4 className="font-bold text-slate-900 text-xs sm:text-base truncate">
+                Spotlight: IGKO Quiz
+              </h4>
+              <p className="text-[11px] sm:text-xs text-slate-700 font-semibold truncate mt-0.5">
+                Test your knowledge with latest curated Olympiad quiz questions.
+              </p>
+            </div>
           </div>
 
-          {/* Card 2: Free Sample Papers */}
-          <div className="bg-gradient-to-br from-sky-200/95 via-blue-200/85 to-indigo-200/85 rounded-2xl border-2 border-sky-400/90 hover:border-sky-500 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all flex items-center justify-between gap-3 text-slate-900">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-2xs border border-white/30">
-                <FileSpreadsheet className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
-                  Free Sample Papers
-                </h4>
-                <p className="text-[10px] text-slate-700 font-semibold truncate mt-0.5">
-                  Download and practice sample papers.
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => onNavigateTab('free_sample_papers')}
-              className="px-4 py-1.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-sky-500"
-            >
-              <span>Open</span>
-              <ArrowRight className="w-3 h-3 text-white" />
-            </button>
-          </div>
-
-          {/* Card 3: Free Previous Year Papers */}
-          <div className="bg-gradient-to-br from-emerald-200/95 via-teal-200/85 to-cyan-200/85 rounded-2xl border-2 border-emerald-400/90 hover:border-emerald-500 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all flex items-center justify-between gap-3 text-slate-900">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-2xs border border-white/30">
-                <Award className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
-                  Free Previous Year Papers
-                </h4>
-                <p className="text-[10px] text-slate-700 font-semibold truncate mt-0.5">
-                  Get past year papers with solutions.
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => onNavigateTab('free_past_papers')}
-              className="px-4 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1 border border-emerald-500"
-            >
-              <span>Open</span>
-              <ArrowRight className="w-3 h-3 text-white" />
-            </button>
-          </div>
-
+          <button
+            type="button"
+            onClick={() => onNavigateTab('free_quizzes')}
+            className="px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0 flex items-center gap-1.5 border border-amber-500"
+          >
+            <span>Open Quiz</span>
+            <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+          </button>
         </div>
       </div>
 
