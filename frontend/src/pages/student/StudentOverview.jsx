@@ -849,7 +849,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
               <span>Olympiad Subjects</span>
             </h2>
             <p className="text-xs text-slate-500 font-semibold mt-0.5">
-              Explore subject-wise preparation material, previous year papers &amp; mock test series.
+              Explore subject-wise preparation material &amp; practice test series.
             </p>
           </div>
 

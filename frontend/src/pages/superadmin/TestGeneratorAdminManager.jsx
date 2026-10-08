@@ -227,7 +227,7 @@ export const TestGeneratorAdminManager = () => {
   const [papers, setPapers] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // Category tabs: 'all' | 'previous_year' | 'sample_paper' | 'generator'
+  // Category tabs: 'all' | 'practice_test' | 'generator'
   const [activeCategoryTab, setActiveCategoryTab] = useState('all');
   const [selectedClassFilter, setSelectedClassFilter] = useState('All');
   const [selectedSubjectFilter, setSelectedSubjectFilter] = useState('All');
@@ -244,7 +244,7 @@ export const TestGeneratorAdminManager = () => {
   const [bulkParsedCount, setBulkParsedCount] = useState(0);
 
   // Form State
-  const [paperCategory, setPaperCategory] = useState('previous_year'); // 'previous_year' | 'sample_paper' | 'generator'
+  const [paperCategory, setPaperCategory] = useState('practice_test'); // 'practice_test' | 'generator'
   const [examYear, setExamYear] = useState('2024');
   const [paperTitle, setPaperTitle] = useState('');
   const [paperClass, setPaperClass] = useState('Class 6');
@@ -288,18 +288,16 @@ export const TestGeneratorAdminManager = () => {
   const generateTitle = (cat, grade, subKey, yr) => {
     const subObj = SUBJECT_OPTIONS.find((s) => s.id === subKey);
     const subCode = subObj ? subObj.code : subKey.toUpperCase();
-    if (cat === 'previous_year') {
-      return `${grade} ${subCode} Previous Year Question Paper (${yr})`;
-    } else if (cat === 'sample_paper') {
-      return `${grade} ${subCode} Official Free Sample Paper`;
-    } else {
+    if (cat === 'generator') {
       return `${grade} ${subCode} Intelligent Generator Practice Paper`;
+    } else {
+      return `${grade} ${subCode} Practice Mock Test (${yr})`;
     }
   };
 
   // Open Create Modal & populate 1 clean blank question for authoring
-  const handleOpenCreateModal = (presetCategory = 'previous_year') => {
-    const cat = presetCategory === 'all' ? 'previous_year' : presetCategory;
+  const handleOpenCreateModal = (presetCategory = 'practice_test') => {
+    const cat = presetCategory === 'all' ? 'practice_test' : presetCategory;
     setPaperCategory(cat);
     setExamYear('2024');
     setPaperClass('Class 6');
@@ -446,7 +444,7 @@ export const TestGeneratorAdminManager = () => {
     }
 
     const local = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-    const prefix = paperCategory === 'previous_year' ? 'PYP' : paperCategory === 'sample_paper' ? 'SMP' : 'TGP';
+    const prefix = paperCategory === 'generator' ? 'TGP' : 'PRAC';
     const newPaperLocal = {
       ...payload,
       id: Date.now(),
@@ -708,14 +706,13 @@ export const TestGeneratorAdminManager = () => {
   const filteredPapers = papers.filter((p) => {
     const pClass = p.class_name || p.class || '';
     const pSubCode = p.subject_code || p.subject || '';
-    const pCategory = p.paper_category || (p.title?.toLowerCase().includes('sample') ? 'sample_paper' : p.title?.toLowerCase().includes('previous') || p.title?.toLowerCase().includes('past') ? 'previous_year' : 'generator');
+    const pCategory = p.paper_category || (p.title?.toLowerCase().includes('sample') ? 'practice_test' : p.title?.toLowerCase().includes('previous') || p.title?.toLowerCase().includes('past') ? 'practice_test' : (p.exam_type === 'generated' || p.paper_category === 'generator' ? 'generator' : 'practice_test'));
     const pYear = p.exam_year || '2024';
 
     const matchesCategory =
       activeCategoryTab === 'all' ||
       pCategory === activeCategoryTab ||
-      (activeCategoryTab === 'sample_paper' && (p.title?.toLowerCase().includes('sample') || p.exam_type === 'sample_paper')) ||
-      (activeCategoryTab === 'previous_year' && (p.title?.toLowerCase().includes('previous') || p.title?.toLowerCase().includes('past') || p.exam_type === 'previous_year')) ||
+      (activeCategoryTab === 'practice_test' && pCategory !== 'generator') ||
       (activeCategoryTab === 'generator' && (pCategory === 'generator' || p.exam_type === 'generated'));
 
     const matchesClass = selectedClassFilter === 'All' || pClass.toLowerCase().includes(selectedClassFilter.toLowerCase());
@@ -755,7 +752,7 @@ export const TestGeneratorAdminManager = () => {
                   Super Admin Exam &amp; Paper Creator
                 </span>
                 <h1 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
-                  {paperCategory === 'previous_year' ? 'Create Free Previous Year Question Paper' : paperCategory === 'sample_paper' ? 'Create Free Sample Paper' : 'Create Intelligent Test Generator Paper'}
+                  {paperCategory === 'generator' ? 'Create Intelligent Test Generator Paper' : 'Create Practice Mock Test Paper'}
                 </h1>
               </div>
             </div>
@@ -811,15 +808,13 @@ export const TestGeneratorAdminManager = () => {
                 </div>
                 <div>
                   <h2 className="text-sm font-black text-slate-900">Select Paper Category / Purpose</h2>
-                  <p className="text-xs text-slate-500">Choose whether this paper is for Previous Year Papers, Sample Papers, or Test Generator.</p>
+                  <p className="text-xs text-slate-500">Choose whether this paper is for Student Practice Tests or Test Generator.</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                 {[
                   { id: 'practice_test', label: 'Practice Mock Test', desc: 'Appears under Student > Practice Tests', icon: Sparkles, color: 'border-indigo-400 bg-indigo-50/50 text-indigo-900' },
-                  { id: 'previous_year', label: 'Previous Year Paper', desc: 'Appears under Student Practice Series', icon: Award, color: 'border-amber-400 bg-amber-50/50 text-amber-900' },
-                  { id: 'sample_paper', label: 'Sample / Model Paper', desc: 'Appears under Student Model Papers', icon: FileSpreadsheet, color: 'border-sky-400 bg-sky-50/50 text-sky-900' },
                   { id: 'generator', label: 'Test Generator Paper', desc: 'Appears under Intelligent Practice Generator', icon: BookOpen, color: 'border-emerald-400 bg-emerald-50/50 text-emerald-900' }
                 ].map((cat) => {
                   const isSel = paperCategory === cat.id;
@@ -1420,8 +1415,6 @@ export const TestGeneratorAdminManager = () => {
         {[
           { id: 'all', label: 'All Practice Papers', icon: Layers },
           { id: 'practice_test', label: '🎯 Practice Tests', icon: Sparkles },
-          { id: 'previous_year', label: '🏆 Previous Year Papers', icon: Award },
-          { id: 'sample_paper', label: '📄 Sample & Model Papers', icon: FileSpreadsheet },
           { id: 'generator', label: '⚡ Test Generator Papers', icon: BookOpen }
         ].map((tab) => {
           const isActive = activeCategoryTab === tab.id;
@@ -1544,13 +1537,11 @@ export const TestGeneratorAdminManager = () => {
             const subCode = paper.subject_code || paper.subject || 'IMO';
             const subObj = SUBJECT_OPTIONS.find((s) => s.code.toLowerCase() === subCode.toLowerCase()) || SUBJECT_OPTIONS[0];
             const qCount = Array.isArray(paper.questions) ? paper.questions.length : (paper.total_questions || 10);
-            const pCategory = paper.paper_category || (paper.title?.toLowerCase().includes('sample') ? 'sample_paper' : paper.title?.toLowerCase().includes('previous') || paper.title?.toLowerCase().includes('past') ? 'previous_year' : 'generator');
+            const pCategory = paper.paper_category || (paper.exam_type === 'generated' || paper.paper_category === 'generator' ? 'generator' : 'practice_test');
 
-            const categoryBadge = pCategory === 'previous_year'
-              ? { label: 'Previous Year Paper', color: 'bg-amber-100 text-amber-900 border-amber-300' }
-              : pCategory === 'sample_paper'
-              ? { label: 'Sample Paper', color: 'bg-sky-100 text-sky-900 border-sky-300' }
-              : { label: 'Test Generator Pro', color: 'bg-emerald-100 text-emerald-900 border-emerald-300' };
+            const categoryBadge = pCategory === 'generator'
+              ? { label: 'Test Generator Pro', color: 'bg-emerald-100 text-emerald-900 border-emerald-300' }
+              : { label: 'Practice Mock Test', color: 'bg-indigo-100 text-indigo-900 border-indigo-300' };
 
             return (
               <div
