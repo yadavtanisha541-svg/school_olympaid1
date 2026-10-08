@@ -444,10 +444,6 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
 
   // Proceed to Instructions
   const handleProceedToInstructions = () => {
-    if (!hasMatchingPaper) {
-      alert(`⚠️ Super Admin ne ${selectedGrade} (${subjectsMap[selectedSubject]?.name || selectedSubject}) ke liye abhi koi questions publish nahi kiye hain.`);
-      return;
-    }
     // If not purchased yet, go directly to Step 2: Payment & QR Scanner Page!
     if (!isCurrentTestUnlocked) {
       setGeneratorStep('checkout');
@@ -2445,7 +2441,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                       ) : (
                         <>
                           <Lock className="w-3.5 h-3.5 text-amber-300" />
-                          <span>Next: Instructions &amp; Start (₹{bankSettings.test_pack_price || 99})</span>
+                          <span>Next: Pay &amp; Unlock Test (₹{bankSettings.test_pack_price || 99})</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </>
                       )}
@@ -2596,16 +2592,9 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                   <button
                     type="button"
                     onClick={handleProceedToInstructions}
-                    disabled={!hasMatchingPaper}
-                    className={`w-full py-3 rounded-2xl text-sm font-black uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 ${
-                      hasMatchingPaper 
-                        ? 'bg-[#6d3a68] hover:bg-[#582d54] text-white hover:shadow-xl active:scale-95 cursor-pointer' 
-                        : 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300'
-                    }`}
+                    className="w-full py-3 rounded-2xl text-sm font-black uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 bg-[#6d3a68] hover:bg-[#582d54] text-white hover:shadow-xl active:scale-95 cursor-pointer"
                   >
-                    {!hasMatchingPaper ? (
-                      <span>Awaiting Super Admin Questions</span>
-                    ) : isCurrentTestUnlocked ? (
+                    {isCurrentTestUnlocked ? (
                       <>
                         <span>Next: View Instructions</span>
                         <ArrowRight className="w-4 h-4" />
@@ -2613,7 +2602,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                     ) : (
                       <>
                         <Lock className="w-4 h-4 text-amber-300" />
-                        <span>Unlock &amp; View Instructions (₹{bankSettings.test_pack_price || 99})</span>
+                        <span>Next: Pay &amp; Unlock Test (₹{bankSettings.test_pack_price || 99})</span>
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}
