@@ -23,9 +23,16 @@ import {
   Trophy,
   FileText,
   Languages,
-  Rocket
+  Rocket,
+  GraduationCap
 } from 'lucide-react';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
+
+const CLASS_OPTIONS = [
+  'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 
+  'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 
+  'Class 11', 'Class 12'
+];
 
 export const StudentMyContentPage = ({
   activeSubjectCode = null, // e.g. 'content_igko', 'content_imo', 'my_content'
@@ -33,7 +40,10 @@ export const StudentMyContentPage = ({
   onStartExam
 }) => {
   const { user } = useAuth();
-  const studentClass = user?.class || user?.grade || 'Class 6';
+  const [selectedClass, setSelectedClass] = useState(() => {
+    return user?.class || user?.grade || 'Class 6';
+  });
+  const studentClass = selectedClass;
 
   const [examPapers, setExamPapers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -516,24 +526,45 @@ export const StudentMyContentPage = ({
                   <span>← Back to Subject Cover</span>
                 </button>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-500">
-                    Switch Subject:
-                  </span>
-                  <select
-                    value={openedMockSeries}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setOpenedMockSeries(val);
-                      setSelectedSubject(val);
-                      if (onNavigateTab) onNavigateTab(`content_${val.toLowerCase()}`);
-                    }}
-                    className="text-xs font-bold bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700 focus:outline-none focus:border-indigo-500 cursor-pointer"
-                  >
-                    {ALL_SUBJECT_COVERS.map(s => (
-                      <option key={s.code} value={s.code}>{s.code} - {s.title}</option>
-                    ))}
-                  </select>
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  {/* Class Dropdown */}
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white border border-slate-200 shadow-2xs">
+                    <GraduationCap className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span className="text-xs font-bold text-slate-500">Class:</span>
+                    <select
+                      value={selectedClass}
+                      onChange={(e) => setSelectedClass(e.target.value)}
+                      aria-label="Select Class"
+                      className="text-xs font-black text-slate-800 bg-transparent focus:outline-none cursor-pointer"
+                    >
+                      {CLASS_OPTIONS.map((cls) => (
+                        <option key={cls} value={cls}>
+                          {cls}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Switch Subject */}
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white border border-slate-200 shadow-2xs">
+                    <span className="text-xs font-bold text-slate-500">
+                      Subject:
+                    </span>
+                    <select
+                      value={openedMockSeries}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setOpenedMockSeries(val);
+                        setSelectedSubject(val);
+                        if (onNavigateTab) onNavigateTab(`content_${val.toLowerCase()}`);
+                      }}
+                      className="text-xs font-black text-slate-800 bg-transparent focus:outline-none cursor-pointer"
+                    >
+                      {ALL_SUBJECT_COVERS.map(s => (
+                        <option key={s.code} value={s.code}>{s.code} - {s.title}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -644,19 +675,23 @@ export const StudentMyContentPage = ({
               </p>
             </div>
 
-            {selectedSubject !== 'ALL' && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedSubject('ALL');
-                  if (onNavigateTab) onNavigateTab('my_content');
-                }}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-indigo-600 px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
+            {/* Class Dropdown placed right where View All Subject Covers was */}
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-indigo-300 transition-colors">
+              <GraduationCap className="w-4 h-4 text-indigo-600 shrink-0" />
+              <span className="text-xs font-bold text-slate-500">Class:</span>
+              <select
+                value={selectedClass}
+                onChange={(e) => setSelectedClass(e.target.value)}
+                aria-label="Select Class"
+                className="text-xs font-black text-slate-800 bg-transparent focus:outline-none cursor-pointer pr-1"
               >
-                <Layers className="w-4 h-4 text-indigo-600" />
-                <span>View All Subject Covers</span>
-              </button>
-            )}
+                {CLASS_OPTIONS.map((cls) => (
+                  <option key={cls} value={cls}>
+                    {cls}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Grid of Subject Covers (Vibrant 2-3 Mix Pastel Gradient Cards) */}

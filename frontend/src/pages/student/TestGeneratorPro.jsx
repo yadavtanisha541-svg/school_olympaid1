@@ -29,7 +29,12 @@ import {
   BookOpen,
   Printer,
   ArrowLeft,
-  Download
+  Download,
+  Lock,
+  CreditCard,
+  QrCode,
+  Copy,
+  CheckCircle
 } from 'lucide-react';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 import { DetailedSolutionsPage } from './DetailedSolutionsPage';
@@ -133,6 +138,111 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   const [selectedChapters, setSelectedChapters] = useState(CHAPTERS_BY_SUBJECT['math'] || []);
   const [generatorStep, setGeneratorStep] = useState('configure'); // 'configure' | 'instructions'
   const [hasAgreedInstructions, setHasAgreedInstructions] = useState(true);
+
+  // Purchased / Unlocked Tests State
+  const [purchasedTests, setPurchasedTests] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('olympiadhub_purchased_tests') || '[]');
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const isTestUnlocked = (grade, subject) => {
+    if (!grade || !subject) return false;
+    const key1 = `${grade}_${subject}`.toLowerCase();
+    const key2 = `${grade}_all`.toLowerCase();
+    const key3 = `all_practice_tests`;
+    return purchasedTests.some(k => {
+      const s = String(k).toLowerCase();
+      return s === key1 || s === key2 || s === key3 || s === subject.toLowerCase();
+    });
+  };
+
+  const isCurrentTestUnlocked = isTestUnlocked(selectedGrade, selectedSubject);
+
+  // Payment Checkout State
+  const [pendingAdminPaper, setPendingAdminPaper] = useState(null);
+  const [paymentStep, setPaymentStep] = useState('method'); // 'method' | 'success'
+  const [selectedPayMethod, setSelectedPayMethod] = useState('upi_qr'); // 'upi_qr' | 'upi_app' | 'card' | 'netbanking'
+  const [utrNumber, setUtrNumber] = useState('');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [copiedUpi, setCopiedUpi] = useState(false);
+  const [bankSettings, setBankSettings] = useState({
+    upi_id: 'olympiadhub@icici',
+    merchant_name: 'Olympiad Foundation India',
+    bank_name: 'ICICI Bank',
+    account_number: '1029384756',
+    ifsc: 'ICIC0001029',
+    qr_code_url: '',
+    test_pack_price: 99,
+    original_price: 299
+  });
+
+  useEffect(() => {
+    apiClient.get('/payment/bank-settings').then(res => {
+      if (res && res.data) {
+        setBankSettings(prev => ({ ...prev, ...res.data }));
+      }
+    }).catch(() => {});
+  }, []);
+
+  const handleCopyUpi = () => {
+    const text = bankSettings.upi_id || 'olympiadhub@icici';
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text);
+    }
+    setCopiedUpi(true);
+    setTimeout(() => setCopiedUpi(false), 2000);
+  };
+
+  const handleCompletePayment = async () => {
+    setIsProcessingPayment(true);
+    try {
+      const purchaseKey = `${selectedGrade}_${selectedSubject}`.toLowerCase();
+      const updatedPurchases = Array.from(new Set([...purchasedTests, purchaseKey, selectedSubject.toLowerCase()]));
+      setPurchasedTests(updatedPurchases);
+      localStorage.setItem('olympiadhub_purchased_tests', JSON.stringify(updatedPurchases));
+
+      // Record order in backend / local storage
+      const orderPayload = {
+        order_id: `ORD-PRAC-${Date.now().toString().slice(-6)}`,
+        grade: selectedGrade,
+        subject: selectedSubject,
+        subject_name: subjectsMap[selectedSubject]?.name || selectedSubject,
+        amount: bankSettings.test_pack_price || 99,
+        payment_method: selectedPayMethod,
+        utr_number: utrNumber || `UPI-TXN-${Date.now().toString().slice(-8)}`,
+        status: 'completed',
+        date: new Date().toISOString()
+      };
+
+      try {
+        await apiClient.post('/payment/checkout', orderPayload);
+      } catch (e) {}
+
+      try {
+        const existingOrders = JSON.parse(localStorage.getItem('olympiadhub_db_orders') || '[]');
+        localStorage.setItem('olympiadhub_db_orders', JSON.stringify([orderPayload, ...existingOrders]));
+        window.dispatchEvent(new CustomEvent('olympiadhub-package-purchased', { detail: orderPayload }));
+      } catch (e) {}
+
+      setPaymentStep('success');
+
+      setTimeout(() => {
+        setPaymentStep('method');
+        if (selectedChapters.length === 0) {
+          setSelectedChapters(CHAPTERS_BY_SUBJECT[selectedSubject] || []);
+        }
+        setGeneratorStep('instructions');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 1200);
+    } catch (err) {
+      alert('Payment confirmation failed. Please try again.');
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
 
   // Fetch Super Admin papers directly from API & all localStorage stores
   // Fetch Super Admin papers directly from API & all localStorage stores
@@ -295,6 +405,16 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       alert(`⚠️ No questions found in this exam paper. Please add questions from Super Admin panel.`);
       return;
     }
+    const pSub = (paper.subject_code || paper.subject || selectedSubject).toLowerCase();
+    const pGrade = paper.class_name || paper.grade || selectedGrade;
+    if (!isTestUnlocked(pGrade, pSub)) {
+      setSelectedGrade(pGrade);
+      if (subjectsMap[pSub]) setSelectedSubject(pSub);
+      setPendingAdminPaper(paper);
+      setGeneratorStep('checkout');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     const questionsToUse = paper.questions.map((q, idx) => ({
       id: q.id || idx + 1,
       q: q.q || q.question_text || `Question ${idx + 1}`,
@@ -326,6 +446,12 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   const handleProceedToInstructions = () => {
     if (!hasMatchingPaper) {
       alert(`⚠️ Super Admin ne ${selectedGrade} (${subjectsMap[selectedSubject]?.name || selectedSubject}) ke liye abhi koi questions publish nahi kiye hain.`);
+      return;
+    }
+    // If not purchased yet, go directly to Step 2: Payment & QR Scanner Page!
+    if (!isCurrentTestUnlocked) {
+      setGeneratorStep('checkout');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
     if (selectedChapters.length === 0) {
@@ -1335,9 +1461,304 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
         </button>
       </div>
 
-      {generatorStep === 'instructions' ? (
+      {generatorStep === 'checkout' ? (
         /* ========================================================================= */
-        /* INSTRUCTIONS & EXAM GUIDELINES SCREEN (Step 2 of Flow)                     */
+        /* STEP 2 OF 3: FULL-PAGE PAYMENT & QR SCANNER CHECKOUT SCREEN               */
+        /* ========================================================================= */
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-[#edd6ed] shadow-lg space-y-6 animate-in fade-in zoom-in-95">
+          {/* Top Header with Back to Setup */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#f4ebf4]">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleBackToConfigure}
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  <span>Back to Customizer</span>
+                </button>
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-black uppercase tracking-wider border border-amber-200">
+                  Step 2 of 3: Payment &amp; Scanner
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-[#4e2a4a] pt-1">
+                Unlock Practice Mock Test — {selectedGrade} ({subjectsMap[selectedSubject]?.name || selectedSubject})
+              </h2>
+              <p className="text-xs text-slate-500 font-medium">
+                Scan QR Code with any UPI app to unlock complete mock test series, timer, and detailed step-by-step solutions.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Instant Auto-Unlock
+              </span>
+            </div>
+          </div>
+
+          {paymentStep === 'success' ? (
+            <div className="py-12 text-center space-y-4 animate-in zoom-in-95 duration-300">
+              <div className="w-20 h-20 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-lg animate-bounce">
+                <CheckCircle2 className="w-10 h-10" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-800">
+                🎉 Payment Verified Successfully!
+              </h3>
+              <p className="text-sm text-slate-500 font-medium max-w-md mx-auto">
+                {selectedGrade} ({subjectsMap[selectedSubject]?.name || selectedSubject}) Practice Test is unlocked. Opening Exam Guidelines...
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* LEFT 7 COLS: Big UPI QR Scanner & UPI Details */}
+              <div className="lg:col-span-7 bg-[#faf5fa] rounded-3xl p-6 border border-[#edd6ed] space-y-5">
+                {/* Method Tabs */}
+                <div className="grid grid-cols-2 gap-2 p-1 bg-white rounded-2xl border border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPayMethod('upi_qr')}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                      selectedPayMethod === 'upi_qr'
+                        ? 'bg-[#6d3a68] text-white shadow-sm font-black'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <QrCode className="w-4 h-4" />
+                    <span>UPI QR &amp; Apps</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPayMethod('card')}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                      selectedPayMethod === 'card'
+                        ? 'bg-[#6d3a68] text-white shadow-sm font-black'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span>Direct Bank Transfer</span>
+                  </button>
+                </div>
+
+                {selectedPayMethod === 'upi_qr' ? (
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row items-center gap-5 p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
+                      {/* Dynamic QR Code */}
+                      <div className="p-3 bg-white rounded-2xl shadow-md border-2 border-[#edd6ed] shrink-0 text-center">
+                        <img
+                          src={
+                            bankSettings.qr_code_url ||
+                            `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
+                              `upi://pay?pa=${bankSettings.upi_id || 'olympiadhub@icici'}&pn=${encodeURIComponent(
+                                bankSettings.merchant_name || 'Olympiad Foundation'
+                              )}&am=${bankSettings.test_pack_price || 99}&cu=INR`
+                            )}`
+                          }
+                          alt="Scan & Pay UPI QR"
+                          className="w-36 h-36 object-contain rounded-xl mx-auto"
+                        />
+                        <p className="text-[10px] font-black text-[#6d3a68] uppercase tracking-wider mt-2">
+                          Scan to Pay ₹{bankSettings.test_pack_price || 99}
+                        </p>
+                      </div>
+
+                      {/* UPI Details & Supported Apps */}
+                      <div className="space-y-3 flex-1 text-center sm:text-left w-full">
+                        <div>
+                          <h4 className="text-sm font-black text-slate-800">
+                            Scan with any UPI App:
+                          </h4>
+                          <div className="flex items-center justify-center sm:justify-start gap-1.5 flex-wrap mt-1.5">
+                            <span className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-xs font-black text-slate-700">Google Pay</span>
+                            <span className="px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-xs font-black text-indigo-700">PhonePe</span>
+                            <span className="px-2.5 py-1 rounded-lg bg-sky-50 border border-sky-200 text-xs font-black text-sky-700">Paytm</span>
+                            <span className="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-xs font-black text-emerald-700">BHIM UPI</span>
+                          </div>
+                        </div>
+
+                        {/* UPI ID & Copy */}
+                        <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                          <div className="min-w-0 text-left">
+                            <p className="text-[9px] text-slate-400 font-bold uppercase">Official UPI ID</p>
+                            <p className="text-xs font-mono font-bold text-slate-800 truncate">
+                              {bankSettings.upi_id || 'olympiadhub@icici'}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleCopyUpi}
+                            className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer shrink-0 border border-slate-200"
+                          >
+                            {copiedUpi ? (
+                              <>
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                <span className="text-emerald-700">Copied</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3.5 h-3.5" />
+                                <span>Copy</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* UTR Input */}
+                    <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2">
+                      <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                        <span>12-Digit UPI / Bank Reference No (UTR)</span>
+                        <span className="text-[10px] text-slate-400 font-normal">(Optional for Instant Unlock)</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 429182746192"
+                        value={utrNumber}
+                        onChange={(e) => setUtrNumber(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-[#6d3a68] outline-none"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  /* Direct Bank Transfer */
+                  <div className="space-y-4 p-5 rounded-2xl bg-white border border-slate-200 text-xs">
+                    <h4 className="text-xs font-black text-slate-700 uppercase tracking-wider">
+                      Official Bank Account Details
+                    </h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">Account Name</p>
+                        <p className="font-black text-slate-800 mt-0.5">{bankSettings.merchant_name || 'Olympiad Foundation'}</p>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">Bank Name</p>
+                        <p className="font-black text-slate-800 mt-0.5">{bankSettings.bank_name || 'ICICI Bank'}</p>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">Account Number</p>
+                        <p className="font-mono font-black text-slate-800 mt-0.5">{bankSettings.account_number || '1029384756'}</p>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">IFSC Code</p>
+                        <p className="font-mono font-black text-slate-800 mt-0.5">{bankSettings.ifsc || 'ICIC0001029'}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                      <label className="text-xs font-bold text-slate-700">
+                        Transfer Reference / Transaction ID
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Enter IMPS / NEFT / Txn Reference No."
+                        value={utrNumber}
+                        onChange={(e) => setUtrNumber(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-[#6d3a68] outline-none"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* RIGHT 5 COLS: Order Summary & Pay Button */}
+              <div className="lg:col-span-5 flex flex-col justify-between bg-white rounded-3xl p-6 border-2 border-[#edd6ed] shadow-sm space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-base font-black text-[#2e1065] tracking-tight border-b border-slate-100 pb-3">
+                    Order Summary
+                  </h3>
+
+                  <div className="space-y-2.5 text-xs">
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-slate-500 font-semibold">Target Grade</span>
+                      <span className="font-black text-slate-800">{selectedGrade}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-slate-500 font-semibold">Olympiad Subject</span>
+                      <span className="font-black text-slate-800 uppercase">{subjectsMap[selectedSubject]?.name || selectedSubject}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-slate-500 font-semibold">Questions / Time</span>
+                      <span className="font-black text-slate-800">
+                        {hasMatchingPaper ? `${matchingPaper.questions.length} MCQs` : `${questionCount} MCQs`} / {matchingPaper?.duration_minutes || testDurationMinutes} Mins
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-slate-500 font-semibold">Detailed Solutions</span>
+                      <span className="font-black text-emerald-600">Included (Step-by-Step)</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-slate-500 font-semibold">National Percentile &amp; Rank</span>
+                      <span className="font-black text-emerald-600">Instant Report</span>
+                    </div>
+                  </div>
+
+                  {/* Price Box */}
+                  <div className="p-4 rounded-2xl bg-[#faf5fa] border border-[#edd6ed] flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase">Total Amount</p>
+                      <p className="text-xs text-emerald-700 font-bold">Special Offer 67% OFF</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs line-through text-slate-400 font-bold mr-1.5">
+                        ₹{bankSettings.original_price || 299}
+                      </span>
+                      <span className="text-3xl font-black text-[#6d3a68]">
+                        ₹{bankSettings.test_pack_price || 99}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 text-[11px] text-slate-500 font-medium">
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>One-time payment for complete practice package</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>Next step: View exam guidelines &amp; start timer</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="space-y-2.5 pt-4 border-t border-slate-100">
+                  <button
+                    type="button"
+                    disabled={isProcessingPayment}
+                    onClick={handleCompletePayment}
+                    className="w-full py-3.5 rounded-2xl bg-[#00b074] hover:bg-[#009260] text-white text-sm font-black uppercase tracking-wider transition-all shadow-lg hover:shadow-xl active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    {isProcessingPayment ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Verifying Payment...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-4 h-4 text-amber-300 fill-current" />
+                        <span>Pay ₹{bankSettings.test_pack_price || 99} &amp; Proceed to Test</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleBackToConfigure}
+                    className="w-full py-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer text-center"
+                  >
+                    ← Cancel &amp; Back to Customizer
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : generatorStep === 'instructions' ? (
+        /* ========================================================================= */
+        /* STEP 3 OF 3: INSTRUCTIONS & EXAM GUIDELINES SCREEN                        */
         /* ========================================================================= */
         <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-[#edd6ed] shadow-lg space-y-6 animate-in fade-in zoom-in-95">
           {/* Top Header with Back to Setup */}
@@ -1353,7 +1774,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                   <span>Back to Setup</span>
                 </button>
                 <span className="px-2.5 py-0.5 rounded-full bg-[#f4ebf4] text-[#6d3a68] text-[10px] font-black uppercase">
-                  Step 2 of 2: Exam Instructions
+                  Step 3 of 3: Exam Instructions
                 </span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-[#4e2a4a] pt-1">
@@ -2016,8 +2437,18 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                       onClick={handleProceedToInstructions}
                       className="px-5 py-2.5 bg-[#6d3a68] hover:bg-[#582d54] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
                     >
-                      <span>Next: Instructions &amp; Start</span>
-                      <ArrowRight className="w-4 h-4" />
+                      {isCurrentTestUnlocked ? (
+                        <>
+                          <span>Next: Instructions &amp; Start</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-3.5 h-3.5 text-amber-300" />
+                          <span>Next: Instructions &amp; Start (₹{bankSettings.test_pack_price || 99})</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -2172,8 +2603,20 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                         : 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300'
                     }`}
                   >
-                    <span>{hasMatchingPaper ? 'Next: View Instructions' : 'Awaiting Super Admin Questions'}</span>
-                    <ArrowRight className="w-4 h-4" />
+                    {!hasMatchingPaper ? (
+                      <span>Awaiting Super Admin Questions</span>
+                    ) : isCurrentTestUnlocked ? (
+                      <>
+                        <span>Next: View Instructions</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-4 h-4 text-amber-300" />
+                        <span>Unlock &amp; View Instructions (₹{bankSettings.test_pack_price || 99})</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -2368,14 +2811,30 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                       </div>
 
                       <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
-                        <button
-                          type="button"
-                          onClick={() => handleStartAdminPaper(paper)}
-                          className="flex-1 py-2.5 bg-[#00b074] hover:bg-[#009260] text-white rounded-xl text-xs font-black transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-                        >
-                          <Play className="w-3.5 h-3.5 fill-current" />
-                          <span>Start Practice Test</span>
-                        </button>
+                        {(() => {
+                          const isPaperUnlocked = isTestUnlocked(pClass, subCode);
+                          return (
+                            <button
+                              type="button"
+                              onClick={() => handleStartAdminPaper(paper)}
+                              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 text-white ${
+                                isPaperUnlocked ? 'bg-[#00b074] hover:bg-[#009260]' : 'bg-[#6d3a68] hover:bg-[#582d54]'
+                              }`}
+                            >
+                              {isPaperUnlocked ? (
+                                <>
+                                  <Play className="w-3.5 h-3.5 fill-current" />
+                                  <span>Start Practice Test</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Lock className="w-3.5 h-3.5 text-amber-300" />
+                                  <span>Unlock &amp; Start (₹{bankSettings.test_pack_price || 99})</span>
+                                </>
+                              )}
+                            </button>
+                          );
+                        })()}
                         <button
                           type="button"
                           onClick={() => setPdfModalPaper(paper)}

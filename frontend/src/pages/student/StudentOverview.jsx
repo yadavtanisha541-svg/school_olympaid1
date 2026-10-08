@@ -46,11 +46,21 @@ import {
   FileCheck2,
   Building2,
   Bookmark,
-  Palette
+  Palette,
+  GraduationCap
 } from 'lucide-react';
+
+const CLASS_OPTIONS = [
+  'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 
+  'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 
+  'Class 11', 'Class 12'
+];
 
 export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, activeSubjectTab }) => {
   const { user } = useAuth();
+  const [selectedClass, setSelectedClass] = useState(() => {
+    return user?.class || user?.grade || 'Class 6';
+  });
   const [data, setData] = useState(null);
   const [availableExams, setAvailableExams] = useState([]);
   const [examPapers, setExamPapers] = useState([]);
@@ -853,14 +863,23 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={() => onNavigateTab && onNavigateTab('my_content')}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95"
-          >
-            <span>View All Subject Covers</span>
-            <ChevronRight className="w-4 h-4 text-slate-500" />
-          </button>
+          {/* Class Dropdown */}
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-indigo-300 transition-colors">
+            <GraduationCap className="w-4 h-4 text-indigo-600 shrink-0" />
+            <span className="text-xs font-bold text-slate-500">Class:</span>
+            <select
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+              aria-label="Select Class"
+              className="text-xs font-black text-slate-800 bg-transparent focus:outline-none cursor-pointer pr-1"
+            >
+              {CLASS_OPTIONS.map((cls) => (
+                <option key={cls} value={cls}>
+                  {cls}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* 6 Colorful 2-3 Mix Pastel Gradient Subject Cards (20% Richer) */}
