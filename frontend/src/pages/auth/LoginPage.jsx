@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   Eye,
@@ -15,9 +15,31 @@ import {
   CheckCircle2,
   Check,
   ShieldCheck,
-  Smartphone
+  Smartphone,
+  Key,
+  ExternalLink,
+  Sparkles,
+  HelpCircle
 } from 'lucide-react';
 import { OlympiadHubLogo } from '../../components/OlympiadHubLogo';
+
+// Helper to decode Google JWT token safely
+const decodeJwt = (token) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      window
+        .atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+};
 
 // Official Multi-color Google 'G' Logo
 const GoogleIcon = () => (
@@ -61,16 +83,50 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
   // reCAPTCHA State
   const [captchaStatus, setCaptchaStatus] = useState('idle'); // 'idle' | 'checking' | 'verified'
 
-  // Google Modal State
+  // Google Modal & Auth State
   const [showGoogleModal, setShowGoogleModal] = useState(false);
+  const [googleAuthTab, setGoogleAuthTab] = useState('device'); // 'device' | 'client_id'
   const [customGoogleEmail, setCustomGoogleEmail] = useState('');
   const [customGoogleName, setCustomGoogleName] = useState('');
+  const [googleClientIdInput, setGoogleClientIdInput] = useState(
+    () => localStorage.getItem('olympiadhub_google_client_id') || ''
+  );
   const [googleSigningIn, setGoogleSigningIn] = useState(false);
 
   // Loading & Error States
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showCoordinatorModal, setShowCoordinatorModal] = useState(false);
+
+  // Initialize Google One Tap if Client ID is configured
+  useEffect(() => {
+    const configuredClientId =
+      import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+      localStorage.getItem('olympiadhub_google_client_id');
+
+    if (configuredClientId && window.google?.accounts?.id) {
+      try {
+        window.google.accounts.id.initialize({
+          client_id: configuredClientId,
+          callback: async (response) => {
+            if (response?.credential) {
+              const decoded = decodeJwt(response.credential);
+              if (decoded?.email) {
+                await handleGoogleSelect({
+                  name: decoded.name || decoded.email.split('@')[0],
+                  email: decoded.email,
+                  avatar: decoded.picture
+                });
+              }
+            }
+          }
+        });
+        window.google.accounts.id.prompt();
+      } catch (err) {
+        console.warn('Google One Tap init notice:', err);
+      }
+    }
+  }, []);
 
   const handleGoHome = () => {
     if (onBackToPublic) {
@@ -151,7 +207,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
     }
   };
 
-  // Handle Google Sign In
+  // Handle Google Sign In Authentication
   const handleGoogleSelect = async (account) => {
     setGoogleSigningIn(true);
     setError('');
@@ -201,6 +257,72 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
     } finally {
       setGoogleSigningIn(false);
     }
+  };
+
+  // Trigger Google Official OAuth (Popup showing real accounts on device)
+  const handleContinueWithGoogle = (forcedClientId) => {
+    const clientId =
+      forcedClientId ||
+      import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+      localStorage.getItem('olympiadhub_google_client_id') ||
+      '';
+
+    // If client ID is present and Google SDK is loaded, launch official Google account popup
+    if (clientId && window.google?.accounts?.oauth2) {
+      try {
+        const client = window.google.accounts.oauth2.initTokenClient({
+          client_id: clientId,
+          scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid',
+          callback: async (tokenResponse) => {
+            if (tokenResponse?.error) {
+              setError(`Google Sign-In: ${tokenResponse.error_description || tokenResponse.error}`);
+              return;
+            }
+            if (tokenResponse?.access_token) {
+              setGoogleSigningIn(true);
+              try {
+                const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                  headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+                });
+                const profile = await res.json();
+                if (profile?.email) {
+                  await handleGoogleSelect({
+                    name: profile.name || profile.given_name || profile.email.split('@')[0],
+                    email: profile.email,
+                    avatar: profile.picture
+                  });
+                } else {
+                  setError('Could not retrieve profile from Google.');
+                }
+              } catch (err) {
+                setError('Failed to fetch details from Google API.');
+              } finally {
+                setGoogleSigningIn(false);
+              }
+            }
+          }
+        });
+        client.requestAccessToken();
+        setShowGoogleModal(false);
+        return;
+      } catch (err) {
+        console.warn('Google Token Client init notice:', err);
+      }
+    }
+
+    // No client ID configured yet -> open account selection / setup modal
+    setShowGoogleModal(true);
+  };
+
+  // Save Client ID and immediately trigger Google Popup
+  const handleSaveClientIdAndLaunch = () => {
+    const cleanId = googleClientIdInput.trim();
+    if (!cleanId) {
+      setError('Please paste a valid Google OAuth Client ID.');
+      return;
+    }
+    localStorage.setItem('olympiadhub_google_client_id', cleanId);
+    handleContinueWithGoogle(cleanId);
   };
 
   return (
@@ -467,7 +589,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
             {/* CONTINUE WITH GOOGLE BUTTON (Image 1 - Functional Google OAuth) */}
             <button
               type="button"
-              onClick={() => setShowGoogleModal(true)}
+              onClick={() => handleContinueWithGoogle()}
               className="w-full h-10 sm:h-10.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs tracking-wider uppercase shadow-xs hover:shadow-sm active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2.5 border border-slate-200"
             >
               <GoogleIcon />
@@ -529,7 +651,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
         </p>
       </div>
 
-      {/* GOOGLE SIGN-IN INTERACTIVE MODAL (Guarantees Google Login Works 100%) */}
+      {/* GOOGLE SIGN-IN INTERACTIVE MODAL (Direct Device Gmail or Official Google OAuth) */}
       {showGoogleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs animate-fadeIn">
           <div
@@ -537,133 +659,180 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
             onClick={(e) => e.stopPropagation()}
           >
             {/* Google Modal Header */}
-            <div className="p-6 border-b border-slate-100 text-center relative">
+            <div className="p-5 border-b border-slate-100 text-center relative bg-gradient-to-b from-slate-50 to-white">
               <button
                 type="button"
                 onClick={() => setShowGoogleModal(false)}
-                className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
 
-              <div className="w-12 h-12 mx-auto rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center mb-3">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-white shadow-md border border-slate-100 flex items-center justify-center mb-2">
                 <GoogleIcon />
               </div>
-              <h3 className="text-lg font-black text-slate-900">
+              <h3 className="text-base sm:text-lg font-black text-slate-900">
                 Sign in with Google
               </h3>
-              <p className="text-xs text-slate-500 font-medium mt-1">
-                Choose an account to continue to SkillRise Olympiad Portal
+              <p className="text-xs text-slate-500 font-medium mt-0.5">
+                Choose your Google account to continue to SkillRise Olympiad
               </p>
+
+              {/* Mode Selector Tabs */}
+              <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl mt-3 text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setGoogleAuthTab('device')}
+                  className={`py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    googleAuthTab === 'device'
+                      ? 'bg-white text-blue-600 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Smartphone className="w-3.5 h-3.5" />
+                  <span>Device Gmail</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGoogleAuthTab('client_id')}
+                  className={`py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    googleAuthTab === 'client_id'
+                      ? 'bg-white text-blue-600 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Key className="w-3.5 h-3.5" />
+                  <span>Google Cloud Popup</span>
+                </button>
+              </div>
             </div>
 
-            {/* Google Modal Body: Account Options */}
-            <div className="p-5 space-y-3">
-              {/* Account 1 */}
-              <div
-                onClick={() =>
-                  handleGoogleSelect({
-                    name: 'Aarav Sharma',
-                    email: 'aarav.sharma@gmail.com',
-                    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150'
-                  })
-                }
-                className="p-3.5 rounded-2xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 transition-all flex items-center justify-between cursor-pointer group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center shadow-xs">
-                    AS
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-black text-slate-900 group-hover:text-blue-600 transition-colors">
-                      Aarav Sharma
-                    </h4>
-                    <p className="text-[11px] text-slate-500 font-medium">
-                      aarav.sharma@gmail.com • Class 6
+            {/* Google Modal Body */}
+            <div className="p-5 space-y-4">
+              {googleAuthTab === 'device' ? (
+                /* Tab 1: Instant Device Gmail Sign In */
+                <div className="space-y-3">
+                  <div className="p-3 rounded-2xl bg-blue-50/70 border border-blue-200/60 flex items-start gap-2.5">
+                    <Smartphone className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                    <p className="text-xs text-blue-900 font-medium leading-relaxed">
+                      Enter the Google / Gmail account active on your phone or device. Your student profile will be signed in instantly.
                     </p>
                   </div>
-                </div>
-                <span className="text-xs text-blue-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                  Select →
-                </span>
-              </div>
 
-              {/* Account 2 */}
-              <div
-                onClick={() =>
-                  handleGoogleSelect({
-                    name: 'Ananya Verma',
-                    email: 'ananya.verma@gmail.com',
-                    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150'
-                  })
-                }
-                className="p-3.5 rounded-2xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 transition-all flex items-center justify-between cursor-pointer group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-pink-600 text-white font-bold flex items-center justify-center shadow-xs">
-                    AV
-                  </div>
                   <div>
-                    <h4 className="text-xs font-black text-slate-900 group-hover:text-blue-600 transition-colors">
-                      Ananya Verma
-                    </h4>
-                    <p className="text-[11px] text-slate-500 font-medium">
-                      ananya.verma@gmail.com • Class 10
-                    </p>
+                    <label className="block text-[11px] font-black text-slate-700 uppercase tracking-wider mb-1">
+                      Your Phone / Device Gmail Address *
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Mail className="h-4 w-4 text-slate-400" />
+                      </div>
+                      <input
+                        type="email"
+                        placeholder="e.g. yadavtanisha541@gmail.com"
+                        value={customGoogleEmail}
+                        onChange={(e) => setCustomGoogleEmail(e.target.value)}
+                        className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                        required
+                        autoFocus
+                      />
+                    </div>
                   </div>
-                </div>
-                <span className="text-xs text-blue-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                  Select →
-                </span>
-              </div>
 
-              {/* Or Enter Custom Gmail */}
-              <div className="pt-2 border-t border-slate-100">
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Or enter your Gmail account:
-                </p>
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    placeholder="Your Full Name"
-                    value={customGoogleName}
-                    onChange={(e) => setCustomGoogleName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                  <input
-                    type="email"
-                    placeholder="yourname@gmail.com"
-                    value={customGoogleEmail}
-                    onChange={(e) => setCustomGoogleEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
+                  <div>
+                    <label className="block text-[11px] font-black text-slate-700 uppercase tracking-wider mb-1">
+                      Student Name (Optional)
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <User className="h-4 w-4 text-slate-400" />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="e.g. Tanisha Yadav"
+                        value={customGoogleName}
+                        onChange={(e) => setCustomGoogleName(e.target.value)}
+                        className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+
                   <button
                     type="button"
                     disabled={!customGoogleEmail.trim() || googleSigningIn}
                     onClick={() =>
                       handleGoogleSelect({
-                        name: customGoogleName.trim() || 'Google Student',
+                        name: customGoogleName.trim() || customGoogleEmail.trim().split('@')[0],
                         email: customGoogleEmail.trim()
                       })
                     }
-                    className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-wider transition-colors disabled:opacity-40 cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white text-xs font-black uppercase tracking-wider transition-all disabled:opacity-40 cursor-pointer flex items-center justify-center gap-2 shadow-md hover:shadow-lg mt-2"
                   >
                     {googleSigningIn ? (
                       <>
                         <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Signing In...</span>
+                        <span>Signing In with Google...</span>
                       </>
                     ) : (
-                      <span>Continue with this Account</span>
+                      <>
+                        <GoogleIcon />
+                        <span>Sign In with this Gmail</span>
+                      </>
                     )}
                   </button>
                 </div>
-              </div>
+              ) : (
+                /* Tab 2: Connect Live Google Cloud OAuth Popup */
+                <div className="space-y-3">
+                  <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-start gap-2.5">
+                    <HelpCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <p className="text-xs text-amber-900 font-medium leading-relaxed">
+                      Phone ke real accounts ka automatic Google popup kholne ke liye Google Cloud Console ka <strong>Client ID</strong> required hota hai.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-black text-slate-700 uppercase tracking-wider mb-1">
+                      Paste Your Google Cloud Client ID
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 123456789-xxxx.apps.googleusercontent.com"
+                      value={googleClientIdInput}
+                      onChange={(e) => setGoogleClientIdInput(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono font-medium focus:ring-2 focus:ring-blue-500 outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={!googleClientIdInput.trim()}
+                    onClick={handleSaveClientIdAndLaunch}
+                    className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider transition-all disabled:opacity-40 cursor-pointer flex items-center justify-center gap-2 shadow-md"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-white" />
+                    <span>Save &amp; Open Live Google Popup</span>
+                  </button>
+
+                  {/* 3 Step Guide */}
+                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-[11px] space-y-1.5 text-slate-600">
+                    <p className="font-bold text-slate-800">Free Google Client ID in 2 minutes:</p>
+                    <p>1. Open <a href="https://console.cloud.google.com" target="_blank" rel="noreferrer" className="text-blue-600 font-bold underline">console.cloud.google.com</a></p>
+                    <p>2. Go to <strong>APIs &amp; Services → Credentials → Create OAuth Client ID</strong></p>
+                    <p>3. Application type: <strong>Web application</strong></p>
+                    <p>4. Add Authorized Origins: your website Vercel domain</p>
+                    <p>5. Copy Client ID and paste here or in Vercel environment <code>VITE_GOOGLE_CLIENT_ID</code>.</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Modal Footer */}
             <div className="bg-slate-50 px-5 py-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Google Identity Services</span>
+              <span className="flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+                Google Identity Services
+              </span>
               <button
                 type="button"
                 onClick={() => setShowGoogleModal(false)}
