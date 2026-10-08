@@ -21,7 +21,9 @@ import {
   CheckCircle2,
   BarChart2,
   Trophy,
-  FileText
+  FileText,
+  Languages,
+  Rocket
 } from 'lucide-react';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 
@@ -139,7 +141,7 @@ export const StudentMyContentPage = ({
       title: 'IEOS (Science)',
       subtitle: 'Science & Practical Discovery',
       description: 'Master scientific principles, experimental observation, physics, chemistry, biology concepts and logic.',
-      icon: Atom,
+      icon: Rocket,
       cardBg: 'bg-gradient-to-br from-purple-200/95 via-indigo-200/85 to-sky-200/85 border-2 border-purple-400/90 hover:border-purple-500 shadow-sm',
       iconBg: 'bg-gradient-to-tr from-purple-500 via-indigo-500 to-sky-500 text-white shadow-purple-300 shadow-md',
       tagBg: 'bg-purple-300/90 text-purple-900 border border-purple-400',
@@ -195,7 +197,7 @@ export const StudentMyContentPage = ({
       title: 'IEOH (Hindi)',
       subtitle: 'Hindi Vyakaran & Sahitya',
       description: 'हिंदी व्याकरण, वर्तनी शुद्धि, मुहावरे, भाषा बोध और शब्द ज्ञान का संपूर्ण अभ्यास करें।',
-      icon: BookOpen,
+      icon: Languages,
       cardBg: 'bg-gradient-to-br from-lime-200/95 via-emerald-200/85 to-teal-200/85 border-2 border-emerald-400/90 hover:border-emerald-500 shadow-sm',
       iconBg: 'bg-gradient-to-tr from-lime-500 via-emerald-500 to-teal-600 text-white shadow-emerald-300 shadow-md',
       tagBg: 'bg-emerald-300/90 text-emerald-900 border border-emerald-400',
@@ -208,8 +210,13 @@ export const StudentMyContentPage = ({
   const getSubjectPapers = (subCode, altCode) => {
     const matching = examPapers.filter((p) => {
       const pSub = (p.subject_code || p.subject || '').toUpperCase();
-      const codeMatches = pSub === subCode || (altCode && pSub === altCode);
-      const classMatches = !p.class_name || p.class_name === studentClass || p.class_name === 'All';
+      const codeMatches = pSub === subCode || (altCode && pSub === altCode) || (subCode === 'IDLO' && (pSub === 'ICSO' || pSub === 'CYBER' || pSub === 'IEOD')) || (subCode === 'IHO' && (pSub === 'IEOH' || pSub === 'HINDI'));
+      
+      const pCls = (p.class_name || p.class || '').toLowerCase();
+      const sCls = (studentClass || '').toLowerCase();
+      const matchP = pCls.match(/\d+/);
+      const matchS = sCls.match(/\d+/);
+      const classMatches = (matchP && matchS) ? matchP[0] === matchS[0] : (pCls === sCls || !pCls || pCls === 'all');
       
       // Strict exclusion: NEVER show Previous Year Papers or Sample Papers in My Content
       const titleLower = (p.title || '').toLowerCase();
@@ -231,8 +238,8 @@ export const StudentMyContentPage = ({
     const basePapers = [
       {
         id: `mock_${subCode.toLowerCase()}_1`,
-        title: `${subCode} Level-1 Mock Test 1 ${studentClass}`,
-        short_code: `${subCode} - Mock 1`,
+        title: `${altCode || subCode} Level-1 Mock Test 1 ${studentClass}`,
+        short_code: `${altCode || subCode} - Mock 1`,
         subject_code: subCode,
         class_name: studentClass,
         duration_minutes: 60,
@@ -242,8 +249,8 @@ export const StudentMyContentPage = ({
       },
       {
         id: `mock_${subCode.toLowerCase()}_2`,
-        title: `${subCode} Level-1 Mock Test 2 ${studentClass}`,
-        short_code: `${subCode} - Mock 2`,
+        title: `${altCode || subCode} Level-1 Mock Test 2 ${studentClass}`,
+        short_code: `${altCode || subCode} - Mock 2`,
         subject_code: subCode,
         class_name: studentClass,
         duration_minutes: 60,
@@ -253,8 +260,8 @@ export const StudentMyContentPage = ({
       },
       {
         id: `mock_${subCode.toLowerCase()}_3`,
-        title: `${subCode} Level-1 Mock Test 3 ${studentClass}`,
-        short_code: `${subCode} - Mock 3`,
+        title: `${altCode || subCode} Level-1 Mock Test 3 ${studentClass}`,
+        short_code: `${altCode || subCode} - Mock 3`,
         subject_code: subCode,
         class_name: studentClass,
         duration_minutes: 60,
@@ -264,8 +271,8 @@ export const StudentMyContentPage = ({
       },
       {
         id: `mock_${subCode.toLowerCase()}_4`,
-        title: `${subCode} Level-1 Mock Test 4 ${studentClass}`,
-        short_code: `${subCode} - Mock 4`,
+        title: `${altCode || subCode} Level-1 Mock Test 4 ${studentClass}`,
+        short_code: `${altCode || subCode} - Mock 4`,
         subject_code: subCode,
         class_name: studentClass,
         duration_minutes: 60,
@@ -278,8 +285,8 @@ export const StudentMyContentPage = ({
     if (subCode === 'IMO') {
       basePapers.push({
         id: `mock_${subCode.toLowerCase()}_5`,
-        title: `${subCode} Level-1 Mock Test 5 ${studentClass}`,
-        short_code: `${subCode} - Mock 5`,
+        title: `${altCode || subCode} Level-1 Mock Test 5 ${studentClass}`,
+        short_code: `${altCode || subCode} - Mock 5`,
         subject_code: subCode,
         class_name: studentClass,
         duration_minutes: 60,
