@@ -82,16 +82,20 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
     }
   };
 
-  // Toggle reCAPTCHA verification with realistic animated spinner
+  // Toggle reCAPTCHA verification: click to verify, click again to unclick / uncheck
   const handleCaptchaClick = () => {
-    if (captchaStatus === 'verified') return;
+    if (captchaStatus === 'checking') return;
+    if (captchaStatus === 'verified') {
+      setCaptchaStatus('idle');
+      return;
+    }
     setCaptchaStatus('checking');
     setTimeout(() => {
       setCaptchaStatus('verified');
       if (error && error.includes('robot')) {
         setError('');
       }
-    }, 700);
+    }, 500);
   };
 
   // Handle Form Submission (Sign Up or Sign In)
@@ -361,19 +365,26 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
             <div className="bg-[#f9f9f9] border border-[#d3d3d3] rounded-2xl p-3 sm:p-3.5 flex items-center justify-between shadow-xs select-none">
               <div
                 onClick={handleCaptchaClick}
-                className="flex items-center gap-3 cursor-pointer group"
+                className="flex items-center gap-3 cursor-pointer group flex-1 py-1"
+                title={captchaStatus === 'verified' ? 'Click to uncheck' : 'Click to verify'}
               >
                 {/* Checkbox Box */}
-                <div className="w-7 h-7 rounded-md border-2 border-[#c1c1c1] group-hover:border-[#999] bg-white flex items-center justify-center transition-colors shadow-2xs">
+                <div
+                  className={`w-7 h-7 rounded-md border-2 transition-all flex items-center justify-center shadow-2xs ${
+                    captchaStatus === 'verified'
+                      ? 'border-emerald-500 bg-emerald-50 text-emerald-600'
+                      : 'border-[#c1c1c1] group-hover:border-[#999] bg-white text-transparent'
+                  }`}
+                >
                   {captchaStatus === 'checking' && (
                     <span className="w-4.5 h-4.5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                   )}
                   {captchaStatus === 'verified' && (
-                    <Check className="w-5 h-5 text-emerald-600 stroke-[3.5] animate-in zoom-in-75 duration-200" />
+                    <Check className="w-5 h-5 text-emerald-600 stroke-[3.5] animate-in zoom-in-75 duration-150" />
                   )}
                 </div>
 
-                <span className="text-xs sm:text-sm font-bold text-slate-800">
+                <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-black transition-colors">
                   I'm not a robot
                 </span>
               </div>
