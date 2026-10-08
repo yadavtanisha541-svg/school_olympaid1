@@ -1642,32 +1642,6 @@ export const SuperAdminPackagesManager = () => {
                 </div>
               </div>
 
-              {/* Supported Formats Banner */}
-              <div className="bg-gradient-to-r from-amber-50 to-orange-50/50 p-4 rounded-2xl border border-amber-200 text-xs text-amber-900 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-black text-[11px] uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Intelligent Auto-Parser Supports All Formats:</span>
-                  </span>
-                  <span className="text-[10px] bg-amber-200/80 text-amber-900 font-black px-2 py-0.5 rounded-md">
-                    Forgiving &amp; Smart
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2 text-[11px] font-bold">
-                  <span className="bg-white px-2.5 py-1 rounded-lg border border-amber-200 text-slate-800">
-                    ✓ Standard (Q1, A, B, C, D, Correct, Explanation)
-                  </span>
-                  <span className="bg-white px-2.5 py-1 rounded-lg border border-amber-200 text-slate-800">
-                    ✓ Plain Questions (Even without options)
-                  </span>
-                  <span className="bg-white px-2.5 py-1 rounded-lg border border-amber-200 text-slate-800">
-                    ✓ JSON Array
-                  </span>
-                  <span className="bg-white px-2.5 py-1 rounded-lg border border-amber-200 text-slate-800">
-                    ✓ CSV Spreadsheet
-                  </span>
-                </div>
-              </div>
 
               {/* Textarea */}
               <div>
