@@ -908,8 +908,145 @@ const initialStore = {
     site_name: 'OlympiadHub',
     support_email: 'support@olympiadhub.com',
     support_phone: '+91 98765 43210'
-  }
+  },
+  audit_logs: [
+    {
+      id: 1,
+      action: 'Superadmin Login',
+      module: 'Auth',
+      user_name: 'Super Administrator',
+      login_id: 'admin',
+      user_role: 'superadmin',
+      details_json: '{"role":"superadmin","method":"secure_auth","status":"success"}',
+      ip_address: '127.0.0.1',
+      created_at: new Date(Date.now() - 3 * 60000).toISOString().replace('T', ' ').substring(0, 19)
+    },
+    {
+      id: 2,
+      action: 'Exam Paper Published',
+      module: 'Exams',
+      user_name: 'Super Administrator',
+      login_id: 'admin',
+      user_role: 'superadmin',
+      details_json: '{"title":"Class 6 Mathematics (IMO) Paper 1","questions_count":10,"class":"Class 6","status":"published"}',
+      ip_address: '127.0.0.1',
+      created_at: new Date(Date.now() - 15 * 60000).toISOString().replace('T', ' ').substring(0, 19)
+    },
+    {
+      id: 3,
+      action: 'Bulk Questions Imported',
+      module: 'QuestionBank',
+      user_name: 'Super Administrator',
+      login_id: 'admin',
+      user_role: 'superadmin',
+      details_json: '{"total_parsed":15,"subject":"Science (NSO)","class":"Class 7","auto_parsed":true}',
+      ip_address: '127.0.0.1',
+      created_at: new Date(Date.now() - 42 * 60000).toISOString().replace('T', ' ').substring(0, 19)
+    },
+    {
+      id: 4,
+      action: 'Student Exam Submitted',
+      module: 'ExamEngine',
+      user_name: 'Aarav Sharma',
+      login_id: 'STU-2026-0100',
+      user_role: 'student',
+      details_json: '{"exam_title":"IMO Championship 2026","score":9,"percentage":90,"passed":true,"duration_mins":42}',
+      ip_address: '103.21.144.62',
+      created_at: new Date(Date.now() - 65 * 60000).toISOString().replace('T', ' ').substring(0, 19)
+    },
+    {
+      id: 5,
+      action: 'Student Registration',
+      module: 'User',
+      user_name: 'Ananya Verma',
+      login_id: 'STU-2026-0101',
+      user_role: 'student',
+      details_json: '{"class":"Class 8","school":"Delhi Public School","category":"Junior Olympiad"}',
+      ip_address: '49.36.120.18',
+      created_at: new Date(Date.now() - 120 * 60000).toISOString().replace('T', ' ').substring(0, 19)
+    },
+    {
+      id: 6,
+      action: 'Academic Structure Synchronized',
+      module: 'Academic',
+      user_name: 'Super Administrator',
+      login_id: 'admin',
+      user_role: 'superadmin',
+      details_json: '{"classes_count":15,"subjects_count":6,"standard":"CBSE/ICSE"}',
+      ip_address: '127.0.0.1',
+      created_at: new Date(Date.now() - 180 * 60000).toISOString().replace('T', ' ').substring(0, 19)
+    },
+    {
+      id: 7,
+      action: 'Practice Test Completed',
+      module: 'ExamEngine',
+      user_name: 'Rohan Gupta',
+      login_id: 'STU-2026-0102',
+      user_role: 'student',
+      details_json: '{"subject":"Cyber & AI (ICO)","questions_answered":10,"accuracy":"90%"}',
+      ip_address: '115.112.89.44',
+      created_at: new Date(Date.now() - 240 * 60000).toISOString().replace('T', ' ').substring(0, 19)
+    },
+    {
+      id: 8,
+      action: 'Payment Bank QR Updated',
+      module: 'Settings',
+      user_name: 'Super Administrator',
+      login_id: 'admin',
+      user_role: 'superadmin',
+      details_json: '{"upi_id":"olympiad@upi","merchant_name":"Olympiad Foundation"}',
+      ip_address: '127.0.0.1',
+      created_at: new Date(Date.now() - 360 * 60000).toISOString().replace('T', ' ').substring(0, 19)
+    },
+    {
+      id: 9,
+      action: 'New Coordinator Inquiry',
+      module: 'User',
+      user_name: 'Priya Patel',
+      login_id: 'CORD-2026-003',
+      user_role: 'coordinator',
+      details_json: '{"city":"Ahmedabad","school":"St. Xavier High School","experience":"6 years"}',
+      ip_address: '122.170.21.90',
+      created_at: new Date(Date.now() - 480 * 60000).toISOString().replace('T', ' ').substring(0, 19)
+    },
+    {
+      id: 10,
+      action: 'Question Bank Updated',
+      module: 'QuestionBank',
+      user_name: 'Super Administrator',
+      login_id: 'admin',
+      user_role: 'superadmin',
+      details_json: '{"subject":"English (IEO)","updated_items":8,"status":"active"}',
+      ip_address: '127.0.0.1',
+      created_at: new Date(Date.now() - 600 * 60000).toISOString().replace('T', ' ').substring(0, 19)
+    }
+  ]
 };
+
+export function logAuditActivity(action, module = 'System', details = {}, userName = 'Super Administrator', loginId = 'admin', ip = '127.0.0.1') {
+  try {
+    let logs = getDb('audit_logs') || [];
+    if (!Array.isArray(logs) || logs.length === 0) {
+      logs = [...(initialStore.audit_logs || [])];
+    }
+    const newLog = {
+      id: Date.now() + Math.floor(Math.random() * 1000),
+      action: action,
+      module: module || 'System',
+      user_name: userName || 'Super Administrator',
+      login_id: loginId || 'admin',
+      user_role: 'superadmin',
+      details_json: typeof details === 'object' ? JSON.stringify(details) : String(details),
+      ip_address: ip || '127.0.0.1',
+      created_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
+    };
+    logs.unshift(newLog);
+    if (logs.length > 500) logs = logs.slice(0, 500);
+    saveDb('audit_logs', logs);
+  } catch (e) {
+    console.warn('logAuditActivity error:', e);
+  }
+}
 
 function getDb(table) {
   try {
@@ -3552,6 +3689,54 @@ export const mockEngine = {
 
     // ANALYTICS
     if (root === 'analytics') {
+      if (sub === 'logs' || subId === 'logs') {
+        if (method === 'DELETE') {
+          saveDb('audit_logs', []);
+          return { success: true, message: 'All activity logs cleared successfully.' };
+        }
+
+        let allLogs = getDb('audit_logs') || [];
+        if (!Array.isArray(allLogs) || allLogs.length === 0) {
+          allLogs = [...(initialStore.audit_logs || [])];
+          saveDb('audit_logs', allLogs);
+        }
+
+        const page = Math.max(1, Number(params.page || body.page || 1));
+        const limit = Math.max(1, Number(params.limit || body.limit || 15));
+        const search = (params.search || body.search || '').trim().toLowerCase();
+        const selectedModule = (params.module || body.module || '').trim().toLowerCase();
+
+        let filtered = allLogs.filter((l) => {
+          if (!l) return false;
+          if (selectedModule && selectedModule !== 'all' && (l.module || '').toLowerCase() !== selectedModule) {
+            return false;
+          }
+          if (search) {
+            const combined = `${l.action || ''} ${l.user_name || ''} ${l.login_id || ''} ${l.details_json || ''} ${l.ip_address || ''} ${l.module || ''}`.toLowerCase();
+            return combined.includes(search);
+          }
+          return true;
+        });
+
+        const total = filtered.length;
+        const totalPages = Math.max(1, Math.ceil(total / limit));
+        const offset = (page - 1) * limit;
+        const pagedLogs = filtered.slice(offset, offset + limit);
+
+        return {
+          success: true,
+          data: {
+            logs: pagedLogs,
+            pagination: {
+              total,
+              page,
+              limit,
+              total_pages: totalPages
+            }
+          }
+        };
+      }
+
       if (sub === 'student') {
         const results = getDb('results') || [];
         const user = JSON.parse(sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user') || '{}');
