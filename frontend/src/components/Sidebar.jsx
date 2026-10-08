@@ -102,6 +102,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
     { id: 'subject_content', label: 'Subject & Class Content', icon: BookOpen, perm: 'manage_subject_content' },
     { id: 'revision_vault', label: 'Revision Vault & Bookmarks', icon: Bookmark, perm: 'manage_revision_vault' },
     { id: 'free_quizzes_manager', label: 'FREE Quizzes Manager', icon: HelpCircle, perm: 'manage_free_quizzes' },
+    { id: 'practice_tests_manager', label: 'Practice Tests & Papers', icon: Sparkles, perm: 'manage_test_generator' },
     { id: 'faqs_key_info', label: 'FAQs & Key Info Manager', icon: HelpCircle, perm: 'manage_faqs_keyinfo' },
     { id: 'results', label: 'Exam Results & Reports', icon: FileCheck2, perm: 'publish_exam_results' },
     { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy, perm: 'manage_leaderboard' },
@@ -334,7 +335,22 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   )}
                 </div>
 
-
+                {/* Practice Tests */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSelectTab('practice_tests');
+                    if (onClose) onClose();
+                  }}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
+                    currentTab === 'practice_tests' || currentTab === 'test_generator'
+                      ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                      : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
+                  }`}
+                >
+                  <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
+                  <span>Practice Tests</span>
+                </button>
               </div>
 
               {/* SECTION B: MY PERFORMANCE */}

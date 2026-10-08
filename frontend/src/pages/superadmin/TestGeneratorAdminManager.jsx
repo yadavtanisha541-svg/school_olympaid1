@@ -815,11 +815,12 @@ export const TestGeneratorAdminManager = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
                 {[
-                  { id: 'previous_year', label: 'Free Previous Year Paper', desc: 'Appears under Student > Free Previous Year Papers', icon: Award, color: 'border-amber-400 bg-amber-50/50 text-amber-900' },
-                  { id: 'sample_paper', label: 'Free Sample Paper', desc: 'Appears under Student > Free Sample Papers & OMR', icon: FileSpreadsheet, color: 'border-sky-400 bg-sky-50/50 text-sky-900' },
-                  { id: 'generator', label: 'Test Generator Pro Paper', desc: 'Appears under Student > Test Generator Pro', icon: Sparkles, color: 'border-emerald-400 bg-emerald-50/50 text-emerald-900' }
+                  { id: 'practice_test', label: 'Practice Mock Test', desc: 'Appears under Student > Practice Tests', icon: Sparkles, color: 'border-indigo-400 bg-indigo-50/50 text-indigo-900' },
+                  { id: 'previous_year', label: 'Previous Year Paper', desc: 'Appears under Student Practice Series', icon: Award, color: 'border-amber-400 bg-amber-50/50 text-amber-900' },
+                  { id: 'sample_paper', label: 'Sample / Model Paper', desc: 'Appears under Student Model Papers', icon: FileSpreadsheet, color: 'border-sky-400 bg-sky-50/50 text-sky-900' },
+                  { id: 'generator', label: 'Test Generator Paper', desc: 'Appears under Intelligent Practice Generator', icon: BookOpen, color: 'border-emerald-400 bg-emerald-50/50 text-emerald-900' }
                 ].map((cat) => {
                   const isSel = paperCategory === cat.id;
                   const Icon = cat.icon;
@@ -1394,10 +1395,10 @@ export const TestGeneratorAdminManager = () => {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight">
-              Sample Papers, Previous Year Papers &amp; Test Generator Manager
+              Practice Tests &amp; Question Papers Manager
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-              Create, author questions in bulk, export PDF with answers, and publish exam papers for students.
+              Create, edit, author questions, configure duration/marks, and manage practice tests for Student Dashboard.
             </p>
           </div>
         </div>
@@ -1409,7 +1410,7 @@ export const TestGeneratorAdminManager = () => {
             className="px-5 py-2.5 bg-[#00b074] hover:bg-[#009260] text-white font-black rounded-xl text-sm transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2 shrink-0"
           >
             <Plus className="w-4.5 h-4.5" />
-            <span>Create New Paper</span>
+            <span>Create New Practice Test</span>
           </button>
         </div>
       </div>
@@ -1417,10 +1418,11 @@ export const TestGeneratorAdminManager = () => {
       {/* Category Tabs Bar */}
       <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
         {[
-          { id: 'all', label: 'All Exam Papers', icon: Layers },
-          { id: 'previous_year', label: '🏆 Free Previous Year Papers', icon: Award },
-          { id: 'sample_paper', label: '📄 Free Sample Papers', icon: FileSpreadsheet },
-          { id: 'generator', label: '⚡ Test Generator Pro', icon: Sparkles }
+          { id: 'all', label: 'All Practice Papers', icon: Layers },
+          { id: 'practice_test', label: '🎯 Practice Tests', icon: Sparkles },
+          { id: 'previous_year', label: '🏆 Previous Year Papers', icon: Award },
+          { id: 'sample_paper', label: '📄 Sample & Model Papers', icon: FileSpreadsheet },
+          { id: 'generator', label: '⚡ Test Generator Papers', icon: BookOpen }
         ].map((tab) => {
           const isActive = activeCategoryTab === tab.id;
           return (

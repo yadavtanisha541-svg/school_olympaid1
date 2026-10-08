@@ -651,8 +651,9 @@ export const App = () => {
           return <SuperAdminFreeQuizzesManager onNavigateTab={setCurrentTab} />;
         case 'question_bank':
           return <QuestionBankPage />;
+        case 'practice_tests_manager':
         case 'test_generator_manager':
-          return <TestGeneratorAdminManager />;
+          return <TestGeneratorAdminManager onNavigateTab={setCurrentTab} />;
         case 'exams':
           return <ExamManagementPage />;
         case 'results':
@@ -826,6 +827,7 @@ export const App = () => {
               onNavigateTab={setCurrentTab}
             />
           );
+        case 'practice_tests':
         case 'test_generator':
           return (
             <TestGeneratorPro
