@@ -135,6 +135,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   const [hasAgreedInstructions, setHasAgreedInstructions] = useState(true);
 
   // Fetch Super Admin papers directly from API & all localStorage stores
+  // Fetch Super Admin papers directly from API & all localStorage stores
   const fetchAdminPapers = async () => {
     setLoadingAdminPapers(true);
     try {
@@ -157,25 +158,31 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
         const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
         if (Array.isArray(mockDb)) {
           mockDb.forEach((mp) => {
-            if (mp && !combined.some((cp) => cp.id === mp.id || (cp.title && mp.title && cp.title === mp.title))) {
+            if (mp && !combined.some((cp) => String(cp.id) === String(mp.id) || (cp.title && mp.title && cp.title === mp.title))) {
               combined.push(mp);
             }
           });
         }
       } catch (e) {}
 
-      // 3. API endpoint check
+      // 3. Direct olympiadhub_db_exam_papers check
       try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`/api/test-generator/admin-papers`, {
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {})
-          }
-        });
-        const data = await res.json();
-        if (data && data.success && Array.isArray(data.data)) {
-          data.data.forEach((p) => {
-            if (p && !combined.some((cp) => cp.id === p.id || (cp.title && p.title && cp.title === p.title))) {
+        const oDb = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+        if (Array.isArray(oDb)) {
+          oDb.forEach((op) => {
+            if (op && !combined.some((cp) => String(cp.id) === String(op.id) || (cp.title && op.title && cp.title === op.title))) {
+              combined.push(op);
+            }
+          });
+        }
+      } catch (e) {}
+
+      // 4. API endpoint check
+      try {
+        const res = await apiClient.get('/exam-papers').catch(() => null);
+        if (res && res.success && Array.isArray(res.data)) {
+          res.data.forEach((p) => {
+            if (p && !combined.some((cp) => String(cp.id) === String(p.id) || (cp.title && p.title && cp.title === p.title))) {
               combined.push(p);
             }
           });
@@ -1300,38 +1307,29 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   // =========================================================================
   return (
     <div className="space-y-6 font-sans animate-in fade-in duration-150 max-w-7xl mx-auto pb-12">
-      {/* Top Header Tabs: [ 🎯 Practice Mock Tests ] & [ ⚡ Custom AI Generator ] & [ 📊 Attempt History ] */}
+      {/* Top Header Tabs: [ 🎯 Practice Mock Tests & AI Generator ] & [ 📊 Attempt History ] */}
       <div className="flex items-center gap-2 flex-wrap">
         <button
           type="button"
-          onClick={() => setActiveTab('tests')}
+          onClick={() => {
+            setActiveTab('tests');
+            setGeneratorStep('configure');
+          }}
           className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer shadow-2xs flex items-center gap-2 ${
-            activeTab === 'tests'
+            activeTab === 'tests' || activeTab === 'generator'
               ? 'bg-[#00b074] text-white shadow-md'
               : 'bg-white text-slate-700 border border-[#edd6ed] hover:bg-[#faf5fa]'
           }`}
         >
           <Sparkles className="w-4 h-4" />
-          <span>Practice Mock Tests ({filteredAdminPapers.length})</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('generator')}
-          className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer shadow-2xs flex items-center gap-2 ${
-            activeTab === 'generator'
-              ? 'bg-[#e7b84b] text-[#321630] border border-[#d4a236]'
-              : 'bg-white text-slate-700 border border-[#edd6ed] hover:bg-[#faf5fa]'
-          }`}
-        >
-          <Zap className="w-4 h-4" />
-          <span>Custom AI Test Generator</span>
+          <span>Practice Mock Tests &amp; AI Generator ({filteredAdminPapers.length})</span>
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('list')}
           className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer shadow-2xs flex items-center gap-2 ${
             activeTab === 'list'
-              ? 'bg-[#e7b84b] text-[#321630] border border-[#d4a236]'
+              ? 'bg-[#00b074] text-white shadow-md'
               : 'bg-white text-slate-700 border border-[#edd6ed] hover:bg-[#faf5fa]'
           }`}
         >
@@ -1340,236 +1338,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
         </button>
       </div>
 
-      {activeTab === 'tests' ? (
-        /* ========================================================================= */
-        /* PRACTICE MOCK TESTS HUB VIEW (Direct Super Admin Authored Tests)           */
-        /* ========================================================================= */
-        <div className="space-y-6">
-          {/* Header Banner */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#edd6ed] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-black uppercase tracking-wider">
-                  ✓ {studentClass} Practice Hub
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 text-[10px] font-bold border border-indigo-200">
-                  Class-Matched Only
-                </span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-black text-[#4e2a4a] mt-1.5 tracking-tight">
-                Official Olympiad Practice Tests — {studentClass}
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-                Practice papers authored by Super Admin exclusively for <strong>{studentClass}</strong>.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('generator')}
-              className="px-5 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2 shrink-0 self-start md:self-auto"
-            >
-              <Zap className="w-4 h-4" />
-              <span>Generate Chapter Test ⚡</span>
-            </button>
-          </div>
-
-          {/* Filter Toolbar */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3 flex-wrap flex-1">
-              {/* Enrolled Grade Indicator */}
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-xs font-black text-indigo-900">
-                <span>🎓 Enrolled: {studentClass}</span>
-              </div>
-
-              {/* Subject Filter */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-500">Subject:</span>
-                <select
-                  value={listSubFilter}
-                  onChange={(e) => setListSubFilter(e.target.value)}
-                  className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
-                >
-                  <option value="All">All Subjects</option>
-                  <option value="IMO">IMO (Mathematics)</option>
-                  <option value="ISO">ISO (Science)</option>
-                  <option value="ICSO">ICSO (Cyber & IT)</option>
-                  <option value="IEO">IEO (English)</option>
-                  <option value="IGKO">IGKO (General Knowledge)</option>
-                  <option value="IHO">IHO (Hindi)</option>
-                  <option value="ISSO">ISSO (Reasoning)</option>
-                </select>
-              </div>
-
-              {/* Search Box */}
-              <div className="flex-1 min-w-[200px]">
-                <input
-                  type="text"
-                  placeholder="Search test title, exam code..."
-                  value={listSearchFilter}
-                  onChange={(e) => setListSearchFilter(e.target.value)}
-                  className="w-full px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                />
-              </div>
-            </div>
-
-            <div className="text-xs font-bold text-slate-500">
-              Showing {filteredAdminPapers.length} {studentClass} Practice Tests
-            </div>
-          </div>
-
-          {/* Test Cards Grid */}
-          {filteredAdminPapers.length === 0 ? (
-            <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 space-y-4">
-              <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto text-2xl">
-                📝
-              </div>
-              <div>
-                <h3 className="text-base font-black text-slate-900">No practice tests match your filter</h3>
-                <p className="text-xs text-slate-500 mt-1">Try selecting a different Grade or Subject, or generate a custom test.</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setListGradeFilter('All');
-                  setListSubFilter('All');
-                  setListSearchFilter('');
-                }}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
-              >
-                Reset Filters
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredAdminPapers.map((paper) => {
-                const subCode = paper.subject_code || paper.subject || 'IMO';
-                const qCount = Array.isArray(paper.questions) ? paper.questions.length : (paper.total_questions || 10);
-                const dur = paper.duration_minutes || 60;
-                const pClass = paper.class_name || paper.class || 'Class 6';
-
-                return (
-                  <div
-                    key={paper.id}
-                    className="bg-white rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md transition-all p-5 flex flex-col justify-between space-y-4"
-                  >
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black border bg-indigo-50 text-indigo-900 border-indigo-200">
-                          {pClass}
-                        </span>
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                          {subCode.toUpperCase()}
-                        </span>
-                      </div>
-
-                      <div>
-                        <h4 className="font-black text-sm text-slate-900 leading-snug line-clamp-2">
-                          {paper.title || `${pClass} ${subCode} Practice Mock Test`}
-                        </h4>
-                        <p className="text-xs text-slate-500 mt-1">
-                          {paper.exam_year ? `Year ${paper.exam_year} • ` : ''}Practice Mock Test Paper
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-2 pt-1 text-center">
-                        <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                          <p className="text-[10px] text-slate-400 font-bold uppercase">Questions</p>
-                          <p className="text-xs font-black text-slate-800 mt-0.5">{qCount} MCQs</p>
-                        </div>
-                        <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                          <p className="text-[10px] text-slate-400 font-bold uppercase">Time</p>
-                          <p className="text-xs font-black text-slate-800 mt-0.5">{dur} Mins</p>
-                        </div>
-                        <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                          <p className="text-[10px] text-slate-400 font-bold uppercase">Marks</p>
-                          <p className="text-xs font-black text-slate-800 mt-0.5">{paper.total_marks || qCount} Pts</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
-                      <button
-                        type="button"
-                        onClick={() => handleStartAdminPaper(paper)}
-                        className="flex-1 py-2.5 bg-[#00b074] hover:bg-[#009260] text-white rounded-xl text-xs font-black transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-                      >
-                        <Play className="w-3.5 h-3.5 fill-current" />
-                        <span>Start Practice Test</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPdfModalPaper(paper)}
-                        className="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
-                        title="Download PDF Paper"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      ) : activeTab === 'list' ? (
-        /* GENERATED TESTS LIST VIEW */
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#edd6ed] shadow-sm space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-[#f4ebf4]">
-            <div>
-              <h3 className="text-lg font-black text-[#4e2a4a]">Your Generated Tests History</h3>
-              <p className="text-xs text-slate-500">Track and review all customized tests you have created.</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setActiveTab('generator')}
-              className="px-4 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white rounded-xl text-xs font-bold cursor-pointer"
-            >
-              + Create New Test
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            {generatedTestsHistory.map((t) => (
-              <div
-                key={t.id}
-                className="p-4 rounded-2xl bg-[#faf5fa] border border-[#edd6ed] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-              >
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-[#f4ebf4] text-[#6d3a68]">
-                      {t.id}
-                    </span>
-                    <h4 className="font-bold text-sm text-[#4e2a4a]">{t.title}</h4>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-1">
-                    {t.grade} • {t.level} • {t.difficulty} • Date: {t.date} • Duration: {t.duration}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-black text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                    Score: {t.score}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedGrade(t.grade);
-                      setSelectedSubject(t.subject);
-                      setSelectedLevel(t.level);
-                      setSelectedDifficulty(t.difficulty);
-                      setActiveTab('generator');
-                    }}
-                    className="px-3.5 py-1.5 bg-white hover:bg-[#f4ebf4] text-[#6d3a68] border border-[#edd6ed] rounded-xl text-xs font-bold transition-colors cursor-pointer"
-                  >
-                    Re-generate ⚡
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : generatorStep === 'instructions' ? (
+      {generatorStep === 'instructions' ? (
         /* ========================================================================= */
         /* INSTRUCTIONS & EXAM GUIDELINES SCREEN (Step 2 of Flow)                     */
         /* ========================================================================= */
@@ -1822,31 +1591,90 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
             </div>
           </div>
         </div>
+      ) : activeTab === 'list' ? (
+        /* GENERATED TESTS LIST VIEW */
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#edd6ed] shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#f4ebf4]">
+            <div>
+              <h3 className="text-lg font-black text-[#4e2a4a]">Your Generated Tests History</h3>
+              <p className="text-xs text-slate-500">Track and review all customized tests you have created.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('tests');
+                setGeneratorStep('configure');
+              }}
+              className="px-4 py-2 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white rounded-xl text-xs font-bold cursor-pointer"
+            >
+              + Create New Test
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {generatedTestsHistory.map((t) => (
+              <div
+                key={t.id}
+                className="p-4 rounded-2xl bg-[#faf5fa] border border-[#edd6ed] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              >
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-[#f4ebf4] text-[#6d3a68]">
+                      {t.id}
+                    </span>
+                    <h4 className="font-bold text-sm text-[#4e2a4a]">{t.title}</h4>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {t.grade} • {t.level} • {t.difficulty} • Date: {t.date} • Duration: {t.duration}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-black text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                    Score: {t.score}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedGrade(t.grade);
+                      setSelectedSubject(t.subject);
+                      setSelectedLevel(t.level);
+                      setSelectedDifficulty(t.difficulty);
+                      setActiveTab('tests');
+                      setGeneratorStep('configure');
+                    }}
+                    className="px-3.5 py-1.5 bg-white hover:bg-[#f4ebf4] text-[#6d3a68] border border-[#edd6ed] rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    Re-generate ⚡
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       ) : (
         /* ========================================================================= */
-        /* MAIN TEST GENERATOR VIEW (Step 1: Configure & Select Topics)              */
+        /* PRACTICE MOCK TESTS & AI GENERATOR PROCESS STUDIO                         */
         /* ========================================================================= */
-        <div className="space-y-6 animate-in fade-in duration-150">
-          {/* Main Card: Olympiad Intelligent Test Generator Pro */}
+        <div className="space-y-8">
+          {/* SECTION 1: MAIN TEST GENERATOR PROCESS STUDIO */}
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#edd6ed] shadow-sm relative">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#f4ebf4]">
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={onExitToDashboard || (() => onNavigateTab && onNavigateTab('dashboard'))}
-                  className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  <span>Back to Dashboard</span>
-                </button>
+                <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-black uppercase tracking-wider">
+                  ✓ {studentClass} Practice Hub
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 text-[10px] font-bold border border-indigo-200">
+                  AI Test Generator
+                </span>
               </div>
 
-              <div className="text-center sm:text-right">
+              <div className="text-left sm:text-right">
                 <h1 className="text-xl sm:text-2xl font-black text-[#4e2a4a] tracking-tight">
-                  Olympiad Intelligent Test Generator Pro
+                  Olympiad Intelligent Practice Test Generator Pro
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-                  Create Your Own Olympiad Test In Seconds
+                  Select subject, difficulty &amp; chapters to generate customized practice tests
                 </p>
               </div>
             </div>
@@ -2367,6 +2195,128 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                 </button>
               </div>
             </div>
+          </div>
+
+          {/* SECTION 2: OFFICIAL PRACTICE MOCK TESTS SERIES (SUPER ADMIN AUTHORED) */}
+          <div className="space-y-5 pt-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-black uppercase tracking-wider">
+                    ⚡ Instant Attempt Mock Tests
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 text-[10px] font-bold border border-indigo-200">
+                    {studentClass} Only
+                  </span>
+                </div>
+                <h3 className="text-lg sm:text-xl font-black text-[#4e2a4a] mt-1 tracking-tight">
+                  Available Practice Mock Tests — {studentClass} ({filteredAdminPapers.length})
+                </h3>
+                <p className="text-xs text-slate-500 font-medium">
+                  Direct full-length practice tests authored by Super Admin for <strong>{studentClass}</strong>.
+                </p>
+              </div>
+
+              {/* Subject Filter Toolbar */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-500">Filter Subject:</span>
+                <select
+                  value={listSubFilter}
+                  onChange={(e) => setListSubFilter(e.target.value)}
+                  className="px-3 py-1.5 rounded-xl bg-white border border-slate-300 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer shadow-2xs"
+                >
+                  <option value="All">All Subjects</option>
+                  <option value="IMO">IMO (Mathematics)</option>
+                  <option value="ISO">ISO (Science)</option>
+                  <option value="IDLO">IDLO (Digital Literacy)</option>
+                  <option value="IEO">IEO (English)</option>
+                  <option value="IGKO">IGKO (General Knowledge)</option>
+                  <option value="IHO">IHO (Hindi)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Test Cards Grid */}
+            {filteredAdminPapers.length === 0 ? (
+              <div className="bg-white rounded-3xl p-8 text-center border border-slate-200 space-y-3">
+                <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto text-xl">
+                  📝
+                </div>
+                <p className="text-xs text-slate-600 font-bold">
+                  No practice tests match your filter for {studentClass}. Use the Generator above to create your custom test!
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {filteredAdminPapers.map((paper) => {
+                  const subCode = paper.subject_code || paper.subject || 'IMO';
+                  const qCount = Array.isArray(paper.questions) ? paper.questions.length : (paper.total_questions || 10);
+                  const dur = paper.duration_minutes || 60;
+                  const pClass = paper.class_name || paper.class || studentClass;
+
+                  return (
+                    <div
+                      key={paper.id}
+                      className="bg-white rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md transition-all p-5 flex flex-col justify-between space-y-4"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black border bg-indigo-50 text-indigo-900 border-indigo-200">
+                            {pClass}
+                          </span>
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                            {subCode.toUpperCase()}
+                          </span>
+                        </div>
+
+                        <div>
+                          <h4 className="font-black text-sm text-slate-900 leading-snug line-clamp-2">
+                            {paper.title || `${pClass} ${subCode} Practice Mock Test`}
+                          </h4>
+                          <p className="text-xs text-slate-500 mt-1">
+                            {paper.exam_year ? `Year ${paper.exam_year} • ` : ''}Practice Mock Test Paper
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+                          <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase">Questions</p>
+                            <p className="text-xs font-black text-slate-800 mt-0.5">{qCount} MCQs</p>
+                          </div>
+                          <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase">Time</p>
+                            <p className="text-xs font-black text-slate-800 mt-0.5">{dur} Mins</p>
+                          </div>
+                          <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase">Marks</p>
+                            <p className="text-xs font-black text-slate-800 mt-0.5">{paper.total_marks || qCount} Pts</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                        <button
+                          type="button"
+                          onClick={() => handleStartAdminPaper(paper)}
+                          className="flex-1 py-2.5 bg-[#00b074] hover:bg-[#009260] text-white rounded-xl text-xs font-black transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                        >
+                          <Play className="w-3.5 h-3.5 fill-current" />
+                          <span>Start Practice Test</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPdfModalPaper(paper)}
+                          className="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                          title="Download PDF Paper"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}
