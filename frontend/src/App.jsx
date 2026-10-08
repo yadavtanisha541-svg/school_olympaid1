@@ -711,12 +711,20 @@ export const App = () => {
             />
           );
         case 'my_content':
-        case 'content_icso':
-        case 'content_iso':
         case 'content_imo':
+        case 'content_iso':
         case 'content_ieo':
         case 'content_igko':
+        case 'content_idlo':
+        case 'content_iho':
+        case 'content_icso':
         case 'content_isso':
+        case 'content_ieom':
+        case 'content_ieos':
+        case 'content_ieoe':
+        case 'content_ieog':
+        case 'content_ieod':
+        case 'content_ieoh':
         case 'content_vc':
         case 'content_ego':
         case 'content_cao':
