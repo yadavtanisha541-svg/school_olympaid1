@@ -1257,25 +1257,26 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     );
   }
 
-  // Filtered admin papers for Practice Tests Hub
+  const studentClass = user?.class || user?.class_name || user?.grade || 'Class 6';
+
+  // Filtered admin papers for Practice Tests Hub (Strictly isolated by student's enrolled grade)
   const filteredAdminPapers = adminPapers.filter((p) => {
     const pClass = (p.class_name || p.class || p.title || '').toLowerCase();
     const pSub = (p.subject_code || p.subject || p.subject_name || p.title || '').toLowerCase();
     const pTitle = (p.title || '').toLowerCase();
     const pCode = (p.exam_code || '').toLowerCase();
 
-    // Grade filter
-    if (listGradeFilter !== 'All') {
-      const match1 = pClass.match(/\d+/);
-      const match2 = listGradeFilter.toLowerCase().match(/\d+/);
-      if (match1 && match2) {
-        if (match1[0] !== match2[0]) return false;
-      } else if (!pClass.includes(listGradeFilter.toLowerCase())) {
-        return false;
-      }
+    // 1. Strict Class Isolation: ONLY show tests created for this student's grade
+    const sCls = studentClass.toLowerCase();
+    const matchP = pClass.match(/\d+/);
+    const matchS = sCls.match(/\d+/);
+    if (matchP && matchS) {
+      if (matchP[0] !== matchS[0]) return false;
+    } else if (pClass && !pClass.includes(sCls) && !sCls.includes(pClass)) {
+      return false;
     }
 
-    // Subject filter
+    // 2. Subject filter
     if (listSubFilter !== 'All') {
       const s = listSubFilter.toLowerCase();
       if (!pSub.includes(s) && !pTitle.includes(s)) {
@@ -1283,10 +1284,10 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       }
     }
 
-    // Search filter
+    // 3. Search filter
     if (listSearchFilter.trim()) {
       const q = listSearchFilter.toLowerCase();
-      if (!pTitle.includes(q) && !pCode.includes(q) && !pClass.includes(q) && !pSub.includes(q)) {
+      if (!pTitle.includes(q) && !pCode.includes(q) && !pSub.includes(q)) {
         return false;
       }
     }
@@ -1311,7 +1312,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
           }`}
         >
           <Sparkles className="w-4 h-4" />
-          <span>Practice Mock Tests ({adminPapers.length})</span>
+          <span>Practice Mock Tests ({filteredAdminPapers.length})</span>
         </button>
         <button
           type="button"
@@ -1349,14 +1350,17 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
             <div>
               <div className="flex items-center gap-2">
                 <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-black uppercase tracking-wider">
-                  ✓ Available Practice Tests
+                  ✓ {studentClass} Practice Hub
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 text-[10px] font-bold border border-indigo-200">
+                  Class-Matched Only
                 </span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-[#4e2a4a] mt-1.5 tracking-tight">
-                Official Olympiad Practice Tests
+                Official Olympiad Practice Tests — {studentClass}
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-                Directly attempt all practice papers and mock test sets authored by Super Admin for your preparation.
+                Practice papers authored by Super Admin exclusively for <strong>{studentClass}</strong>.
               </p>
             </div>
 
@@ -1373,18 +1377,9 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
           {/* Filter Toolbar */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3 flex-wrap flex-1">
-              {/* Class Filter */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-500">Grade:</span>
-                <select
-                  value={listGradeFilter}
-                  onChange={(e) => setListGradeFilter(e.target.value)}
-                  className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
-                >
-                  {['All', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((g) => (
-                    <option key={g} value={g}>{g}</option>
-                  ))}
-                </select>
+              {/* Enrolled Grade Indicator */}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-xs font-black text-indigo-900">
+                <span>🎓 Enrolled: {studentClass}</span>
               </div>
 
               {/* Subject Filter */}
@@ -1419,7 +1414,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
             </div>
 
             <div className="text-xs font-bold text-slate-500">
-              Showing {filteredAdminPapers.length} Practice Tests
+              Showing {filteredAdminPapers.length} {studentClass} Practice Tests
             </div>
           </div>
 
