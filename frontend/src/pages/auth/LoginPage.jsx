@@ -25,29 +25,11 @@ import {
   Inbox,
   RotateCw,
   Clock,
-  Star,
-  Reply,
-  Forward,
-  MailCheck,
-  MailOpen,
-  Settings,
-  KeyRound,
-  SendHorizontal,
-  Server,
-  Info,
-  Save
+  ShieldCheck
 } from 'lucide-react';
 import { OlympiadHubLogo } from '../../components/OlympiadHubLogo';
 import { GOOGLE_CLIENT_ID } from '../../config/googleConfig';
-import {
-  generateOtp,
-  sendOtpEmail,
-  sendWelcomeEmail,
-  getEmailConfig,
-  saveEmailConfig,
-  isEmailConfigured,
-  sendTestEmail
-} from '../../utils/emailService';
+import { generateOtp, sendOtpEmail, sendWelcomeEmail } from '../../utils/emailService';
 
 // Helper to decode Google JWT token safely
 const decodeJwt = (token) => {
@@ -121,66 +103,6 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
   const [otpError, setOtpError] = useState('');
   const [pendingSignup, setPendingSignup] = useState(null); // { email, password }
   const [copiedOtp, setCopiedOtp] = useState(false);
-
-  // Email Notification & Exact Gmail Preview Modal (matching Image 2 & Image 3)
-  const [emailToast, setEmailToast] = useState(null); // { title, subtitle, type, otp, email, name, password }
-  const [emailPreviewModal, setEmailPreviewModal] = useState(null); // { type: 'otp' | 'welcome', data: {} }
-
-  // Real Email Service Configuration State
-  const [showEmailConfigModal, setShowEmailConfigModal] = useState(false);
-  const [emailConfig, setEmailConfig] = useState(getEmailConfig());
-  const [emailDeliveryNotice, setEmailDeliveryNotice] = useState(null); // { type: 'success' | 'warning' | 'error', message: '' }
-  const [testEmailAddress, setTestEmailAddress] = useState('');
-  const [testStatus, setTestStatus] = useState(null); // { success: boolean, message: string }
-  const [testingEmail, setTestingEmail] = useState(false);
-  const [savingConfig, setSavingConfig] = useState(false);
-  const [configActiveTab, setConfigActiveTab] = useState('gmail'); // 'gmail' | 'brevo' | 'emailjs'
-  const [configSavedNotice, setConfigSavedNotice] = useState(false);
-
-  // Save email configuration to localStorage and environment endpoint
-  const handleSaveEmailConfig = async () => {
-    setSavingConfig(true);
-    saveEmailConfig(emailConfig);
-    try {
-      await fetch('/api/save-email-config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(emailConfig)
-      });
-    } catch (e) {}
-    setSavingConfig(false);
-    setConfigSavedNotice(true);
-    setTimeout(() => setConfigSavedNotice(false), 3000);
-  };
-
-  // Test real email delivery to an entered email address
-  const handleTestEmailSend = async () => {
-    const target = (testEmailAddress || identifier || '').trim();
-    if (!target) {
-      setTestStatus({ success: false, message: 'Please enter a valid recipient email address to test.' });
-      return;
-    }
-    setTestingEmail(true);
-    setTestStatus(null);
-    try {
-      const res = await sendTestEmail(target, emailConfig);
-      if (res.success) {
-        setTestStatus({
-          success: true,
-          message: `Success! Real test email delivered to ${target}. Please check your Gmail inbox or spam folder.`
-        });
-      } else {
-        setTestStatus({
-          success: false,
-          message: res.error || res.message || 'Delivery failed. Please check your credentials or 16-character App Password.'
-        });
-      }
-    } catch (err) {
-      setTestStatus({ success: false, message: err.message || 'Network error while contacting email service.' });
-    } finally {
-      setTestingEmail(false);
-    }
-  };
 
   // Loading & Error States
   const [loading, setLoading] = useState(false);
@@ -363,38 +285,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
         setShowOtpModal(true);
 
         // Send OTP Verification Email
-        const sendResult = await sendOtpEmail(cleanId, newOtp);
-
-        if (sendResult?.realSent) {
-          setEmailDeliveryNotice({
-            type: 'success',
-            message: `Real verification OTP delivered to ${cleanId}! Please check your Gmail inbox or spam folder.`
-          });
-          setEmailToast({
-            title: 'OTP sent to your Gmail inbox!',
-            subtitle: `Delivered to ${cleanId} via ${sendResult.provider || 'Email Service'}`,
-            type: 'otp',
-            otp: newOtp,
-            email: cleanId
-          });
-        } else if (sendResult?.notConfigured) {
-          setEmailDeliveryNotice({
-            type: 'warning',
-            message: `Real email delivery is not configured yet. To receive OTP in your actual Gmail inbox, click 'Setup Real Email Delivery' above. For quick testing, your OTP is ${newOtp}.`
-          });
-          setEmailToast({
-            title: 'Real Email Setup Needed',
-            subtitle: `Connect Gmail or Brevo in 1 minute to receive email directly`,
-            type: 'otp',
-            otp: newOtp,
-            email: cleanId
-          });
-        } else {
-          setEmailDeliveryNotice({
-            type: 'error',
-            message: sendResult?.error || 'Failed to dispatch email. Please check your credentials in Email Setup.'
-          });
-        }
+        await sendOtpEmail(cleanId, newOtp);
       } catch (err) {
         setError('Failed to send verification code. Please try again.');
       } finally {
@@ -420,7 +311,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
     }
   };
 
-  // Verify OTP and complete registration -> Dispatch Welcome Email (matching Image 3)
+  // Verify OTP and complete registration -> Dispatch Welcome Email
   const handleVerifyOtp = async () => {
     const enteredCode = otpDigits.join('');
     if (enteredCode.length < 6) {
@@ -429,7 +320,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
     }
 
     if (enteredCode !== generatedOtp) {
-      setOtpError('Incorrect verification code. Please check your email or copy from preview.');
+      setOtpError('Incorrect verification code. Please check your email.');
       return;
     }
 
@@ -439,22 +330,12 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
       // Register & Login user via AuthContext
       const userObj = await login(pendingSignup.email, pendingSignup.password);
 
-      // Dispatch Welcome Email with Credentials (matching Image 3)
+      // Dispatch Welcome Email with Credentials
       await sendWelcomeEmail({
         email: pendingSignup.email,
         name: userObj?.name || pendingSignup.email.split('@')[0],
         password: pendingSignup.password,
         siteUrl: window.location.origin
-      });
-
-      // Show Welcome Toast Notification
-      setEmailToast({
-        title: 'Welcome to SkillRise Olympiad!',
-        subtitle: `Account details sent to ${pendingSignup.email}`,
-        type: 'welcome',
-        email: pendingSignup.email,
-        name: userObj?.name || pendingSignup.email.split('@')[0],
-        password: pendingSignup.password
       });
 
       setShowOtpModal(false);
@@ -619,8 +500,8 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
         }}
       />
 
-      {/* Top Header Navigation: Back to Website & Email Setup */}
-      <div className="w-full max-w-[390px] mx-auto flex items-center justify-between relative z-20 mb-2">
+      {/* Top Header Navigation: Back to Website */}
+      <div className="w-full max-w-[390px] mx-auto flex items-center justify-start relative z-20 mb-2">
         <button
           type="button"
           onClick={handleGoHome}
@@ -628,25 +509,6 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
         >
           <ArrowLeft className="w-3.5 h-3.5 text-slate-600 group-hover:-translate-x-0.5 transition-transform" />
           <span>← Back to Website</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setShowEmailConfigModal(true)}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold shadow-xs transition-all cursor-pointer active:scale-95 ${
-            isEmailConfigured()
-              ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
-              : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
-          }`}
-          title="Configure real email delivery service (Gmail App Password or Brevo)"
-        >
-          <Mail className="w-3.5 h-3.5 text-blue-600" />
-          <span>{isEmailConfigured() ? 'Email: Active' : 'Setup Real Email'}</span>
-          <span
-            className={`w-2 h-2 rounded-full ${
-              isEmailConfigured() ? 'bg-emerald-500' : 'bg-amber-400 animate-pulse'
-            }`}
-          />
         </button>
       </div>
 
@@ -951,62 +813,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
 
 
 
-      {/* Floating Gmail Toast Notification */}
-      {emailToast && (
-        <div className="fixed top-5 right-5 z-[70] max-w-sm w-full bg-slate-900/95 text-white rounded-2xl shadow-2xl border border-slate-700/80 p-4 animate-slideDown flex items-start gap-3 backdrop-blur-md">
-          <div className="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0 border border-red-500/30">
-            <Mail className="w-5 h-5" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-1">
-              <p className="text-xs font-bold text-white truncate flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                {emailToast.type === 'otp' ? 'Gmail: New OTP Received' : 'Gmail: Welcome Email'}
-              </p>
-              <button
-                type="button"
-                onClick={() => setEmailToast(null)}
-                className="text-slate-400 hover:text-white p-0.5 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <p className="text-[11px] text-slate-300 font-medium mt-1 truncate">
-              {emailToast.title}
-            </p>
-            <p className="text-[10px] text-slate-400 truncate">
-              {emailToast.subtitle}
-            </p>
-            <div className="mt-2.5 flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setEmailPreviewModal({
-                    type: emailToast.type,
-                    data: emailToast
-                  });
-                  setEmailToast(null);
-                }}
-                className="px-3 py-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-[11px] font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
-              >
-                <MailOpen className="w-3.5 h-3.5" />
-                Open Email
-              </button>
-              {emailToast.otp && (
-                <button
-                  type="button"
-                  onClick={handleAutoFillOtp}
-                  className="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white text-[10px] font-semibold rounded-lg transition-all border border-white/10 cursor-pointer"
-                >
-                  Fill {emailToast.otp}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* OTP Verification Modal (matching Image 1 & 2 flow) */}
+      {/* OTP Verification Modal */}
       {showOtpModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/75 backdrop-blur-xs animate-fadeIn">
           <div
@@ -1048,38 +855,6 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                 </p>
               </div>
 
-              {/* Delivery notice banner */}
-              {emailDeliveryNotice && (
-                <div
-                  className={`p-3 rounded-2xl text-xs space-y-1.5 border animate-fadeIn ${
-                    emailDeliveryNotice.type === 'success'
-                      ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
-                      : emailDeliveryNotice.type === 'warning'
-                      ? 'bg-amber-50 text-amber-900 border-amber-200'
-                      : 'bg-red-50 text-red-900 border-red-200'
-                  }`}
-                >
-                  <div className="flex items-start gap-2">
-                    {emailDeliveryNotice.type === 'success' ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                    )}
-                    <p className="leading-relaxed font-medium">{emailDeliveryNotice.message}</p>
-                  </div>
-                  {emailDeliveryNotice.type === 'warning' && (
-                    <button
-                      type="button"
-                      onClick={() => setShowEmailConfigModal(true)}
-                      className="w-full py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-[11px] shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer mt-1"
-                    >
-                      <Settings className="w-3.5 h-3.5" />
-                      <span>Setup Gmail / Brevo for Real Email</span>
-                    </button>
-                  )}
-                </div>
-              )}
-
               {/* 6-Digit OTP Box inputs */}
               <div className="flex items-center justify-center gap-2 sm:gap-2.5">
                 {otpDigits.map((digit, idx) => (
@@ -1105,43 +880,6 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                   <span>{otpError}</span>
                 </div>
               )}
-
-              {/* Quick Auto-fill testing helper */}
-              {generatedOtp && (
-                <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-indigo-900 font-medium">
-                    <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
-                    <span>Demo OTP: <strong className="font-mono tracking-widest text-indigo-700">{generatedOtp}</strong></span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleAutoFillOtp}
-                    className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer"
-                  >
-                    Auto Fill
-                  </button>
-                </div>
-              )}
-
-              {/* Open Exact Gmail Preview Trigger */}
-              <div className="text-center">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmailPreviewModal({
-                      type: 'otp',
-                      data: {
-                        otp: generatedOtp,
-                        email: pendingSignup?.email
-                      }
-                    });
-                  }}
-                  className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-bold hover:underline cursor-pointer transition-colors"
-                >
-                  <MailOpen className="w-4 h-4 text-blue-600" />
-                  View Email in Gmail format (Image 2)
-                </button>
-              </div>
 
               {/* Submit Verification Button */}
               <button
@@ -1185,646 +923,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
         </div>
       )}
 
-      {/* Interactive Gmail Email Preview Modal (Exactly matching Image 2 & Image 3) */}
-      {emailPreviewModal && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6 bg-slate-900/80 backdrop-blur-xs animate-fadeIn overflow-y-auto">
-          <div
-            className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden text-slate-900 my-auto animate-scaleUp"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Gmail Mobile Topbar */}
-            <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800">
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setEmailPreviewModal(null)}
-                  className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
-                <div>
-                  <p className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                    Gmail Inbox
-                  </p>
-                  <p className="text-[11px] text-slate-400 truncate max-w-[200px] sm:max-w-xs">
-                    {emailPreviewModal.type === 'otp'
-                      ? 'OTP for email verification on SOF Olympiad Trainer'
-                      : 'Welcome to SOF Olympiad Trainer!'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  className="p-1.5 text-slate-400 hover:text-amber-400 transition-colors"
-                  title="Star email"
-                >
-                  <Star className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEmailPreviewModal(null)}
-                  className="p-1.5 text-slate-400 hover:text-white transition-colors cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
 
-            {/* Email Subject Line & Header */}
-            <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/70">
-              <h2 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
-                {emailPreviewModal.type === 'otp'
-                  ? 'OTP for email verification on SOF Olympiad Trainer'
-                  : 'Welcome to SOF Olympiad Trainer!'}
-              </h2>
-
-              {/* Sender & Recipient row */}
-              <div className="flex items-start gap-3 mt-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs">
-                  SOF
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">
-                      SOF Olympiad Trainer
-                    </p>
-                    <span className="text-[10px] text-slate-400 font-medium">Just now</span>
-                  </div>
-                  <p className="text-[11px] text-slate-500">
-                    to {emailPreviewModal.data?.email || pendingSignup?.email || identifier || 'me'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Email Body Content */}
-            <div className="p-4 sm:p-6 bg-white max-h-[70vh] overflow-y-auto space-y-4">
-              {emailPreviewModal.type === 'otp' ? (
-                /* ----------------- IMAGE 2 RECREATION: OTP EMAIL ----------------- */
-                <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl border border-slate-800 text-center">
-                  <div className="space-y-1">
-                    <h3 className="text-lg sm:text-xl font-bold tracking-tight text-white">
-                      Code Requested
-                    </h3>
-                  </div>
-
-                  {/* 6 Big Spaced Digits (matching Image 2) */}
-                  <div className="py-2">
-                    <div className="inline-flex items-center justify-center gap-2 sm:gap-3 bg-slate-800/80 px-4 sm:px-6 py-3 rounded-2xl border border-slate-700">
-                      {(emailPreviewModal.data?.otp || generatedOtp || '123779')
-                        .split('')
-                        .map((char, i) => (
-                          <span
-                            key={i}
-                            className="text-2xl sm:text-3xl font-black font-mono tracking-wider text-white"
-                          >
-                            {char}
-                          </span>
-                        ))}
-                    </div>
-                  </div>
-
-                  {/* Copy Code Button (matching Image 2) */}
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const code = emailPreviewModal.data?.otp || generatedOtp;
-                        if (code) {
-                          navigator.clipboard.writeText(code);
-                          setCopiedOtp(true);
-                          setTimeout(() => setCopiedOtp(false), 2000);
-                          // Also auto fill in modal
-                          setOtpDigits(code.split(''));
-                        }
-                      }}
-                      className="px-6 py-2.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95 inline-flex items-center gap-2 cursor-pointer"
-                    >
-                      {copiedOtp ? (
-                        <>
-                          <Check className="w-4 h-4 text-emerald-300" />
-                          <span>Code Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4" />
-                          <span>Copy code</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Text statement matching user screenshot */}
-                  <p className="text-xs text-slate-300 leading-relaxed max-w-sm mx-auto">
-                    <strong className="text-white font-mono font-bold">
-                      {emailPreviewModal.data?.otp || generatedOtp}
-                    </strong>{' '}
-                    is your OTP for email verification on SOF Olympiad Trainer.
-                  </p>
-
-                  <div className="pt-4 border-t border-slate-800 text-[11px] text-slate-400">
-                    <p>This code will expire in 10 minutes. If you did not request this, please ignore this email.</p>
-                  </div>
-                </div>
-              ) : (
-                /* ----------------- IMAGE 3 RECREATION: WELCOME EMAIL ----------------- */
-                <div className="space-y-4 text-slate-800 text-xs sm:text-sm leading-relaxed">
-                  <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-4 rounded-2xl text-white shadow-sm">
-                    <h3 className="text-base sm:text-lg font-black tracking-tight">
-                      Welcome to SOF Olympiad Trainer!
-                    </h3>
-                    <p className="text-xs text-blue-100 mt-0.5">
-                      Your registered account is ready to use
-                    </p>
-                  </div>
-
-                  <p className="font-semibold text-slate-900">
-                    Hi {emailPreviewModal.data?.name || 'Student'},
-                  </p>
-
-                  <p className="text-slate-700">
-                    Welcome aboard and thanks for signing up! We are so glad to have you with us.
-                  </p>
-
-                  {/* Login Credentials Box (matching Image 3) */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
-                    <p className="font-bold text-xs uppercase tracking-wider text-slate-500">
-                      Your Login Information
-                    </p>
-
-                    <div className="space-y-2 text-xs">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-slate-200 gap-1">
-                        <span className="text-slate-500 font-medium">Portal URL:</span>
-                        <span className="font-mono font-bold text-blue-600 truncate">
-                          {window.location.origin}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-slate-200 gap-1">
-                        <span className="text-slate-500 font-medium">User Name / Email:</span>
-                        <span className="font-mono font-bold text-slate-900">
-                          {emailPreviewModal.data?.email || pendingSignup?.email || identifier}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                        <span className="text-slate-500 font-medium">Password:</span>
-                        <span className="font-mono font-bold text-indigo-700">
-                          {emailPreviewModal.data?.password || password || '••••••••'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Study packages note (matching Image 3) */}
-                  <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs space-y-1">
-                    <p className="font-bold">Access Activated:</p>
-                    <p className="text-slate-700">
-                      You can now purchase and access Chapterwise Practice tests, Mock tests, and Previous Years Papers on your student dashboard.
-                    </p>
-                  </div>
-
-                  <div className="pt-2 text-xs text-slate-600 space-y-1">
-                    <p>Best regards,</p>
-                    <p className="font-bold text-slate-900">The SOF Olympiad Trainer Team</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Modal Bottom Footer with Close & Action */}
-            <div className="bg-slate-50 px-4 sm:px-6 py-3 border-t border-slate-200 flex items-center justify-between">
-              {emailPreviewModal.type === 'otp' && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleAutoFillOtp();
-                    setEmailPreviewModal(null);
-                  }}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
-                >
-                  Apply Code to Verification Box
-                </button>
-              )}
-              {emailPreviewModal.type === 'welcome' && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmailPreviewModal(null);
-                    handleGoHome();
-                  }}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
-                >
-                  Go to Student Dashboard
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => setEmailPreviewModal(null)}
-                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl text-xs font-bold transition-all cursor-pointer ml-auto"
-              >
-                Close Email
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Real Email Delivery Setup Modal */}
-      {showEmailConfigModal && (
-        <div className="fixed inset-0 z-[85] flex items-center justify-center p-3 sm:p-5 bg-slate-900/80 backdrop-blur-xs animate-fadeIn overflow-y-auto">
-          <div
-            className="w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden text-slate-900 my-auto animate-scaleUp"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-5 text-white flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center shadow-xs">
-                  <Mail className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black text-white tracking-tight flex items-center gap-2">
-                    Real Email Delivery Setup
-                    {isEmailConfigured() ? (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-400/40">
-                        Active
-                      </span>
-                    ) : (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/30 text-amber-200 border border-amber-400/40">
-                        Setup Required
-                      </span>
-                    )}
-                  </h3>
-                  <p className="text-xs text-blue-100">
-                    Send real OTP and Welcome emails directly to student's Gmail
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowEmailConfigModal(false)}
-                className="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition-all cursor-pointer active:scale-95"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-5 sm:p-6 space-y-5 max-h-[78vh] overflow-y-auto text-xs sm:text-sm">
-              {/* Notice */}
-              <div className="p-3.5 bg-blue-50/80 border border-blue-200 rounded-2xl text-blue-900 space-y-1">
-                <p className="font-bold flex items-center gap-1.5 text-xs text-blue-800">
-                  <Info className="w-4 h-4 text-blue-600 shrink-0" />
-                  Real Gmail par email bhejne ke liye:
-                </p>
-                <p className="text-[11px] text-blue-700 leading-relaxed font-medium">
-                  Internet par kisi bhi student ke asli Gmail inbox me email deliver karne ke liye niche diya gaya <strong>Option 1 (Gmail App Password)</strong> sabse aasan aur 100% free hai (500 emails/day).
-                </p>
-              </div>
-
-              {/* Provider Selection Tabs */}
-              <div className="grid grid-cols-3 gap-2 p-1 bg-slate-100 rounded-2xl">
-                <button
-                  type="button"
-                  onClick={() => setConfigActiveTab('gmail')}
-                  className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
-                    configActiveTab === 'gmail'
-                      ? 'bg-white text-indigo-700 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Gmail (Recommended)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfigActiveTab('brevo')}
-                  className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
-                    configActiveTab === 'brevo'
-                      ? 'bg-white text-indigo-700 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Brevo API
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfigActiveTab('emailjs')}
-                  className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
-                    configActiveTab === 'emailjs'
-                      ? 'bg-white text-indigo-700 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  EmailJS
-                </button>
-              </div>
-
-              {/* TAB 1: GMAIL APP PASSWORD */}
-              {configActiveTab === 'gmail' && (
-                <div className="space-y-4 animate-fadeIn">
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 text-xs">
-                    <p className="font-bold text-slate-800">1-Minute Quick Guide:</p>
-                    <ol className="list-decimal list-inside space-y-1 text-slate-600 text-[11px] leading-relaxed">
-                      <li>Apne Google Account me 2-Step Verification ON rakhein.</li>
-                      <li>
-                        Google App Passwords open karein:{' '}
-                        <a
-                          href="https://myaccount.google.com/apppasswords"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="font-bold text-blue-600 underline inline-flex items-center gap-0.5 ml-1"
-                        >
-                          myaccount.google.com/apppasswords
-                          <ExternalLink className="w-3 h-3 inline" />
-                        </a>
-                      </li>
-                      <li>App Name me <strong className="text-slate-900">OlympiadHub</strong> likhkar <strong>Create</strong> dabayein.</li>
-                      <li>Google ek 16-character ka password dega (jaise: <span className="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200 text-indigo-600 font-bold">abcd efgh ijkl mnop</span>), use yaha paste karein:</li>
-                    </ol>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Your Gmail Address:
-                      </label>
-                      <input
-                        type="email"
-                        value={emailConfig.gmailUser || ''}
-                        onChange={(e) =>
-                          setEmailConfig((prev) => ({
-                            ...prev,
-                            gmailUser: e.target.value,
-                            provider: 'gmail_smtp'
-                          }))
-                        }
-                        placeholder="yourname@gmail.com"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:outline-hidden text-xs text-slate-800 font-mono shadow-2xs"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Google 16-Digit App Password:
-                      </label>
-                      <input
-                        type="password"
-                        value={emailConfig.gmailAppPassword || ''}
-                        onChange={(e) =>
-                          setEmailConfig((prev) => ({
-                            ...prev,
-                            gmailAppPassword: e.target.value,
-                            provider: 'gmail_smtp'
-                          }))
-                        }
-                        placeholder="xxxx xxxx xxxx xxxx"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:outline-hidden text-xs text-slate-800 font-mono shadow-2xs"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 2: BREVO API */}
-              {configActiveTab === 'brevo' && (
-                <div className="space-y-4 animate-fadeIn">
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-1.5 text-xs text-slate-600">
-                    <p className="font-bold text-slate-800">Brevo (Sendinblue) Setup:</p>
-                    <p className="text-[11px] leading-relaxed">
-                      Brevo provides 300 free emails per day to ANY recipient. Sign up for free at{' '}
-                      <a
-                        href="https://www.brevo.com"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="font-bold text-blue-600 underline inline-flex items-center gap-0.5"
-                      >
-                        brevo.com
-                        <ExternalLink className="w-3 h-3 inline" />
-                      </a>{' '}
-                      and copy your API Key from SMTP &amp; API tab.
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Brevo API Key (starts with xkeysib-):
-                      </label>
-                      <input
-                        type="password"
-                        value={emailConfig.brevoApiKey || ''}
-                        onChange={(e) =>
-                          setEmailConfig((prev) => ({
-                            ...prev,
-                            brevoApiKey: e.target.value,
-                            provider: 'brevo'
-                          }))
-                        }
-                        placeholder="xkeysib-..."
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:outline-hidden text-xs text-slate-800 font-mono shadow-2xs"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Registered Sender Email:
-                      </label>
-                      <input
-                        type="email"
-                        value={emailConfig.brevoSenderEmail || ''}
-                        onChange={(e) =>
-                          setEmailConfig((prev) => ({
-                            ...prev,
-                            brevoSenderEmail: e.target.value,
-                            provider: 'brevo'
-                          }))
-                        }
-                        placeholder="sender@yourdomain.com"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:outline-hidden text-xs text-slate-800 font-mono shadow-2xs"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 3: EMAILJS */}
-              {configActiveTab === 'emailjs' && (
-                <div className="space-y-4 animate-fadeIn">
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-1.5 text-xs text-slate-600">
-                    <p className="font-bold text-slate-800">EmailJS Setup:</p>
-                    <p className="text-[11px] leading-relaxed">
-                      Sends emails directly from browser using{' '}
-                      <a
-                        href="https://www.emailjs.com"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="font-bold text-blue-600 underline inline-flex items-center gap-0.5"
-                      >
-                        emailjs.com
-                        <ExternalLink className="w-3 h-3 inline" />
-                      </a>{' '}
-                      (200 free emails/month).
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Service ID:
-                      </label>
-                      <input
-                        type="text"
-                        value={emailConfig.emailjsServiceId || ''}
-                        onChange={(e) =>
-                          setEmailConfig((prev) => ({
-                            ...prev,
-                            emailjsServiceId: e.target.value,
-                            provider: 'emailjs'
-                          }))
-                        }
-                        placeholder="service_xxxxx"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:outline-hidden text-xs text-slate-800 font-mono shadow-2xs"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Template ID:
-                      </label>
-                      <input
-                        type="text"
-                        value={emailConfig.emailjsTemplateId || ''}
-                        onChange={(e) =>
-                          setEmailConfig((prev) => ({
-                            ...prev,
-                            emailjsTemplateId: e.target.value,
-                            provider: 'emailjs'
-                          }))
-                        }
-                        placeholder="template_xxxxx"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:outline-hidden text-xs text-slate-800 font-mono shadow-2xs"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Public Key:
-                      </label>
-                      <input
-                        type="text"
-                        value={emailConfig.emailjsPublicKey || ''}
-                        onChange={(e) =>
-                          setEmailConfig((prev) => ({
-                            ...prev,
-                            emailjsPublicKey: e.target.value,
-                            provider: 'emailjs'
-                          }))
-                        }
-                        placeholder="publicKey_xxxxx"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:outline-hidden text-xs text-slate-800 font-mono shadow-2xs"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* LIVE TEST SECTION */}
-              <div className="pt-4 border-t border-slate-200 space-y-3">
-                <p className="font-bold text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                  <SendHorizontal className="w-3.5 h-3.5 text-indigo-600" />
-                  Live Delivery Test
-                </p>
-
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    value={testEmailAddress}
-                    onChange={(e) => setTestEmailAddress(e.target.value)}
-                    placeholder="Enter your email to receive a test OTP"
-                    className="flex-1 px-3.5 py-2 rounded-xl border border-slate-300 focus:border-indigo-600 focus:outline-hidden text-xs text-slate-800 font-mono shadow-2xs"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleTestEmailSend}
-                    disabled={testingEmail}
-                    className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer disabled:opacity-50 flex items-center gap-1.5 active:scale-95"
-                  >
-                    {testingEmail ? (
-                      <>
-                        <RotateCw className="w-3.5 h-3.5 animate-spin" />
-                        <span>Sending...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-3.5 h-3.5" />
-                        <span>Send Test</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                {/* Test Status feedback */}
-                {testStatus && (
-                  <div
-                    className={`p-3 rounded-xl text-xs flex items-start gap-2 border animate-fadeIn ${
-                      testStatus.success
-                        ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
-                        : 'bg-red-50 text-red-900 border-red-200'
-                    }`}
-                  >
-                    {testStatus.success ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                    )}
-                    <span className="leading-relaxed font-medium">{testStatus.message}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="bg-slate-50 px-5 sm:px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-              {configSavedNotice ? (
-                <span className="text-xs font-bold text-emerald-600 flex items-center gap-1.5">
-                  <Check className="w-4 h-4" />
-                  Settings saved &amp; active!
-                </span>
-              ) : (
-                <span className="text-[11px] text-slate-500 font-medium">
-                  Settings are saved locally &amp; to server
-                </span>
-              )}
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowEmailConfigModal(false)}
-                  className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl text-xs font-bold transition-all cursor-pointer"
-                >
-                  Close
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveEmailConfig}
-                  disabled={savingConfig}
-                  className="px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5"
-                >
-                  {savingConfig ? (
-                    <RotateCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Save className="w-3.5 h-3.5" />
-                  )}
-                  <span>Save Configuration</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* School Coordinator & Helpdesk Modal */}
       {showCoordinatorModal && (
