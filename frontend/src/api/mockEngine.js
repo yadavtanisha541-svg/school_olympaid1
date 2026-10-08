@@ -2572,14 +2572,14 @@ export const mockEngine = {
               }
             ]
           },
-          // ICSO Cyber Mock Test Series
+          // IDLO / ICSO Cyber & Digital Literacy Mock Test Series
           {
             id: 3008,
-            title: 'ICSO Level-1 Mock Test 1 Class 6',
-            short_code: 'ICSO - Mock 1',
-            series_title: 'Class 6 - All India ICSO Mock Test Series',
-            subject_code: 'ICSO',
-            subject_name: 'ICSO (Cyber & AI Olympiad)',
+            title: 'IDLO Level-1 Mock Test 1 Class 6',
+            short_code: 'IDLO - Mock 1',
+            series_title: 'Class 6 - All India IDLO Mock Test Series',
+            subject_code: 'IDLO',
+            subject_name: 'IDLO (Digital Literacy)',
             class_name: 'Class 6',
             paper_category: 'mock_test',
             exam_year: '2026',
@@ -2599,6 +2599,44 @@ export const mockEngine = {
                 correct: 0,
                 marks: 1,
                 explanation: 'HTTPS (HyperText Transfer Protocol Secure) encrypts communication using TLS/SSL.'
+              },
+              {
+                id: 2,
+                section: 'Computer Fundamentals',
+                q: 'What is the brain of a computer system that performs calculation and controls all units?',
+                options: ['Central Processing Unit (CPU)', 'Random Access Memory (RAM)', 'Hard Disk Drive (HDD)', 'Motherboard'],
+                correct: 0,
+                marks: 1,
+                explanation: 'The CPU is known as the central brain of the computer.'
+              }
+            ]
+          },
+          {
+            id: 3018,
+            title: 'IDLO Level-1 Mock Test 2 Class 6',
+            short_code: 'IDLO - Mock 2',
+            series_title: 'Class 6 - All India IDLO Mock Test Series',
+            subject_code: 'IDLO',
+            subject_name: 'IDLO (Digital Literacy)',
+            class_name: 'Class 6',
+            paper_category: 'mock_test',
+            exam_year: '2026',
+            duration_minutes: 60,
+            total_marks: 60,
+            cutoff_marks: 42,
+            status: 'published',
+            header_color: '#809926',
+            accent_color: '#809926',
+            sections: ['Coding & Logic', 'Digital Literacy', 'Achievers Section'],
+            questions: [
+              {
+                id: 1,
+                section: 'Coding & Logic',
+                q: 'Which of the following is NOT an operating system?',
+                options: ['Microsoft Word', 'Windows 11', 'Linux Ubuntu', 'macOS'],
+                correct: 0,
+                marks: 1,
+                explanation: 'Microsoft Word is an application software/word processor, not an operating system.'
               }
             ]
           },
@@ -2668,23 +2706,39 @@ export const mockEngine = {
 
       if (method === 'GET') {
         const queryParams = params || {};
-        const classFilter = queryParams.class || (endpoint.includes('class=') ? decodeURIComponent(endpoint.split('class=')[1].split('&')[0]) : '');
-        const subjectFilter = queryParams.subject || (endpoint.includes('subject=') ? decodeURIComponent(endpoint.split('subject=')[1].split('&')[0]) : '');
+        const rawClass = queryParams.class || (endpoint.includes('class=') ? decodeURIComponent(endpoint.split('class=')[1].split('&')[0]) : '');
+        const classFilter = rawClass.replace(/\+/g, ' ').trim();
+        const rawSubject = queryParams.subject || (endpoint.includes('subject=') ? decodeURIComponent(endpoint.split('subject=')[1].split('&')[0]) : '');
+        const subjectFilter = rawSubject.replace(/\+/g, ' ').trim();
         const categoryFilter = queryParams.category || queryParams.paper_category || (endpoint.includes('category=') ? decodeURIComponent(endpoint.split('category=')[1].split('&')[0]) : '');
 
         let filtered = [...papers];
-        if (classFilter && classFilter !== 'All') {
+        if (classFilter && classFilter !== 'All' && classFilter !== 'ALL') {
           filtered = filtered.filter((p) => {
             const pCls = p.class_name || p.class || '';
             const match1 = pCls.match(/\d+/);
             const match2 = classFilter.match(/\d+/);
-            return match1 && match2 ? match1[0] === match2[0] : pCls === classFilter;
+            return match1 && match2 ? match1[0] === match2[0] : pCls.toLowerCase() === classFilter.toLowerCase();
           });
         }
         if (subjectFilter && subjectFilter !== 'ALL' && subjectFilter !== 'All') {
+          const sUpper = subjectFilter.toUpperCase();
           filtered = filtered.filter((p) => {
             const sc = (p.subject_code || p.subject || '').toUpperCase();
-            return sc.includes(subjectFilter.toUpperCase()) || subjectFilter.toUpperCase().includes(sc);
+            if (sc === sUpper) return true;
+            if ((sUpper === 'IDLO' || sUpper === 'IEOD' || sUpper === 'ICSO' || sUpper === 'ICO' || sUpper === 'COMPUTER') &&
+                (sc === 'IDLO' || sc === 'IEOD' || sc === 'ICSO' || sc === 'ICO' || sc === 'COMPUTER')) return true;
+            if ((sUpper === 'IHO' || sUpper === 'IEOH' || sUpper === 'HINDI') &&
+                (sc === 'IHO' || sc === 'IEOH' || sc === 'HINDI')) return true;
+            if ((sUpper === 'IMO' || sUpper === 'IEOM' || sUpper === 'MATH') &&
+                (sc === 'IMO' || sc === 'IEOM' || sc === 'MATH')) return true;
+            if ((sUpper === 'ISO' || sUpper === 'IEOS' || sUpper === 'NSO' || sUpper === 'SCIENCE') &&
+                (sc === 'ISO' || sc === 'IEOS' || sc === 'NSO' || sc === 'SCIENCE')) return true;
+            if ((sUpper === 'IEO' || sUpper === 'IEOE' || sUpper === 'ENGLISH') &&
+                (sc === 'IEO' || sc === 'IEOE' || sc === 'ENGLISH')) return true;
+            if ((sUpper === 'IGKO' || sUpper === 'IEOG' || sUpper === 'GK') &&
+                (sc === 'IGKO' || sc === 'IEOG' || sc === 'GK')) return true;
+            return sc.includes(sUpper) || sUpper.includes(sc);
           });
         }
         if (categoryFilter && categoryFilter !== 'all' && categoryFilter !== 'All') {
@@ -2800,29 +2854,42 @@ export const mockEngine = {
         });
 
         const newPaper = {
-          id: Date.now(),
+          id: body.id || Date.now(),
           title: body.title || 'New Model Test Paper',
           short_code: body.short_code || `${body.subject_code || 'EXAM'} - ${body.exam_year || '2026'}`,
-          subject_code: body.subject_code || 'IMO',
-          subject_name: body.subject_name || 'Mathematics Olympiad',
+          series_title: body.series_title || `${body.class_name || 'Class 6'} - All India ${body.subject_code || 'IMO'} Mock Test Series`,
+          subject_code: (body.subject_code || 'IMO').toUpperCase(),
+          subject_name: body.subject_name || `${body.subject_code || 'IMO'} Olympiad`,
           class_name: body.class_name || body.class || 'Class 6',
-          paper_category: body.paper_category || 'previous_year',
+          paper_category: body.paper_category || 'mock_test',
           exam_year: body.exam_year || '2026',
           duration_minutes: Number(body.duration_minutes) || 60,
           total_marks: Number(body.total_marks) || (normQuestions.length > 0 ? normQuestions.reduce((a, b) => a + (b.marks || 1), 0) : 60),
           cutoff_marks: Number(body.cutoff_marks) || 42,
           status: 'published',
-          header_color: body.header_color || '#d97706',
-          accent_color: body.accent_color || '#d97706',
-          sections: Array.isArray(body.sections) && body.sections.length > 0 ? body.sections : ['General Awareness', 'Current Affairs', 'Achievers Section'],
+          header_color: body.header_color || '#809926',
+          accent_color: body.accent_color || '#809926',
+          sections: Array.isArray(body.sections) && body.sections.length > 0 ? body.sections : ['General Awareness', 'Subject Knowledge', 'Achievers Section'],
           questions: normQuestions
         };
-        papers.unshift(newPaper);
+        papers = [newPaper, ...papers.filter(p => String(p.id) !== String(newPaper.id))];
         saveDb('exam_papers', papers);
+
+        try {
+          const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+          localStorage.setItem('mock_db_exam_papers', JSON.stringify([newPaper, ...mockDb.filter(p => String(p.id) !== String(newPaper.id))]));
+          const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+          localStorage.setItem('admin_generator_papers', JSON.stringify([newPaper, ...genPapers.filter(p => String(p.id) !== String(newPaper.id))]));
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: newPaper }));
+          }
+        } catch (e) {}
+
         return { success: true, message: 'Model Test Paper created successfully', data: newPaper };
       }
 
       if (method === 'PUT' && sub) {
+        let updatedPaper = null;
         papers = papers.map((p) => {
           if (String(p.id) === String(sub)) {
             const rawQs = Array.isArray(body.questions) ? body.questions : (p.questions || []);
@@ -2855,22 +2922,46 @@ export const mockEngine = {
                 explanation: q.explanation || q.solution || ''
               };
             });
-            return {
+            updatedPaper = {
               ...p,
               ...body,
+              subject_code: (body.subject_code || p.subject_code || 'IMO').toUpperCase(),
               cutoff_marks: body.cutoff_marks !== undefined ? Number(body.cutoff_marks) : (p.cutoff_marks || 42),
               questions: normQuestions
             };
+            return updatedPaper;
           }
           return p;
         });
         saveDb('exam_papers', papers);
-        return { success: true, message: 'Model Test Paper updated successfully' };
+
+        if (updatedPaper) {
+          try {
+            const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+            localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockDb.map(p => String(p.id) === String(sub) ? updatedPaper : p)));
+            const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+            localStorage.setItem('admin_generator_papers', JSON.stringify(genPapers.map(p => String(p.id) === String(sub) ? updatedPaper : p)));
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedPaper }));
+            }
+          } catch (e) {}
+        }
+
+        return { success: true, message: 'Model Test Paper updated successfully', data: updatedPaper };
       }
 
       if (method === 'DELETE' && sub) {
         papers = papers.filter((p) => String(p.id) !== String(sub));
         saveDb('exam_papers', papers);
+        try {
+          const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+          localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockDb.filter(p => String(p.id) !== String(sub))));
+          const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+          localStorage.setItem('admin_generator_papers', JSON.stringify(genPapers.filter(p => String(p.id) !== String(sub))));
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedId: sub } }));
+          }
+        } catch (e) {}
         return { success: true, message: 'Model Test Paper deleted successfully' };
       }
     }

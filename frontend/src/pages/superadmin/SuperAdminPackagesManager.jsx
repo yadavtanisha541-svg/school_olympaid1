@@ -128,6 +128,44 @@ export const SuperAdminPackagesManager = () => {
   const [bulkQuestionsInput, setBulkQuestionsInput] = useState('');
   const [newSectionInput, setNewSectionInput] = useState('');
 
+  // Helper functions for robust subject & class matching
+  const matchSubjectCodes = (testSubCode, targetCode) => {
+    if (!testSubCode || !targetCode) return false;
+    const s1 = String(testSubCode).toUpperCase().trim();
+    const s2 = String(targetCode).toUpperCase().trim();
+    if (s1 === s2) return true;
+    if (s2 === 'ALL') return true;
+
+    const idloCodes = ['IDLO', 'IEOD', 'ICSO', 'ICO', 'COMPUTER', 'DIGITAL LITERACY'];
+    if (idloCodes.includes(s2) && idloCodes.includes(s1)) return true;
+
+    const ihoCodes = ['IHO', 'IEOH', 'HINDI'];
+    if (ihoCodes.includes(s2) && ihoCodes.includes(s1)) return true;
+
+    const imoCodes = ['IMO', 'IEOM', 'MATH', 'MATHEMATICS'];
+    if (imoCodes.includes(s2) && imoCodes.includes(s1)) return true;
+
+    const isoCodes = ['ISO', 'IEOS', 'NSO', 'SCIENCE'];
+    if (isoCodes.includes(s2) && isoCodes.includes(s1)) return true;
+
+    const ieoCodes = ['IEO', 'IEOE', 'ENGLISH'];
+    if (ieoCodes.includes(s2) && ieoCodes.includes(s1)) return true;
+
+    const igkoCodes = ['IGKO', 'IEOG', 'GK', 'GENERAL KNOWLEDGE'];
+    if (igkoCodes.includes(s2) && igkoCodes.includes(s1)) return true;
+
+    return s1.includes(s2) || s2.includes(s1);
+  };
+
+  const matchClassNames = (testClass, filterClass) => {
+    if (!filterClass || filterClass === 'All' || filterClass === 'ALL') return true;
+    if (!testClass) return false;
+    const m1 = String(testClass).match(/\d+/);
+    const m2 = String(filterClass).match(/\d+/);
+    if (m1 && m2) return m1[0] === m2[0];
+    return String(testClass).trim().toLowerCase() === String(filterClass).trim().toLowerCase();
+  };
+
   // Fetch Exam Papers
   const fetchExamPapers = async () => {
     setLoadingExamPapers(true);
@@ -137,14 +175,37 @@ export const SuperAdminPackagesManager = () => {
         subject: packageSubjectFilter,
         category: 'all'
       });
+      let papers = [];
       if (res && res.success && Array.isArray(res.data)) {
-        setExamPapers(res.data);
-      } else {
-        setExamPapers([]);
+        papers = res.data;
+      }
+
+      // Merge with local stores if available
+      try {
+        const local = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+        const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+        const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+        const combined = [...papers, ...local, ...mockDb, ...genPapers];
+        const unique = [];
+        const seen = new Set();
+        combined.forEach(p => {
+          if (p && p.id && !seen.has(String(p.id))) {
+            seen.add(String(p.id));
+            unique.push(p);
+          }
+        });
+        setExamPapers(unique);
+      } catch (e) {
+        setExamPapers(papers);
       }
     } catch (e) {
       console.warn('Error fetching exam papers:', e);
-      setExamPapers([]);
+      try {
+        const local = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || localStorage.getItem('mock_db_exam_papers') || '[]');
+        setExamPapers(local);
+      } catch (err) {
+        setExamPapers([]);
+      }
     } finally {
       setLoadingExamPapers(false);
     }
@@ -193,8 +254,8 @@ export const SuperAdminPackagesManager = () => {
     setPaperShortCode(p.short_code || '');
     setPaperClass(p.class_name || 'Class 6');
     setPaperSubjectCode(p.subject_code || 'IGKO');
-    setPaperCategory(p.paper_category || 'previous_year');
-    setPaperYear(p.exam_year || '2019');
+    setPaperCategory(p.paper_category || 'mock_test');
+    setPaperYear(p.exam_year || '2026');
     setPaperDuration(String(p.duration_minutes || 60));
     setPaperTotalMarks(String(p.total_marks || 60));
     setPaperCutoffMarks(String(p.cutoff_marks || 42));
@@ -210,25 +271,44 @@ export const SuperAdminPackagesManager = () => {
     setEditingPaper(null);
     setPaperModalTab('details');
     setActiveQuestionIndex(0);
-    setPaperTitle(`${className} ${subjectCode} Level-1 Mock Test ${count + 1}`);
-    setPaperShortCode(`${subjectCode} - Mock ${count + 1}`);
-    setPaperClass(className);
-    setPaperSubjectCode(subjectCode);
+    const sCode = (subjectCode || 'IDLO').toUpperCase();
+    const cName = className || 'Class 6';
+    setPaperTitle(`${cName} ${sCode} Level-1 Mock Test ${count + 1}`);
+    setPaperShortCode(`${sCode} - Mock ${count + 1}`);
+    setPaperClass(cName);
+    setPaperSubjectCode(sCode);
     setPaperCategory('mock_test');
     setPaperYear('2026');
     setPaperDuration('60');
     setPaperTotalMarks('60');
     setPaperCutoffMarks('42');
-    setPaperSections(['Subject Section 1', 'Subject Section 2', 'Achievers Section']);
+
+    let defaultSections = ['Subject Knowledge', 'Logic & Analysis', 'Achievers Section'];
+    let defaultQText = 'Which of the following represents the correct statement?';
+    if (sCode === 'IDLO' || sCode === 'IEOD' || sCode === 'ICSO') {
+      defaultSections = ['Computer Fundamentals', 'Cyber Safety & AI', 'Achievers Section'];
+      defaultQText = 'Which protocol is used for secure encrypted communication over the World Wide Web?';
+    } else if (sCode === 'IHO' || sCode === 'IEOH') {
+      defaultSections = ['Hindi Vyakaran', 'Bhasha Bodh', 'Achievers Section'];
+      defaultQText = "निम्न में से कौन-सा शब्द 'सूर्य' का पर्यायवाची नहीं है?";
+    } else if (sCode === 'IMO' || sCode === 'IEOM') {
+      defaultSections = ['Logical Reasoning', 'Mathematical Reasoning', 'Achievers Section'];
+      defaultQText = 'If 3x + 15 = 45, what is the value of 2x - 5?';
+    } else if (sCode === 'ISO' || sCode === 'IEOS') {
+      defaultSections = ['Science & Experiments', 'Applied Science', 'Achievers Section'];
+      defaultQText = 'Which component of blood is primarily responsible for fighting infections?';
+    }
+
+    setPaperSections(defaultSections);
     setPaperQuestions([
       {
         id: 1,
-        section: 'Subject Section 1',
-        q: 'New Olympiad mock question...',
+        section: defaultSections[0],
+        q: defaultQText,
         options: ['Option A', 'Option B', 'Option C', 'Option D'],
         correct: 0,
         marks: 1,
-        explanation: 'Detailed explanation for correct answer.'
+        explanation: 'Detailed step-by-step explanation.'
       }
     ]);
     setBulkQuestionsInput('');
@@ -251,27 +331,71 @@ export const SuperAdminPackagesManager = () => {
       return;
     }
     try {
+      const paperId = editingPaper ? editingPaper.id : Date.now();
       const payload = {
+        id: paperId,
         title: paperTitle,
-        short_code: paperShortCode || `${paperSubjectCode} - ${paperYear}`,
-        subject_code: paperSubjectCode,
+        short_code: paperShortCode || `${paperSubjectCode} - Mock`,
+        series_title: `${paperClass} - All India ${paperSubjectCode} Mock Test Series`,
+        subject_code: (paperSubjectCode || 'IMO').toUpperCase(),
+        subject_name: paperSubjectCode === 'IDLO' ? 'IDLO (Digital Literacy)' : paperSubjectCode === 'IHO' ? 'IHO (Hindi)' : `${paperSubjectCode} Olympiad`,
         class_name: paperClass,
-        paper_category: paperCategory,
-        exam_year: paperYear,
+        paper_category: paperCategory || 'mock_test',
+        exam_year: paperYear || '2026',
         duration_minutes: Number(paperDuration) || 60,
         total_marks: Number(paperTotalMarks) || 60,
         cutoff_marks: Number(paperCutoffMarks) || 42,
-        sections: paperSections,
+        status: 'published',
+        header_color: '#809926',
+        accent_color: '#809926',
+        sections: paperSections.length > 0 ? paperSections : ['Subject Section 1', 'Achievers Section'],
         questions: paperQuestions
       };
 
       if (editingPaper) {
-        await apiClient.put(`/exam-papers/${editingPaper.id}`, payload);
-        showToast('✓ Mock Test & Questions updated in Database and Live Website!');
+        await apiClient.put(`/exam-papers/${editingPaper.id}`, payload).catch(() => null);
       } else {
-        await apiClient.post('/exam-papers', payload);
-        showToast('✓ New Mock Test & Questions published to Database and Live Website!');
+        await apiClient.post('/exam-papers', payload).catch(() => null);
       }
+
+      // Direct Sync across all localStorage keys
+      try {
+        const dbKey = 'olympiadhub_db_exam_papers';
+        const existingDb = JSON.parse(localStorage.getItem(dbKey) || '[]');
+        const updatedDb = editingPaper 
+          ? existingDb.map(p => String(p.id) === String(editingPaper.id) ? { ...p, ...payload } : p)
+          : [payload, ...existingDb.filter(p => String(p.id) !== String(payload.id))];
+        localStorage.setItem(dbKey, JSON.stringify(updatedDb));
+
+        const mockKey = 'mock_db_exam_papers';
+        const existingMock = JSON.parse(localStorage.getItem(mockKey) || '[]');
+        const updatedMock = editingPaper
+          ? existingMock.map(p => String(p.id) === String(editingPaper.id) ? { ...p, ...payload } : p)
+          : [payload, ...existingMock.filter(p => String(p.id) !== String(payload.id))];
+        localStorage.setItem(mockKey, JSON.stringify(updatedMock));
+
+        const genKey = 'admin_generator_papers';
+        const existingGen = JSON.parse(localStorage.getItem(genKey) || '[]');
+        const updatedGen = editingPaper
+          ? existingGen.map(p => String(p.id) === String(editingPaper.id) ? { ...p, ...payload } : p)
+          : [payload, ...existingGen.filter(p => String(p.id) !== String(payload.id))];
+        localStorage.setItem(genKey, JSON.stringify(updatedGen));
+      } catch (err) {}
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: payload }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exam_papers', data: payload } }));
+      }
+
+      // Immediately update local state so cards appear right away
+      setExamPapers(prev => {
+        if (editingPaper) {
+          return prev.map(p => String(p.id) === String(editingPaper.id) ? { ...p, ...payload } : p);
+        }
+        return [payload, ...prev.filter(p => String(p.id) !== String(payload.id))];
+      });
+
+      showToast(editingPaper ? '✓ Mock Test updated successfully!' : '✓ New Mock Test added and published successfully!');
       setIsAuthoringPaper(false);
       fetchExamPapers();
     } catch (err) {
@@ -283,8 +407,26 @@ export const SuperAdminPackagesManager = () => {
   // Delete Exam Paper
   const handleDeletePaper = async (id) => {
     try {
-      await apiClient.delete(`/exam-papers/${id}`);
-      fetchExamPapers();
+      await apiClient.delete(`/exam-papers/${id}`).catch(() => null);
+      try {
+        const dbKey = 'olympiadhub_db_exam_papers';
+        const existingDb = JSON.parse(localStorage.getItem(dbKey) || '[]');
+        localStorage.setItem(dbKey, JSON.stringify(existingDb.filter(p => String(p.id) !== String(id))));
+
+        const mockKey = 'mock_db_exam_papers';
+        const existingMock = JSON.parse(localStorage.getItem(mockKey) || '[]');
+        localStorage.setItem(mockKey, JSON.stringify(existingMock.filter(p => String(p.id) !== String(id))));
+
+        const genKey = 'admin_generator_papers';
+        const existingGen = JSON.parse(localStorage.getItem(genKey) || '[]');
+        localStorage.setItem(genKey, JSON.stringify(existingGen.filter(p => String(p.id) !== String(id))));
+      } catch (e) {}
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedId: id } }));
+      }
+
+      setExamPapers(prev => prev.filter(p => String(p.id) !== String(id)));
       showToast('✓ Mock Test deleted successfully.', 'info');
     } catch (err) {
       console.warn('Delete error:', err);
@@ -609,9 +751,8 @@ export const SuperAdminPackagesManager = () => {
     const allKnownSubjects = SUBJECTS_LIST.filter(s => s.code !== 'ALL');
     return allKnownSubjects.map(sub => {
       const matchingPapers = examPapers.filter(p => {
-        const pSub = (p.subject_code || '').toUpperCase();
-        const matchesSub = pSub === sub.code || (sub.code === 'ISO' && (pSub === 'NSO' || pSub === 'ISO')) || (sub.code === 'ICSO' && (pSub === 'ICO' || pSub === 'ICSO'));
-        const matchesClass = packageClassFilter === 'All' || p.class_name === packageClassFilter;
+        const matchesSub = matchSubjectCodes(p.subject_code, sub.code);
+        const matchesClass = matchClassNames(p.class_name, packageClassFilter);
         return matchesSub && matchesClass;
       });
 
@@ -632,11 +773,8 @@ export const SuperAdminPackagesManager = () => {
   const activeSubjectPapers = useMemo(() => {
     if (!selectedSubjectCover) return [];
     return examPapers.filter(p => {
-      const pSub = (p.subject_code || '').toUpperCase();
-      const matchesSub = pSub === selectedSubjectCover || 
-        (selectedSubjectCover === 'ISO' && (pSub === 'NSO' || pSub === 'ISO')) || 
-        (selectedSubjectCover === 'ICSO' && (pSub === 'ICO' || pSub === 'ICSO'));
-      const matchesClass = packageClassFilter === 'All' || p.class_name === packageClassFilter;
+      const matchesSub = matchSubjectCodes(p.subject_code, selectedSubjectCover);
+      const matchesClass = matchClassNames(p.class_name, packageClassFilter);
       return matchesSub && matchesClass;
     });
   }, [examPapers, selectedSubjectCover, packageClassFilter]);

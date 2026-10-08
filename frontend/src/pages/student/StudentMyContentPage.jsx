@@ -70,9 +70,13 @@ export const StudentMyContentPage = ({
 
       // Also include any mock tests authored in admin generator or local storage
       const localAdminPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-      if (Array.isArray(localAdminPapers)) {
-        localAdminPapers.forEach((lp) => {
-          if (!allPapers.some(p => p.id === lp.id || (p.title === lp.title && p.class_name === (lp.class_name || lp.class)))) {
+      const mockDbPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+      const olympiadDbPapers = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+      const combinedLocal = [...localAdminPapers, ...mockDbPapers, ...olympiadDbPapers];
+
+      if (Array.isArray(combinedLocal)) {
+        combinedLocal.forEach((lp) => {
+          if (lp && !allPapers.some(p => String(p.id) === String(lp.id) || (p.title === lp.title && p.class_name === (lp.class_name || lp.class)))) {
             allPapers.push({
               id: lp.id,
               title: lp.title,
@@ -82,8 +86,9 @@ export const StudentMyContentPage = ({
               category: lp.paper_category || 'mock_test',
               duration_minutes: lp.duration_minutes || 60,
               total_marks: lp.total_marks || 60,
-              cutoff_marks: 42,
-              status: 'published'
+              cutoff_marks: lp.cutoff_marks || 42,
+              status: 'published',
+              questions: lp.questions || []
             });
           }
         });
@@ -105,6 +110,15 @@ export const StudentMyContentPage = ({
 
   useEffect(() => {
     fetchMyContentData();
+    const handleSync = () => {
+      fetchMyContentData();
+    };
+    window.addEventListener('olympiadhub-admin-papers-updated', handleSync);
+    window.addEventListener('storage', handleSync);
+    return () => {
+      window.removeEventListener('olympiadhub-admin-papers-updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
   }, [user]);
 
   // When activeSubjectCode changes from the sidebar (e.g. student clicks IGKO or ISO)
