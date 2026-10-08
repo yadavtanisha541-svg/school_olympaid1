@@ -952,76 +952,40 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. SECTION: TWO FEATURED BANNERS (10% Richer 2-3 Mix Pastel Gradient)     */}
+      {/* 3. SECTION: PRACTICE TESTS & INTELLIGENT TEST GENERATOR                   */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2">
-        
-        {/* Left Banner: Online Classes */}
-        <div className="bg-gradient-to-r from-blue-200/95 via-indigo-200/90 to-purple-200/95 rounded-3xl border-2 border-indigo-400 hover:border-indigo-500 p-6 sm:p-7 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-slate-900">
-          <div className="flex items-center gap-4 min-w-0">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-indigo-300 shadow-sm shrink-0 text-white border border-white/30">
-              <div className="relative">
-                <BookOpen className="w-8 h-8 text-white" />
-                <Lightbulb className="w-4 h-4 text-amber-300 fill-amber-300 absolute -top-1 -right-1" />
-              </div>
-            </div>
-
-            <div className="min-w-0 space-y-1.5">
-              <span className="inline-block px-3 py-1 rounded-lg bg-indigo-300/90 text-indigo-900 text-[10px] font-black uppercase tracking-wider border border-indigo-400">
-                FEATURED
-              </span>
-              <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
-                Online Classes for Mathematics, Science &amp; Digital Literacy
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-700 font-semibold leading-relaxed">
-                Get expert guidance and master competitive Olympiad problem-solving.
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => onNavigateTab('my_classes')}
-            className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-sm hover:shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-indigo-600"
-          >
-            <span>ENROLL NOW</span>
-            <ArrowRight className="w-4 h-4 text-white" />
-          </button>
-        </div>
-
-        {/* Right Banner: Olympiad Intelligent Test Generator Pro */}
+      <div className="pt-2">
         <div className="bg-gradient-to-r from-pink-200/95 via-purple-200/90 to-blue-200/95 rounded-3xl border-2 border-pink-400 hover:border-pink-500 p-6 sm:p-7 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 text-slate-900">
           <div className="flex items-center gap-4 min-w-0">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 flex items-center justify-center shadow-pink-300 shadow-sm shrink-0 text-white border border-white/30">
               <div className="relative">
-                <FileSpreadsheet className="w-8 h-8 text-white" />
+                <Sparkles className="w-8 h-8 text-white" />
                 <Target className="w-4 h-4 text-yellow-300 absolute -top-1 -right-1" />
               </div>
             </div>
 
             <div className="min-w-0 space-y-1.5">
               <span className="inline-block px-3 py-1 rounded-lg bg-pink-300/90 text-pink-900 text-[10px] font-black uppercase tracking-wider border border-pink-400">
-                PRO TOOL
+                PRACTICE &amp; MOCK EXAMS
               </span>
               <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
-                Olympiad Intelligent Test Generator Pro
+                Olympiad Practice Tests &amp; Mock Exam Portal
               </h3>
               <p className="text-xs sm:text-sm text-slate-700 font-semibold leading-relaxed">
-                Create customized Olympiad mock tests in seconds.
+                Take timed Olympiad practice tests, customize questions by chapter and difficulty, and track accuracy.
               </p>
             </div>
           </div>
 
           <button
             type="button"
-            onClick={() => onNavigateTab('test_generator')}
+            onClick={() => onNavigateTab('practice_tests')}
             className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-pink-600 via-rose-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-sm hover:shadow-md active:scale-95 cursor-pointer shrink-0 flex items-center justify-center gap-2 border border-pink-600"
           >
-            <span>TRY NOW</span>
+            <span>START PRACTICE</span>
             <ArrowRight className="w-4 h-4 text-white" />
           </button>
         </div>
-
       </div>
 
       {/* ========================================================================= */}
