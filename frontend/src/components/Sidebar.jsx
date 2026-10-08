@@ -337,22 +337,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   )}
                 </div>
 
-                {/* My Classes */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    onSelectTab('my_classes');
-                    if (onClose) onClose();
-                  }}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
-                    currentTab === 'my_classes'
-                      ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
-                      : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
-                  }`}
-                >
-                  <Users className="w-5 h-5 text-slate-400 shrink-0" />
-                  <span>My Classes</span>
-                </button>
+
               </div>
 
               {/* SECTION B: MY PERFORMANCE */}
