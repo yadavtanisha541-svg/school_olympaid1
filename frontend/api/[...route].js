@@ -27,6 +27,12 @@ export default function handler(req, res) {
           ? { id: 1, name: 'Super Administrator', email: 'admin@olympiadhub.com', role: 'superadmin', permissions: ['all'] }
           : { id: 2, name: 'Aarav Sharma', email: 'student@olympiadhub.com', role: 'student', class: 'Class 6', grade: 'Class 6' }
       }
+  if (cleanUrl.includes('/send-email')) {
+    const { type, to, otp, name, password } = req.body || {};
+    return res.status(200).json({
+      success: true,
+      message: 'Email dispatched successfully',
+      data: { type, to, otp, name }
     });
   }
 

@@ -1115,6 +1115,15 @@ export const mockEngine = {
     const sub = segments[1];
     const subId = segments[2];
 
+    // EMAIL DISPATCH
+    if (root === 'send-email') {
+      return {
+        success: true,
+        message: 'Email dispatched (mockEngine)',
+        data: body
+      };
+    }
+
     // AUTH
     if (root === 'auth') {
       if (sub === 'login') {

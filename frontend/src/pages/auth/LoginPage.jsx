@@ -19,10 +19,21 @@ import {
   Key,
   ExternalLink,
   Sparkles,
-  HelpCircle
+  HelpCircle,
+  Copy,
+  Send,
+  Inbox,
+  RotateCw,
+  Clock,
+  Star,
+  Reply,
+  Forward,
+  MailCheck,
+  MailOpen
 } from 'lucide-react';
 import { OlympiadHubLogo } from '../../components/OlympiadHubLogo';
 import { GOOGLE_CLIENT_ID } from '../../config/googleConfig';
+import { generateOtp, sendOtpEmail, sendWelcomeEmail } from '../../utils/emailService';
 
 // Helper to decode Google JWT token safely
 const decodeJwt = (token) => {
@@ -87,10 +98,45 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
   // Google Auth State
   const [googleSigningIn, setGoogleSigningIn] = useState(false);
 
+  // OTP Verification States (Sign Up Flow matching Image 1 & 2)
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
+  const [generatedOtp, setGeneratedOtp] = useState('');
+  const [otpTimer, setOtpTimer] = useState(30);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState('');
+  const [pendingSignup, setPendingSignup] = useState(null); // { email, password }
+  const [copiedOtp, setCopiedOtp] = useState(false);
+
+  // Email Notification & Exact Gmail Preview Modal (matching Image 2 & Image 3)
+  const [emailToast, setEmailToast] = useState(null); // { title, subtitle, type, otp, email, name, password }
+  const [emailPreviewModal, setEmailPreviewModal] = useState(null); // { type: 'otp' | 'welcome', data: {} }
+
   // Loading & Error States
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showCoordinatorModal, setShowCoordinatorModal] = useState(false);
+
+  // Countdown timer for OTP Resend
+  useEffect(() => {
+    let timer;
+    if (showOtpModal && otpTimer > 0) {
+      timer = setInterval(() => {
+        setOtpTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [showOtpModal, otpTimer]);
+
+  // Auto-dismiss floating email toast after 12s
+  useEffect(() => {
+    if (emailToast) {
+      const timer = setTimeout(() => {
+        setEmailToast(null);
+      }, 12000);
+      return () => clearTimeout(timer);
+    }
+  }, [emailToast]);
 
   // Initialize Google One Tap if Client ID is configured
   useEffect(() => {
@@ -148,7 +194,53 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
     }, 500);
   };
 
-  // Handle Form Submission (Sign Up or Sign In)
+  // OTP 6-Digit input change handler with auto-advance and paste support
+  const handleOtpDigitChange = (index, value) => {
+    if (value.length > 1) {
+      // User pasted full OTP
+      const pastedDigits = value.replace(/\D/g, '').slice(0, 6).split('');
+      const newDigits = [...otpDigits];
+      pastedDigits.forEach((digit, i) => {
+        if (i < 6) newDigits[i] = digit;
+      });
+      setOtpDigits(newDigits);
+      setOtpError('');
+      const nextFocus = Math.min(pastedDigits.length, 5);
+      const nextInput = document.getElementById(`otp-input-${nextFocus}`);
+      if (nextInput) nextInput.focus();
+      return;
+    }
+
+    const clean = value.replace(/\D/g, '');
+    const newDigits = [...otpDigits];
+    newDigits[index] = clean;
+    setOtpDigits(newDigits);
+    setOtpError('');
+
+    // Auto advance to next input box
+    if (clean && index < 5) {
+      const nextInput = document.getElementById(`otp-input-${index + 1}`);
+      if (nextInput) nextInput.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index, e) => {
+    if (e.key === 'Backspace' && !otpDigits[index] && index > 0) {
+      const prevInput = document.getElementById(`otp-input-${index - 1}`);
+      if (prevInput) prevInput.focus();
+    }
+  };
+
+  const handleAutoFillOtp = () => {
+    if (!generatedOtp) return;
+    const digits = generatedOtp.split('');
+    setOtpDigits(digits);
+    setOtpError('');
+    const lastInput = document.getElementById('otp-input-5');
+    if (lastInput) lastInput.focus();
+  };
+
+  // Handle Form Submission (Sign Up triggers OTP, Login performs direct authentication)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -182,9 +274,44 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
         setError('Please agree to the Terms & Conditions to register.');
         return;
       }
+
+      // Require reCAPTCHA verification
+      if (captchaStatus !== 'verified') {
+        setError("Please check 'I'm not a robot' to verify.");
+        return;
+      }
+
+      setLoading(true);
+      try {
+        // Generate secure 6-digit OTP
+        const newOtp = generateOtp();
+        setGeneratedOtp(newOtp);
+        setPendingSignup({ email: cleanId, password });
+        setOtpDigits(['', '', '', '', '', '']);
+        setOtpError('');
+        setOtpTimer(30);
+        setShowOtpModal(true);
+
+        // Send OTP Verification Email
+        await sendOtpEmail(cleanId, newOtp);
+
+        // Trigger interactive floating Gmail notification
+        setEmailToast({
+          title: 'OTP for email verification on SkillRise Olympiad',
+          subtitle: `Verification code sent to ${cleanId}`,
+          type: 'otp',
+          otp: newOtp,
+          email: cleanId
+        });
+      } catch (err) {
+        setError('Failed to send verification code. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+      return;
     }
 
-    // Require reCAPTCHA verification
+    // Direct Login Flow
     if (captchaStatus !== 'verified') {
       setError("Please check 'I'm not a robot' to verify.");
       return;
@@ -192,13 +319,78 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
 
     setLoading(true);
     try {
-      // Authenticate via login service (auto-registers student if new)
+      // Authenticate via login service
       await login(cleanId, password);
     } catch (err) {
       setError(err.message || 'Authentication failed. Please verify your details.');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Verify OTP and complete registration -> Dispatch Welcome Email (matching Image 3)
+  const handleVerifyOtp = async () => {
+    const enteredCode = otpDigits.join('');
+    if (enteredCode.length < 6) {
+      setOtpError('Please enter all 6 digits of the OTP.');
+      return;
+    }
+
+    if (enteredCode !== generatedOtp) {
+      setOtpError('Incorrect verification code. Please check your email or copy from preview.');
+      return;
+    }
+
+    setOtpLoading(true);
+    setOtpError('');
+    try {
+      // Register & Login user via AuthContext
+      const userObj = await login(pendingSignup.email, pendingSignup.password);
+
+      // Dispatch Welcome Email with Credentials (matching Image 3)
+      await sendWelcomeEmail({
+        email: pendingSignup.email,
+        name: userObj?.name || pendingSignup.email.split('@')[0],
+        password: pendingSignup.password,
+        siteUrl: window.location.origin
+      });
+
+      // Show Welcome Toast Notification
+      setEmailToast({
+        title: 'Welcome to SkillRise Olympiad!',
+        subtitle: `Account details sent to ${pendingSignup.email}`,
+        type: 'welcome',
+        email: pendingSignup.email,
+        name: userObj?.name || pendingSignup.email.split('@')[0],
+        password: pendingSignup.password
+      });
+
+      setShowOtpModal(false);
+    } catch (err) {
+      setOtpError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  // Resend OTP Code
+  const handleResendOtp = async () => {
+    if (otpTimer > 0 || !pendingSignup?.email) return;
+    const newOtp = generateOtp();
+    setGeneratedOtp(newOtp);
+    setOtpDigits(['', '', '', '', '', '']);
+    setOtpError('');
+    setOtpTimer(30);
+
+    await sendOtpEmail(pendingSignup.email, newOtp);
+
+    setEmailToast({
+      title: 'New OTP Code Sent!',
+      subtitle: `New verification code sent to ${pendingSignup.email}`,
+      type: 'otp',
+      otp: newOtp,
+      email: pendingSignup.email
+    });
   };
 
   // Handle Google Sign In Authentication
@@ -647,6 +839,455 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
       </div>
 
 
+
+      {/* Floating Gmail Toast Notification */}
+      {emailToast && (
+        <div className="fixed top-5 right-5 z-[70] max-w-sm w-full bg-slate-900/95 text-white rounded-2xl shadow-2xl border border-slate-700/80 p-4 animate-slideDown flex items-start gap-3 backdrop-blur-md">
+          <div className="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0 border border-red-500/30">
+            <Mail className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-1">
+              <p className="text-xs font-bold text-white truncate flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                {emailToast.type === 'otp' ? 'Gmail: New OTP Received' : 'Gmail: Welcome Email'}
+              </p>
+              <button
+                type="button"
+                onClick={() => setEmailToast(null)}
+                className="text-slate-400 hover:text-white p-0.5 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-[11px] text-slate-300 font-medium mt-1 truncate">
+              {emailToast.title}
+            </p>
+            <p className="text-[10px] text-slate-400 truncate">
+              {emailToast.subtitle}
+            </p>
+            <div className="mt-2.5 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmailPreviewModal({
+                    type: emailToast.type,
+                    data: emailToast
+                  });
+                  setEmailToast(null);
+                }}
+                className="px-3 py-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-[11px] font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+              >
+                <MailOpen className="w-3.5 h-3.5" />
+                Open Email
+              </button>
+              {emailToast.otp && (
+                <button
+                  type="button"
+                  onClick={handleAutoFillOtp}
+                  className="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white text-[10px] font-semibold rounded-lg transition-all border border-white/10 cursor-pointer"
+                >
+                  Fill {emailToast.otp}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* OTP Verification Modal (matching Image 1 & 2 flow) */}
+      {showOtpModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/75 backdrop-blur-xs animate-fadeIn">
+          <div
+            className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden text-slate-800 animate-scaleUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-[#b93787] to-[#2355c8] p-5 text-white flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center shadow-xs">
+                  <ShieldCheck className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white tracking-tight">
+                    Verify Your Email
+                  </h3>
+                  <p className="text-xs text-white/80">
+                    6-digit code sent to your email
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowOtpModal(false)}
+                className="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition-all cursor-pointer active:scale-95"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              <div className="text-center space-y-1">
+                <p className="text-xs text-slate-500 font-medium">
+                  We sent a 6-digit verification code to
+                </p>
+                <p className="text-sm font-bold text-slate-800 font-mono bg-slate-100 py-1 px-3 rounded-lg inline-block border border-slate-200">
+                  {pendingSignup?.email}
+                </p>
+              </div>
+
+              {/* 6-Digit OTP Box inputs */}
+              <div className="flex items-center justify-center gap-2 sm:gap-2.5">
+                {otpDigits.map((digit, idx) => (
+                  <input
+                    key={idx}
+                    id={`otp-input-${idx}`}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                    className="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-black font-mono rounded-xl border-2 border-slate-300 focus:border-[#2355c8] focus:bg-blue-50/40 focus:outline-hidden transition-all shadow-xs"
+                    autoFocus={idx === 0}
+                  />
+                ))}
+              </div>
+
+              {/* Error display */}
+              {otpError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-red-600 text-xs font-semibold animate-shake">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{otpError}</span>
+                </div>
+              )}
+
+              {/* Quick Auto-fill testing helper */}
+              {generatedOtp && (
+                <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 text-indigo-900 font-medium">
+                    <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
+                    <span>Demo OTP: <strong className="font-mono tracking-widest text-indigo-700">{generatedOtp}</strong></span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAutoFillOtp}
+                    className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer"
+                  >
+                    Auto Fill
+                  </button>
+                </div>
+              )}
+
+              {/* Open Exact Gmail Preview Trigger */}
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmailPreviewModal({
+                      type: 'otp',
+                      data: {
+                        otp: generatedOtp,
+                        email: pendingSignup?.email
+                      }
+                    });
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-bold hover:underline cursor-pointer transition-colors"
+                >
+                  <MailOpen className="w-4 h-4 text-blue-600" />
+                  View Email in Gmail format (Image 2)
+                </button>
+              </div>
+
+              {/* Submit Verification Button */}
+              <button
+                type="button"
+                onClick={handleVerifyOtp}
+                disabled={otpLoading || otpDigits.join('').length < 6}
+                className="w-full py-3.5 px-4 rounded-xl font-black text-sm uppercase tracking-wider text-white bg-gradient-to-r from-[#b93787] to-[#2355c8] hover:opacity-95 shadow-lg shadow-indigo-500/25 transition-all transform active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {otpLoading ? (
+                  <>
+                    <RotateCw className="w-4 h-4 animate-spin" />
+                    <span>Verifying Code...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Verify &amp; Open Dashboard</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+
+              {/* Resend OTP */}
+              <div className="text-center pt-1 border-t border-slate-100">
+                {otpTimer > 0 ? (
+                  <p className="text-xs text-slate-500 flex items-center justify-center gap-1.5 font-medium">
+                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                    Resend code in <span className="font-bold font-mono text-slate-700">{otpTimer}s</span>
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    className="text-xs text-indigo-600 hover:text-indigo-800 font-bold transition-colors cursor-pointer"
+                  >
+                    Didn't receive code? Resend OTP
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Interactive Gmail Email Preview Modal (Exactly matching Image 2 & Image 3) */}
+      {emailPreviewModal && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6 bg-slate-900/80 backdrop-blur-xs animate-fadeIn overflow-y-auto">
+          <div
+            className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden text-slate-900 my-auto animate-scaleUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Gmail Mobile Topbar */}
+            <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setEmailPreviewModal(null)}
+                  className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                    Gmail Inbox
+                  </p>
+                  <p className="text-[11px] text-slate-400 truncate max-w-[200px] sm:max-w-xs">
+                    {emailPreviewModal.type === 'otp'
+                      ? 'OTP for email verification on SOF Olympiad Trainer'
+                      : 'Welcome to SOF Olympiad Trainer!'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  className="p-1.5 text-slate-400 hover:text-amber-400 transition-colors"
+                  title="Star email"
+                >
+                  <Star className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEmailPreviewModal(null)}
+                  className="p-1.5 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Email Subject Line & Header */}
+            <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/70">
+              <h2 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
+                {emailPreviewModal.type === 'otp'
+                  ? 'OTP for email verification on SOF Olympiad Trainer'
+                  : 'Welcome to SOF Olympiad Trainer!'}
+              </h2>
+
+              {/* Sender & Recipient row */}
+              <div className="flex items-start gap-3 mt-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs">
+                  SOF
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                      SOF Olympiad Trainer
+                    </p>
+                    <span className="text-[10px] text-slate-400 font-medium">Just now</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    to {emailPreviewModal.data?.email || pendingSignup?.email || identifier || 'me'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Email Body Content */}
+            <div className="p-4 sm:p-6 bg-white max-h-[70vh] overflow-y-auto space-y-4">
+              {emailPreviewModal.type === 'otp' ? (
+                /* ----------------- IMAGE 2 RECREATION: OTP EMAIL ----------------- */
+                <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl border border-slate-800 text-center">
+                  <div className="space-y-1">
+                    <h3 className="text-lg sm:text-xl font-bold tracking-tight text-white">
+                      Code Requested
+                    </h3>
+                  </div>
+
+                  {/* 6 Big Spaced Digits (matching Image 2) */}
+                  <div className="py-2">
+                    <div className="inline-flex items-center justify-center gap-2 sm:gap-3 bg-slate-800/80 px-4 sm:px-6 py-3 rounded-2xl border border-slate-700">
+                      {(emailPreviewModal.data?.otp || generatedOtp || '123779')
+                        .split('')
+                        .map((char, i) => (
+                          <span
+                            key={i}
+                            className="text-2xl sm:text-3xl font-black font-mono tracking-wider text-white"
+                          >
+                            {char}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+
+                  {/* Copy Code Button (matching Image 2) */}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const code = emailPreviewModal.data?.otp || generatedOtp;
+                        if (code) {
+                          navigator.clipboard.writeText(code);
+                          setCopiedOtp(true);
+                          setTimeout(() => setCopiedOtp(false), 2000);
+                          // Also auto fill in modal
+                          setOtpDigits(code.split(''));
+                        }
+                      }}
+                      className="px-6 py-2.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                    >
+                      {copiedOtp ? (
+                        <>
+                          <Check className="w-4 h-4 text-emerald-300" />
+                          <span>Code Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          <span>Copy code</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Text statement matching user screenshot */}
+                  <p className="text-xs text-slate-300 leading-relaxed max-w-sm mx-auto">
+                    <strong className="text-white font-mono font-bold">
+                      {emailPreviewModal.data?.otp || generatedOtp}
+                    </strong>{' '}
+                    is your OTP for email verification on SOF Olympiad Trainer.
+                  </p>
+
+                  <div className="pt-4 border-t border-slate-800 text-[11px] text-slate-400">
+                    <p>This code will expire in 10 minutes. If you did not request this, please ignore this email.</p>
+                  </div>
+                </div>
+              ) : (
+                /* ----------------- IMAGE 3 RECREATION: WELCOME EMAIL ----------------- */
+                <div className="space-y-4 text-slate-800 text-xs sm:text-sm leading-relaxed">
+                  <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-4 rounded-2xl text-white shadow-sm">
+                    <h3 className="text-base sm:text-lg font-black tracking-tight">
+                      Welcome to SOF Olympiad Trainer!
+                    </h3>
+                    <p className="text-xs text-blue-100 mt-0.5">
+                      Your registered account is ready to use
+                    </p>
+                  </div>
+
+                  <p className="font-semibold text-slate-900">
+                    Hi {emailPreviewModal.data?.name || 'Student'},
+                  </p>
+
+                  <p className="text-slate-700">
+                    Welcome aboard and thanks for signing up! We are so glad to have you with us.
+                  </p>
+
+                  {/* Login Credentials Box (matching Image 3) */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
+                    <p className="font-bold text-xs uppercase tracking-wider text-slate-500">
+                      Your Login Information
+                    </p>
+
+                    <div className="space-y-2 text-xs">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-slate-200 gap-1">
+                        <span className="text-slate-500 font-medium">Portal URL:</span>
+                        <span className="font-mono font-bold text-blue-600 truncate">
+                          {window.location.origin}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-slate-200 gap-1">
+                        <span className="text-slate-500 font-medium">User Name / Email:</span>
+                        <span className="font-mono font-bold text-slate-900">
+                          {emailPreviewModal.data?.email || pendingSignup?.email || identifier}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                        <span className="text-slate-500 font-medium">Password:</span>
+                        <span className="font-mono font-bold text-indigo-700">
+                          {emailPreviewModal.data?.password || password || '••••••••'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Study packages note (matching Image 3) */}
+                  <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs space-y-1">
+                    <p className="font-bold">Access Activated:</p>
+                    <p className="text-slate-700">
+                      You can now purchase and access Chapterwise Practice tests, Mock tests, and Previous Years Papers on your student dashboard.
+                    </p>
+                  </div>
+
+                  <div className="pt-2 text-xs text-slate-600 space-y-1">
+                    <p>Best regards,</p>
+                    <p className="font-bold text-slate-900">The SOF Olympiad Trainer Team</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Bottom Footer with Close & Action */}
+            <div className="bg-slate-50 px-4 sm:px-6 py-3 border-t border-slate-200 flex items-center justify-between">
+              {emailPreviewModal.type === 'otp' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleAutoFillOtp();
+                    setEmailPreviewModal(null);
+                  }}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
+                >
+                  Apply Code to Verification Box
+                </button>
+              )}
+              {emailPreviewModal.type === 'welcome' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmailPreviewModal(null);
+                    handleGoHome();
+                  }}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
+                >
+                  Go to Student Dashboard
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setEmailPreviewModal(null)}
+                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl text-xs font-bold transition-all cursor-pointer ml-auto"
+              >
+                Close Email
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* School Coordinator & Helpdesk Modal */}
       {showCoordinatorModal && (
