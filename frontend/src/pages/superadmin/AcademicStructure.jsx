@@ -1027,7 +1027,7 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
 
       {/* Mode 2: Subject & Class Content Navigation Tabs */}
       {defaultTab === 'page_content' && (
-        <div className="w-full bg-white p-1.5 rounded-2xl border border-[#edd6ed] shadow-xs flex items-center gap-2 overflow-x-auto">
+        <div className="w-full bg-white p-1.5 rounded-2xl border border-[#edd6ed] shadow-xs flex items-center gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
             { id: 'page_content', label: '📄 Class-wise Syllabus & Page Content', icon: BookOpen },
             { id: 'chapters', label: '📚 Class Chapters', icon: FolderTree, count: chapters.length },
@@ -1068,68 +1068,87 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
       {activeTab === 'page_content' && (
         <div className="space-y-6">
           {/* Top Selection Strip: Subject Selector + Class Selector + Action Shortcuts */}
-          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-4">
-              <div>
-                <label className="block text-[11px] font-black uppercase tracking-wider text-[#6d3a68] mb-1.5">
-                  1. Select Discipline / Subject:
-                </label>
-                <select
-                  value={editorSubjectSlug}
-                  onChange={(e) => setEditorSubjectSlug(e.target.value)}
-                  className="px-3.5 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-xl text-xs font-black text-[#4e2a4a] focus:outline-none focus:border-[#6d3a68] cursor-pointer min-w-[230px]"
-                >
-                  <option value="math">Mathematics (IMO)</option>
-                  <option value="science">Science (ISO / NSO)</option>
-                  <option value="digital_literacy">Digital Literacy (IDLO)</option>
-                  <option value="english">English (IEO)</option>
-                  <option value="gk">General Knowledge (IGKO)</option>
-                  <option value="hindi">Hindi (IHO)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-black uppercase tracking-wider text-[#6d3a68] mb-1.5">
-                  2. Select Grade Level:
-                </label>
-                <select
-                  value={editorClassName}
-                  onChange={(e) => setEditorClassName(e.target.value)}
-                  className="px-3.5 py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-xl text-xs font-black text-[#4e2a4a] focus:outline-none focus:border-[#6d3a68] cursor-pointer min-w-[130px]"
-                >
-                  {ALL_CLASSES.map((cls) => (
-                    <option key={cls} value={cls}>{cls}</option>
-                  ))}
-                </select>
-              </div>
-
-              {contentLoading && (
-                <div className="flex items-center gap-1.5 text-xs text-[#6d3a68] font-bold self-end pb-2.5">
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#d9775b]" />
-                  <span>Loading database content...</span>
+          <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+            <div className="w-full md:w-auto">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 md:flex md:items-center md:gap-4">
+                <div className="min-w-0 md:w-60">
+                  <label className="block text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#6d3a68] mb-1 sm:mb-1.5 truncate">
+                    <span className="sm:hidden">1. Subject:</span>
+                    <span className="hidden sm:inline">1. Select Discipline / Subject:</span>
+                  </label>
+                  <select
+                    value={editorSubjectSlug}
+                    onChange={(e) => setEditorSubjectSlug(e.target.value)}
+                    className="w-full px-2.5 sm:px-3.5 py-2 sm:py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-xl text-xs font-black text-[#4e2a4a] focus:outline-none focus:border-[#6d3a68] cursor-pointer truncate"
+                  >
+                    <option value="math">Mathematics (IMO)</option>
+                    <option value="science">Science (ISO / NSO)</option>
+                    <option value="digital_literacy">Digital Literacy (IDLO)</option>
+                    <option value="english">English (IEO)</option>
+                    <option value="gk">General Knowledge (IGKO)</option>
+                    <option value="hindi">Hindi (IHO)</option>
+                  </select>
                 </div>
-              )}
+
+                <div className="min-w-0 md:w-36">
+                  <label className="block text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#6d3a68] mb-1 sm:mb-1.5 truncate">
+                    <span className="sm:hidden">2. Grade:</span>
+                    <span className="hidden sm:inline">2. Select Grade Level:</span>
+                  </label>
+                  <select
+                    value={editorClassName}
+                    onChange={(e) => setEditorClassName(e.target.value)}
+                    className="w-full px-2.5 sm:px-3.5 py-2 sm:py-2.5 bg-[#faf5fa] border border-[#edd6ed] rounded-xl text-xs font-black text-[#4e2a4a] focus:outline-none focus:border-[#6d3a68] cursor-pointer truncate"
+                  >
+                    {ALL_CLASSES.map((cls) => (
+                      <option key={cls} value={cls}>{cls}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {contentLoading && (
+                  <div className="col-span-2 md:col-span-1 flex items-center gap-1.5 text-xs text-[#6d3a68] font-bold py-0.5 md:py-0 md:self-end md:pb-2.5">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#d9775b]" />
+                    <span className="text-[11px] sm:text-xs">Loading database content...</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="flex items-center gap-3 pt-2 md:pt-0">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-3 w-full md:w-auto pt-0.5 md:pt-0">
               <a
                 href={`/#/olympiad-detail?id=${editorSubjectSlug}&class=${encodeURIComponent(editorClassName)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="px-4 py-2.5 bg-[#faf5fa] hover:bg-[#f4ebf4] text-[#6d3a68] border border-[#edd6ed] rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-2xs hover:shadow-xs"
+                className="w-full sm:w-auto px-2.5 sm:px-4 py-2 sm:py-2.5 bg-[#faf5fa] hover:bg-[#f4ebf4] text-[#6d3a68] border border-[#edd6ed] rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer shadow-2xs hover:shadow-xs active:scale-95 text-center min-w-0"
               >
-                <ExternalLink className="w-4 h-4 text-[#d9775b]" />
-                <span>Preview Public Page</span>
+                <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#d9775b] shrink-0" />
+                <span className="truncate">
+                  <span className="sm:hidden">Preview Page</span>
+                  <span className="hidden sm:inline">Preview Public Page</span>
+                </span>
               </a>
 
               <button
                 type="button"
                 onClick={handleSavePageContent}
                 disabled={contentSaving}
-                className="px-5 py-2.5 bg-gradient-to-r from-[#059669] to-[#047857] hover:from-[#047857] hover:to-[#065f46] text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 shadow-xs hover:shadow-md disabled:opacity-50 active:scale-95"
+                className="w-full sm:w-auto px-2.5 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-[#059669] to-[#047857] hover:from-[#047857] hover:to-[#065f46] text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 shadow-xs hover:shadow-md disabled:opacity-50 active:scale-95 text-center min-w-0"
               >
-                <Save className={`w-4 h-4 text-[#e7b84b] ${contentSaving ? 'animate-spin' : ''}`} />
-                <span>{contentSaving ? 'Saving to MySQL...' : 'Save to MySQL Database'}</span>
+                <Save className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#e7b84b] shrink-0 ${contentSaving ? 'animate-spin' : ''}`} />
+                <span className="truncate">
+                  {contentSaving ? (
+                    <>
+                      <span className="sm:hidden">Saving...</span>
+                      <span className="hidden sm:inline">Saving to MySQL...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="sm:hidden">Save to MySQL</span>
+                      <span className="hidden sm:inline">Save to MySQL Database</span>
+                    </>
+                  )}
+                </span>
               </button>
             </div>
           </div>
