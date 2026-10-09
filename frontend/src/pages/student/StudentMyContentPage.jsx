@@ -31,7 +31,8 @@ import {
   Copy,
   Package,
   Eye,
-  RefreshCw
+  RefreshCw,
+  AlertTriangle
 } from 'lucide-react';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 import { isSubjectPurchased, savePurchasedSubject, lockSubject, getPurchasedTests, getTestPricing } from '../../utils/purchaseUtils';

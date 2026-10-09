@@ -34,7 +34,8 @@ import {
   CreditCard,
   QrCode,
   Copy,
-  CheckCircle
+  CheckCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 import { DetailedSolutionsPage } from './DetailedSolutionsPage';
