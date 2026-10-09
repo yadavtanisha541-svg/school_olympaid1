@@ -1302,17 +1302,17 @@ export const StudentMyContentPage = ({
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                <Package className="w-6 h-6 text-indigo-600" />
+                <BookOpen className="w-6 h-6 text-indigo-600" />
                 <span>
                   {selectedSubject !== 'ALL'
-                    ? `${selectedSubject} Study Packages & Mock Test Series`
-                    : 'Olympiad Study Packages & Mock Test Series'}
+                    ? `${selectedSubject} Mock Test Series`
+                    : 'Olympiad Mock Test Series'}
                 </span>
               </h2>
               <p className="text-xs text-slate-500 font-semibold mt-1">
                 {selectedSubject !== 'ALL'
-                  ? `Purchase the official package to unlock ${selectedSubject} mock tests, timer, scorecards and solutions.`
-                  : 'Unlock official All-in-One Study Packages. Once purchased, access your subject cover and full mock test series.'}
+                  ? `Click "Unlock & Buy Test Series" below to unlock and start mock tests for ${selectedSubject}.`
+                  : 'Select any Olympiad subject below to view official mock tests, papers & practice.'}
               </p>
             </div>
 
@@ -1335,84 +1335,7 @@ export const StudentMyContentPage = ({
             </div>
           </div>
 
-          {/* Subheader Toolbar: Subject Filter Pills + View Mode Tabs */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
-            {/* Quick Subject Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
-              {[
-                { code: 'ALL', label: 'All Subjects' },
-                { code: 'IMO', label: 'IEOM (Math)', icon: Calculator },
-                { code: 'ISO', label: 'IEOS (Science)', icon: Rocket },
-                { code: 'IDLO', label: 'IEOD (Digital)', icon: Laptop },
-                { code: 'IEO', label: 'IEOE (English)', icon: BookOpen },
-                { code: 'IGKO', label: 'IEOG (GK)', icon: Globe },
-                { code: 'IHO', label: 'IEOH (Hindi)', icon: Languages }
-              ].map((tab) => {
-                const isSelected = selectedSubject === tab.code;
-                const TabIcon = tab.icon;
-                return (
-                  <button
-                    key={tab.code}
-                    type="button"
-                    onClick={() => {
-                      setSelectedSubject(tab.code);
-                      if (onNavigateTab) {
-                        onNavigateTab(tab.code === 'ALL' ? 'my_content' : `content_${tab.code.toLowerCase()}`);
-                      }
-                    }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                      isSelected
-                        ? 'bg-indigo-600 text-white shadow-2xs'
-                        : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
-                    }`}
-                  >
-                    {TabIcon && <TabIcon className="w-3.5 h-3.5" />}
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
-            </div>
 
-            {/* View Mode Switcher */}
-            <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200 shrink-0 self-start sm:self-auto">
-              <button
-                type="button"
-                onClick={() => setViewMode('smart')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === 'smart'
-                    ? 'bg-white text-indigo-700 shadow-2xs font-black'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="Shows Study Package when locked and Subject Cover when unlocked"
-              >
-                ✨ Auto Flow
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('packages')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === 'packages'
-                    ? 'bg-white text-indigo-700 shadow-2xs font-black'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="All-in-One Study Packages (Image 1 style)"
-              >
-                📦 Packages
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('covers')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === 'covers'
-                    ? 'bg-white text-indigo-700 shadow-2xs font-black'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="Subject Series Covers (Image 2 style)"
-              >
-                🎨 Covers
-              </button>
-            </div>
-          </div>
 
           {/* Grid of Cards */}
           <div className={`grid gap-6 w-full ${
@@ -1529,31 +1452,7 @@ export const StudentMyContentPage = ({
                         </button>
                       )}
 
-                      {/* Preview Subject Cover Peek */}
-                      <button
-                        type="button"
-                        onClick={() => setPreviewCoverSubject(previewCoverSubject === sub.code ? null : sub.code)}
-                        className="text-[11px] font-bold text-slate-500 hover:text-indigo-600 flex items-center justify-center gap-1 w-full text-center cursor-pointer transition-colors pt-1"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>{previewCoverSubject === sub.code ? 'Hide Subject Cover Preview' : 'Preview Subject Cover'}</span>
-                      </button>
 
-                      {/* Inline Subject Cover Preview if toggled */}
-                      {previewCoverSubject === sub.code && (
-                        <div className={`mt-3 p-4 rounded-2xl ${sub.cardBg} border space-y-2 animate-in fade-in`}>
-                          <div className="flex items-center gap-2">
-                            <div className={`w-8 h-8 rounded-xl ${sub.iconBg} flex items-center justify-center text-white shrink-0`}>
-                              <SubIcon className="w-4 h-4" />
-                            </div>
-                            <div>
-                              <h4 className="text-xs font-black text-slate-900">{sub.title}</h4>
-                              <p className="text-[10px] text-slate-600 font-bold">{sub.subtitle}</p>
-                            </div>
-                          </div>
-                          <p className="text-[10px] text-slate-600 line-clamp-2">{sub.description}</p>
-                        </div>
-                      )}
                     </div>
                   </div>
                 );
