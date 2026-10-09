@@ -1683,27 +1683,30 @@ export const TestGeneratorAdminManager = () => {
 
 
       {/* Filter Toolbar */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs p-4 flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center gap-3 flex-wrap flex-1">
-          {/* Search Box */}
-          <div className="relative min-w-[220px] flex-1 sm:flex-initial">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search title, exam code, year..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-amber-500"
-            />
-          </div>
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs p-3.5 sm:p-4 space-y-3">
+        {/* Search Box */}
+        <div className="relative w-full">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search title, exam code, year..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+          />
+        </div>
 
+        {/* 2-Column Mobile Grid for Filters */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 text-xs">
           {/* Class Filter */}
-          <div className="flex items-center gap-1.5">
-            <label className="text-xs font-bold text-slate-500">Grade:</label>
+          <div>
+            <label className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-wider block mb-1 truncate">
+              Grade
+            </label>
             <select
               value={selectedClassFilter}
               onChange={(e) => setSelectedClassFilter(e.target.value)}
-              className="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+              className="w-full px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer truncate"
             >
               <option value="All">All Grades (1-12)</option>
               {GRADE_OPTIONS.map((cls) => (
@@ -1715,12 +1718,14 @@ export const TestGeneratorAdminManager = () => {
           </div>
 
           {/* Subject Filter */}
-          <div className="flex items-center gap-1.5">
-            <label className="text-xs font-bold text-slate-500">Subject:</label>
+          <div>
+            <label className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-wider block mb-1 truncate">
+              Subject
+            </label>
             <select
               value={selectedSubjectFilter}
               onChange={(e) => setSelectedSubjectFilter(e.target.value)}
-              className="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+              className="w-full px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500 cursor-pointer truncate"
             >
               <option value="All">All Subjects</option>
               {SUBJECT_OPTIONS.map((sub) => (
@@ -1732,12 +1737,14 @@ export const TestGeneratorAdminManager = () => {
           </div>
 
           {/* Year Filter */}
-          <div className="flex items-center gap-1.5">
-            <label className="text-xs font-bold text-slate-500">Year:</label>
+          <div>
+            <label className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-wider block mb-1 truncate">
+              Year
+            </label>
             <select
               value={selectedYearFilter}
               onChange={(e) => setSelectedYearFilter(e.target.value)}
-              className="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+              className="w-full px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer truncate"
             >
               <option value="All">All Years</option>
               {YEARS_OPTIONS.map((yr) => (
@@ -1747,10 +1754,34 @@ export const TestGeneratorAdminManager = () => {
               ))}
             </select>
           </div>
+
+          {/* Clear Filters Button */}
+          <div className="flex flex-col justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedClassFilter('All');
+                setSelectedSubjectFilter('All');
+                setSelectedYearFilter('All');
+                setSearchQuery('');
+              }}
+              className="w-full px-2.5 py-1.5 sm:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg sm:rounded-xl text-xs font-bold transition-colors cursor-pointer text-center"
+            >
+              Clear Filters
+            </button>
+          </div>
         </div>
 
-        <div className="text-xs font-bold text-slate-500">
-          Showing: <span className="text-slate-900 font-black">{filteredPapers.length} Papers</span>
+        {/* Status Count Footer */}
+        <div className="flex items-center justify-between text-xs font-bold text-slate-500 pt-1 border-t border-slate-100">
+          <span>
+            Showing: <strong className="text-slate-900 font-black">{filteredPapers.length} {filteredPapers.length === 1 ? 'Paper' : 'Papers'}</strong>
+          </span>
+          {(selectedClassFilter !== 'All' || selectedSubjectFilter !== 'All' || selectedYearFilter !== 'All' || searchQuery) && (
+            <span className="text-[11px] text-amber-600 font-bold">
+              Filters active
+            </span>
+          )}
         </div>
       </div>
 
