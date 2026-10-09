@@ -1622,16 +1622,18 @@ export const SuperAdminPackagesManager = () => {
                   <button
                     type="button"
                     onClick={() => setBulkQuestionsInput(SAMPLE_MOCK_TEST_QUESTIONS)}
-                    className="px-3.5 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all"
+                    className="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-[11px] sm:text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all whitespace-nowrap"
                     title="Load 4 Sample Formatted Questions"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-700" />
-                    <span>📋 Load Sample Format Template</span>
+                    <Sparkles className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                    <span className="hidden sm:inline">📋 Load Sample Format Template</span>
+                    <span className="sm:hidden">📋 Sample Template</span>
                   </button>
 
-                  <label className="px-3.5 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-900 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all">
-                    <Upload className="w-3.5 h-3.5 text-sky-700" />
-                    <span>📁 Import File (.txt / .csv / .json)</span>
+                  <label className="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-900 font-bold text-[11px] sm:text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all whitespace-nowrap">
+                    <Upload className="w-3.5 h-3.5 text-sky-700 shrink-0" />
+                    <span className="hidden sm:inline">📁 Import File (.txt / .csv / .json)</span>
+                    <span className="sm:hidden">📁 Import File</span>
                     <input
                       type="file"
                       accept=".txt,.csv,.json"
@@ -1644,10 +1646,10 @@ export const SuperAdminPackagesManager = () => {
                     <button
                       type="button"
                       onClick={() => setBulkQuestionsInput('')}
-                      className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 font-bold text-xs flex items-center gap-1 cursor-pointer transition-all"
+                      className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 font-bold text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer transition-all"
                       title="Clear text area"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-3.5 h-3.5 shrink-0" />
                       <span>Clear</span>
                     </button>
                   )}
@@ -1660,39 +1662,40 @@ export const SuperAdminPackagesManager = () => {
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-black text-slate-700">Paste Questions Text Here:</label>
                   {bulkQuestionsInput.trim() && (
-                    <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                      ⚡ ~{parseAnyQuestionsInput(bulkQuestionsInput, paperSections[0] || 'General Awareness').length} questions detected
+                    <span className="text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      ⚡ ~{parseAnyQuestionsInput(bulkQuestionsInput, paperSections[0] || 'General Awareness').length} detected
                     </span>
                   )}
                 </div>
                 <textarea
-                  rows={12}
+                  rows={10}
                   value={bulkQuestionsInput}
                   onChange={(e) => setBulkQuestionsInput(e.target.value)}
                   placeholder="Paste your questions here...&#10;&#10;Example:&#10;Q1. If 3x + 15 = 45, what is the value of 2x - 5?&#10;A) 15&#10;B) 20&#10;C) 25&#10;D) 30&#10;Correct: A&#10;&#10;Tip: Even if you paste single plain questions without options, the system will automatically parse them and create editable options for you!"
-                  className="w-full px-4 py-3.5 rounded-2xl border border-slate-300 text-xs font-mono text-slate-800 outline-none focus:border-[#859900] leading-relaxed shadow-2xs bg-slate-50/50"
+                  className="w-full px-3.5 sm:px-4 py-3 rounded-2xl border border-slate-300 text-xs font-mono text-slate-800 outline-none focus:border-[#859900] leading-relaxed shadow-2xs bg-slate-50/50"
                 />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pt-2 border-t border-slate-100">
                 <span className="text-xs font-bold text-slate-500">
-                  Currently in test: <span className="font-black text-slate-900">{paperQuestions.length}</span> questions
+                  Currently in test: <span className="font-black text-slate-900">{paperQuestions.length}</span> question{paperQuestions.length !== 1 ? 's' : ''}
                 </span>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
                   <button
                     type="button"
                     onClick={() => setPaperModalTab('questions')}
-                    className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-all"
+                    className="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-all text-center whitespace-nowrap"
                   >
                     View Questions ({paperQuestions.length})
                   </button>
                   <button
                     type="button"
                     onClick={handleParseBulkQuestions}
-                    className="px-6 py-2.5 bg-[#859900] hover:bg-[#728400] text-white rounded-xl text-xs font-black shadow-md cursor-pointer flex items-center gap-2 active:scale-95 transition-all"
+                    className="flex-1 sm:flex-initial px-3.5 sm:px-5 py-2 bg-[#859900] hover:bg-[#728400] text-white rounded-xl text-xs font-black shadow-md cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 transition-all whitespace-nowrap"
                   >
-                    <Sparkles className="w-4 h-4" />
-                    <span>Parse &amp; Add All Questions to Test</span>
+                    <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                    <span className="hidden sm:inline">Parse &amp; Add All Questions to Test</span>
+                    <span className="sm:hidden">Parse &amp; Add All</span>
                   </button>
                 </div>
               </div>
