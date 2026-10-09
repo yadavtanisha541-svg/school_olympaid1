@@ -258,13 +258,12 @@ export const StudentMyContentPage = ({
   };
 
   const handleOpenPayment = (sub, pkg = null) => {
-    const defaultPrice = bankSettings.mock_test_price || bankSettings.test_pack_price || 99;
-    const pkgPrice = pkg?.price && pkg.price <= 500 ? pkg.price : defaultPrice;
+    const effectivePrice = Number(bankSettings.mock_test_price) || Number(bankSettings.test_pack_price) || 99;
     setPurchasingSubject({
       ...sub,
       packageId: pkg?.id,
       packageTitle: pkg?.title,
-      price: pkgPrice
+      price: effectivePrice
     });
     setPaymentError('');
     setPaymentStep('method');
@@ -285,7 +284,7 @@ export const StudentMyContentPage = ({
     setPaymentError('');
     setIsProcessingPayment(true);
     try {
-      const payAmount = purchasingSubject.price || bankSettings.mock_test_price || bankSettings.test_pack_price || 99;
+      const payAmount = Number(purchasingSubject.price) || Number(bankSettings.mock_test_price) || 99;
       const updated = savePurchasedSubject(
         purchasingSubject.code,
         purchasingSubject.altCode,
@@ -637,18 +636,33 @@ export const StudentMyContentPage = ({
 
   const getPackagesForSubject = (subCode) => {
     const norm = normalizeCode(subCode);
+    const mockPrice = Number(bankSettings.mock_test_price) || Number(bankSettings.test_pack_price) || 99;
+    const origPrice = Number(bankSettings.original_price) || 299;
+
     const matched = packagesList.filter(p => {
       const pNorm = normalizeCode(p.subject_code || p.subject || '');
       return pNorm === norm;
     });
-    if (matched.length > 0) return matched;
-    return DEFAULT_SUBJECT_PACKAGES[norm] || [];
+
+    if (matched.length > 0) {
+      return matched.map(p => ({
+        ...p,
+        price: mockPrice,
+        original_price: origPrice
+      }));
+    }
+
+    return (DEFAULT_SUBJECT_PACKAGES[norm] || []).map(p => ({
+      ...p,
+      price: mockPrice,
+      original_price: origPrice
+    }));
   };
 
   // Dedicated Step 2: Payment & QR Checkout Screen for Mock Test Series
   if (purchasingSubject) {
     const sub = purchasingSubject;
-    const upiAmount = purchasingSubject.price || bankSettings.test_pack_price || 99;
+    const upiAmount = Number(purchasingSubject.price) || Number(bankSettings.mock_test_price) || 99;
     const upiPayUrl = `upi://pay?pa=${bankSettings.upi_id || 'olympiadhub@icici'}&pn=${encodeURIComponent(bankSettings.merchant_name || 'Olympiad Foundation')}&am=${upiAmount}&cu=INR&tn=${encodeURIComponent(`${studentClass} ${sub.code} Mock Series`)}`;
     const qrImageSrc = bankSettings.qr_code_url || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiPayUrl)}`;
 
@@ -1423,8 +1437,8 @@ export const StudentMyContentPage = ({
                 ]
               };
               const SubIcon = sub.icon;
-              const effectivePrice = primaryPkg.price || bankSettings.mock_test_price || bankSettings.test_pack_price || 99;
-              const origPrice = primaryPkg.original_price || bankSettings.original_price || 299;
+              const effectivePrice = Number(bankSettings.mock_test_price) || Number(bankSettings.test_pack_price) || Number(primaryPkg.price) || 99;
+              const origPrice = Number(bankSettings.original_price) || Number(primaryPkg.original_price) || 299;
 
               // Decide whether to render the Package Card (Image 1) or Cover Card (Image 2)
               const renderAsPackage = viewMode === 'packages' || (viewMode === 'smart' && !isUnlocked);
