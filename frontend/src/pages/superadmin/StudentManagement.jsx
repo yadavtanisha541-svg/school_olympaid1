@@ -1916,33 +1916,38 @@ export const StudentManagement = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={Upload}
-            onClick={() => {
-              setShowImportModal(true);
-              setImportStep(1);
-            }}
-          >
-            Import Students
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={Download}
-            onClick={handleExportCSV}
-          >
-            Export
-          </Button>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto shrink-0">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={Upload}
+              className="flex-1 sm:flex-initial justify-center whitespace-nowrap text-xs"
+              onClick={() => {
+                setShowImportModal(true);
+                setImportStep(1);
+              }}
+            >
+              Import Students
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={Download}
+              className="flex-1 sm:flex-initial justify-center whitespace-nowrap text-xs"
+              onClick={handleExportCSV}
+            >
+              Export
+            </Button>
+          </div>
           <Button
             variant="primary"
             size="sm"
             icon={Plus}
+            className="w-full sm:w-auto justify-center whitespace-nowrap text-xs shadow-xs"
             onClick={handleOpenAddStudent}
           >
-            + Add Student
+            Add Student
           </Button>
         </div>
       </div>
@@ -1955,76 +1960,76 @@ export const StudentManagement = () => {
       )}
 
       {/* 2. Student Statistics (5 Pastel Colorful Cards) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3.5">
         {/* Total Students - Light Sky Blue */}
-        <div className="bg-sky-50/80 hover:bg-sky-50 p-4 rounded-3xl border border-sky-100 shadow-2xs transition-all flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-sky-700/80 uppercase tracking-wider">Total Students</span>
-            <div className="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shadow-2xs">
-              <Users className="w-4 h-4" />
+        <div className="bg-sky-50/80 hover:bg-sky-50 p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-sky-100 shadow-2xs transition-all flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-[10px] sm:text-[11px] font-bold text-sky-700/80 uppercase tracking-wider truncate">Total Students</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center shadow-2xs shrink-0">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="mt-3">
-            <h3 className="text-2xl font-black text-slate-900">{totalStudentsCount}</h3>
-            <p className="text-[10px] font-bold text-sky-700 mt-0.5 flex items-center gap-0.5">
+          <div className="mt-1.5 sm:mt-2.5">
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 font-mono">{totalStudentsCount}</h3>
+            <p className="text-[10px] font-bold text-sky-700 mt-0.5 flex items-center gap-0.5 truncate">
               <span>↑ Active database</span>
             </p>
           </div>
         </div>
 
         {/* Active - Light Emerald Green */}
-        <div className="bg-emerald-50/80 hover:bg-emerald-50 p-4 rounded-3xl border border-emerald-100 shadow-2xs transition-all flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-emerald-700/80 uppercase tracking-wider">Active</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-2xs">
-              <CheckCircle className="w-4 h-4" />
+        <div className="bg-emerald-50/80 hover:bg-emerald-50 p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-emerald-100 shadow-2xs transition-all flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-[10px] sm:text-[11px] font-bold text-emerald-700/80 uppercase tracking-wider truncate">Active</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-2xs shrink-0">
+              <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="mt-3">
-            <h3 className="text-2xl font-black text-emerald-800">{activeStudentsCount}</h3>
-            <p className="text-[10px] font-bold text-emerald-700 mt-0.5">Active candidates</p>
+          <div className="mt-1.5 sm:mt-2.5">
+            <h3 className="text-xl sm:text-2xl font-black text-emerald-800 font-mono">{activeStudentsCount}</h3>
+            <p className="text-[10px] font-bold text-emerald-700 mt-0.5 truncate">Active candidates</p>
           </div>
         </div>
 
         {/* New Registrations - Light Purple */}
-        <div className="bg-purple-50/80 hover:bg-purple-50 p-4 rounded-3xl border border-purple-100 shadow-2xs transition-all flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-purple-700/80 uppercase tracking-wider">New Registrations</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center shadow-2xs">
-              <Plus className="w-4 h-4" />
+        <div className="bg-purple-50/80 hover:bg-purple-50 p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-purple-100 shadow-2xs transition-all flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-[10px] sm:text-[11px] font-bold text-purple-700/80 uppercase tracking-wider truncate">New Registrations</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center shadow-2xs shrink-0">
+              <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="mt-3">
-            <h3 className="text-2xl font-black text-purple-800">{newRegistrationsCount}</h3>
-            <p className="text-[10px] font-bold text-purple-700 mt-0.5">Ready for Olympiad</p>
+          <div className="mt-1.5 sm:mt-2.5">
+            <h3 className="text-xl sm:text-2xl font-black text-purple-800 font-mono">{newRegistrationsCount}</h3>
+            <p className="text-[10px] font-bold text-purple-700 mt-0.5 truncate">Ready for Olympiad</p>
           </div>
         </div>
 
         {/* Appeared - Light Indigo */}
-        <div className="bg-indigo-50/80 hover:bg-indigo-50 p-4 rounded-3xl border border-indigo-100 shadow-2xs transition-all flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-indigo-700/80 uppercase tracking-wider">Appeared</span>
-            <div className="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center shadow-2xs">
-              <BookOpen className="w-4 h-4" />
+        <div className="bg-indigo-50/80 hover:bg-indigo-50 p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-indigo-100 shadow-2xs transition-all flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-[10px] sm:text-[11px] font-bold text-indigo-700/80 uppercase tracking-wider truncate">Appeared</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center shadow-2xs shrink-0">
+              <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="mt-3">
-            <h3 className="text-2xl font-black text-indigo-800">{studentsAppearedCount}</h3>
-            <p className="text-[10px] font-bold text-indigo-700 mt-0.5">Total attempts</p>
+          <div className="mt-1.5 sm:mt-2.5">
+            <h3 className="text-xl sm:text-2xl font-black text-indigo-800 font-mono">{studentsAppearedCount}</h3>
+            <p className="text-[10px] font-bold text-indigo-700 mt-0.5 truncate">Total attempts</p>
           </div>
         </div>
 
         {/* Passed - Light Teal */}
-        <div className="bg-teal-50/80 hover:bg-teal-50 p-4 rounded-3xl border border-teal-100 shadow-2xs transition-all flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-teal-700/80 uppercase tracking-wider">Passed</span>
-            <div className="w-8 h-8 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center shadow-2xs">
-              <CheckCircle2 className="w-4 h-4" />
+        <div className="bg-teal-50/80 hover:bg-teal-50 p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-teal-100 shadow-2xs transition-all flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-[10px] sm:text-[11px] font-bold text-teal-700/80 uppercase tracking-wider truncate">Passed</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center shadow-2xs shrink-0">
+              <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="mt-3">
-            <h3 className="text-2xl font-black text-teal-800">{studentsPassedCount}</h3>
-            <p className="text-[10px] font-bold text-teal-700 mt-0.5">
+          <div className="mt-1.5 sm:mt-2.5">
+            <h3 className="text-xl sm:text-2xl font-black text-teal-800 font-mono">{studentsPassedCount}</h3>
+            <p className="text-[10px] font-bold text-teal-700 mt-0.5 truncate">
               {studentsAppearedCount > 0 ? `${Math.round((studentsPassedCount / studentsAppearedCount) * 100)}% Pass rate` : '0% Pass rate'}
             </p>
           </div>
