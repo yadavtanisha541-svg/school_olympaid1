@@ -1879,92 +1879,25 @@ export const mockEngine = {
     // PACKAGES & SUBJECT MODEL TEST PAPERS
     if (root === 'packages') {
       let pkgs = getDb('packages');
-      if (pkgs.length === 0) {
+      let currentMockPrice = 99;
+      let currentOrigPrice = 299;
+      try {
+        const p = JSON.parse(localStorage.getItem('olympiadhub_test_pricing') || '{}');
+        if (p.mock_test_price) currentMockPrice = Number(p.mock_test_price);
+        if (p.original_price) currentOrigPrice = Number(p.original_price);
+      } catch (e) {}
+
+      // Auto-migrate if empty or if containing legacy high-price items (e.g. 1999)
+      if (pkgs.length === 0 || pkgs.some(p => Number(p.price) >= 500)) {
         pkgs = [
-          {
-            id: 101,
-            title: 'Olympiads Level-2 Champs Package - Class 6',
-            class_name: 'Class 6',
-            subject_code: 'ICSO',
-            subject_name: 'International Cyber Olympiad',
-            price: 99,
-            original_price: 299,
-            header_color: '#4895d9',
-            status: 'active',
-            points: [
-              '5 Grand Level-2 National Mock Tests',
-              'Advanced HOTS & Tie-Breaker Problem Sets',
-              'Detailed Video Solutions & Step-by-Step Analysis',
-              'National Benchmark Percentile & AIR Ranking',
-              'Unlimited Test Retake Attempts for 365 Days'
-            ],
-            sub_items: [
-              {
-                id: 'mock_icso_1',
-                title: 'Mock Test Series - ICSO Class 6',
-                subject: 'ICSO',
-                original_price: 299.0,
-                price: 99.0,
-                points: ['10 ICSO Online Mock Tests', 'Aligned with SOF 2026 Pattern', 'Interactive and Downloadable'],
-                is_default_selected: true
-              },
-              {
-                id: 'pyp_icso_1',
-                title: 'Previous Years Papers with Solutions - ICSO Class 6',
-                subject: 'ICSO',
-                original_price: 299.0,
-                price: 99.0,
-                points: ['6 ICSO Previous Years Papers', 'Answer keys & Explanations', 'Identify Important Topics'],
-                is_default_selected: true
-              }
-            ]
-          },
-          {
-            id: 102,
-            title: 'Comprehensive Practice Test Pack - Class 6',
-            class_name: 'Class 6',
-            subject_code: 'ICSO',
-            subject_name: 'International Cyber Olympiad',
-            price: 99,
-            original_price: 299,
-            header_color: '#0284c7',
-            status: 'active',
-            points: [
-              '50+ Chapter-wise Diagnostic Tests with Instant Scoring',
-              'Previous 5 Years Solved Official Papers (2020-2024)',
-              '10 Full-Length Timed Model Examination Papers',
-              'Performance Weakness Diagnostic Heatmap',
-              'Full Validity for Academic Year 2026-27'
-            ],
-            sub_items: []
-          },
-          {
-            id: 103,
-            title: 'Chapter-wise Synopsis & Worksheets Kit - Class 6',
-            class_name: 'Class 6',
-            subject_code: 'ICSO',
-            subject_name: 'International Cyber Olympiad',
-            price: 99,
-            original_price: 299,
-            header_color: '#059669',
-            status: 'active',
-            points: [
-              'Comprehensive Chapter-wise Theory & Formula Booklets',
-              '75+ Printable High-Yield Practice Worksheets (PDFs)',
-              '1000+ Curated Question Bank with Answer Keys',
-              'Self-Assessment Progress Trackers for Every Unit',
-              'Instant Lifetime Digital Access Across All Devices'
-            ],
-            sub_items: []
-          },
           {
             id: 201,
             title: 'Olympiads Level-2 Champs Package - IMO Class 6',
             class_name: 'Class 6',
             subject_code: 'IMO',
             subject_name: 'International Mathematics Olympiad',
-            price: 99,
-            original_price: 299,
+            price: currentMockPrice,
+            original_price: currentOrigPrice,
             header_color: '#d97706',
             status: 'active',
             points: [
@@ -1981,8 +1914,8 @@ export const mockEngine = {
             class_name: 'Class 6',
             subject_code: 'ISO',
             subject_name: 'International Science Olympiad',
-            price: 99,
-            original_price: 299,
+            price: currentMockPrice,
+            original_price: currentOrigPrice,
             header_color: '#059669',
             status: 'active',
             points: [
@@ -1999,8 +1932,8 @@ export const mockEngine = {
             class_name: 'Class 6',
             subject_code: 'IGKO',
             subject_name: 'International General Knowledge Olympiad',
-            price: 99,
-            original_price: 299,
+            price: currentMockPrice,
+            original_price: currentOrigPrice,
             header_color: '#e7b84b',
             status: 'active',
             points: [
@@ -2017,8 +1950,8 @@ export const mockEngine = {
             class_name: 'Class 6',
             subject_code: 'IEO',
             subject_name: 'International English Olympiad',
-            price: 99,
-            original_price: 299,
+            price: currentMockPrice,
+            original_price: currentOrigPrice,
             header_color: '#ea580c',
             status: 'active',
             points: [
@@ -2030,13 +1963,31 @@ export const mockEngine = {
             sub_items: []
           },
           {
+            id: 101,
+            title: 'Olympiads Level-2 Champs Package - ICSO Class 6',
+            class_name: 'Class 6',
+            subject_code: 'ICSO',
+            subject_name: 'International Cyber Olympiad',
+            price: currentMockPrice,
+            original_price: currentOrigPrice,
+            header_color: '#4895d9',
+            status: 'active',
+            points: [
+              '10 ICSO Computer & Cyber Olympiad Mock Papers',
+              'Computational Thinking & Logic Building',
+              'Previous 5 Years Solved Cyber Papers',
+              'Instant Scoring & Rank Benchmark'
+            ],
+            sub_items: []
+          },
+          {
             id: 601,
             title: 'Olympiads Level-2 Champs Package - IHO Hindi Class 6',
             class_name: 'Class 6',
             subject_code: 'IHO',
             subject_name: 'International Hindi Olympiad',
-            price: 99,
-            original_price: 299,
+            price: currentMockPrice,
+            original_price: currentOrigPrice,
             header_color: '#dc2626',
             status: 'active',
             points: [
@@ -2091,7 +2042,13 @@ export const mockEngine = {
             return false;
           });
         }
-        return { success: true, data: filtered };
+
+        const mappedPackages = filtered.map(pkg => ({
+          ...pkg,
+          price: Number(currentMockPrice) || Number(pkg.price) || 99,
+          original_price: Number(currentOrigPrice) || Number(pkg.original_price) || 299
+        }));
+        return { success: true, data: mappedPackages };
       }
 
       if (method === 'POST') {
@@ -3824,8 +3781,20 @@ export const mockEngine = {
                 test_pack_price: Number(body.mock_test_price ?? body.test_pack_price ?? 99)
               };
               localStorage.setItem('olympiadhub_test_pricing', JSON.stringify(newPricing));
+
+              try {
+                let dbPkgs = getDb('packages') || [];
+                dbPkgs = dbPkgs.map(p => ({
+                  ...p,
+                  price: newPricing.mock_test_price,
+                  original_price: newPricing.original_price
+                }));
+                saveDb('packages', dbPkgs);
+              } catch (e) {}
+
               if (typeof window !== 'undefined') {
                 window.dispatchEvent(new CustomEvent('olympiadhub-pricing-updated', { detail: newPricing }));
+                window.dispatchEvent(new CustomEvent('olympiadhub-package-updated'));
                 window.dispatchEvent(new Event('storage'));
               }
             } catch (e) {}
@@ -3875,8 +3844,19 @@ export const mockEngine = {
             const bankData = getDb('bank_settings') || {};
             saveDb('bank_settings', { ...bankData, ...newPricing });
 
+            try {
+              let dbPkgs = getDb('packages') || [];
+              dbPkgs = dbPkgs.map(p => ({
+                ...p,
+                price: newPricing.mock_test_price,
+                original_price: newPricing.original_price
+              }));
+              saveDb('packages', dbPkgs);
+            } catch (e) {}
+
             if (typeof window !== 'undefined') {
               window.dispatchEvent(new CustomEvent('olympiadhub-pricing-updated', { detail: newPricing }));
+              window.dispatchEvent(new CustomEvent('olympiadhub-package-updated'));
               window.dispatchEvent(new Event('storage'));
             }
             return { success: true, message: 'Mock test & practice test pricing updated successfully', data: newPricing };

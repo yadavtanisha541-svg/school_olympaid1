@@ -27,7 +27,8 @@ import {
   Sparkles,
   ChevronRight,
   Lock,
-  Tag
+  Tag,
+  BookOpen
 } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
@@ -575,24 +576,71 @@ export const SuperAdminPaymentManager = () => {
 
           <form onSubmit={handleSaveBankSettings} className="space-y-6 text-xs max-w-4xl">
             {/* 0. Mock Test & Practice Test Pricing Settings */}
-            <div className="p-5 bg-gradient-to-br from-emerald-50 via-teal-50 to-sky-50 rounded-2xl border-2 border-emerald-400 space-y-4 shadow-xs">
+            <div className="p-5 bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50 rounded-2xl border-2 border-indigo-300 space-y-5 shadow-xs">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <h3 className="font-black text-emerald-950 text-sm flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-emerald-600" />
-                  <span>Practice Tests &amp; Paper Pricing Control</span>
+                <h3 className="font-black text-indigo-950 text-sm flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-indigo-600" />
+                  <span>Test Series &amp; Practice Pricing Control (Live Sync to Student Panel)</span>
                 </h3>
-                <span className="text-[10px] font-bold text-emerald-900 bg-emerald-200/90 px-2.5 py-0.5 rounded-full uppercase">
-                  Live Sync Across All Students
+                <span className="text-[10px] font-bold text-indigo-900 bg-indigo-200/90 px-2.5 py-0.5 rounded-full uppercase">
+                  Connected to Student Dashboard
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Practice Test Price */}
-                <div className="bg-white p-4 rounded-xl border border-emerald-300 space-y-2">
-                  <label className="text-[11px] font-black text-slate-800 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-purple-500" />
-                    <span>Practice Test Price (₹)</span>
-                  </label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* 1. Mock Test Price */}
+                <div className="bg-white p-4 rounded-xl border-2 border-blue-300 space-y-2 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-black text-blue-900 flex items-center gap-1.5">
+                      <BookOpen className="w-4 h-4 text-blue-600" />
+                      <span>Mock Tests Price (₹)</span>
+                    </label>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">
+                      Mock Series
+                    </span>
+                  </div>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                    value={bankSettings.mock_test_price}
+                    onChange={(e) => setBankSettings({ ...bankSettings, mock_test_price: e.target.value })}
+                    className="w-full px-3 py-2 bg-blue-50/50 border border-blue-300 rounded-lg font-black text-blue-950 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <p className="text-[10px] text-blue-700 font-medium">
+                    Applied on Student Dashboard Mock Test Packages: Pay ₹{bankSettings.mock_test_price || 99}
+                  </p>
+                  <div className="flex items-center gap-1.5 flex-wrap pt-1 text-[10px]">
+                    <span className="font-bold text-slate-500">Presets:</span>
+                    {[49, 79, 99, 149, 199, 299].map(amt => (
+                      <button
+                        key={amt}
+                        type="button"
+                        onClick={() => setBankSettings({ ...bankSettings, mock_test_price: amt })}
+                        className={`px-2 py-0.5 rounded font-bold transition-all cursor-pointer ${
+                          Number(bankSettings.mock_test_price) === amt
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-slate-100 text-slate-700 hover:bg-blue-100'
+                        }`}
+                      >
+                        ₹{amt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. Practice Test Price */}
+                <div className="bg-white p-4 rounded-xl border-2 border-purple-300 space-y-2 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-black text-purple-900 flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-purple-600" />
+                      <span>Practice Tests Price (₹)</span>
+                    </label>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-purple-100 text-purple-800">
+                      Practice Hub
+                    </span>
+                  </div>
                   <input
                     type="number"
                     min="0"
@@ -600,42 +648,70 @@ export const SuperAdminPaymentManager = () => {
                     required
                     value={bankSettings.practice_test_price}
                     onChange={(e) => setBankSettings({ ...bankSettings, practice_test_price: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-black text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 bg-purple-50/50 border border-purple-300 rounded-lg font-black text-purple-950 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
-                  <p className="text-[10px] text-slate-500">Practice test start button: Pay ₹{bankSettings.practice_test_price || 99}</p>
+                  <p className="text-[10px] text-purple-700 font-medium">
+                    Applied on Student Practice Test &amp; Generator: Pay ₹{bankSettings.practice_test_price || 99}
+                  </p>
+                  <div className="flex items-center gap-1.5 flex-wrap pt-1 text-[10px]">
+                    <span className="font-bold text-slate-500">Presets:</span>
+                    {[49, 79, 99, 149, 199, 299].map(amt => (
+                      <button
+                        key={amt}
+                        type="button"
+                        onClick={() => setBankSettings({ ...bankSettings, practice_test_price: amt })}
+                        className={`px-2 py-0.5 rounded font-bold transition-all cursor-pointer ${
+                          Number(bankSettings.practice_test_price) === amt
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-slate-100 text-slate-700 hover:bg-purple-100'
+                        }`}
+                      >
+                        ₹{amt}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Original MRP */}
-                <div className="bg-white p-4 rounded-xl border border-emerald-300 space-y-2">
-                  <label className="text-[11px] font-black text-slate-800 flex items-center gap-1.5">
-                    <Tag className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Original MRP (₹)</span>
-                  </label>
+                {/* 3. Original MRP (Strikethrough) */}
+                <div className="bg-white p-4 rounded-xl border-2 border-amber-300 space-y-2 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-black text-amber-900 flex items-center gap-1.5">
+                      <Tag className="w-4 h-4 text-amber-600" />
+                      <span>Original MRP (₹)</span>
+                    </label>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">
+                      Strikethrough
+                    </span>
+                  </div>
                   <input
                     type="number"
                     min="0"
                     step="1"
                     value={bankSettings.original_price}
                     onChange={(e) => setBankSettings({ ...bankSettings, original_price: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-bold text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    className="w-full px-3 py-2 bg-amber-50/50 border border-amber-300 rounded-lg font-bold text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
                   />
-                  <p className="text-[10px] text-slate-500">Strikethrough: ₹{bankSettings.original_price || 299}</p>
+                  <p className="text-[10px] text-slate-500 font-medium">
+                    Displayed strikethrough comparison: ₹{bankSettings.original_price || 299}
+                  </p>
+                  <div className="flex items-center gap-1.5 flex-wrap pt-1 text-[10px]">
+                    <span className="font-bold text-slate-500">Presets:</span>
+                    {[199, 299, 499, 999].map(amt => (
+                      <button
+                        key={amt}
+                        type="button"
+                        onClick={() => setBankSettings({ ...bankSettings, original_price: amt })}
+                        className={`px-2 py-0.5 rounded font-bold transition-all cursor-pointer ${
+                          Number(bankSettings.original_price) === amt
+                            ? 'bg-amber-600 text-white'
+                            : 'bg-slate-100 text-slate-700 hover:bg-amber-100'
+                        }`}
+                      >
+                        ₹{amt}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-
-              {/* Quick Presets */}
-              <div className="flex items-center gap-2 flex-wrap pt-1 text-[11px]">
-                <span className="font-bold text-slate-700">Quick Presets:</span>
-                {[49, 79, 99, 149, 199, 299].map(amt => (
-                  <button
-                    key={amt}
-                    type="button"
-                    onClick={() => setBankSettings({ ...bankSettings, practice_test_price: amt })}
-                    className="px-2.5 py-0.5 rounded-md bg-white border border-emerald-300 text-emerald-900 font-bold hover:bg-emerald-100 transition-colors cursor-pointer"
-                  >
-                    ₹{amt}
-                  </button>
-                ))}
               </div>
             </div>
 

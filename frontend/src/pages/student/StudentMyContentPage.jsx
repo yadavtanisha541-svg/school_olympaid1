@@ -525,15 +525,14 @@ export const StudentMyContentPage = ({
         class_name: studentClass,
         subject_code: 'IMO',
         subject_name: 'International Mathematics Olympiad',
-        price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
-        original_price: bankSettings.original_price || 299,
+        price: Number(bankSettings.mock_test_price) || 99,
+        original_price: Number(bankSettings.original_price) || 299,
         header_color: '#d97706',
         points: [
-          '5 Grand Level-1 & Level-2 National Math Mock Tests',
+          '10 Grand Level-2 National Math Mock Tests',
           'Speed Arithmetic & Mental Shortcuts Guide',
           'Step-by-Step Problem Solving Breakdown',
-          'Achievers HOTS Math Section with Master Answers',
-          'Unlimited Test Retake Attempts & Instant Scorecards'
+          'Achievers HOTS Math Section with Master Answers'
         ]
       }
     ],
@@ -544,34 +543,32 @@ export const StudentMyContentPage = ({
         class_name: studentClass,
         subject_code: 'ISO',
         subject_name: 'International Science Olympiad',
-        price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
-        original_price: bankSettings.original_price || 299,
-        header_color: '#8b5cf6',
+        price: Number(bankSettings.mock_test_price) || 99,
+        original_price: Number(bankSettings.original_price) || 299,
+        header_color: '#059669',
         points: [
-          '5 NSO / ISO Science Olympiad Mock Papers',
+          '10 NSO / ISO Science Olympiad Mock Papers',
           'Concepts, Diagram Analysis & Practical Reasoning',
-          'Previous Solved Papers with Explanations',
-          'Rank Booster High-Yield Questions',
-          'Step-by-Step Concept Breakdown & Solutions'
+          'Previous 5 Years Solved Papers',
+          'Rank Booster High-Yield Questions'
         ]
       }
     ],
     IDLO: [
       {
         id: 'def_pkg_idlo',
-        title: `Olympiads Level-2 Champs Package - ${studentClass}`,
+        title: `Olympiads Level-2 Champs Package - ICSO ${studentClass}`,
         class_name: studentClass,
         subject_code: 'ICSO',
         subject_name: 'International Cyber Olympiad',
-        price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
-        original_price: bankSettings.original_price || 299,
+        price: Number(bankSettings.mock_test_price) || 99,
+        original_price: Number(bankSettings.original_price) || 299,
         header_color: '#4895d9',
         points: [
-          '5 Grand Level-2 National Mock Tests',
-          'Advanced HOTS & Tie-Breaker Problem Sets',
-          'Detailed Video Solutions & Step-by-Step Analysis',
-          'National Benchmark Percentile & AIR Ranking',
-          'Unlimited Test Retake Attempts for 365 Days'
+          '10 ICSO Computer & Cyber Olympiad Mock Papers',
+          'Computational Thinking & Logic Building',
+          'Previous 5 Years Solved Cyber Papers',
+          'Instant Scoring & Rank Benchmark'
         ]
       }
     ],
@@ -582,15 +579,14 @@ export const StudentMyContentPage = ({
         class_name: studentClass,
         subject_code: 'IEO',
         subject_name: 'International English Olympiad',
-        price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
-        original_price: bankSettings.original_price || 299,
-        header_color: '#06b6d4',
+        price: Number(bankSettings.mock_test_price) || 99,
+        original_price: Number(bankSettings.original_price) || 299,
+        header_color: '#ea580c',
         points: [
-          '5 Complete IEO Model Test Papers with Solutions',
+          '10 Complete IEO Model Test Papers with Solutions',
           'Grammar, Vocabulary & Reading Comprehension Booster',
           'Idioms, Proverbs & Sentence Structure Mastery',
-          'National Percentile & Real Examination Simulation',
-          'Detailed Explanations & Error Diagnostic Report'
+          'National Percentile & Real Examination Simulation'
         ]
       }
     ],
@@ -601,15 +597,14 @@ export const StudentMyContentPage = ({
         class_name: studentClass,
         subject_code: 'IGKO',
         subject_name: 'International General Knowledge Olympiad',
-        price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
-        original_price: bankSettings.original_price || 299,
-        header_color: '#f59e0b',
+        price: Number(bankSettings.mock_test_price) || 99,
+        original_price: Number(bankSettings.original_price) || 299,
+        header_color: '#e7b84b',
         points: [
-          '5 Full-Length IGKO Grand Mock Test Papers',
+          '8 Full-Length IGKO Grand Mock Test Papers',
           'Current Affairs Digest & Global News Summaries',
           'India & World Factbook with Life Skills Guide',
-          'Instant Scoring & Section-wise Performance Heatmap',
-          'Comprehensive Answer Keys & Explanations'
+          'Instant Scoring & Section-wise Performance Heatmap'
         ]
       }
     ],
@@ -620,15 +615,14 @@ export const StudentMyContentPage = ({
         class_name: studentClass,
         subject_code: 'IHO',
         subject_name: 'International Hindi Olympiad',
-        price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
-        original_price: bankSettings.original_price || 299,
-        header_color: '#10b981',
+        price: Number(bankSettings.mock_test_price) || 99,
+        original_price: Number(bankSettings.original_price) || 299,
+        header_color: '#dc2626',
         points: [
-          '5 Full-Length IHO Hindi Mock Test Papers',
-          'हिंदी व्याकरण, मुहावरे और लोकोक्तियाँ अभ्यास सेट',
-          'पठन कौशल, शब्द भंडार और वर्तनी शुद्धि',
-          'परीक्षा पैटर्न अनुसार तुरंत परिणाम और विश्लेषण',
-          'संपूर्ण उत्तर कुंजी एवं विस्तृत समाधान'
+          '8 Full-Length IHO Hindi Vyakaran & Sahitya Papers',
+          'Varn, Shabd, Sandhi & Samas Quick Revision Notes',
+          'Muhavare, Lokoktiyan & Bhasha Bodh Master Practice Sets',
+          'Instant Detailed Answers with Expert Explanations'
         ]
       }
     ]
@@ -636,12 +630,18 @@ export const StudentMyContentPage = ({
 
   const getPackagesForSubject = (subCode) => {
     const norm = normalizeCode(subCode);
-    const mockPrice = Number(bankSettings.mock_test_price) || Number(bankSettings.test_pack_price) || 99;
+    const mockPrice = Number(bankSettings.mock_test_price) || 99;
     const origPrice = Number(bankSettings.original_price) || 299;
 
     const matched = packagesList.filter(p => {
       const pNorm = normalizeCode(p.subject_code || p.subject || '');
-      return pNorm === norm;
+      if (pNorm !== norm) return false;
+      if (p.class_name && p.class_name !== 'All' && p.class_name !== 'ALL') {
+        const pNum = String(p.class_name).match(/\d+/);
+        const stNum = String(studentClass).match(/\d+/);
+        if (pNum && stNum && pNum[0] !== stNum[0]) return false;
+      }
+      return true;
     });
 
     if (matched.length > 0) {
@@ -1420,25 +1420,24 @@ export const StudentMyContentPage = ({
             {visibleCovers.map((sub) => {
               const isUnlocked = isSubjectPurchased(sub.code, studentClass, purchasedTests);
               const subjectPkgs = getPackagesForSubject(sub.code);
+              const effectivePrice = Number(bankSettings.mock_test_price) || 99;
+              const origPrice = Number(bankSettings.original_price) || 299;
               const primaryPkg = subjectPkgs[0] || {
                 id: `pkg_${sub.code.toLowerCase()}`,
-                title: `Olympiads Level-2 Champs Package - ${studentClass}`,
+                title: `Olympiads Level-2 Champs Package - ${sub.code} ${studentClass}`,
                 class_name: studentClass,
                 subject_code: sub.code,
-                price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
-                original_price: bankSettings.original_price || 299,
+                price: effectivePrice,
+                original_price: origPrice,
                 header_color: '#4895d9',
                 points: [
-                  '5 Grand Level-1 & Level-2 National Mock Tests',
-                  'Detailed Step-by-Step Solutions & Explanations',
-                  'All India Rank & Benchmark Percentile',
-                  'Timed CBT Online Exam Simulator',
-                  'Unlimited Re-attempts for Academic Year'
+                  '10 Grand Level-2 National Mock Tests',
+                  'Speed Arithmetic & Mental Shortcuts Guide',
+                  'Step-by-Step Problem Solving Breakdown',
+                  'Achievers HOTS Section with Master Answers'
                 ]
               };
               const SubIcon = sub.icon;
-              const effectivePrice = Number(bankSettings.mock_test_price) || Number(bankSettings.test_pack_price) || Number(primaryPkg.price) || 99;
-              const origPrice = Number(bankSettings.original_price) || Number(primaryPkg.original_price) || 299;
 
               // Decide whether to render the Package Card (Image 1) or Cover Card (Image 2)
               const renderAsPackage = viewMode === 'packages' || (viewMode === 'smart' && !isUnlocked);

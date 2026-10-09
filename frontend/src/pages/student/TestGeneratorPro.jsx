@@ -173,7 +173,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [bankSettings, setBankSettings] = useState(() => {
     const p = getTestPricing();
-    const effectivePrice = p.practice_test_price || p.mock_test_price || 99;
+    const practicePrice = Number(p.practice_test_price) || 99;
     return {
       upi_id: 'olympiadhub@icici',
       merchant_name: 'Olympiad Foundation India',
@@ -181,33 +181,35 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       account_number: '1029384756',
       ifsc: 'ICIC0001029',
       qr_code_url: '',
-      test_pack_price: effectivePrice,
-      practice_test_price: p.practice_test_price || 99,
-      mock_test_price: p.mock_test_price || 99,
-      original_price: p.original_price || 299
+      test_pack_price: practicePrice,
+      practice_test_price: practicePrice,
+      mock_test_price: Number(p.mock_test_price) || 99,
+      original_price: Number(p.original_price) || 299
     };
   });
 
   useEffect(() => {
     apiClient.get('/payment/bank-settings').then(res => {
       if (res && res.data) {
+        const practicePrice = Number(res.data.practice_test_price) || 99;
         setBankSettings(prev => ({
           ...prev,
           ...res.data,
-          test_pack_price: res.data.practice_test_price || res.data.test_pack_price || prev.test_pack_price || 99
+          test_pack_price: practicePrice,
+          practice_test_price: practicePrice
         }));
       }
     }).catch(() => {});
 
     const handlePricingUpdate = (e) => {
       const p = e?.detail || getTestPricing();
-      const effectivePrice = p.practice_test_price || p.mock_test_price || 99;
+      const practicePrice = Number(p.practice_test_price) || 99;
       setBankSettings(prev => ({
         ...prev,
-        test_pack_price: effectivePrice,
-        practice_test_price: p.practice_test_price || 99,
-        mock_test_price: p.mock_test_price || 99,
-        original_price: p.original_price || 299
+        test_pack_price: practicePrice,
+        practice_test_price: practicePrice,
+        mock_test_price: Number(p.mock_test_price) || 99,
+        original_price: Number(p.original_price) || 299
       }));
     };
 

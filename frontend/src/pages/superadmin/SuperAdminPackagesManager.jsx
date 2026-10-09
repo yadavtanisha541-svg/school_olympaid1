@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
+import { getTestPricing } from '../../utils/purchaseUtils';
 import {
   ShoppingBag,
   Package,
@@ -844,12 +845,13 @@ export const SuperAdminPackagesManager = () => {
 
   const handleOpenCreatePackage = () => {
     setEditingPackage(null);
+    const pricing = getTestPricing();
     setPackageForm({
       title: 'New Comprehensive Olympiad Study Package',
       class_name: packageClassFilter !== 'All' ? packageClassFilter : 'Class 6',
       subject_code: 'IMO',
-      price: '1499',
-      original_price: '1999',
+      price: String(pricing.mock_test_price || 99),
+      original_price: String(pricing.original_price || 299),
       header_color: '#0284c7',
       status: 'active',
       points: [
@@ -968,6 +970,18 @@ export const SuperAdminPackagesManager = () => {
     fetchExamPapers();
     fetchPackages();
     fetchOrders();
+
+    const handlePricingOrPackageSync = () => {
+      fetchPackages();
+    };
+    window.addEventListener('olympiadhub-package-updated', handlePricingOrPackageSync);
+    window.addEventListener('olympiadhub-pricing-updated', handlePricingOrPackageSync);
+    window.addEventListener('storage', handlePricingOrPackageSync);
+    return () => {
+      window.removeEventListener('olympiadhub-package-updated', handlePricingOrPackageSync);
+      window.removeEventListener('olympiadhub-pricing-updated', handlePricingOrPackageSync);
+      window.removeEventListener('storage', handlePricingOrPackageSync);
+    };
   }, [packageClassFilter, packageSubjectFilter]);
 
   // Group papers by Subject and Series Cover
