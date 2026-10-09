@@ -179,28 +179,28 @@ export const ApplicantLeadsManagement = () => {
   return (
     <div className="space-y-6">
       {/* 1. Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#122459] via-[#241e6e] to-[#5b3da8] p-6 rounded-md text-white shadow-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 bg-gradient-to-r from-[#122459] via-[#241e6e] to-[#5b3da8] p-4 sm:p-6 rounded-2xl sm:rounded-3xl text-white shadow-md">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-sm bg-[#fbbf24] text-[#122459] text-[10px] font-black uppercase tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-md bg-[#fbbf24] text-[#122459] text-[10px] font-black uppercase tracking-wider shadow-2xs">
               Website Leads
             </span>
-            <span className="text-xs text-indigo-200">Real-time Stream</span>
+            <span className="text-xs text-indigo-200 font-semibold">Real-time Stream</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-snug mt-1">
             New Applicant Registrations &amp; Leads
           </h1>
-          <p className="text-xs sm:text-sm text-indigo-100 font-medium mt-1">
+          <p className="text-xs sm:text-sm text-indigo-100 font-medium leading-relaxed mt-0.5">
             Direct student inquiries and enrollment submissions from the website home page.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
           <button
             type="button"
             onClick={fetchLeads}
             disabled={loading}
-            className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white rounded-md text-xs font-bold transition-all flex items-center gap-1.5 border border-white/20 cursor-pointer"
+            className="flex-1 sm:flex-initial px-3.5 py-2 bg-white/15 hover:bg-white/25 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-white/20 cursor-pointer shadow-2xs active:scale-95"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
@@ -209,7 +209,7 @@ export const ApplicantLeadsManagement = () => {
             type="button"
             onClick={exportCsv}
             disabled={leads.length === 0}
-            className="px-4 py-2 bg-[#fbbf24] hover:bg-[#f59e0b] text-[#122459] rounded-md text-xs font-black shadow-sm transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="flex-1 sm:flex-initial px-4 py-2 bg-[#fbbf24] hover:bg-[#f59e0b] text-[#122459] rounded-xl text-xs font-black shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export CSV</span>
@@ -218,50 +218,50 @@ export const ApplicantLeadsManagement = () => {
       </div>
 
       {/* 2. Key Metrics Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-md border border-[#c7d2fe] shadow-xs flex items-center justify-between">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-[#c7d2fe] shadow-2xs flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Submissions</p>
-            <h3 className="text-2xl font-black text-[#16327a] mt-0.5">{totalCount}</h3>
+            <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider truncate">Total Submissions</p>
+            <h3 className="text-xl sm:text-2xl font-black text-[#16327a] mt-0.5 font-mono">{totalCount}</h3>
           </div>
-          <div className="w-10 h-10 rounded-full bg-[#eef2ff] border border-[#c7d2fe] flex items-center justify-center text-[#16327a]">
-            <Users className="w-5 h-5" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#eef2ff] border border-[#c7d2fe] flex items-center justify-center text-[#16327a] shrink-0">
+            <Users className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-md border border-amber-200 shadow-xs flex items-center justify-between">
+        <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-amber-200 shadow-2xs flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">New Action Required</p>
-            <h3 className="text-2xl font-black text-amber-600 mt-0.5">{newCount}</h3>
+            <p className="text-[10px] sm:text-[11px] font-bold text-amber-600 uppercase tracking-wider truncate">Action Required</p>
+            <h3 className="text-xl sm:text-2xl font-black text-amber-600 mt-0.5 font-mono">{newCount}</h3>
           </div>
-          <div className="w-10 h-10 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
-            <Clock className="w-5 h-5" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0">
+            <Clock className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-md border border-indigo-200 shadow-xs flex items-center justify-between">
+        <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-indigo-200 shadow-2xs flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-bold text-indigo-600 uppercase tracking-wider">Contacted Leads</p>
-            <h3 className="text-2xl font-black text-indigo-700 mt-0.5">{contactedCount}</h3>
+            <p className="text-[10px] sm:text-[11px] font-bold text-indigo-600 uppercase tracking-wider truncate">Contacted Leads</p>
+            <h3 className="text-xl sm:text-2xl font-black text-indigo-700 mt-0.5 font-mono">{contactedCount}</h3>
           </div>
-          <div className="w-10 h-10 rounded-full bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600">
-            <MessageCircle className="w-5 h-5" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 shrink-0">
+            <MessageCircle className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-md border border-emerald-200 shadow-xs flex items-center justify-between">
+        <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-emerald-200 shadow-2xs flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Enrolled / Confirmed</p>
-            <h3 className="text-2xl font-black text-emerald-700 mt-0.5">{enrolledCount}</h3>
+            <p className="text-[10px] sm:text-[11px] font-bold text-emerald-600 uppercase tracking-wider truncate">Enrolled Leads</p>
+            <h3 className="text-xl sm:text-2xl font-black text-emerald-700 mt-0.5 font-mono">{enrolledCount}</h3>
           </div>
-          <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
-            <CheckCircle2 className="w-5 h-5" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0">
+            <CheckCircle2 className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
           </div>
         </div>
       </div>
 
       {/* 3. Filters & Search Bar */}
-      <div className="bg-white p-4 rounded-md border border-[#e2e8f0] shadow-xs space-y-3">
+      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-[#e2e8f0] shadow-2xs space-y-3">
         <div className="flex flex-col md:flex-row items-center gap-3 justify-between">
           {/* Search Input */}
           <div className="relative w-full md:w-96">
@@ -271,19 +271,19 @@ export const ApplicantLeadsManagement = () => {
               placeholder="Search by candidate name, email, mobile, school..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
+              className="w-full pl-9 pr-4 py-2 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl text-xs font-semibold text-[#1e293b] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
             />
           </div>
 
           {/* Status & Class Filters */}
-          <div className="flex items-center gap-2.5 w-full md:w-auto flex-wrap">
+          <div className="flex items-center gap-2 w-full md:w-auto flex-wrap">
             {/* Status Filter */}
             <div className="flex items-center gap-1">
               <Filter className="w-3.5 h-3.5 text-slate-400" />
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-2.5 py-2 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-bold text-[#16327a] focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
+                className="px-2.5 py-2 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl text-xs font-bold text-[#16327a] focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
               >
                 <option value="All">All Statuses</option>
                 <option value="new">New (Unread)</option>
@@ -298,7 +298,7 @@ export const ApplicantLeadsManagement = () => {
             <select
               value={filterClass}
               onChange={(e) => setFilterClass(e.target.value)}
-              className="px-2.5 py-2 bg-[#f8fafc] border border-[#e2e8f0] rounded-md text-xs font-bold text-[#16327a] focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
+              className="px-2.5 py-2 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl text-xs font-bold text-[#16327a] focus:outline-none focus:ring-2 focus:ring-[#5b3da8]"
             >
               <option value="All">All Classes</option>
               {['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((cls) => (
@@ -310,7 +310,7 @@ export const ApplicantLeadsManagement = () => {
       </div>
 
       {/* 4. Leads Table */}
-      <div className="bg-white rounded-md border border-[#e2e8f0] shadow-xs overflow-hidden">
+      <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-2xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
