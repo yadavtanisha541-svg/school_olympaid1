@@ -262,58 +262,58 @@ export const SuperAdminPaymentManager = () => {
       )}
 
       {/* 2. Rich Top Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* Total Revenue */}
-        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
-            <DollarSign className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
+            <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Revenue</p>
-            <h3 className="text-2xl font-black text-emerald-600 mt-0.5 font-mono">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Total Revenue</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-2xl font-black text-emerald-600 mt-0.5 font-mono truncate">
               ₹{Number(stats.total_revenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Verified &amp; confirmed orders</p>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Verified &amp; confirmed orders</p>
           </div>
         </div>
 
         {/* Total Orders */}
-        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
-            <CreditCard className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
+            <CreditCard className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Orders</p>
-            <h3 className="text-2xl font-black text-[#80497D] mt-0.5 font-mono">{orders.length}</h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">All student checkouts</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Total Orders</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-2xl font-black text-[#80497D] mt-0.5 font-mono truncate">{orders.length}</h3>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">All student checkouts</p>
           </div>
         </div>
 
         {/* Active UPI */}
-        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
-            <Eye className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
+            <Eye className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active UPI ID</p>
-            <h3 className="text-sm font-black text-slate-800 mt-1 font-mono truncate">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Active UPI ID</p>
+            <h3 className="text-xs sm:text-sm font-black text-slate-800 mt-0.5 sm:mt-1 font-mono truncate">
               {bankSettings.upi_id || 'Not set'}
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Live in checkout</p>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Live in checkout</p>
           </div>
         </div>
 
         {/* Active Bank */}
-        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 shrink-0">
-            <Building className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 shrink-0">
+            <Building className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Bank</p>
-            <h3 className="text-sm font-black text-slate-800 mt-1 truncate">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Active Bank</p>
+            <h3 className="text-xs sm:text-sm font-black text-slate-800 mt-0.5 sm:mt-1 truncate">
               {bankSettings.bank_name || 'Not set'}
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">{bankSettings.account_number ? `A/C: ••••${bankSettings.account_number.slice(-4)}` : 'Bank Transfer'}</p>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">{bankSettings.account_number ? `A/C: ••••${bankSettings.account_number.slice(-4)}` : 'Bank Transfer'}</p>
           </div>
         </div>
       </div>

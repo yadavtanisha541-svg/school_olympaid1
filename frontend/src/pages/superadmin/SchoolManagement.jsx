@@ -176,54 +176,54 @@ export const SchoolManagement = () => {
       </div>
 
       {/* Summary KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
-            <Building2 className="w-6 h-6" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
+            <Building2 className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Registered Schools</p>
-            <h3 className="text-2xl sm:text-3xl font-black text-[#80497D] mt-0.5 font-mono">{schools.length}</h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Partner institutions</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Registered Schools</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-3xl font-black text-[#80497D] mt-0.5 font-mono truncate">{schools.length}</h3>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Partner institutions</p>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
-            <CheckCircle className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
+            <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Approved &amp; Active</p>
-            <h3 className="text-2xl sm:text-3xl font-black text-emerald-600 mt-0.5 font-mono">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Approved &amp; Active</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-3xl font-black text-emerald-600 mt-0.5 font-mono truncate">
               {schools.filter((s) => (s.status || 'approved') === 'approved').length}
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Verified schools</p>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Verified schools</p>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 shrink-0">
-            <Clock className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 shrink-0">
+            <Clock className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Pending Verification</p>
-            <h3 className="text-2xl sm:text-3xl font-black text-amber-600 mt-0.5 font-mono">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Pending Verification</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-3xl font-black text-amber-600 mt-0.5 font-mono truncate">
               {schools.filter((s) => s.status === 'pending').length}
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Awaiting review</p>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Awaiting review</p>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
-            <UserCheck className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
+            <UserCheck className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Estimated Student Reach</p>
-            <h3 className="text-2xl sm:text-3xl font-black text-blue-600 mt-0.5 font-mono">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Student Reach</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-3xl font-black text-blue-600 mt-0.5 font-mono truncate">
               {schools.length > 0 ? `${schools.length * 150}+` : '0'}
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Potential candidates</p>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Potential candidates</p>
           </div>
         </div>
       </div>

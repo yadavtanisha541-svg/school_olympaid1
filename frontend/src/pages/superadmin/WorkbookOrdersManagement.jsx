@@ -164,48 +164,48 @@ export const WorkbookOrdersManagement = () => {
       </div>
 
       {/* KPI Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
-            <ShoppingBag className="w-6 h-6" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
+            <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Orders</p>
-            <h3 className="text-2xl sm:text-3xl font-black text-[#80497D] mt-0.5 font-mono">{orders.length}</h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Total placed</p>
-          </div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
-            <DollarSign className="w-6 h-6" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Volume</p>
-            <h3 className="text-2xl sm:text-3xl font-black text-emerald-600 mt-0.5 font-mono">₹{totalRevenue.toLocaleString()}</h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Total revenue</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Total Orders</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-3xl font-black text-[#80497D] mt-0.5 font-mono truncate">{orders.length}</h3>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Total placed</p>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
-            <Truck className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
+            <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Physical Couriers</p>
-            <h3 className="text-2xl sm:text-3xl font-black text-blue-600 mt-0.5 font-mono">{physicalCount}</h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Printed books</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Total Volume</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-3xl font-black text-emerald-600 mt-0.5 font-mono truncate">₹{totalRevenue.toLocaleString()}</h3>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Total revenue</p>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 shrink-0">
-            <BookOpen className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
+            <Truck className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Instant E-Books</p>
-            <h3 className="text-2xl sm:text-3xl font-black text-purple-600 mt-0.5 font-mono">{digitalCount}</h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">PDF editions</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Physical Couriers</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-3xl font-black text-blue-600 mt-0.5 font-mono truncate">{physicalCount}</h3>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Printed books</p>
+          </div>
+        </div>
+
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 shrink-0">
+            <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Instant E-Books</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-3xl font-black text-purple-600 mt-0.5 font-mono truncate">{digitalCount}</h3>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">PDF editions</p>
           </div>
         </div>
       </div>

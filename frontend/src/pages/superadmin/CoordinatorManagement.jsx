@@ -155,54 +155,54 @@ export const CoordinatorManagement = () => {
       </div>
 
       {/* Summary KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
-            <UserCheck className="w-6 h-6" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
+            <UserCheck className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Applications</p>
-            <h3 className="text-2xl sm:text-3xl font-black text-[#80497D] mt-0.5 font-mono">{inquiries.length}</h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Total submissions</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Applications</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-3xl font-black text-[#80497D] mt-0.5 font-mono truncate">{inquiries.length}</h3>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Total submissions</p>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 shrink-0">
-            <Clock className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 shrink-0">
+            <Clock className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">New / Pending</p>
-            <h3 className="text-2xl sm:text-3xl font-black text-amber-600 mt-0.5 font-mono">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">New / Pending</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-3xl font-black text-amber-600 mt-0.5 font-mono truncate">
               {inquiries.filter((i) => (i.status || 'pending') === 'pending').length}
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Awaiting review</p>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Awaiting review</p>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
-            <Mail className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
+            <Mail className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Contacted / Interview</p>
-            <h3 className="text-2xl sm:text-3xl font-black text-blue-600 mt-0.5 font-mono">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Contacted</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-3xl font-black text-blue-600 mt-0.5 font-mono truncate">
               {inquiries.filter((i) => i.status === 'contacted').length}
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">In progress</p>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">In progress</p>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
-            <Check className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#edd6ed] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
+            <Check className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Approved Coordinators</p>
-            <h3 className="text-2xl sm:text-3xl font-black text-emerald-600 mt-0.5 font-mono">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Approved</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-3xl font-black text-emerald-600 mt-0.5 font-mono truncate">
               {inquiries.filter((i) => i.status === 'approved').length}
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Active partners</p>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Active partners</p>
           </div>
         </div>
       </div>

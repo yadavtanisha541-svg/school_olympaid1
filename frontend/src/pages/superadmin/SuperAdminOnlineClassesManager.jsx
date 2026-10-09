@@ -615,54 +615,54 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
       )}
 
       {/* 2. Rich Top Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* Active Packages */}
-        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
-            <Layers className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#f4eaf4] text-[#80497D] flex items-center justify-center border border-[#ebd7eb] shrink-0">
+            <Layers className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Packages</p>
-            <h3 className="text-2xl font-black text-[#80497D] mt-0.5 font-mono">{packages.length}</h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Self-paced &amp; bundles</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Active Packages</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-2xl font-black text-[#80497D] mt-0.5 font-mono truncate">{packages.length}</h3>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Self-paced &amp; bundles</p>
           </div>
         </div>
 
         {/* Live Batches */}
-        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-orange-50 text-[#C35B3F] flex items-center justify-center border border-orange-100 shrink-0">
-            <Calendar className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-50 text-[#C35B3F] flex items-center justify-center border border-orange-100 shrink-0">
+            <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Batches</p>
-            <h3 className="text-2xl font-black text-[#C35B3F] mt-0.5 font-mono">{batches.length}</h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Interactive sessions</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Live Batches</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-2xl font-black text-[#C35B3F] mt-0.5 font-mono truncate">{batches.length}</h3>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Interactive sessions</p>
           </div>
         </div>
 
         {/* Video Lectures */}
-        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
-            <Video className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
+            <Video className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Video Lectures</p>
-            <h3 className="text-2xl font-black text-emerald-600 mt-0.5 font-mono">{lectures.length}</h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Chapter-wise topics</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Video Lectures</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-2xl font-black text-emerald-600 mt-0.5 font-mono truncate">{lectures.length}</h3>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Chapter-wise topics</p>
           </div>
         </div>
 
         {/* Total Enrollments */}
-        <div className="bg-white p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
-            <Users className="w-6 h-6" />
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#ebd7eb] shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
+            <Users className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Enrollments</p>
-            <h3 className="text-2xl font-black text-slate-900 mt-0.5 font-mono">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Total Enrollments</p>
+            <h3 className="text-base min-[360px]:text-lg sm:text-2xl font-black text-slate-900 mt-0.5 font-mono truncate">
               {packages.reduce((acc, p) => acc + (p.enrolled_students || 0), 0) + 120}
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate">Students enrolled</p>
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Students enrolled</p>
           </div>
         </div>
       </div>
