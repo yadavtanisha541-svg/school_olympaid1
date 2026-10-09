@@ -1339,17 +1339,17 @@ export const SuperAdminPackagesManager = () => {
           {paperModalTab === 'questions' && (
             <div className="space-y-6">
               {/* Question Quick Jump Navigation Pill Bar */}
-              <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-2xs flex items-center justify-between gap-3 overflow-x-auto">
-                <div className="flex items-center gap-2 overflow-x-auto py-1">
-                  <span className="text-xs font-black text-slate-700 mr-2 shrink-0">Questions:</span>
+              <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3">
+                <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto py-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden min-w-0 flex-1">
+                  <span className="text-xs font-black text-slate-700 mr-1 shrink-0">Questions:</span>
                   {paperQuestions.map((_, qIdx) => (
                     <button
                       key={qIdx}
                       type="button"
                       onClick={() => setActiveQuestionIndex(qIdx)}
-                      className={`w-9 h-9 rounded-xl font-black text-xs flex items-center justify-center shrink-0 transition-all cursor-pointer ${
+                      className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl font-black text-xs flex items-center justify-center shrink-0 transition-all cursor-pointer ${
                         activeQuestionIndex === qIdx
-                          ? 'bg-[#859900] text-white shadow-sm ring-2 ring-[#859900]/40 scale-105'
+                          ? 'bg-[#859900] text-white shadow-xs ring-2 ring-[#859900]/40 scale-105'
                           : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
                       }`}
                     >
@@ -1359,25 +1359,31 @@ export const SuperAdminPackagesManager = () => {
                   <button
                     type="button"
                     onClick={handleAddBlankQuestion}
-                    className="px-3 h-9 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white text-xs font-black flex items-center gap-1 shrink-0 cursor-pointer shadow-2xs"
+                    className="h-8 sm:h-9 px-2.5 sm:px-3 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white text-xs font-black flex items-center gap-1 shrink-0 cursor-pointer shadow-2xs whitespace-nowrap"
+                    title="Add Blank Question"
                   >
-                    <Plus className="w-4 h-4" />
-                    <span>Add Question</span>
+                    <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                    <span>Add</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setPaperModalTab('bulk')}
-                    className="px-3.5 h-9 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-black flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs transition-all"
+                    className="h-8 sm:h-9 px-2.5 sm:px-3.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-black flex items-center gap-1 shrink-0 cursor-pointer shadow-2xs transition-all whitespace-nowrap"
                     title="Bulk Import / Paste Multiple Questions"
                   >
-                    <Upload className="w-3.5 h-3.5 text-purple-600" />
-                    <span>⚡ Bulk Import</span>
+                    <Upload className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                    <span>Bulk Import</span>
                   </button>
                 </div>
 
-                <div className="shrink-0 text-xs font-bold text-slate-500">
-                  Total: <span className="text-slate-900 font-black">{paperQuestions.length}</span> questions
+                <div className="shrink-0 text-[11px] sm:text-xs font-bold text-slate-500 flex items-center justify-between sm:justify-end gap-2 border-t border-slate-100 sm:border-t-0 pt-2 sm:pt-0">
+                  <span>
+                    Total: <span className="text-slate-900 font-black">{paperQuestions.length}</span> question{paperQuestions.length !== 1 ? 's' : ''}
+                  </span>
+                  <span className="sm:hidden text-slate-400 font-semibold">
+                    Q{activeQuestionIndex + 1} active
+                  </span>
                 </div>
               </div>
 
