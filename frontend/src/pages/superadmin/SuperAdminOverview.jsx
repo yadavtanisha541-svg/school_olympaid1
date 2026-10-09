@@ -268,92 +268,92 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
       </div>
 
       {/* 2. Top Metric Cards (Navy Blue, Purple & Wine/Crimson Theme) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5">
         {/* Total Students (Wine / Crimson / Rose) */}
-        <div className="bg-gradient-to-br from-rose-200/95 via-pink-200/85 to-red-200/85 rounded-3xl border-2 border-rose-400/90 hover:border-rose-500 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between text-slate-900 group hover:-translate-y-1">
-          <div className="flex items-center gap-3.5">
-            <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-rose-600 via-pink-600 to-red-500 text-white shadow-rose-300 shadow-sm border border-white/40 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-              <Users className="w-6.5 h-6.5" />
+        <div className="bg-gradient-to-br from-rose-200/95 via-pink-200/85 to-red-200/85 rounded-2xl sm:rounded-3xl border-2 border-rose-400/90 hover:border-rose-500 p-3 sm:p-5 md:p-6 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between text-slate-900 group hover:-translate-y-1">
+          <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3">
+            <div className="w-9 h-9 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-rose-600 via-pink-600 to-red-500 text-white shadow-rose-300 shadow-sm border border-white/40 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+              <Users className="w-4.5 h-4.5 sm:w-6 sm:h-6 md:w-6.5 md:h-6.5" />
             </div>
-            <div>
-              <p className="text-xs sm:text-sm font-bold text-rose-950">Total Students</p>
-              <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mt-0.5 font-mono">
-                {currentTotalStudents}
-              </h3>
-              <p className="text-xs text-slate-700 font-semibold mt-0.5">Enrolled candidates</p>
+            <div className="flex flex-col items-end">
+              <svg className="hidden min-[420px]:block sm:block w-11 sm:w-14 h-5 sm:h-7 text-rose-600 stroke-current fill-none" viewBox="0 0 50 20">
+                <path d="M 0 15 Q 15 5 25 10 T 50 3" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+              <span className="text-[10px] sm:text-[11px] font-black text-rose-950 mt-0.5 bg-white/95 px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg border border-rose-300 shadow-2xs shrink-0">↑ 12%</span>
             </div>
           </div>
-          <div className="text-right flex flex-col items-end">
-            <svg className="w-14 h-7 text-rose-600 stroke-current fill-none" viewBox="0 0 50 20">
-              <path d="M 0 15 Q 15 5 25 10 T 50 3" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-            <span className="text-[11px] font-black text-rose-950 mt-1 bg-white/95 px-2 py-0.5 rounded-lg border border-rose-300 shadow-2xs">↑ 12%</span>
+          <div>
+            <p className="text-[11px] sm:text-xs md:text-sm font-bold text-rose-950 truncate">Total Students</p>
+            <h3 className="text-lg min-[360px]:text-xl sm:text-2xl md:text-3xl font-black text-slate-900 leading-tight mt-0.5 font-mono">
+              {currentTotalStudents}
+            </h3>
+            <p className="text-[10px] sm:text-xs text-slate-700 font-semibold mt-0.5 truncate">Enrolled candidates</p>
           </div>
         </div>
 
         {/* Registered Schools (Navy Blue / Royal Blue) */}
-        <div className="bg-gradient-to-br from-blue-200/95 via-indigo-200/85 to-sky-200/85 rounded-3xl border-2 border-blue-400/90 hover:border-blue-500 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between text-slate-900 group hover:-translate-y-1">
-          <div className="flex items-center gap-3.5">
-            <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white shadow-blue-300 shadow-sm border border-white/40 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-              <Building2 className="w-6.5 h-6.5" />
+        <div className="bg-gradient-to-br from-blue-200/95 via-indigo-200/85 to-sky-200/85 rounded-2xl sm:rounded-3xl border-2 border-blue-400/90 hover:border-blue-500 p-3 sm:p-5 md:p-6 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between text-slate-900 group hover:-translate-y-1">
+          <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3">
+            <div className="w-9 h-9 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white shadow-blue-300 shadow-sm border border-white/40 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+              <Building2 className="w-4.5 h-4.5 sm:w-6 sm:h-6 md:w-6.5 md:h-6.5" />
             </div>
-            <div>
-              <p className="text-xs sm:text-sm font-bold text-blue-950">Registered Schools</p>
-              <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mt-0.5 font-mono">
-                {currentTotalSchools}
-              </h3>
-              <p className="text-xs text-slate-700 font-semibold mt-0.5">Partner Institutions</p>
+            <div className="flex flex-col items-end">
+              <svg className="hidden min-[420px]:block sm:block w-11 sm:w-14 h-5 sm:h-7 text-blue-600 stroke-current fill-none" viewBox="0 0 50 20">
+                <path d="M 0 18 Q 12 12 25 8 T 50 2" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+              <span className="text-[10px] sm:text-[11px] font-black text-blue-950 mt-0.5 bg-white/95 px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg border border-blue-300 shadow-2xs shrink-0">↑ 18%</span>
             </div>
           </div>
-          <div className="text-right flex flex-col items-end">
-            <svg className="w-14 h-7 text-blue-600 stroke-current fill-none" viewBox="0 0 50 20">
-              <path d="M 0 18 Q 12 12 25 8 T 50 2" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-            <span className="text-[11px] font-black text-blue-950 mt-1 bg-white/95 px-2 py-0.5 rounded-lg border border-blue-300 shadow-2xs">↑ 18%</span>
+          <div>
+            <p className="text-[11px] sm:text-xs md:text-sm font-bold text-blue-950 truncate">Registered Schools</p>
+            <h3 className="text-lg min-[360px]:text-xl sm:text-2xl md:text-3xl font-black text-slate-900 leading-tight mt-0.5 font-mono">
+              {currentTotalSchools}
+            </h3>
+            <p className="text-[10px] sm:text-xs text-slate-700 font-semibold mt-0.5 truncate">Partner Institutions</p>
           </div>
         </div>
 
         {/* Total Exams (Deep Purple / Violet / Indigo) */}
-        <div className="bg-gradient-to-br from-purple-200/95 via-indigo-200/85 to-violet-200/85 rounded-3xl border-2 border-purple-400/90 hover:border-purple-500 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between text-slate-900 group hover:-translate-y-1">
-          <div className="flex items-center gap-3.5">
-            <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-violet-600 text-white shadow-purple-300 shadow-sm border border-white/40 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-              <FileSpreadsheet className="w-6.5 h-6.5" />
+        <div className="bg-gradient-to-br from-purple-200/95 via-indigo-200/85 to-violet-200/85 rounded-2xl sm:rounded-3xl border-2 border-purple-400/90 hover:border-purple-500 p-3 sm:p-5 md:p-6 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between text-slate-900 group hover:-translate-y-1">
+          <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3">
+            <div className="w-9 h-9 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-violet-600 text-white shadow-purple-300 shadow-sm border border-white/40 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+              <FileSpreadsheet className="w-4.5 h-4.5 sm:w-6 sm:h-6 md:w-6.5 md:h-6.5" />
             </div>
-            <div>
-              <p className="text-xs sm:text-sm font-bold text-purple-950">Total Exams</p>
-              <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mt-0.5 font-mono">
-                {currentTotalExams}
-              </h3>
-              <p className="text-xs text-slate-700 font-semibold mt-0.5">Live Olympiads</p>
+            <div className="flex flex-col items-end">
+              <svg className="hidden min-[420px]:block sm:block w-11 sm:w-14 h-5 sm:h-7 text-purple-600 stroke-current fill-none" viewBox="0 0 50 20">
+                <path d="M 0 16 Q 15 14 30 6 T 50 2" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+              <span className="text-[10px] sm:text-[11px] font-black text-purple-950 mt-0.5 bg-white/95 px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg border border-purple-300 shadow-2xs shrink-0">↑ 50%</span>
             </div>
           </div>
-          <div className="text-right flex flex-col items-end">
-            <svg className="w-14 h-7 text-purple-600 stroke-current fill-none" viewBox="0 0 50 20">
-              <path d="M 0 16 Q 15 14 30 6 T 50 2" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-            <span className="text-[11px] font-black text-purple-950 mt-1 bg-white/95 px-2 py-0.5 rounded-lg border border-purple-300 shadow-2xs">↑ 50%</span>
+          <div>
+            <p className="text-[11px] sm:text-xs md:text-sm font-bold text-purple-950 truncate">Total Exams</p>
+            <h3 className="text-lg min-[360px]:text-xl sm:text-2xl md:text-3xl font-black text-slate-900 leading-tight mt-0.5 font-mono">
+              {currentTotalExams}
+            </h3>
+            <p className="text-[10px] sm:text-xs text-slate-700 font-semibold mt-0.5 truncate">Live Olympiads</p>
           </div>
         </div>
 
         {/* Questions in Bank (Navy-Wine Fusion) */}
-        <div className="bg-gradient-to-br from-blue-200/95 via-purple-200/85 to-rose-200/85 rounded-3xl border-2 border-purple-400/90 hover:border-purple-500 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between text-slate-900 group hover:-translate-y-1">
-          <div className="flex items-center gap-3.5">
-            <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-rose-600 text-white shadow-indigo-300 shadow-sm border border-white/40 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-              <FileText className="w-6.5 h-6.5" />
+        <div className="bg-gradient-to-br from-blue-200/95 via-purple-200/85 to-rose-200/85 rounded-2xl sm:rounded-3xl border-2 border-purple-400/90 hover:border-purple-500 p-3 sm:p-5 md:p-6 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between text-slate-900 group hover:-translate-y-1">
+          <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3">
+            <div className="w-9 h-9 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-rose-600 text-white shadow-indigo-300 shadow-sm border border-white/40 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+              <FileText className="w-4.5 h-4.5 sm:w-6 sm:h-6 md:w-6.5 md:h-6.5" />
             </div>
-            <div>
-              <p className="text-xs sm:text-sm font-bold text-indigo-950">Questions in Bank</p>
-              <h3 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight mt-0.5 font-mono">
-                {currentTotalQuestions}
-              </h3>
-              <p className="text-xs text-slate-700 font-semibold mt-0.5">Across 6 subjects</p>
+            <div className="flex flex-col items-end">
+              <svg className="hidden min-[420px]:block sm:block w-11 sm:w-14 h-5 sm:h-7 text-indigo-600 stroke-current fill-none" viewBox="0 0 50 20">
+                <path d="M 0 18 Q 15 10 30 12 T 50 4" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+              <span className="text-[10px] sm:text-[11px] font-black text-indigo-950 mt-0.5 bg-white/95 px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg border border-indigo-300 shadow-2xs shrink-0">↑ 33%</span>
             </div>
           </div>
-          <div className="text-right flex flex-col items-end">
-            <svg className="w-14 h-7 text-indigo-600 stroke-current fill-none" viewBox="0 0 50 20">
-              <path d="M 0 18 Q 15 10 30 12 T 50 4" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-            <span className="text-[11px] font-black text-indigo-950 mt-1 bg-white/95 px-2 py-0.5 rounded-lg border border-indigo-300 shadow-2xs">↑ 33%</span>
+          <div>
+            <p className="text-[11px] sm:text-xs md:text-sm font-bold text-indigo-950 truncate">Questions in Bank</p>
+            <h3 className="text-lg min-[360px]:text-xl sm:text-2xl md:text-3xl font-black text-slate-900 leading-tight mt-0.5 font-mono">
+              {currentTotalQuestions}
+            </h3>
+            <p className="text-[10px] sm:text-xs text-slate-700 font-semibold mt-0.5 truncate">Across 6 subjects</p>
           </div>
         </div>
       </div>
