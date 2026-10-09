@@ -964,50 +964,50 @@ export const PublicHomePage = ({
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 py-8 border-t border-[#edd6ed]">
         
         {/* Top Trust Stats Row - Clean Direct on Background (No Box Wrappers) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto py-2">
+        <div className="grid grid-cols-3 gap-1.5 min-[360px]:gap-2 sm:gap-6 md:gap-8 max-w-5xl mx-auto py-2">
           {/* Stat 1: Countries */}
-          <div className="flex items-center gap-3.5 sm:gap-4 justify-start md:justify-center">
-            <div className="w-12 h-12 rounded-full bg-[#fde8e4] border border-[#f7d7cc] flex items-center justify-center shrink-0 text-[#d9775b]">
-              <Globe className="w-6 h-6" />
+          <div className="flex items-center gap-1.5 min-[360px]:gap-2 sm:gap-4 justify-center">
+            <div className="w-8 h-8 min-[380px]:w-9 min-[380px]:h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-[#fde8e4] border border-[#f7d7cc] flex items-center justify-center shrink-0 text-[#d9775b]">
+              <Globe className="w-4 h-4 min-[380px]:w-4.5 min-[380px]:h-4.5 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </div>
-            <div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">45+</span>
-                <span className="text-sm sm:text-base font-bold text-[#4e2a4a]">Countries</span>
+            <div className="min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5 leading-tight">
+                <span className="text-sm min-[360px]:text-base sm:text-2xl md:text-3xl font-black text-[#4e2a4a] tracking-tight">45+</span>
+                <span className="text-[10px] min-[360px]:text-xs sm:text-sm md:text-base font-bold text-[#4e2a4a] truncate">Countries</span>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-600 font-normal leading-tight mt-0.5">
+              <p className="text-[11px] sm:text-xs text-slate-600 font-normal leading-tight mt-0.5 hidden sm:block">
                 Participating from across the globe.
               </p>
             </div>
           </div>
 
           {/* Stat 2: Scholars */}
-          <div className="flex items-center gap-3.5 sm:gap-4 justify-start md:justify-center">
-            <div className="w-12 h-12 rounded-full bg-[#fde8e4] border border-[#f7d7cc] flex items-center justify-center shrink-0 text-[#d9775b]">
-              <Users className="w-6 h-6" />
+          <div className="flex items-center gap-1.5 min-[360px]:gap-2 sm:gap-4 justify-center">
+            <div className="w-8 h-8 min-[380px]:w-9 min-[380px]:h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-[#fde8e4] border border-[#f7d7cc] flex items-center justify-center shrink-0 text-[#d9775b]">
+              <Users className="w-4 h-4 min-[380px]:w-4.5 min-[380px]:h-4.5 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </div>
-            <div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">2.4M+</span>
-                <span className="text-sm sm:text-base font-bold text-[#4e2a4a]">Scholars</span>
+            <div className="min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5 leading-tight">
+                <span className="text-sm min-[360px]:text-base sm:text-2xl md:text-3xl font-black text-[#4e2a4a] tracking-tight">2.4M+</span>
+                <span className="text-[10px] min-[360px]:text-xs sm:text-sm md:text-base font-bold text-[#4e2a4a] truncate">Scholars</span>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-600 font-normal leading-tight mt-0.5">
+              <p className="text-[11px] sm:text-xs text-slate-600 font-normal leading-tight mt-0.5 hidden sm:block">
                 Young minds, big dreams, one platform.
               </p>
             </div>
           </div>
 
           {/* Stat 3: Schools */}
-          <div className="flex items-center gap-3.5 sm:gap-4 justify-start md:justify-center">
-            <div className="w-12 h-12 rounded-full bg-[#fde8e4] border border-[#f7d7cc] flex items-center justify-center shrink-0 text-[#d9775b]">
-              <Building className="w-6 h-6" />
+          <div className="flex items-center gap-1.5 min-[360px]:gap-2 sm:gap-4 justify-center">
+            <div className="w-8 h-8 min-[380px]:w-9 min-[380px]:h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-[#fde8e4] border border-[#f7d7cc] flex items-center justify-center shrink-0 text-[#d9775b]">
+              <Building className="w-4 h-4 min-[380px]:w-4.5 min-[380px]:h-4.5 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </div>
-            <div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-2xl sm:text-3xl font-black text-[#4e2a4a] tracking-tight">8,500+</span>
-                <span className="text-sm sm:text-base font-bold text-[#4e2a4a]">Schools</span>
+            <div className="min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5 leading-tight">
+                <span className="text-sm min-[360px]:text-base sm:text-2xl md:text-3xl font-black text-[#4e2a4a] tracking-tight">8,500+</span>
+                <span className="text-[10px] min-[360px]:text-xs sm:text-sm md:text-base font-bold text-[#4e2a4a] truncate">Schools</span>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-600 font-normal leading-tight mt-0.5">
+              <p className="text-[11px] sm:text-xs text-slate-600 font-normal leading-tight mt-0.5 hidden sm:block">
                 Trusted by schools worldwide.
               </p>
             </div>
