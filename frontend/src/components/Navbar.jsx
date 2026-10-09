@@ -455,27 +455,27 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
   };
 
   return (
-    <header className={`sticky top-0 z-30 backdrop-blur-md border-b h-20 flex items-center lg:pl-72 w-full transition-colors duration-200 ${
+    <header className={`sticky top-0 z-30 backdrop-blur-md border-b h-16 sm:h-20 flex items-center lg:pl-72 w-full transition-colors duration-200 ${
       theme === 'dark'
         ? 'bg-[#0f172a]/95 border-slate-800 text-slate-100'
         : 'bg-white/95 border-slate-200 text-slate-800'
     }`}>
-      <div className="w-full flex items-center justify-between gap-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full flex items-center justify-between gap-1.5 sm:gap-4 max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         {/* Left: Mobile Toggle & Global Search Bar */}
-        <div className="flex items-center gap-3 flex-1 max-w-xl">
+        <div className="flex items-center gap-1.5 sm:gap-3 flex-1 min-w-0 max-w-xl">
           <button
             type="button"
             onClick={onToggleSidebar}
-            className="p-2 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 lg:hidden"
+            className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 shrink-0 lg:hidden cursor-pointer"
             aria-label="Toggle Navigation"
           >
             <Menu className="w-5 h-5" />
           </button>
 
           {/* Search Bar Container (Enlarged & Clean) */}
-          <div className="relative w-full max-w-lg">
+          <div className="relative w-full max-w-lg min-w-0">
             <div className="relative flex items-center">
-              <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 ref={inputRef}
                 type="text"
@@ -488,8 +488,8 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
                   if (query.trim()) setIsOpen(true);
                 }}
                 onKeyDown={handleKeyDown}
-                placeholder="Search anything... (e.g. math, exams, student, results)"
-                className={`w-full pl-11 pr-20 py-2.5 sm:py-3 rounded-2xl text-sm font-semibold placeholder-slate-400 focus:outline-none transition-all shadow-xs border ${
+                placeholder="Search anything..."
+                className={`w-full pl-8 sm:pl-11 pr-7 sm:pr-20 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-semibold placeholder-slate-400 focus:outline-none transition-all shadow-xs border ${
                   theme === 'dark'
                     ? 'bg-slate-900 border-slate-700 text-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10'
                     : 'bg-white border-slate-200 text-slate-800 focus:border-slate-400 focus:ring-4 focus:ring-slate-100'
@@ -497,7 +497,7 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
               />
 
               {/* Right indicators in input */}
-              <div className="absolute right-3 flex items-center gap-1.5">
+              <div className="absolute right-2 sm:right-3 flex items-center gap-1">
                 {query ? (
                   <button
                     type="button"
@@ -506,9 +506,9 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
                       setIsOpen(false);
                       inputRef.current?.focus();
                     }}
-                    className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors"
+                    className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors cursor-pointer"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                 ) : (
                   <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-1 text-[10px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200 rounded-lg shadow-2xs">
@@ -552,7 +552,7 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
                             <div
                               className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
                                 isSelected
-                                  ? 'bg-slate-900 text-white shadow-xs'
+                                    ? 'bg-slate-900 text-white shadow-xs'
                                   : 'bg-slate-100 text-slate-600'
                               }`}
                             >
@@ -611,12 +611,12 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
         </div>
 
         {/* Right: Quick actions, Light/Dark toggle, notifications, cart, logout */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
           {/* Light / Dark Mode Toggle Button */}
           <button
             type="button"
             onClick={toggleTheme}
-            className={`p-2.5 sm:p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-center shadow-2xs group active:scale-95 ${
+            className={`p-1.5 min-[360px]:p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border transition-all cursor-pointer flex items-center justify-center shadow-2xs group active:scale-95 shrink-0 ${
               theme === 'dark'
                 ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-amber-300 hover:text-amber-200 shadow-md shadow-indigo-950/40'
                 : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700 hover:text-slate-900'
@@ -625,9 +625,9 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
             aria-label="Toggle Theme"
           >
             {theme === 'dark' ? (
-              <Sun className="w-5 h-5 sm:w-5.5 sm:h-5.5 transition-transform group-hover:rotate-45 text-amber-300" />
+              <Sun className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:rotate-45 text-amber-300" />
             ) : (
-              <Moon className="w-5 h-5 sm:w-5.5 sm:h-5.5 transition-transform group-hover:-rotate-12 text-slate-700" />
+              <Moon className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:-rotate-12 text-slate-700" />
             )}
           </button>
 
@@ -635,16 +635,16 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
           <button
             type="button"
             onClick={openCart}
-            className={`relative p-2.5 sm:p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-center shadow-2xs group active:scale-95 ${
+            className={`relative p-1.5 min-[360px]:p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border transition-all cursor-pointer flex items-center justify-center shadow-2xs group active:scale-95 shrink-0 ${
               theme === 'dark'
                 ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200 hover:text-white'
                 : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700 hover:text-slate-900'
             }`}
             title={`Shopping Cart (${totalItems} items)`}
           >
-            <ShoppingCart className="w-5 h-5 sm:w-5.5 sm:h-5.5 transition-transform group-hover:scale-110" />
+            <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:scale-110" />
             {totalItems > 0 ? (
-              <span className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1.5 rounded-full bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center ring-2 ring-white animate-in zoom-in shadow-xs">
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] flex items-center justify-center ring-2 ring-white animate-in zoom-in shadow-xs">
                 {totalItems}
               </span>
             ) : (
@@ -656,15 +656,15 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
           <button
             type="button"
             onClick={onOpenNotifications}
-            className={`relative p-2.5 sm:p-3 rounded-2xl border transition-all cursor-pointer shadow-2xs group active:scale-95 flex items-center justify-center ${
+            className={`relative p-1.5 min-[360px]:p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border transition-all cursor-pointer shadow-2xs group active:scale-95 flex items-center justify-center shrink-0 ${
               theme === 'dark'
                 ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200 hover:text-white'
                 : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700 hover:text-slate-900'
             }`}
             title="Open Notification Center"
           >
-            <Bell className="w-5 h-5 sm:w-5.5 sm:h-5.5 transition-transform group-hover:scale-110" />
-            <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-white animate-pulse" />
+            <Bell className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:scale-110" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white animate-pulse" />
           </button>
 
           {/* Quick Logout Button */}
@@ -673,7 +673,7 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
             onClick={async () => {
               await logout();
             }}
-            className={`inline-flex items-center gap-2 px-3.5 py-2.5 sm:px-4.5 sm:py-2.5 text-xs sm:text-sm font-bold rounded-2xl transition-all cursor-pointer shadow-2xs active:scale-95 ${
+            className={`inline-flex items-center gap-1.5 p-1.5 min-[360px]:p-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl sm:rounded-2xl transition-all cursor-pointer shadow-2xs active:scale-95 shrink-0 ${
               theme === 'dark'
                 ? 'text-slate-200 hover:text-rose-400 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-rose-500/40'
                 : 'text-slate-700 hover:text-rose-600 bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200'
@@ -681,7 +681,7 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
             title="Sign Out / Logout"
           >
             <LogOut className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-            <span>Logout</span>
+            <span className="hidden sm:inline">Logout</span>
           </button>
         </div>
       </div>
