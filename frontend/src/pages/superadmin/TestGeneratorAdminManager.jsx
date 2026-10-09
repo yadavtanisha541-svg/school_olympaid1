@@ -33,9 +33,14 @@ import {
   Printer,
   FileDown,
   Copy,
-  CheckCircle
+  CheckCircle,
+  DollarSign,
+  Lock,
+  ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../api/client';
+import { getTestPricing, saveTestPricing } from '../../utils/purchaseUtils';
 
 const SUBJECT_OPTIONS = [
   { id: 'math', name: 'IMO (Mathematics)', code: 'IMO', color: '#d97706', icon: '📐' },
@@ -343,6 +348,65 @@ export const TestGeneratorAdminManager = () => {
   const [selectedSubjectFilter, setSelectedSubjectFilter] = useState('All');
   const [selectedYearFilter, setSelectedYearFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // =========================================================================
+  // PRACTICE TEST PRICING & UNLOCK CONFIGURATION STATE
+  // =========================================================================
+  const [testPricing, setTestPricing] = useState(() => getTestPricing());
+  const [practicePriceInput, setPracticePriceInput] = useState(() => {
+    const p = getTestPricing();
+    return p.practice_test_price || 99;
+  });
+  const [originalPriceInput, setOriginalPriceInput] = useState(() => {
+    const p = getTestPricing();
+    return p.original_price || 299;
+  });
+  const [showPricingModal, setShowPricingModal] = useState(false);
+  const [isSavingPricing, setIsSavingPricing] = useState(false);
+  const [pricingSavedToast, setPricingSavedToast] = useState(false);
+
+  useEffect(() => {
+    const handlePricingSync = (e) => {
+      const p = e?.detail || getTestPricing();
+      setTestPricing(p);
+      setPracticePriceInput(p.practice_test_price || 99);
+      setOriginalPriceInput(p.original_price || 299);
+    };
+    window.addEventListener('olympiadhub-pricing-updated', handlePricingSync);
+    window.addEventListener('storage', handlePricingSync);
+    return () => {
+      window.removeEventListener('olympiadhub-pricing-updated', handlePricingSync);
+      window.removeEventListener('storage', handlePricingSync);
+    };
+  }, []);
+
+  const handleSavePracticePricing = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    setIsSavingPricing(true);
+    try {
+      const current = getTestPricing();
+      const updated = saveTestPricing({
+        ...current,
+        practice_test_price: Number(practicePriceInput) || 99,
+        original_price: Number(originalPriceInput) || 299
+      });
+      setTestPricing(updated);
+      setPracticePriceInput(updated.practice_test_price);
+      setOriginalPriceInput(updated.original_price);
+
+      try {
+        await apiClient.post('/pricing/tests', updated);
+      } catch (err) {}
+
+      setPricingSavedToast(true);
+      setTimeout(() => setPricingSavedToast(false), 4500);
+      setShowPricingModal(false);
+    } catch (err) {
+      alert('Failed to save practice test pricing: ' + err.message);
+    } finally {
+      setIsSavingPricing(false);
+    }
+  };
 
   // Modal / Creator State
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -1518,11 +1582,94 @@ export const TestGeneratorAdminManager = () => {
         <div className="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
           <button
             type="button"
+            onClick={() => setShowPricingModal(true)}
+            className="px-4 py-2.5 bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-800 hover:from-purple-800 hover:to-indigo-800 text-white font-black rounded-xl text-xs sm:text-sm transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2 shrink-0 border border-purple-400/30"
+            title="Set Practice Test & Generator Pro Price"
+          >
+            <DollarSign className="w-4 h-4 text-amber-300" />
+            <span>💰 Practice Test Price: ₹{testPricing.practice_test_price || 99}</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => handleOpenCreateModal(activeCategoryTab)}
             className="px-5 py-2.5 bg-[#00b074] hover:bg-[#009260] text-white font-black rounded-xl text-sm transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2 shrink-0"
           >
             <Plus className="w-4.5 h-4.5" />
             <span>Create New Practice Test</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Success Toast */}
+      {pricingSavedToast && (
+        <div className="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-400 text-emerald-900 shadow-sm flex items-center justify-between gap-3 animate-in slide-in-from-top">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span className="font-black text-xs sm:text-sm">
+              Practice Test price updated successfully to ₹{testPricing.practice_test_price}! Student Practice Test Generator unlock buttons updated live.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setPricingSavedToast(false)}
+            className="text-emerald-700 hover:text-emerald-900 font-black text-xs cursor-pointer p-1"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Dedicated Practice Test Pricing Banner Card */}
+      <div className="bg-gradient-to-r from-[#2d124d] via-[#1e1b4b] to-[#3b0764] rounded-3xl p-5 sm:p-6 text-white shadow-md flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 border border-purple-800/50">
+        <div className="flex items-start sm:items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-900 flex items-center justify-center font-black shadow-md shrink-0">
+            <Sparkles className="w-6 h-6 text-slate-950" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <span className="text-xs uppercase font-black text-purple-300 tracking-wider bg-purple-950/70 px-2.5 py-0.5 rounded-full border border-purple-700/50">
+                Live Student Generator Pricing
+              </span>
+              <span className="text-xs font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                <span>Auto-Syncs to All Students</span>
+              </span>
+            </div>
+
+            <div className="flex items-baseline gap-2.5 mt-1.5 flex-wrap">
+              <span className="text-lg sm:text-xl font-black text-white">
+                Practice Tests / Test Generator Pro Price:
+              </span>
+              <span className="text-2xl sm:text-3xl font-black text-amber-300">
+                ₹{testPricing.practice_test_price || 99}
+              </span>
+              {testPricing.original_price && Number(testPricing.original_price) > Number(testPricing.practice_test_price) && (
+                <>
+                  <span className="text-sm text-purple-300 line-through font-bold">
+                    ₹{testPricing.original_price}
+                  </span>
+                  <span className="text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500 text-white shadow-2xs">
+                    {Math.round(((Number(testPricing.original_price) - Number(testPricing.practice_test_price)) / Number(testPricing.original_price)) * 100)}% OFF
+                  </span>
+                </>
+              )}
+            </div>
+
+            <p className="text-xs text-purple-200/90 font-medium mt-1">
+              Amount charged to students when unlocking Practice Tests and generating custom papers in Test Generator Pro.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+          <button
+            type="button"
+            onClick={() => setShowPricingModal(true)}
+            className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-purple-950 font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5"
+          >
+            <DollarSign className="w-4 h-4 text-purple-950" />
+            <span>Edit Practice Price</span>
           </button>
         </div>
       </div>
@@ -1724,6 +1871,182 @@ export const TestGeneratorAdminManager = () => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* PRACTICE TEST & GENERATOR PRICING MODAL */}
+      {showPricingModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="px-6 py-5 border-b border-purple-100 flex items-center justify-between bg-gradient-to-r from-purple-50 via-indigo-50 to-pink-50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center shadow-md">
+                  <DollarSign className="w-5 h-5 text-amber-300" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">
+                    Practice Tests &amp; Test Generator Pricing
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Set the live unlocked price charged to students on Practice Tests.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPricingModal(false)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleSavePracticePricing} className="p-6 space-y-5 overflow-y-auto flex-1">
+              {/* 1. Practice Test Price */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-purple-50 to-indigo-50 border-2 border-purple-300 space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <label className="text-xs font-black text-purple-950 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-purple-600" />
+                    <span>Practice Tests / Test Generator Pro Price</span>
+                  </label>
+                  <span className="text-[10px] font-bold text-purple-800 bg-purple-200/70 px-2 py-0.5 rounded-full">
+                    Student Generator unlock button
+                  </span>
+                </div>
+
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-black text-slate-500 text-base">₹</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                    value={practicePriceInput}
+                    onChange={(e) => setPracticePriceInput(e.target.value)}
+                    placeholder="99"
+                    className="w-full pl-8 pr-4 py-3 bg-white border border-purple-300 rounded-xl font-black text-slate-900 text-base focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-2xs"
+                  />
+                </div>
+
+                <p className="text-[11px] text-slate-600 font-medium">
+                  Displayed on the student Practice Test unlock button (<span className="font-bold text-purple-900 font-mono">🔒 NEXT: PAY &amp; UNLOCK TEST (₹{practicePriceInput || 99})</span>).
+                </p>
+
+                {/* 1-Click Presets */}
+                <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                  <span className="text-[10px] font-black uppercase text-purple-900 mr-1">Quick Presets:</span>
+                  {[49, 79, 99, 149, 199, 299].map((amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => setPracticePriceInput(amt)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                        Number(practicePriceInput) === amt
+                          ? 'bg-purple-600 text-white shadow-xs'
+                          : 'bg-white text-slate-700 border border-purple-200 hover:bg-purple-100'
+                      }`}
+                    >
+                      ₹{amt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 2. Original MRP Price (Strikethrough) */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <label className="text-xs font-black text-slate-800 flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-slate-500" />
+                    <span>Original / MRP Price (Strikethrough Display)</span>
+                  </label>
+                  <span className="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full">
+                    Optional strikethrough
+                  </span>
+                </div>
+
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-black text-slate-500 text-base">₹</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={originalPriceInput}
+                    onChange={(e) => setOriginalPriceInput(e.target.value)}
+                    placeholder="299"
+                    className="w-full pl-8 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl font-bold text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-slate-600">
+                  <span>
+                    Discount percentage: {' '}
+                    <strong className="text-emerald-700">
+                      {originalPriceInput && Number(originalPriceInput) > Number(practicePriceInput)
+                        ? `${Math.round(((Number(originalPriceInput) - Number(practicePriceInput)) / Number(originalPriceInput)) * 100)}% OFF`
+                        : 'No discount'}
+                    </strong>
+                  </span>
+                  <span className="line-through text-slate-400 font-bold">
+                    ₹{originalPriceInput || 299}
+                  </span>
+                </div>
+              </div>
+
+              {/* 3. Live Student View Preview */}
+              <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-2">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block">
+                  👁️ Live Student Preview (Unlock Button)
+                </span>
+                <div className="py-2.5 px-4 rounded-xl bg-[#00b074] text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs">
+                  <Lock className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Next: Pay &amp; Unlock Test (₹{practicePriceInput || 99})</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-slate-300 px-1 pt-1">
+                  <span>Student Checkout Fee: <strong>₹{practicePriceInput || 99}</strong></span>
+                  {originalPriceInput && Number(originalPriceInput) > Number(practicePriceInput) && (
+                    <span className="text-emerald-400 font-bold">
+                      {Math.round(((Number(originalPriceInput) - Number(practicePriceInput)) / Number(originalPriceInput)) * 100)}% Discount Applied
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={isSavingPricing}
+                  className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-sm shadow-md hover:shadow-lg active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  {isSavingPricing ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Saving &amp; Updating Live...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4 stroke-[3]" />
+                      <span>Save &amp; Apply Live to Students</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPracticePriceInput(99);
+                    setOriginalPriceInput(299);
+                  }}
+                  className="px-4 py-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-colors"
+                >
+                  ↺ Reset (₹99)
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 

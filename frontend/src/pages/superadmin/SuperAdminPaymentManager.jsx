@@ -579,32 +579,14 @@ export const SuperAdminPaymentManager = () => {
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <h3 className="font-black text-emerald-950 text-sm flex items-center gap-2">
                   <DollarSign className="w-5 h-5 text-emerald-600" />
-                  <span>Mock Test &amp; Practice Test Pricing Control</span>
+                  <span>Practice Tests &amp; Paper Pricing Control</span>
                 </h3>
                 <span className="text-[10px] font-bold text-emerald-900 bg-emerald-200/90 px-2.5 py-0.5 rounded-full uppercase">
                   Live Sync Across All Students
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Mock Test Price */}
-                <div className="bg-white p-4 rounded-xl border border-emerald-300 space-y-2">
-                  <label className="text-[11px] font-black text-slate-800 flex items-center gap-1.5">
-                    <Lock className="w-3.5 h-3.5 text-amber-500" />
-                    <span>Mock Test Price (₹)</span>
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    required
-                    value={bankSettings.mock_test_price}
-                    onChange={(e) => setBankSettings({ ...bankSettings, mock_test_price: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-black text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  />
-                  <p className="text-[10px] text-slate-500">Lock badge on student sidebar: 🔒 ₹{bankSettings.mock_test_price || 99}</p>
-                </div>
-
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Practice Test Price */}
                 <div className="bg-white p-4 rounded-xl border border-emerald-300 space-y-2">
                   <label className="text-[11px] font-black text-slate-800 flex items-center gap-1.5">
@@ -648,10 +630,10 @@ export const SuperAdminPaymentManager = () => {
                   <button
                     key={amt}
                     type="button"
-                    onClick={() => setBankSettings({ ...bankSettings, mock_test_price: amt, practice_test_price: amt })}
+                    onClick={() => setBankSettings({ ...bankSettings, practice_test_price: amt })}
                     className="px-2.5 py-0.5 rounded-md bg-white border border-emerald-300 text-emerald-900 font-bold hover:bg-emerald-100 transition-colors cursor-pointer"
                   >
-                    Set Both to ₹{amt}
+                    ₹{amt}
                   </button>
                 ))}
               </div>
