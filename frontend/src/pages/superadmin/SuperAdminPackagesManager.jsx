@@ -1068,83 +1068,90 @@ export const SuperAdminPackagesManager = () => {
 
         {/* Top Sticky Header */}
         <div className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-2xs">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <button
                 type="button"
                 onClick={() => setIsAuthoringPaper(false)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer shadow-2xs"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer shadow-2xs shrink-0"
+                title="Back to Subject Covers"
               >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back to {selectedSubjectCover ? `${selectedSubjectCover} Tests` : 'Subject Covers'}</span>
+                <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <span className="hidden sm:inline">Back to {selectedSubjectCover ? `${selectedSubjectCover} Tests` : 'Subject Covers'}</span>
+                <span className="sm:hidden text-[11px]">Back</span>
               </button>
-              <div className="h-5 w-px bg-slate-200 hidden sm:block" />
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-[#6d3a68] block">
+              <div className="h-4 w-px bg-slate-200 hidden sm:block" />
+              <div className="min-w-0 flex-1">
+                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-[#6d3a68] block truncate">
                   Subject Mock Test Studio &bull; {paperSubjectCode} ({paperClass})
                 </span>
-                <h1 className="text-base sm:text-xl font-black text-slate-900 leading-tight">
+                <h1 className="text-sm sm:text-xl font-black text-slate-900 leading-snug">
                   {editingPaper ? `Edit: ${paperTitle || 'Mock Test Paper'}` : 'Create New Subject Mock Test Paper'}
                 </h1>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => setIsAuthoringPaper(false)}
-                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-all"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-all shrink-0"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleSavePaper}
-                className="px-6 py-2 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white font-black text-xs shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5 transition-all"
+                className="flex-1 sm:flex-initial px-3 sm:px-5 py-1.5 sm:py-2 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white font-black text-xs shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 transition-all"
               >
-                <Check className="w-4 h-4" />
-                <span>Save All Changes to Database</span>
+                <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <span className="hidden min-[380px]:inline sm:hidden">Save to Database</span>
+                <span className="min-[380px]:hidden">Save</span>
+                <span className="hidden sm:inline">Save All Changes to Database</span>
               </button>
             </div>
           </div>
 
           {/* Sub Navigation Studio Tabs */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-2 border-t border-slate-100 overflow-x-auto py-1">
+          <div className="max-w-7xl mx-auto px-2 sm:px-6 flex items-center gap-1.5 sm:gap-2 border-t border-slate-100 overflow-x-auto py-1 sm:py-1.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <button
               type="button"
               onClick={() => setPaperModalTab('details')}
-              className={`py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+              className={`py-1.5 sm:py-2 px-2.5 sm:px-4 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                 paperModalTab === 'details'
                   ? 'bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
-              <FileText className="w-4 h-4" />
-              <span>1. Test Details &amp; Settings</span>
+              <FileText className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline">1. Test Details &amp; Settings</span>
+              <span className="sm:hidden">1. Test Details</span>
             </button>
             <button
               type="button"
               onClick={() => setPaperModalTab('questions')}
-              className={`py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+              className={`py-1.5 sm:py-2 px-2.5 sm:px-4 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                 paperModalTab === 'questions'
                   ? 'bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
-              <HelpCircle className="w-4 h-4" />
-              <span>2. Question-by-Question Studio ({paperQuestions.length})</span>
+              <HelpCircle className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline">2. Question-by-Question Studio ({paperQuestions.length})</span>
+              <span className="sm:hidden">2. Questions ({paperQuestions.length})</span>
             </button>
             <button
               type="button"
               onClick={() => setPaperModalTab('bulk')}
-              className={`py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+              className={`py-1.5 sm:py-2 px-2.5 sm:px-4 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                 paperModalTab === 'bulk'
                   ? 'bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
-              <Sparkles className="w-4 h-4" />
-              <span>3. Fast Bulk Import (Text)</span>
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline">3. Fast Bulk Import (Text)</span>
+              <span className="sm:hidden">3. Bulk Import</span>
             </button>
           </div>
         </div>
