@@ -629,21 +629,21 @@ export const PublicHomePage = ({
             </div>
 
             {/* Simple CTAs */}
-            <div className="pt-2 flex flex-wrap items-center gap-3">
+            <div className="pt-2 flex flex-row flex-nowrap items-center gap-1.5 sm:gap-3 max-w-full">
               <button
                 type="button"
                 onClick={onOpenRegister}
-                className="px-6 py-3 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-black shadow-md shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95 flex items-center gap-2"
+                className="px-2.5 min-[360px]:px-3.5 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-[10px] min-[360px]:text-[11px] sm:text-xs font-black shadow-md shadow-[#d9775b]/30 cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1 sm:gap-2 whitespace-nowrap shrink-0"
               >
                 <span>Register Student Now</span>
-                <ArrowRight className="w-4 h-4 text-[#e7b84b]" />
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#e7b84b] shrink-0" />
               </button>
               <button
                 type="button"
                 onClick={() => onNavigatePublic('practice-hub')}
-                className="px-5 py-3 bg-[#f4ebf4] hover:bg-[#edd6ed] text-[#6d3a68] border border-[#edd6ed] rounded-md text-xs font-bold transition-all cursor-pointer"
+                className="px-2 min-[360px]:px-3 sm:px-5 py-2 sm:py-3 bg-[#f4ebf4] hover:bg-[#edd6ed] text-[#6d3a68] border border-[#edd6ed] rounded-md text-[10px] min-[360px]:text-[11px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 text-center"
               >
-                Explore Free Practice Hub
+                <span>Explore Free Practice Hub</span>
               </button>
             </div>
           </div>
@@ -818,21 +818,21 @@ export const PublicHomePage = ({
             </div>
 
             {/* CTAs */}
-            <div className="pt-2 flex flex-wrap items-center gap-3">
+            <div className="pt-2 flex flex-row flex-nowrap items-center gap-1.5 sm:gap-3 max-w-full">
               <button
                 type="button"
                 onClick={onOpenRegister}
-                className="px-6 py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-xs font-black shadow-md shadow-[#16327a]/30 cursor-pointer transition-all active:scale-95 flex items-center gap-2"
+                className="px-2.5 min-[360px]:px-3.5 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white rounded-md text-[10px] min-[360px]:text-[11px] sm:text-xs font-black shadow-md shadow-[#16327a]/30 cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1 sm:gap-2 whitespace-nowrap shrink-0"
               >
                 <span>Register Student Now</span>
-                <ArrowRight className="w-4 h-4 text-[#fbbf24]" />
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#fbbf24] shrink-0" />
               </button>
               <button
                 type="button"
                 onClick={() => onNavigatePublic('practice-hub')}
-                className="px-5 py-2.5 bg-[#eef2ff] hover:bg-[#e0e7ff] text-[#16327a] border border-[#c7d2fe] rounded-md text-xs font-bold transition-all cursor-pointer"
+                className="px-2 min-[360px]:px-3 sm:px-5 py-2 sm:py-2.5 bg-[#eef2ff] hover:bg-[#e0e7ff] text-[#16327a] border border-[#c7d2fe] rounded-md text-[10px] min-[360px]:text-[11px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 text-center"
               >
-                Explore Free Practice Hub
+                <span>Explore Free Practice Hub</span>
               </button>
             </div>
           </div>
