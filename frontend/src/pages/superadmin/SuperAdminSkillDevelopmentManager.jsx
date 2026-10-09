@@ -639,46 +639,54 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-              <button
-                type="button"
-                onClick={handleDownloadProgramsTemplate}
-                className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
-              >
-                <Download className="w-4 h-4 text-[#16327a]" />
-                <span>Template</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowImportModal(true)}
-                className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
-              >
-                <Upload className="w-4 h-4 text-[#16327a]" />
-                <span>Import CSV</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleExportProgramsCSV}
-                className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
-              >
-                <Download className="w-4 h-4 text-[#16327a]" />
-                <span>Export CSV</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleResetDefaults}
-                className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
-                title="Reset Defaults"
-              >
-                <RotateCcw className="w-4 h-4 text-slate-500" />
-                <span>Reset</span>
-              </button>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2.5 shrink-0 w-full sm:w-auto">
+              {/* Row 1 on mobile: 4 utility buttons in 1 single line */}
+              <div className="grid grid-cols-4 sm:flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={handleDownloadProgramsTemplate}
+                  className="px-2 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-[10px] min-[360px]:text-[11px] sm:text-sm flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs whitespace-nowrap"
+                  title="Download Template"
+                >
+                  <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#16327a] shrink-0" />
+                  <span>Template</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowImportModal(true)}
+                  className="px-2 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-[10px] min-[360px]:text-[11px] sm:text-sm flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs whitespace-nowrap"
+                  title="Import CSV"
+                >
+                  <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#16327a] shrink-0" />
+                  <span>Import CSV</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleExportProgramsCSV}
+                  className="px-2 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-[10px] min-[360px]:text-[11px] sm:text-sm flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs whitespace-nowrap"
+                  title="Export CSV"
+                >
+                  <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#16327a] shrink-0" />
+                  <span>Export CSV</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResetDefaults}
+                  className="px-2 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-[10px] min-[360px]:text-[11px] sm:text-sm flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs whitespace-nowrap"
+                  title="Reset Defaults"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500 shrink-0" />
+                  <span>Reset</span>
+                </button>
+              </div>
+
+              {/* Row 2 on mobile: Create New Program CTA in 2nd line */}
               <button
                 type="button"
                 onClick={handleOpenNew}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30"
+                className="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30 shrink-0"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4 shrink-0" />
                 <span>Create New Program</span>
               </button>
             </div>

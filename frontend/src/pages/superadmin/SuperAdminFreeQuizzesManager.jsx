@@ -397,49 +397,54 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
-          <button
-            type="button"
-            onClick={handleDownloadTemplate}
-            className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
-            title="Download CSV Template"
-          >
-            <FileText className="w-4 h-4 text-indigo-600" />
-            <span>Template</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsImportModalOpen(true)}
-            className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-indigo-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-indigo-200 shadow-2xs"
-            title="Import questions from CSV / Excel"
-          >
-            <Upload className="w-4 h-4 text-indigo-600" />
-            <span>Import CSV</span>
-          </button>
-          <button
-            type="button"
-            onClick={handleExportCSV}
-            className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-emerald-50 text-emerald-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-200 shadow-2xs"
-            title="Export questions to CSV"
-          >
-            <Download className="w-4 h-4 text-emerald-600" />
-            <span>Export CSV</span>
-          </button>
-          <button
-            type="button"
-            onClick={handleResetDefaults}
-            className="px-3 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs"
-            title="Reset Seed Defaults"
-          >
-            <RotateCcw className="w-4 h-4 text-[#16327a]" />
-            <span>Reset</span>
-          </button>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2.5 shrink-0 w-full sm:w-auto">
+          {/* Row 1 on mobile: 4 utility buttons in 1 single line */}
+          <div className="grid grid-cols-4 sm:flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={handleDownloadTemplate}
+              className="px-2 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-[10px] min-[360px]:text-[11px] sm:text-xs flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs whitespace-nowrap"
+              title="Download CSV Template"
+            >
+              <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600 shrink-0" />
+              <span>Template</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsImportModalOpen(true)}
+              className="px-2 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-indigo-700 font-bold text-[10px] min-[360px]:text-[11px] sm:text-xs flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer border border-indigo-200 shadow-2xs whitespace-nowrap"
+              title="Import questions from CSV / Excel"
+            >
+              <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600 shrink-0" />
+              <span>Import CSV</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleExportCSV}
+              className="px-2 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-emerald-50 text-emerald-700 font-bold text-[10px] min-[360px]:text-[11px] sm:text-xs flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer border border-emerald-200 shadow-2xs whitespace-nowrap"
+              title="Export questions to CSV"
+            >
+              <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 shrink-0" />
+              <span>Export CSV</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleResetDefaults}
+              className="px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-[10px] min-[360px]:text-[11px] sm:text-xs flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs whitespace-nowrap"
+              title="Reset Seed Defaults"
+            >
+              <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#16327a] shrink-0" />
+              <span>Reset</span>
+            </button>
+          </div>
+
+          {/* Row 2 on mobile: Add Question CTA in 2nd line */}
           <button
             type="button"
             onClick={handleOpenCreateModal}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shadow-blue-950/20 active:scale-95 cursor-pointer border border-[#7854d6]/30 shrink-0"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 shrink-0" />
             <span>Add Question</span>
           </button>
         </div>
