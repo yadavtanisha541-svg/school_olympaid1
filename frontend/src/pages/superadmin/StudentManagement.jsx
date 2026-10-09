@@ -2037,27 +2037,27 @@ export const StudentManagement = () => {
       </div>
 
       {/* 3. Search Bar & Filters */}
-      <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+      <div className="bg-white p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-2xs space-y-3">
         {/* Main Search */}
         <div className="relative w-full">
-          <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by student name, Student ID, email or school..."
-            className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm sm:text-base text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-all"
+            className="w-full pl-9 pr-3 py-2 sm:py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-all"
           />
         </div>
 
         {/* Filter Dropdowns Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 text-sm">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-2.5 text-xs">
           <div>
-            <label className="text-xs font-black text-slate-600 uppercase tracking-wider block mb-1.5">Class</label>
+            <label className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-wider block mb-1">Class</label>
             <select
               value={filterClass}
               onChange={(e) => setFilterClass(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              className="w-full px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer truncate"
             >
               <option value="all">All Classes</option>
               {['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((c) => (
@@ -2067,11 +2067,11 @@ export const StudentManagement = () => {
           </div>
 
           <div>
-            <label className="text-xs font-black text-slate-600 uppercase tracking-wider block mb-1.5">Section</label>
+            <label className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-wider block mb-1">Section</label>
             <select
               value={filterSection}
               onChange={(e) => setFilterSection(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              className="w-full px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer truncate"
             >
               <option value="all">All Sections</option>
               <option value="A">Section A</option>
@@ -2081,11 +2081,11 @@ export const StudentManagement = () => {
           </div>
 
           <div>
-            <label className="text-xs font-black text-slate-600 uppercase tracking-wider block mb-1.5">School</label>
+            <label className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-wider block mb-1">School</label>
             <select
               value={filterSchool}
               onChange={(e) => setFilterSchool(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              className="w-full px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer truncate"
             >
               <option value="all">All Schools</option>
               <option value="Delhi Public School">Delhi Public School</option>
@@ -2095,11 +2095,11 @@ export const StudentManagement = () => {
           </div>
 
           <div>
-            <label className="text-xs font-black text-slate-600 uppercase tracking-wider block mb-1.5">Olympiad</label>
+            <label className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-wider block mb-1">Olympiad</label>
             <select
               value={filterOlympiad}
               onChange={(e) => setFilterOlympiad(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              className="w-full px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer truncate"
             >
               <option value="all">All Olympiads</option>
               <option value="Mathematics Olympiad">Mathematics Olympiad</option>
@@ -2110,11 +2110,11 @@ export const StudentManagement = () => {
           </div>
 
           <div>
-            <label className="text-xs font-black text-slate-600 uppercase tracking-wider block mb-1.5">Status</label>
+            <label className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-wider block mb-1">Status</label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              className="w-full px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer truncate"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -2123,11 +2123,11 @@ export const StudentManagement = () => {
           </div>
 
           <div>
-            <label className="text-xs font-black text-slate-600 uppercase tracking-wider block mb-1.5">Registration</label>
+            <label className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-wider block mb-1">Registration</label>
             <select
               value={filterRegStatus}
               onChange={(e) => setFilterRegStatus(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              className="w-full px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 cursor-pointer truncate"
             >
               <option value="all">All Registrations</option>
               <option value="Registered">Registered</option>
@@ -2136,11 +2136,11 @@ export const StudentManagement = () => {
             </select>
           </div>
 
-          <div className="flex flex-col justify-end">
+          <div className="col-span-2 sm:col-span-1 flex flex-col justify-end pt-1 sm:pt-0">
             <button
               type="button"
               onClick={handleClearFilters}
-              className="w-full px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs sm:text-sm font-black transition-colors cursor-pointer"
+              className="w-full px-3 py-1.5 sm:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg sm:rounded-xl text-xs font-bold transition-colors cursor-pointer text-center"
             >
               Clear Filters
             </button>
