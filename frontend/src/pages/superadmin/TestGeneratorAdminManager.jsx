@@ -1564,39 +1564,45 @@ export const TestGeneratorAdminManager = () => {
     <div className="space-y-6 font-sans pb-16 animate-in fade-in duration-150">
       
       {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="w-14 h-14 rounded-2xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-xs">
-            <Award className="w-7 h-7 text-[#80497D]" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 pb-2">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-xs">
+            <Award className="w-5 h-5 sm:w-7 sm:h-7 text-[#80497D]" />
           </div>
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight">
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-black text-[#422240] tracking-tight leading-snug sm:leading-tight">
               Practice Tests &amp; Question Papers Manager
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+            <p className="text-[11px] sm:text-xs md:text-sm text-slate-500 font-medium mt-0.5 sm:mt-1 line-clamp-2 sm:line-clamp-none">
               Create, edit, author questions, configure duration/marks, and manage practice tests for Student Dashboard.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-3 w-full md:w-auto shrink-0 pt-1 md:pt-0">
           <button
             type="button"
             onClick={() => setShowPricingModal(true)}
-            className="px-4 py-2.5 bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-800 hover:from-purple-800 hover:to-indigo-800 text-white font-black rounded-xl text-xs sm:text-sm transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2 shrink-0 border border-purple-400/30"
+            className="w-full sm:w-auto px-2.5 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-800 hover:from-purple-800 hover:to-indigo-800 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 shrink-0 border border-purple-400/30 text-center min-w-0"
             title="Set Practice Test & Generator Pro Price"
           >
-            <DollarSign className="w-4 h-4 text-amber-300" />
-            <span>💰 Practice Test Price: ₹{testPricing.practice_test_price || 99}</span>
+            <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300 shrink-0" />
+            <span className="truncate">
+              <span className="sm:hidden">Price: ₹{testPricing.practice_test_price || 99}</span>
+              <span className="hidden sm:inline">Practice Test Price: ₹{testPricing.practice_test_price || 99}</span>
+            </span>
           </button>
 
           <button
             type="button"
             onClick={() => handleOpenCreateModal(activeCategoryTab)}
-            className="px-5 py-2.5 bg-[#00b074] hover:bg-[#009260] text-white font-black rounded-xl text-sm transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2 shrink-0"
+            className="w-full sm:w-auto px-2.5 sm:px-5 py-2 sm:py-2.5 bg-[#00b074] hover:bg-[#009260] text-white font-black rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 shrink-0 text-center min-w-0"
           >
-            <Plus className="w-4.5 h-4.5" />
-            <span>Create New Practice Test</span>
+            <Plus className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 shrink-0" />
+            <span className="truncate">
+              <span className="sm:hidden">Create Test</span>
+              <span className="hidden sm:inline">Create New Practice Test</span>
+            </span>
           </button>
         </div>
       </div>
@@ -1621,52 +1627,52 @@ export const TestGeneratorAdminManager = () => {
       )}
 
       {/* Dedicated Practice Test Pricing Banner Card */}
-      <div className="bg-gradient-to-r from-[#2d124d] via-[#1e1b4b] to-[#3b0764] rounded-3xl p-5 sm:p-6 text-white shadow-md flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 border border-purple-800/50">
-        <div className="flex items-start sm:items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-900 flex items-center justify-center font-black shadow-md shrink-0">
-            <Sparkles className="w-6 h-6 text-slate-950" />
+      <div className="bg-gradient-to-r from-[#2d124d] via-[#1e1b4b] to-[#3b0764] rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-white shadow-md flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-5 border border-purple-800/50">
+        <div className="flex items-start sm:items-center gap-3.5 sm:gap-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-900 flex items-center justify-center font-black shadow-md shrink-0">
+            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-slate-950" />
           </div>
           <div>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <span className="text-xs uppercase font-black text-purple-300 tracking-wider bg-purple-950/70 px-2.5 py-0.5 rounded-full border border-purple-700/50">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[10px] sm:text-xs uppercase font-black text-purple-300 tracking-wider bg-purple-950/70 px-2 sm:px-2.5 py-0.5 rounded-full border border-purple-700/50">
                 Live Student Generator Pricing
               </span>
-              <span className="text-xs font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span className="text-[10px] sm:text-xs font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded-full flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                 <span>Auto-Syncs to All Students</span>
               </span>
             </div>
 
-            <div className="flex items-baseline gap-2.5 mt-1.5 flex-wrap">
-              <span className="text-lg sm:text-xl font-black text-white">
-                Practice Tests / Test Generator Pro Price:
+            <div className="flex items-baseline gap-2 sm:gap-2.5 mt-1.5 flex-wrap">
+              <span className="text-sm sm:text-lg lg:text-xl font-black text-white">
+                Practice Tests Price:
               </span>
-              <span className="text-2xl sm:text-3xl font-black text-amber-300">
+              <span className="text-xl sm:text-2xl lg:text-3xl font-black text-amber-300">
                 ₹{testPricing.practice_test_price || 99}
               </span>
               {testPricing.original_price && Number(testPricing.original_price) > Number(testPricing.practice_test_price) && (
                 <>
-                  <span className="text-sm text-purple-300 line-through font-bold">
+                  <span className="text-xs sm:text-sm text-purple-300 line-through font-bold">
                     ₹{testPricing.original_price}
                   </span>
-                  <span className="text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500 text-white shadow-2xs">
+                  <span className="text-[10px] sm:text-[11px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500 text-white shadow-2xs">
                     {Math.round(((Number(testPricing.original_price) - Number(testPricing.practice_test_price)) / Number(testPricing.original_price)) * 100)}% OFF
                   </span>
                 </>
               )}
             </div>
 
-            <p className="text-xs text-purple-200/90 font-medium mt-1">
+            <p className="text-[11px] sm:text-xs text-purple-200/90 font-medium mt-1">
               Amount charged to students when unlocking Practice Tests and generating custom papers in Test Generator Pro.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+        <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
           <button
             type="button"
             onClick={() => setShowPricingModal(true)}
-            className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-purple-950 font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5"
+            className="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-purple-950 font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 text-center"
           >
             <DollarSign className="w-4 h-4 text-purple-950" />
             <span>Edit Practice Price</span>
