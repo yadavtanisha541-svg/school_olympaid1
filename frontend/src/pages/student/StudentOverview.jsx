@@ -950,7 +950,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                 <p className="text-xs text-slate-500 font-semibold mt-0.5">
                   {purchasedDashboardSubjects.length > 0
                     ? 'Only your purchased Olympiad test series are shown below. Click to start mock tests.'
-                    : 'Unlock any subject below for ₹99 to access full mock test series and CBT exams.'}
+                    : 'Unlock any subject below to access full mock test series and CBT exams.'}
                 </p>
               </div>
 
@@ -1041,7 +1041,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                         + Add Subject
                       </h3>
                       <p className="text-xs text-slate-500 font-medium">
-                        Unlock for ₹99
+                        Unlock Subject Package
                       </p>
                     </div>
 
@@ -1064,7 +1064,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                         No Mock Test Series Unlocked Yet
                       </h4>
                       <p className="text-xs text-slate-600 font-medium mt-0.5">
-                        Select any Olympiad subject below to unlock the complete 5 mock tests package for Class {selectedClass} for just ₹99!
+                        Select any Olympiad subject below to unlock the complete 5 mock tests package for Class {selectedClass}!
                       </p>
                     </div>
                   </div>
@@ -1086,9 +1086,8 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                     >
                       {/* Lock Badge */}
                       <div className="absolute top-2.5 right-2.5">
-                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-black flex items-center gap-1 shadow-2xs">
-                          <Lock className="w-2.5 h-2.5" />
-                          ₹99
+                        <span className="p-1 sm:p-1.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 flex items-center justify-center shadow-2xs">
+                          <Lock className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         </span>
                       </div>
 
@@ -1109,7 +1108,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
 
                       {/* Bottom Action Indicator */}
                       <div className={`w-full pt-2.5 border-t border-black/10 flex items-center justify-between text-xs font-bold ${sub.linkText} transition-colors`}>
-                        <span>Unlock ₹99</span>
+                        <span>Unlock</span>
                         <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                       </div>
                     </div>
