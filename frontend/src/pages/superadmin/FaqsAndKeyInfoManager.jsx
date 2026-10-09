@@ -400,45 +400,46 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
       )}
 
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="w-14 h-14 rounded-2xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-xs">
-            <Sparkles className="w-7 h-7 text-[#80497D]" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 pb-2">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#80497D]/10 text-[#80497D] flex items-center justify-center font-bold border border-[#ebd7eb] shrink-0 shadow-xs">
+            <Sparkles className="w-5 h-5 sm:w-7 sm:h-7 text-[#80497D]" />
           </div>
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#422240] tracking-tight">
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-black text-[#422240] tracking-tight leading-snug sm:leading-tight">
               FAQs &amp; Key Info Content Manager
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+            <p className="text-[11px] sm:text-xs md:text-sm text-slate-500 font-medium mt-0.5 sm:mt-1 line-clamp-2 sm:line-clamp-none">
               Manage the 5 key dropdown items (FAQs, Exam Dates, Syllabus, Sample Papers, Marking Scheme) across all subjects and grades.
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-          {onGoToPublic && (
-            <button
-              type="button"
-              onClick={onGoToPublic}
-              className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-2 cursor-pointer shadow-xs"
-            >
-              <Eye className="w-4 h-4 text-[#80497D]" />
-              <span>Preview Public Website</span>
-            </button>
-          )}
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-2.5 w-full sm:w-auto shrink-0 pt-1 md:pt-0">
+          <button
+            type="button"
+            onClick={onGoToPublic || (() => window.open('/', '_blank'))}
+            className="w-full sm:w-auto px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer shadow-xs active:scale-95 text-center min-w-0"
+          >
+            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#80497D] shrink-0" />
+            <span className="truncate">
+              <span className="sm:hidden">Preview Site</span>
+              <span className="hidden sm:inline">Preview Public Website</span>
+            </span>
+          </button>
           <button
             type="button"
             onClick={handleResetAllToDefaults}
-            className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-all flex items-center gap-2 cursor-pointer shadow-xs"
+            className="w-full sm:w-auto px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer shadow-xs active:scale-95 text-center min-w-0"
           >
-            <RotateCcw className="w-4 h-4" />
-            <span>Reset Defaults</span>
+            <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-600 shrink-0" />
+            <span className="truncate">Reset Defaults</span>
           </button>
         </div>
       </div>
 
       {/* 6 Sub-Section Navigation Tabs */}
-      <div className="bg-white rounded-2xl p-2 border border-[#edd6ed] shadow-sm flex items-center gap-2 overflow-x-auto scrollbar-thin">
+      <div className="bg-white rounded-2xl p-1.5 sm:p-2 border border-[#edd6ed] shadow-xs flex items-center gap-1.5 sm:gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {[
           { id: 'menu', label: '1. Dropdown Menu Items', icon: Layers, desc: 'Manage 5 navbar links' },
           { id: 'faqs', label: '2. FAQs Repository', icon: HelpCircle, desc: 'All Q&A pairs' },
@@ -453,13 +454,13 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id)}
-              className={`px-4 py-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2.5 cursor-pointer ${
+              className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer shadow-xs active:scale-95 ${
                 isActive
                   ? 'bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white shadow-md shadow-blue-950/20 border border-[#7854d6]/30'
                   : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
               }`}
             >
-              <Icon className={`w-4 h-4 ${isActive ? 'text-[#e7b84b]' : 'text-slate-500'}`} />
+              <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${isActive ? 'text-[#e7b84b]' : 'text-slate-500'}`} />
               <span>{tab.label}</span>
             </button>
           );
@@ -981,7 +982,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
             </div>
 
             {/* Subject Selector Pills */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin mb-6">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-6">
               {subjectKeys.map((key) => {
                 const meta = OLYMPIAD_SUBJECT_METADATA[key];
                 return (
@@ -1388,7 +1389,7 @@ export const FaqsAndKeyInfoManager = ({ onNavigateTab, onGoToPublic }) => {
             </div>
 
             {/* Class Bands Selector */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin mb-6">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden mb-6">
               {[
                 { id: 'early', label: 'Early Years (Nursery, LKG, UKG)' },
                 { id: 'primary', label: 'Primary (Class 1 to 4)' },
