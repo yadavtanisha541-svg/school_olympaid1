@@ -29,7 +29,8 @@ import {
   Rocket,
   Globe,
   Brain,
-  Laptop
+  Laptop,
+  FileSpreadsheet
 } from 'lucide-react';
 
 // Master list of all system permissions strictly aligned with Super Admin and Student Sidebar Modules
@@ -180,6 +181,24 @@ const DEFAULT_PERMISSIONS_CATALOG = [
     studentDefault: false,
     level: 'Advanced',
     icon: Sparkles
+  },
+  {
+    key: 'manage_question_bank',
+    module: 'Super Admin: Question Bank',
+    name: 'Question Bank',
+    description: 'Curate, author, edit, and organize question bank items with LaTeX, options and explanations.',
+    studentDefault: false,
+    level: 'Advanced',
+    icon: HelpCircle
+  },
+  {
+    key: 'manage_exams',
+    module: 'Super Admin: Exams & Scheduler',
+    name: 'Exams & Mock Paper Scheduler',
+    description: 'Schedule Olympiad exam windows, mock tests, time slots, and duration rules.',
+    studentDefault: false,
+    level: 'Critical',
+    icon: FileSpreadsheet
   },
   {
     key: 'publish_exam_results',
@@ -345,32 +364,42 @@ export const RolesAndPermissionsManager = ({ onNavigateTab }) => {
   const [catalog, setCatalog] = useState(() => {
     try {
       const saved = localStorage.getItem('olympiadhub_permissions_catalog_v2');
-      return saved ? JSON.parse(saved) : DEFAULT_PERMISSIONS_CATALOG;
-    } catch {
-      return DEFAULT_PERMISSIONS_CATALOG;
-    }
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const existingKeys = new Set(parsed.map(p => p.key));
+          const missing = DEFAULT_PERMISSIONS_CATALOG.filter(p => !existingKeys.has(p.key));
+          return [...parsed, ...missing];
+        }
+      }
+    } catch {}
+    return DEFAULT_PERMISSIONS_CATALOG;
   });
 
   // Role permissions map: { superadmin: { [key]: boolean }, student: { [key]: boolean } }
   const [rolePerms, setRolePerms] = useState(() => {
+    const superadminDefaults = {};
+    const studentDefaults = {};
+    DEFAULT_PERMISSIONS_CATALOG.forEach(p => {
+      if (p.module.startsWith('Super Admin')) {
+        superadminDefaults[p.key] = true;
+      } else {
+        studentDefaults[p.key] = p.studentDefault;
+      }
+    });
+
     try {
       const saved = localStorage.getItem('olympiadhub_role_permissions_map_v2');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.superadmin && parsed.student) return parsed;
+        return {
+          superadmin: { ...superadminDefaults, ...(parsed.superadmin || {}) },
+          student: { ...studentDefaults, ...(parsed.student || {}) }
+        };
       }
     } catch {}
 
-    const superadminMap = {};
-    const studentMap = {};
-    DEFAULT_PERMISSIONS_CATALOG.forEach(p => {
-      if (p.module.startsWith('Super Admin')) {
-        superadminMap[p.key] = true;
-      } else {
-        studentMap[p.key] = p.studentDefault;
-      }
-    });
-    return { superadmin: superadminMap, student: studentMap };
+    return { superadmin: superadminDefaults, student: studentDefaults };
   });
 
   const [isSaving, setIsSaving] = useState(false);

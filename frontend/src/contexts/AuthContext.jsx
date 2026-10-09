@@ -83,21 +83,39 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const [permissionsTick, setPermissionsTick] = useState(0);
+
+  useEffect(() => {
+    const handlePermChange = () => {
+      setPermissionsTick((t) => t + 1);
+    };
+    window.addEventListener('role-permissions-updated', handlePermChange);
+    window.addEventListener('storage', handlePermChange);
+    return () => {
+      window.removeEventListener('role-permissions-updated', handlePermChange);
+      window.removeEventListener('storage', handlePermChange);
+    };
+  }, []);
+
   const hasPermission = (permCode) => {
-    if (!user) return false;
+    if (!permCode) return true;
+    const normalizedRole = (user?.role || '').toLowerCase().replace(/[\s_-]/g, '');
+    const roleKey = (normalizedRole === 'superadmin' || normalizedRole === 'admin')
+      ? 'superadmin'
+      : (normalizedRole === 'teacher' ? 'teacher' : 'student');
+
     try {
       const savedMapStr = localStorage.getItem('olympiadhub_role_permissions_map_v2');
       if (savedMapStr) {
         const savedMap = JSON.parse(savedMapStr);
-        const roleKey = user.role === 'superadmin' ? 'superadmin' : user.role === 'student' ? 'student' : user.role;
         if (savedMap && savedMap[roleKey] && savedMap[roleKey][permCode] !== undefined) {
           return Boolean(savedMap[roleKey][permCode]);
         }
       }
     } catch (e) {}
 
-    if (user.role === 'superadmin') return true;
-    if (Array.isArray(user.permissions)) {
+    if (roleKey === 'superadmin') return true;
+    if (Array.isArray(user?.permissions)) {
       return user.permissions.includes('all') || user.permissions.includes(permCode);
     }
     return true;
@@ -131,7 +149,8 @@ export const AuthProvider = ({ children }) => {
         hasPermission,
         isRole,
         setUser,
-        updateUser
+        updateUser,
+        permissionsTick
       }}
     >
       {children}

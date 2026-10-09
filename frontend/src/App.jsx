@@ -193,7 +193,7 @@ const updateUrlAndStorage = (state) => {
 };
 
 export const App = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, hasPermission } = useAuth();
   const { theme } = useTheme();
 
   const initialRoute = useMemo(() => parseRouteFromUrl(), []);
@@ -539,6 +539,26 @@ export const App = () => {
     );
   }
 
+  // Access restricted message if a module is hidden by Super Admin permissions
+  const renderAccessRestricted = (moduleName) => (
+    <div className="p-8 max-w-lg mx-auto my-12 bg-white rounded-3xl border border-slate-200 shadow-sm text-center space-y-4 animate-in fade-in duration-200">
+      <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 mx-auto flex items-center justify-center font-bold text-2xl shadow-xs">
+        🔒
+      </div>
+      <h3 className="text-lg font-black text-slate-900">Module Currently Disabled</h3>
+      <p className="text-xs text-slate-500 leading-relaxed">
+        {moduleName || 'This section'} is currently hidden by the Roles &amp; Permissions matrix. You can re-enable it anytime from the Super Admin matrix.
+      </p>
+      <button
+        type="button"
+        onClick={() => setCurrentTab('overview')}
+        className="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 transition-colors cursor-pointer shadow-xs"
+      >
+        Return to Dashboard
+      </button>
+    </div>
+  );
+
   // 3. DASHBOARD VIEW (Logged-in Super Admin, Teacher, or Student)
   const renderDashboardContent = () => {
     // 0. Universal Notifications Page
@@ -603,68 +623,91 @@ export const App = () => {
     if (user?.role === 'superadmin') {
       switch (currentTab) {
         case 'overview':
+          if (!hasPermission('access_superadmin_dashboard')) return renderAccessRestricted('Super Admin Dashboard');
           return <SuperAdminOverview onNavigateTab={setCurrentTab} />;
         case 'online_classes_manager':
         case 'online_classes_admin':
         case 'superadmin_online_classes':
+          if (!hasPermission('manage_online_classes')) return renderAccessRestricted('Online Classes Studio');
           return <SuperAdminOnlineClassesManager onNavigateTab={setCurrentTab} />;
         case 'skill_programs_manager':
         case 'skill_programs':
+          if (!hasPermission('manage_skill_programs')) return renderAccessRestricted('Skill Programs Studio');
           return <SuperAdminSkillDevelopmentManager onNavigateTab={setCurrentTab} />;
         case 'packages':
         case 'superadmin_packages':
+          if (!hasPermission('manage_superadmin_packages')) return renderAccessRestricted('Subject Model Tests & Packages');
           return <SuperAdminPackagesManager onNavigateTab={setCurrentTab} />;
         case 'payment_bank_manager':
         case 'payment_settings':
         case 'payment_orders':
+          if (!hasPermission('manage_payments_qr')) return renderAccessRestricted('Payment, QR & Orders');
           return <SuperAdminPaymentManager onNavigateTab={setCurrentTab} />;
         case 'applicant_leads':
         case 'applicant-leads':
         case 'applicant_registrations':
+          if (!hasPermission('manage_applicant_leads')) return renderAccessRestricted('New Applicant Leads');
           return <ApplicantLeadsManagement />;
         case 'schools':
           return <SchoolManagement />;
         case 'coordinators':
+          if (!hasPermission('manage_coordinators')) return renderAccessRestricted('Coordinator Applicants');
           return <CoordinatorManagement />;
         case 'workbook_orders':
+          if (!hasPermission('manage_workbook_orders')) return renderAccessRestricted('Workbook Orders');
           return <WorkbookOrdersManagement />;
         case 'teachers':
           return <UserManagement mode="teachers" />;
         case 'students':
+          if (!hasPermission('manage_students')) return renderAccessRestricted('Student Management');
           return <StudentManagement />;
         case 'roles_permissions':
         case 'role_permissions':
         case 'roles':
         case 'permissions':
+          if (!hasPermission('manage_roles_permissions')) return renderAccessRestricted('Roles & Permissions');
           return <RolesAndPermissionsManager onNavigateTab={setCurrentTab} />;
         case 'academic':
+          if (!hasPermission('manage_academic_structure')) return renderAccessRestricted('Disciplines & Subjects');
           return <AcademicStructure defaultTab="subjects" onNavigateTab={setCurrentTab} />;
         case 'subject_content':
+          if (!hasPermission('manage_subject_content')) return renderAccessRestricted('Subject & Class Content');
           return <AcademicStructure defaultTab="page_content" onNavigateTab={setCurrentTab} />;
         case 'faqs_key_info':
+          if (!hasPermission('manage_faqs_keyinfo')) return renderAccessRestricted('FAQs & Key Info Manager');
           return <FaqsAndKeyInfoManager onNavigateTab={setCurrentTab} onGoToPublic={() => setViewMode('public')} />;
         case 'revision_vault':
         case 'revision_vault_manager':
+          if (!hasPermission('manage_revision_vault')) return renderAccessRestricted('Revision Vault & Bookmarks');
           return <SuperAdminRevisionVaultManager onNavigateTab={setCurrentTab} />;
         case 'free_quizzes_manager':
         case 'free_quizzes_admin':
+          if (!hasPermission('manage_free_quizzes')) return renderAccessRestricted('FREE Quizzes Manager');
           return <SuperAdminFreeQuizzesManager onNavigateTab={setCurrentTab} />;
         case 'question_bank':
+          if (!hasPermission('manage_question_bank')) return renderAccessRestricted('Question Bank');
           return <QuestionBankPage />;
         case 'practice_tests_manager':
         case 'test_generator_manager':
+          if (!hasPermission('manage_test_generator')) return renderAccessRestricted('Practice Tests & Papers');
           return <TestGeneratorAdminManager onNavigateTab={setCurrentTab} />;
         case 'exams':
+          if (!hasPermission('manage_exams')) return renderAccessRestricted('Exams & Mock Paper Scheduler');
           return <ExamManagementPage />;
         case 'results':
+          if (!hasPermission('publish_exam_results')) return renderAccessRestricted('Exam Results & Reports');
           return <ExamResultsPage />;
         case 'leaderboard':
+          if (!hasPermission('manage_leaderboard')) return renderAccessRestricted('Rankings & Leaderboard');
           return <LeaderboardPage />;
         case 'certificates':
+          if (!hasPermission('manage_certificates')) return renderAccessRestricted('Certificates Manager');
           return <CertificatesPage />;
         case 'activity_logs':
+          if (!hasPermission('audit_activity_logs')) return renderAccessRestricted('Audit Activity Logs');
           return <ActivityLogsPage />;
         case 'settings':
+          if (!hasPermission('manage_system_settings')) return renderAccessRestricted('System Settings');
           return <SystemSettingsPage />;
         case 'profile':
           return <StudentProfilePage />;
@@ -699,6 +742,7 @@ export const App = () => {
     if (user?.role === 'student' || !user?.role) {
       switch (currentTab) {
         case 'overview':
+          if (!hasPermission('access_student_dashboard')) return renderAccessRestricted('Student Dashboard');
           return (
             <StudentOverview
               onNavigateTab={setCurrentTab}
@@ -728,6 +772,7 @@ export const App = () => {
         case 'content_vc':
         case 'content_ego':
         case 'content_cao':
+          if (!hasPermission('access_mock_tests')) return renderAccessRestricted('Mock Tests');
           return (
             <StudentMyContentPage
               activeSubjectCode={currentTab}
@@ -742,6 +787,7 @@ export const App = () => {
             />
           );
         case 'exam_history':
+          if (!hasPermission('view_exam_history')) return renderAccessRestricted('Exam History');
           return (
             <ExamHistoryPage
               onViewResult={(attId) => {
@@ -779,6 +825,9 @@ export const App = () => {
         case 'analysis':
         case 'performance':
         case 'statistics':
+          if (!hasPermission('view_performance_analytics') && !hasPermission('view_detailed_solutions')) {
+            return renderAccessRestricted('Performance Analytics');
+          }
           return (
             <StudentPerformancePage
               onNavigateTab={setCurrentTab}
@@ -792,8 +841,10 @@ export const App = () => {
         case 'leaderboard':
           return <LeaderboardPage />;
         case 'certificates':
+          if (!hasPermission('download_merit_certificates')) return renderAccessRestricted('Merit Certificates');
           return <CertificatesPage />;
         case 'profile':
+          if (!hasPermission('manage_student_profile')) return renderAccessRestricted('Student Profile');
           return <StudentProfilePage />;
         case 'prog_rsdp':
         case 'prog_msdp':
@@ -801,6 +852,7 @@ export const App = () => {
         case 'prog_esdp':
         case 'prog_gksdp':
         case 'prog_csdp':
+          if (!hasPermission('access_skill_programs')) return renderAccessRestricted('Skill Programs');
           return (
             <SkillDevelopmentProgramPage
               initialProgram={currentTab}
@@ -822,6 +874,12 @@ export const App = () => {
         case 'free_past_papers':
         case 'free_quizzes':
         case 'fun_zone':
+          if (currentTab === 'my_revision' && !hasPermission('access_student_revision_vault')) {
+            return renderAccessRestricted('Revision Vault');
+          }
+          if (currentTab === 'free_past_papers' && !hasPermission('access_previous_year_papers')) {
+            return renderAccessRestricted('Previous Year Papers (PYQs)');
+          }
           return (
             <StudentHubModules
               activeModule={currentTab}
@@ -830,6 +888,7 @@ export const App = () => {
             />
           );
         case 'my_classes':
+          if (!hasPermission('access_online_classes')) return renderAccessRestricted('Online Classes');
           return (
             <OnlineClassesPage
               onNavigateTab={setCurrentTab}
@@ -837,6 +896,7 @@ export const App = () => {
           );
         case 'practice_tests':
         case 'test_generator':
+          if (!hasPermission('use_test_generator')) return renderAccessRestricted('Practice Tests');
           return (
             <TestGeneratorPro
               onNavigateTab={setCurrentTab}

@@ -117,19 +117,25 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
   const superAdminNav = [
     { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, perm: 'access_superadmin_dashboard' },
     { id: 'payment_bank_manager', label: 'Payment, QR & Orders', icon: CreditCard, perm: 'manage_payments_qr' },
+    { id: 'online_classes_manager', label: 'Online Classes Studio', icon: Video, perm: 'manage_online_classes' },
     { id: 'skill_programs_manager', label: 'Skill Programs Studio', icon: Rocket, perm: 'manage_skill_programs' },
     { id: 'superadmin_packages', label: 'Subject Model Tests & Packages', icon: BookOpen, perm: 'manage_superadmin_packages' },
     { id: 'applicant_leads', label: 'New Applicant Leads', icon: UserCheck, perm: 'manage_applicant_leads' },
     { id: 'coordinators', label: 'Coordinator Applicants', icon: UserCheck, perm: 'manage_coordinators' },
+    { id: 'workbook_orders', label: 'Workbook Orders', icon: ShoppingBag, perm: 'manage_workbook_orders' },
     { id: 'students', label: 'Student Management', icon: Users, perm: 'manage_students' },
     { id: 'roles_permissions', label: 'Roles & Permissions', icon: ShieldCheck, perm: 'manage_roles_permissions' },
     { id: 'academic', label: 'Disciplines & Subjects', icon: Layers, perm: 'manage_academic_structure' },
     { id: 'subject_content', label: 'Subject & Class Content', icon: BookOpen, perm: 'manage_subject_content' },
     { id: 'revision_vault', label: 'Revision Vault & Bookmarks', icon: Bookmark, perm: 'manage_revision_vault' },
-    { id: 'practice_tests_manager', label: 'Practice Tests & Papers', icon: Sparkles, perm: 'manage_test_generator' },
+    { id: 'free_quizzes_manager', label: 'FREE Quizzes Manager', icon: HelpCircle, perm: 'manage_free_quizzes' },
     { id: 'faqs_key_info', label: 'FAQs & Key Info Manager', icon: HelpCircle, perm: 'manage_faqs_keyinfo' },
+    { id: 'practice_tests_manager', label: 'Practice Tests & Papers', icon: Sparkles, perm: 'manage_test_generator' },
+    { id: 'question_bank', label: 'Question Bank', icon: HelpCircle, perm: 'manage_question_bank' },
+    { id: 'exams', label: 'Exams & Mock Paper Scheduler', icon: FileSpreadsheet, perm: 'manage_exams' },
     { id: 'results', label: 'Exam Results & Reports', icon: FileCheck2, perm: 'publish_exam_results' },
     { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy, perm: 'manage_leaderboard' },
+    { id: 'certificates', label: 'Certificates Manager', icon: Award, perm: 'manage_certificates' },
     { id: 'activity_logs', label: 'Audit Activity Logs', icon: Activity, perm: 'audit_activity_logs' },
     { id: 'settings', label: 'System Settings', icon: Settings, perm: 'manage_system_settings' }
   ];
@@ -182,7 +188,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           )}
 
           {/* Top Dashboard Button */}
-          {(!user || user?.role !== 'superadmin' || hasPermission('access_superadmin_dashboard')) && (
+          {((user?.role === 'superadmin' ? hasPermission('access_superadmin_dashboard') : hasPermission('access_student_dashboard'))) && (
             <button
               type="button"
               onClick={() => {
@@ -276,191 +282,303 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           )}
 
           {/* ========================================================================= */}
-          {/* 3. STUDENT PORTAL (CLEAN MODERN ACCORDION STYLING)                        */}
+          {/* ========================================================================= */}
+          {/* 3. STUDENT PORTAL (CLEAN MODERN ACCORDION STYLING WITH RBAC GUARDS)       */}
           {/* ========================================================================= */}
           {(!user || user?.role === 'student') && (
             <div className="space-y-3.5 pt-2">
-              {/* SECTION A: OLYMPIADS */}
-              <div className="space-y-1.5">
-                <p className="px-3 text-xs font-black uppercase tracking-wider text-red-500">
-                  OLYMPIADS
-                </p>
+              {/* SECTION A: OLYMPIADS & LEARNING */}
+              {(hasPermission('access_mock_tests') || hasPermission('use_test_generator') || hasPermission('access_online_classes') || hasPermission('access_skill_programs')) && (
+                <div className="space-y-1.5">
+                  <p className="px-3 text-xs font-black uppercase tracking-wider text-red-500">
+                    OLYMPIADS &amp; LEARNING
+                  </p>
 
-                {/* Mock Test Accordion Header */}
-                <div>
-                  <div className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold transition-colors ${
-                    currentTab === 'my_content' || currentTab.startsWith('content_')
-                      ? 'bg-slate-800 text-white shadow-sm border border-slate-700'
-                      : 'text-slate-200 hover:bg-[#1a264e] hover:text-white'
-                  }`}>
+                  {/* Mock Test Accordion Header */}
+                  {hasPermission('access_mock_tests') && (
+                    <div>
+                      <div className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold transition-colors ${
+                        currentTab === 'my_content' || currentTab.startsWith('content_')
+                          ? 'bg-slate-800 text-white shadow-sm border border-slate-700'
+                          : 'text-slate-200 hover:bg-[#1a264e] hover:text-white'
+                      }`}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onSelectTab('my_content');
+                            if (!studentAccordions.content) {
+                              toggleStudentAccordion('content');
+                            }
+                            if (onClose) onClose();
+                          }}
+                          className="flex-1 flex items-center gap-2.5 text-left cursor-pointer"
+                        >
+                          <BookOpen className="w-5 h-5 text-slate-300 shrink-0" />
+                          <span>Mock Test</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleStudentAccordion('content');
+                          }}
+                          className="p-1 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white cursor-pointer transition-colors"
+                        >
+                          {studentAccordions.content ? (
+                            <ChevronUp className="w-4.5 h-4.5" />
+                          ) : (
+                            <ChevronDown className="w-4.5 h-4.5" />
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Clean Sub-items for all 6 core Olympiad subjects */}
+                      {studentAccordions.content && (
+                        <div className="pl-3.5 pr-1 py-1 space-y-1">
+                          {[
+                            { id: 'content_imo', key: 'imo', label: 'IEOM (Mathematics)', icon: Calculator },
+                            { id: 'content_iso', key: 'iso', label: 'IEOS (Science)', icon: Rocket },
+                            { id: 'content_ieo', key: 'ieo', label: 'IEOE (English)', icon: BookOpen },
+                            { id: 'content_igko', key: 'igko', label: 'IEOG (General Knowledge)', icon: Globe },
+                            { id: 'content_idlo', key: 'idlo', label: 'IEOD (Digital Literacy)', icon: Laptop },
+                            { id: 'content_iho', key: 'iho', label: 'IEOH (Hindi)', icon: Languages }
+                          ].map((sub) => {
+                            const SubIcon = sub.icon;
+                            const isSubActive = currentTab === sub.id;
+                            const isUnlocked = isSubjectPurchased(sub.key, user?.class || user?.grade || 'Class 6', purchasedTests);
+
+                            return (
+                              <button
+                                key={sub.id}
+                                type="button"
+                                onClick={() => {
+                                  onSelectTab(sub.id);
+                                  if (onClose) onClose();
+                                }}
+                                className={`w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                                  isSubActive
+                                    ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
+                                    : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-white' : 'text-slate-400'}`} />
+                                  <span className="truncate">{sub.label}</span>
+                                </div>
+
+                                {isUnlocked && (
+                                  <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/70 border border-emerald-500/40 px-1.5 py-0.5 rounded shrink-0">
+                                    ✓
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Practice Tests */}
+                  {hasPermission('use_test_generator') && (
                     <button
                       type="button"
                       onClick={() => {
-                        onSelectTab('my_content');
-                        if (!studentAccordions.content) {
-                          toggleStudentAccordion('content');
-                        }
+                        onSelectTab('practice_tests');
                         if (onClose) onClose();
                       }}
-                      className="flex-1 flex items-center gap-2.5 text-left cursor-pointer"
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
+                        currentTab === 'practice_tests' || currentTab === 'test_generator'
+                          ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                          : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
+                      }`}
                     >
-                      <BookOpen className="w-5 h-5 text-slate-300 shrink-0" />
-                      <span>Mock Test</span>
+                      <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
+                      <span>Practice Tests</span>
                     </button>
+                  )}
+
+                  {/* Online Classes Studio */}
+                  {hasPermission('access_online_classes') && (
                     <button
                       type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleStudentAccordion('content');
+                      onClick={() => {
+                        onSelectTab('my_classes');
+                        if (onClose) onClose();
                       }}
-                      className="p-1 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white cursor-pointer transition-colors"
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
+                        currentTab === 'my_classes'
+                          ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                          : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
+                      }`}
                     >
-                      {studentAccordions.content ? (
-                        <ChevronUp className="w-4.5 h-4.5" />
-                      ) : (
-                        <ChevronDown className="w-4.5 h-4.5" />
-                      )}
+                      <Video className="w-5 h-5 text-sky-400 shrink-0" />
+                      <span>Online Classes</span>
                     </button>
-                  </div>
+                  )}
 
-                  {/* Clean Sub-items for all 6 core Olympiad subjects */}
-                  {studentAccordions.content && (
-                    <div className="pl-3.5 pr-1 py-1 space-y-1">
-                      {[
-                        { id: 'content_imo', key: 'imo', label: 'IEOM (Mathematics)', icon: Calculator },
-                        { id: 'content_iso', key: 'iso', label: 'IEOS (Science)', icon: Rocket },
-                        { id: 'content_ieo', key: 'ieo', label: 'IEOE (English)', icon: BookOpen },
-                        { id: 'content_igko', key: 'igko', label: 'IEOG (General Knowledge)', icon: Globe },
-                        { id: 'content_idlo', key: 'idlo', label: 'IEOD (Digital Literacy)', icon: Laptop },
-                        { id: 'content_iho', key: 'iho', label: 'IEOH (Hindi)', icon: Languages }
-                      ].map((sub) => {
-                        const SubIcon = sub.icon;
-                        const isSubActive = currentTab === sub.id;
-                        const isUnlocked = isSubjectPurchased(sub.key, user?.class || user?.grade || 'Class 6', purchasedTests);
-
-                        return (
-                          <button
-                            key={sub.id}
-                            type="button"
-                            onClick={() => {
-                              onSelectTab(sub.id);
-                              if (onClose) onClose();
-                            }}
-                            className={`w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
-                              isSubActive
-                                ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
-                                : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2 min-w-0">
-                              <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-white' : 'text-slate-400'}`} />
-                              <span className="truncate">{sub.label}</span>
-                            </div>
-
-                            {isUnlocked && (
-                              <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/70 border border-emerald-500/40 px-1.5 py-0.5 rounded shrink-0">
-                                ✓
-                              </span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
+                  {/* Skill Programs Studio */}
+                  {hasPermission('access_skill_programs') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSelectTab('prog_rsdp');
+                        if (onClose) onClose();
+                      }}
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
+                        currentTab.startsWith('prog_')
+                          ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                          : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
+                      }`}
+                    >
+                      <Rocket className="w-5 h-5 text-purple-400 shrink-0" />
+                      <span>Skill Programs</span>
+                    </button>
                   )}
                 </div>
+              )}
 
-                {/* Practice Tests */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    onSelectTab('practice_tests');
-                    if (onClose) onClose();
-                  }}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
-                    currentTab === 'practice_tests' || currentTab === 'test_generator'
-                      ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
-                      : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
-                  }`}
-                >
-                  <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
-                  <span>Practice Tests</span>
-                </button>
-              </div>
+              {/* SECTION B: MY PERFORMANCE & REPORTS */}
+              {(hasPermission('view_performance_analytics') || hasPermission('view_detailed_solutions') || hasPermission('view_exam_history') || hasPermission('download_merit_certificates') || hasPermission('access_student_revision_vault') || hasPermission('access_previous_year_papers')) && (
+                <div className="space-y-1.5 pt-2 border-t border-[#312e81]/60">
+                  <p className="px-3 text-xs font-black uppercase tracking-wider text-red-500">
+                    PERFORMANCE &amp; VAULT
+                  </p>
 
-              {/* SECTION B: MY PERFORMANCE */}
-              <div className="space-y-1.5 pt-2 border-t border-[#312e81]/60">
-                {/* My Performance Accordion Header */}
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => toggleStudentAccordion('performance')}
-                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-slate-200 hover:bg-[#1a264e] hover:text-white cursor-pointer transition-colors"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <BarChart3 className="w-5 h-5 text-slate-400 shrink-0" />
-                      <span>My Performance</span>
-                    </div>
-                    {studentAccordions.performance ? (
-                      <ChevronUp className="w-4.5 h-4.5 text-slate-400" />
-                    ) : (
-                      <ChevronDown className="w-4.5 h-4.5 text-slate-400" />
-                    )}
-                  </button>
-
-                  {/* Clean Sub-items */}
-                  {studentAccordions.performance && (
-                    <div className="pl-3.5 pr-1 py-1 space-y-1">
+                  {/* My Performance Accordion Header */}
+                  {(hasPermission('view_performance_analytics') || hasPermission('view_detailed_solutions') || hasPermission('view_exam_history') || hasPermission('download_merit_certificates')) && (
+                    <div>
                       <button
                         type="button"
-                        onClick={() => {
-                          onSelectTab('performance');
-                          if (onClose) onClose();
-                        }}
-                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
-                          currentTab === 'performance'
-                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
-                            : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
-                        }`}
+                        onClick={() => toggleStudentAccordion('performance')}
+                        className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-slate-200 hover:bg-[#1a264e] hover:text-white cursor-pointer transition-colors"
                       >
-                        <BarChart3 className="w-4 h-4 text-slate-400 shrink-0" />
-                        <span className="truncate">Statistics &amp; Reports</span>
+                        <div className="flex items-center gap-2.5">
+                          <BarChart3 className="w-5 h-5 text-slate-400 shrink-0" />
+                          <span>My Performance</span>
+                        </div>
+                        {studentAccordions.performance ? (
+                          <ChevronUp className="w-4.5 h-4.5 text-slate-400" />
+                        ) : (
+                          <ChevronDown className="w-4.5 h-4.5 text-slate-400" />
+                        )}
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onSelectTab('analysis');
-                          if (onClose) onClose();
-                        }}
-                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
-                          currentTab === 'analysis' || currentTab === 'exam_solutions'
-                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
-                            : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
-                        }`}
-                      >
-                        <TrendingUp className="w-4 h-4 text-slate-400 shrink-0" />
-                        <span className="truncate">Analysis</span>
-                      </button>
+
+                      {/* Clean Sub-items */}
+                      {studentAccordions.performance && (
+                        <div className="pl-3.5 pr-1 py-1 space-y-1">
+                          {hasPermission('view_performance_analytics') && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                onSelectTab('performance');
+                                if (onClose) onClose();
+                              }}
+                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                                currentTab === 'performance'
+                                  ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
+                                  : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                              }`}
+                            >
+                              <BarChart3 className="w-4 h-4 text-slate-400 shrink-0" />
+                              <span className="truncate">Statistics &amp; Reports</span>
+                            </button>
+                          )}
+                          {hasPermission('view_detailed_solutions') && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                onSelectTab('analysis');
+                                if (onClose) onClose();
+                              }}
+                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                                currentTab === 'analysis' || currentTab === 'exam_solutions'
+                                  ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
+                                  : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                              }`}
+                            >
+                              <TrendingUp className="w-4 h-4 text-slate-400 shrink-0" />
+                              <span className="truncate">Analysis &amp; Solutions</span>
+                            </button>
+                          )}
+                          {hasPermission('view_exam_history') && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                onSelectTab('exam_history');
+                                if (onClose) onClose();
+                              }}
+                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                                currentTab === 'exam_history'
+                                  ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
+                                  : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                              }`}
+                            >
+                              <FileCheck2 className="w-4 h-4 text-slate-400 shrink-0" />
+                              <span className="truncate">Exam History</span>
+                            </button>
+                          )}
+                          {hasPermission('download_merit_certificates') && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                onSelectTab('certificates');
+                                if (onClose) onClose();
+                              }}
+                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                                currentTab === 'certificates'
+                                  ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
+                                  : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                              }`}
+                            >
+                              <Award className="w-4 h-4 text-amber-400 shrink-0" />
+                              <span className="truncate">Merit Certificates</span>
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
-                </div>
 
-                {/* My Revision */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    onSelectTab('my_revision');
-                    if (onClose) onClose();
-                  }}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
-                    currentTab === 'my_revision'
-                      ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
-                      : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
-                  }`}
-                >
-                  <Bookmark className="w-5 h-5 text-slate-400 shrink-0" />
-                  <span>My Revision</span>
-                </button>
-              </div>
+                  {/* My Revision Vault */}
+                  {hasPermission('access_student_revision_vault') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSelectTab('my_revision');
+                        if (onClose) onClose();
+                      }}
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
+                        currentTab === 'my_revision'
+                          ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                          : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
+                      }`}
+                    >
+                      <Bookmark className="w-5 h-5 text-slate-400 shrink-0" />
+                      <span>My Revision</span>
+                    </button>
+                  )}
+
+                  {/* Previous Year Papers */}
+                  {hasPermission('access_previous_year_papers') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSelectTab('free_past_papers');
+                        if (onClose) onClose();
+                      }}
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
+                        currentTab === 'free_past_papers'
+                          ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                          : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
+                      }`}
+                    >
+                      <BookOpen className="w-5 h-5 text-slate-400 shrink-0" />
+                      <span>Past Papers (PYQs)</span>
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* SECTION C: MY ACCOUNT */}
               <div className="space-y-1.5 pt-2 border-t border-[#312e81]/60">
@@ -489,21 +607,23 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   {/* Clean Sub-items */}
                   {studentAccordions.account && (
                     <div className="pl-3.5 pr-1 py-1 space-y-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onSelectTab('profile');
-                          if (onClose) onClose();
-                        }}
-                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
-                          currentTab === 'profile'
-                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
-                            : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
-                        }`}
-                      >
-                        <User className="w-4 h-4 text-slate-400 shrink-0" />
-                        <span className="truncate">My Profile</span>
-                      </button>
+                      {hasPermission('manage_student_profile') && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onSelectTab('profile');
+                            if (onClose) onClose();
+                          }}
+                          className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                            currentTab === 'profile'
+                              ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
+                              : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                          }`}
+                        >
+                          <User className="w-4 h-4 text-slate-400 shrink-0" />
+                          <span className="truncate">My Profile</span>
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => {
@@ -594,10 +714,6 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     </div>
                   )}
                 </div>
-
-
-
-
               </div>
             </div>
           )}
