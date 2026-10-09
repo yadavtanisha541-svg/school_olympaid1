@@ -205,54 +205,58 @@ export const SuperAdminOverview = ({ onNavigateTab }) => {
   return (
     <div className="space-y-6 pb-12 font-sans">
       {/* 1. Hero Greeting Banner (Navy Blue -> Purple -> Wine/Crimson Theme Gradient) */}
-      <div className="bg-gradient-to-r from-blue-200/95 via-indigo-200/90 to-rose-200/95 border-2 border-indigo-400/90 rounded-3xl p-5 sm:p-6 shadow-sm relative overflow-hidden text-slate-900">
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div className="flex items-start sm:items-center gap-4 min-w-0">
-            <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-400 via-orange-400 to-rose-400 text-slate-900 shadow-xs flex items-center justify-center shrink-0 border border-white/50">
-              <Trophy className="w-7 h-7 fill-slate-900 text-slate-900" />
+      <div className="bg-gradient-to-r from-blue-200/95 via-indigo-200/90 to-rose-200/95 border-2 border-indigo-400/90 rounded-3xl p-4 sm:p-6 shadow-sm relative overflow-hidden text-slate-900">
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5">
+          <div className="flex items-start sm:items-center gap-3.5 sm:gap-4 min-w-0">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-400 via-orange-400 to-rose-400 text-slate-900 shadow-xs flex items-center justify-center shrink-0 border border-white/50">
+              <Trophy className="w-6 h-6 sm:w-7 sm:h-7 fill-slate-900 text-slate-900" />
             </div>
-            <div className="min-w-0">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/95 text-indigo-950 font-black text-[11px] tracking-wider uppercase border border-indigo-300 shadow-2xs">
+            <div className="min-w-0 flex-1">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-lg bg-white/95 text-indigo-950 font-black text-[10px] sm:text-[11px] tracking-wider uppercase border border-indigo-300 shadow-2xs">
                 WELCOME BACK, SUPER ADMIN
               </span>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight mt-1 leading-snug truncate">
+              <h1 className="text-lg sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight mt-1 leading-snug">
                 OlympiadHub Performance &amp; Analytics
               </h1>
-              <p className="text-xs sm:text-sm text-slate-800 font-semibold truncate mt-0.5">
+              <p className="text-xs sm:text-sm text-slate-800 font-semibold mt-0.5 leading-normal">
                 Monitor candidates, academic metrics, and live examination activities.
               </p>
 
               {/* LIVE REGISTERED STUDENTS COUNTER BADGE INSIDE FRONT BANNER */}
-              <div className="mt-3 flex items-center flex-wrap gap-2.5">
+              <div className="mt-3 flex items-center flex-wrap gap-2 max-w-full">
                 <button
                   type="button"
                   onClick={() => onNavigateTab && onNavigateTab('students')}
-                  className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-white/95 hover:bg-white border-2 border-rose-400 text-slate-900 shadow-xs transition-all hover:scale-[1.02] cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start flex-wrap gap-2 px-3 py-2 sm:px-3.5 sm:py-1.5 rounded-xl bg-white/95 hover:bg-white border-2 border-rose-400 text-slate-900 shadow-xs transition-all hover:scale-[1.01] cursor-pointer max-w-full"
                   title="Click to view all registered students"
                 >
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                  </span>
-                  <Users className="w-4 h-4 text-rose-600 shrink-0" />
-                  <span className="text-xs font-bold text-slate-700">Total Registered Students:</span>
-                  <span className="font-black text-rose-700 font-mono text-sm sm:text-base bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200">
-                    {currentTotalStudents}
-                  </span>
-                  <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-md uppercase tracking-wider">
-                    Live Auto-Sync
-                  </span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="relative flex h-2.5 w-2.5 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <Users className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span className="text-xs font-bold text-slate-700">Total Registered Students:</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0 ml-auto sm:ml-0">
+                    <span className="font-black text-rose-700 font-mono text-xs sm:text-base bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200">
+                      {currentTotalStudents}
+                    </span>
+                    <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+                      Live Auto-Sync
+                    </span>
+                  </div>
                 </button>
               </div>
             </div>
           </div>
 
-          <div className="text-left lg:text-right shrink-0">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 border border-indigo-300 rounded-xl text-xs font-bold text-indigo-950 shadow-2xs">
+          <div className="flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-start gap-2 text-left lg:text-right shrink-0 pt-2 lg:pt-0 border-t border-indigo-200/60 lg:border-t-0">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/95 border border-indigo-300 rounded-xl text-xs font-bold text-indigo-950 shadow-2xs">
               <Calendar className="w-3.5 h-3.5 text-indigo-600" />
               <span>{formattedDateStr}</span>
             </div>
-            <p className="text-sm sm:text-base font-mono font-black text-slate-900 mt-1">
+            <p className="text-xs sm:text-base font-mono font-black text-slate-900 mt-0 lg:mt-1">
               {formattedTimeStr}
             </p>
           </div>
