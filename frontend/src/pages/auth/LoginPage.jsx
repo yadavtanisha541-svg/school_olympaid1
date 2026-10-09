@@ -467,7 +467,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col justify-between items-center py-6 sm:py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-slate-100/90 font-sans">
+    <div className="min-h-screen w-full flex flex-col justify-between items-center py-3 sm:py-6 px-3 sm:px-6 relative overflow-hidden bg-slate-100/90 font-sans">
       {/* Ambient Lighting Accents in background */}
       <div className="absolute top-[-10%] left-[-8%] w-[480px] h-[480px] rounded-full bg-pink-200/40 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-8%] w-[520px] h-[520px] rounded-full bg-blue-200/40 blur-3xl pointer-events-none" />
@@ -482,11 +482,11 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
       />
 
       {/* Top Header Navigation: Back to Website */}
-      <div className="w-full max-w-[390px] mx-auto flex items-center justify-start relative z-20 mb-2">
+      <div className="w-full max-w-[370px] sm:max-w-[390px] mx-auto flex items-center justify-start relative z-20 mb-1.5 sm:mb-2">
         <button
           type="button"
           onClick={handleGoHome}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold shadow-xs transition-all cursor-pointer group active:scale-95"
+          className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold shadow-xs transition-all cursor-pointer group active:scale-95"
         >
           <ArrowLeft className="w-3.5 h-3.5 text-slate-600 group-hover:-translate-x-0.5 transition-transform" />
           <span>← Back to Website</span>
@@ -494,29 +494,29 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
       </div>
 
       {/* Center Auth Card with Rich Pink -> Purple -> Blue Brand Gradient (Compact Proportioned Height) */}
-      <div className="w-full max-w-[390px] relative z-10 my-auto bg-gradient-to-b from-[#b93787] via-[#6e32a0] to-[#2355c8] rounded-[26px] p-4 sm:p-5 shadow-2xl border-2 border-white/30 text-white">
+      <div className="w-full max-w-[370px] sm:max-w-[390px] relative z-10 my-auto bg-gradient-to-b from-[#b93787] via-[#6e32a0] to-[#2355c8] rounded-2xl sm:rounded-[26px] p-3.5 sm:p-5 shadow-2xl border-2 border-white/30 text-white">
         {/* Branding Header */}
-        <div className="text-center mb-3 flex flex-col items-center">
+        <div className="text-center mb-2.5 sm:mb-3 flex flex-col items-center">
           <div
-            className="mb-1 transform hover:scale-105 transition-transform duration-200 cursor-pointer p-1.5 rounded-xl bg-white/95 shadow-md"
+            className="mb-1 transform hover:scale-105 transition-transform duration-200 cursor-pointer p-1 sm:p-1.5 rounded-xl bg-white/95 shadow-md"
             onClick={handleGoHome}
             title="Go to Home"
           >
             <OlympiadHubLogo size="sm" />
           </div>
-          <p className="mt-0.5 text-[11px] text-pink-100 font-bold tracking-tight drop-shadow-xs">
+          <p className="mt-0.5 text-[10px] sm:text-[11px] text-pink-100 font-bold tracking-tight drop-shadow-xs">
             National Online Examination &amp; Assessment System
           </p>
 
           {/* Clean Segmented Tabs: Sign Up vs Login */}
-          <div className="grid grid-cols-2 gap-1 p-0.5 bg-black/25 backdrop-blur-md rounded-xl border border-white/20 mt-2.5 w-full">
+          <div className="grid grid-cols-2 gap-1 p-0.5 bg-black/25 backdrop-blur-md rounded-xl border border-white/20 mt-2 sm:mt-2.5 w-full">
             <button
               type="button"
               onClick={() => {
                 setAuthMode('signup');
                 setError('');
               }}
-              className={`py-1.5 px-3 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1 ${
+              className={`py-1 sm:py-1.5 px-3 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1 ${
                 authMode === 'signup'
                   ? 'bg-white text-purple-900 shadow-sm scale-100'
                   : 'text-pink-100 hover:text-white hover:bg-white/10'
@@ -530,7 +530,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                 setAuthMode('login');
                 setError('');
               }}
-              className={`py-1.5 px-3 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1 ${
+              className={`py-1 sm:py-1.5 px-3 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1 ${
                 authMode === 'login'
                   ? 'bg-white text-purple-900 shadow-sm scale-100'
                   : 'text-pink-100 hover:text-white hover:bg-white/10'
@@ -543,9 +543,9 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
 
         {/* Auth Form Container */}
         <div className="w-full">
-          <form className="space-y-2.5" onSubmit={handleSubmit}>
+          <form className="space-y-2 sm:space-y-2.5" onSubmit={handleSubmit}>
             {error && (
-              <div className="p-2.5 rounded-xl bg-rose-500/95 border border-white/30 text-white text-[11px] font-bold flex items-start gap-2 animate-shake shadow-md">
+              <div className="p-2 sm:p-2.5 rounded-xl bg-rose-500/95 border border-white/30 text-white text-[10px] sm:text-[11px] font-bold flex items-start gap-2 animate-shake shadow-md">
                 <AlertCircle className="w-3.5 h-3.5 text-white shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
@@ -563,7 +563,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                       ? 'Register with Mobile Number or Email'
                       : 'Enter Mobile Number, Email or Login ID'
                   }
-                  className="block w-full px-3.5 h-10 bg-white text-slate-900 placeholder-slate-500 border border-white/60 focus:border-indigo-400 focus:ring-2 focus:ring-white/30 rounded-xl text-xs font-bold transition-all focus:outline-none shadow-xs"
+                  className="block w-full px-3 sm:px-3.5 h-9 sm:h-10 bg-white text-slate-900 placeholder-slate-500 border border-white/60 focus:border-indigo-400 focus:ring-2 focus:ring-white/30 rounded-xl text-xs font-bold transition-all focus:outline-none shadow-xs"
                   required
                 />
               </div>
@@ -577,7 +577,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password*"
-                  className="block w-full px-3.5 h-10 bg-white text-slate-900 placeholder-slate-500 border border-white/60 focus:border-indigo-400 focus:ring-2 focus:ring-white/30 rounded-xl text-xs font-bold transition-all focus:outline-none shadow-xs"
+                  className="block w-full px-3 sm:px-3.5 h-9 sm:h-10 bg-white text-slate-900 placeholder-slate-500 border border-white/60 focus:border-indigo-400 focus:ring-2 focus:ring-white/30 rounded-xl text-xs font-bold transition-all focus:outline-none shadow-xs"
                   required
                 />
               </div>
@@ -592,7 +592,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm Password*"
-                    className="block w-full px-3.5 h-10 bg-white text-slate-900 placeholder-slate-500 border border-white/60 focus:border-indigo-400 focus:ring-2 focus:ring-white/30 rounded-xl text-xs font-bold transition-all focus:outline-none shadow-xs"
+                    className="block w-full px-3 sm:px-3.5 h-9 sm:h-10 bg-white text-slate-900 placeholder-slate-500 border border-white/60 focus:border-indigo-400 focus:ring-2 focus:ring-white/30 rounded-xl text-xs font-bold transition-all focus:outline-none shadow-xs"
                     required
                   />
                 </div>
@@ -600,7 +600,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
             )}
 
             {/* Checkbox: Show Password */}
-            <div className="flex items-center justify-between text-[11px] pt-0.5">
+            <div className="flex items-center justify-between text-[10px] sm:text-[11px] pt-0">
               <label className="flex items-center gap-1.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -625,37 +625,37 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
             </div>
 
             {/* OFFICIAL GOOGLE RECAPTCHA WIDGET ("I'm not a robot" - Compact & Toggleable) */}
-            <div className="bg-[#f9f9f9] border border-[#d3d3d3] rounded-xl py-1.5 px-3 flex items-center justify-between shadow-2xs select-none">
+            <div className="bg-[#f9f9f9] border border-[#d3d3d3] rounded-xl py-1 sm:py-1.5 px-2.5 sm:px-3 flex items-center justify-between shadow-2xs select-none">
               <div
                 onClick={handleCaptchaClick}
-                className="flex items-center gap-2.5 cursor-pointer group flex-1 py-0.5"
+                className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group flex-1 py-0.5"
                 title={captchaStatus === 'verified' ? 'Click to uncheck' : 'Click to verify'}
               >
                 {/* Checkbox Box */}
                 <div
-                  className={`w-6 h-6 rounded border-2 transition-all flex items-center justify-center shadow-2xs shrink-0 ${
+                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 transition-all flex items-center justify-center shadow-2xs shrink-0 ${
                     captchaStatus === 'verified'
                       ? 'border-emerald-500 bg-emerald-50 text-emerald-600'
                       : 'border-[#c1c1c1] group-hover:border-[#999] bg-white text-transparent'
                   }`}
                 >
                   {captchaStatus === 'checking' && (
-                    <span className="w-3.5 h-3.5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                    <span className="w-3 h-3 sm:w-3.5 sm:h-3.5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                   )}
                   {captchaStatus === 'verified' && (
-                    <Check className="w-4 h-4 text-emerald-600 stroke-[3.5] animate-in zoom-in-75 duration-150" />
+                    <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 stroke-[3.5] animate-in zoom-in-75 duration-150" />
                   )}
                 </div>
 
-                <span className="text-xs font-bold text-slate-800 group-hover:text-black transition-colors">
+                <span className="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-black transition-colors">
                   I'm not a robot
                 </span>
               </div>
 
               {/* Official reCAPTCHA Badge */}
-              <div className="flex flex-col items-center justify-center pl-2.5 border-l border-slate-200 shrink-0">
-                <div className="w-5 h-5 relative flex items-center justify-center">
-                  <svg viewBox="0 0 48 48" className="w-5 h-5" fill="none">
+              <div className="flex flex-col items-center justify-center pl-2 sm:pl-2.5 border-l border-slate-200 shrink-0">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 relative flex items-center justify-center">
+                  <svg viewBox="0 0 48 48" className="w-4 h-4 sm:w-5 sm:h-5" fill="none">
                     <path
                       d="M24 6V2L19 7l5 5V8c8.8 0 16 7.2 16 16 0 3.3-1 6.4-2.8 9l2.9 2.9C42.4 32.4 44 28.4 44 24c0-11-9-20-20-20z"
                       fill="#4A90E2"
@@ -670,10 +670,10 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                     />
                   </svg>
                 </div>
-                <span className="text-[7.5px] font-bold text-slate-600 tracking-tight leading-none mt-0.5">
+                <span className="text-[7px] sm:text-[7.5px] font-bold text-slate-600 tracking-tight leading-none mt-0.5">
                   reCAPTCHA
                 </span>
-                <span className="text-[6.5px] text-slate-400 leading-none mt-0.5">
+                <span className="text-[6px] sm:text-[6.5px] text-slate-400 leading-none mt-0.5">
                   Privacy - Terms
                 </span>
               </div>
@@ -681,7 +681,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
 
             {/* Checkboxes from Image 1 (Sign Up Mode) */}
             {authMode === 'signup' && (
-              <div className="space-y-1 text-[11px] pt-0.5">
+              <div className="space-y-1 text-[10px] sm:text-[11px] pt-0.5">
                 <label className="flex items-start gap-1.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
@@ -712,7 +712,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-10 sm:h-10.5 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-black text-xs tracking-wider uppercase shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 border border-white/30 mt-1"
+              className="w-full h-9 sm:h-10 rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] hover:from-[#db2777] hover:via-[#7c3aed] hover:to-[#2563eb] text-white font-black text-xs tracking-wider uppercase shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 border border-white/30 mt-1"
             >
               {loading ? (
                 <>
@@ -731,7 +731,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
             <button
               type="button"
               onClick={() => handleContinueWithGoogle()}
-              className="w-full h-10 sm:h-10.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs tracking-wider uppercase shadow-xs hover:shadow-sm active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2.5 border border-slate-200"
+              className="w-full h-9 sm:h-10 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs tracking-wider uppercase shadow-xs hover:shadow-sm active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 border border-slate-200"
             >
               <GoogleIcon />
               <span className="text-[#3c4043] font-black text-xs">CONTINUE WITH GOOGLE</span>
@@ -739,7 +739,7 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
           </form>
 
           {/* Bottom Switch Link */}
-          <div className="mt-3.5 text-center">
+          <div className="mt-2.5 sm:mt-3.5 text-center">
             {authMode === 'signup' ? (
               <p className="text-xs text-pink-100 font-semibold drop-shadow-xs">
                 Already Registered?{' '}
@@ -771,11 +771,11 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
             )}
 
             {authMode === 'login' && (
-              <div className="mt-2">
+              <div className="mt-1.5 sm:mt-2">
                 <button
                   type="button"
                   onClick={() => setShowCoordinatorModal(true)}
-                  className="text-[11px] text-pink-200 hover:text-white font-bold underline transition-colors cursor-pointer"
+                  className="text-[10px] sm:text-[11px] text-pink-200 hover:text-white font-bold underline transition-colors cursor-pointer"
                 >
                   Don't have login credentials? Contact School Coordinator
                 </button>
@@ -786,8 +786,8 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
       </div>
 
       {/* Footer */}
-      <div className="relative z-10 text-center mt-3">
-        <p className="text-[11px] text-slate-500 font-bold">
+      <div className="relative z-10 text-center mt-2 sm:mt-3">
+        <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">
           © {new Date().getFullYear()} OlympiadHub Assessment Portal. All Rights Reserved.
         </p>
       </div>
