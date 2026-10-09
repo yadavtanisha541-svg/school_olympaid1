@@ -34,7 +34,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
-import { isSubjectPurchased, savePurchasedSubject, getPurchasedTests, getTestPricing } from '../../utils/purchaseUtils';
+import { isSubjectPurchased, savePurchasedSubject, lockSubject, getPurchasedTests, getTestPricing } from '../../utils/purchaseUtils';
 
 const CLASS_OPTIONS = [
   'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 
@@ -293,9 +293,8 @@ export const StudentMyContentPage = ({
         setPaymentStep('method');
         setPurchasingSubject(null);
         setSelectedSubject(boughtCode);
-        // User requested: "tb show ho y cover or iske andr ka test"
-        // Open the mock series directly so they see the test papers inside it!
-        setOpenedMockSeries(boughtCode);
+        // After purchase, show the unlocked Subject Cover card first ("uske baad y cover phir test")
+        setOpenedMockSeries(null);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 1200);
     } catch (err) {
@@ -1485,14 +1484,25 @@ export const StudentMyContentPage = ({
 
                       {/* Status indicator: Unlocked vs Locked */}
                       {isUnlocked ? (
-                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-black shrink-0 shadow-2xs">
-                          <Check className="w-3.5 h-3.5 stroke-[3]" />
-                          <span>UNLOCKED</span>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            lockSubject(sub.code, studentClass);
+                            setPurchasedTests(getPurchasedTests());
+                          }}
+                          title="Click to lock this subject again for testing"
+                          className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 hover:bg-rose-100 text-emerald-900 hover:text-rose-900 border border-emerald-300 hover:border-rose-300 text-xs font-black shrink-0 shadow-2xs transition-all cursor-pointer group/lock"
+                        >
+                          <Check className="w-3.5 h-3.5 stroke-[3] group-hover/lock:hidden" />
+                          <Lock className="w-3.5 h-3.5 hidden group-hover/lock:inline text-rose-600" />
+                          <span className="group-hover/lock:hidden">UNLOCKED</span>
+                          <span className="hidden group-hover/lock:inline text-rose-700">LOCK</span>
+                        </button>
                       ) : (
                         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-xs font-black shrink-0 shadow-2xs">
                           <Lock className="w-3.5 h-3.5" />
-                          <span>LOCKED (₹{effectivePrice})</span>
+                          <span>LOCKED</span>
                         </div>
                       )}
                     </div>

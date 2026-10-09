@@ -16,12 +16,62 @@ export const SUBJECT_ALIAS_MAP = {
   ieoh: ['iho', 'ieoh', 'hindi']
 };
 
+// Reset legacy/cached purchases so subjects start locked by default as requested
+if (typeof window !== 'undefined') {
+  try {
+    const lockResetDone = localStorage.getItem('olympiadhub_lock_reset_v4');
+    if (!lockResetDone) {
+      localStorage.removeItem('olympiadhub_purchased_tests');
+      localStorage.setItem('olympiadhub_lock_reset_v4', 'true');
+    }
+  } catch (e) {}
+}
+
 export const getPurchasedTests = () => {
   try {
     return JSON.parse(localStorage.getItem('olympiadhub_purchased_tests') || '[]');
   } catch (e) {
     return [];
   }
+};
+
+export const lockSubject = (subCodeOrKey, studentClass = null) => {
+  try {
+    const list = getPurchasedTests();
+    const rawKey = String(subCodeOrKey).toLowerCase().trim();
+    const rawClass = studentClass ? String(studentClass).toLowerCase().trim() : '';
+    const aliases = SUBJECT_ALIAS_MAP[rawKey] || [rawKey];
+
+    const updated = list.filter(item => {
+      const s = String(item).toLowerCase().trim();
+      for (const alias of aliases) {
+        if (s === alias) return false;
+        if (rawClass && (s === `${rawClass}_${alias}` || s === `${rawClass} ${alias}`)) return false;
+        const parts = s.split(/[_\s-]+/);
+        if (parts.includes(alias)) return false;
+      }
+      return true;
+    });
+
+    localStorage.setItem('olympiadhub_purchased_tests', JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('olympiadhub-package-purchased', { detail: { locked: true, subject: subCodeOrKey } }));
+      window.dispatchEvent(new Event('storage'));
+    }
+    return updated;
+  } catch (e) {
+    return [];
+  }
+};
+
+export const resetPurchasedTests = () => {
+  try {
+    localStorage.removeItem('olympiadhub_purchased_tests');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('olympiadhub-package-purchased', { detail: { reset: true } }));
+      window.dispatchEvent(new Event('storage'));
+    }
+  } catch (e) {}
 };
 
 export const isSubjectPurchased = (subCodeOrKey, studentClass = null, purchasedList = null) => {
