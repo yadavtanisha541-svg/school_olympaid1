@@ -357,14 +357,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                               <span className="truncate">{sub.label}</span>
                             </div>
 
-                            {isUnlocked ? (
+                            {isUnlocked && (
                               <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/70 border border-emerald-500/40 px-1.5 py-0.5 rounded shrink-0">
                                 ✓
-                              </span>
-                            ) : (
-                              <span className="text-[10px] font-bold text-amber-300 bg-amber-950/60 border border-amber-500/40 px-1.5 py-0.5 rounded flex items-center gap-0.5 shrink-0">
-                                <Lock className="w-2.5 h-2.5" />
-                                <span>₹{testPricing.mock_test_price || 99}</span>
                               </span>
                             )}
                           </button>
