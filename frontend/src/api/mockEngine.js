@@ -2057,11 +2057,39 @@ export const mockEngine = {
         const subjectFilter = queryParams.subject || (endpoint.includes('subject=') ? decodeURIComponent(endpoint.split('subject=')[1].split('&')[0]) : '');
 
         let filtered = [...pkgs];
-        if (classFilter && classFilter !== 'All') {
-          filtered = filtered.filter((p) => !p.class_name || p.class_name === classFilter || p.class === classFilter || p.class_name === 'All');
+        if (classFilter && classFilter !== 'All' && classFilter !== 'ALL') {
+          const mFilter = String(classFilter).match(/\d+/);
+          const filterClassNum = mFilter ? mFilter[0] : null;
+          const classSpecific = filtered.filter((p) => {
+            if (!p.class_name || p.class_name === 'All' || p.class_name === 'ALL') return true;
+            const mPkg = String(p.class_name || p.class || '').match(/\d+/);
+            if (mPkg && filterClassNum) return mPkg[0] === filterClassNum;
+            return String(p.class_name || p.class || '').toLowerCase() === String(classFilter).toLowerCase();
+          });
+          if (classSpecific.length > 0) {
+            filtered = classSpecific;
+          }
         }
         if (subjectFilter && subjectFilter !== 'ALL' && subjectFilter !== 'All') {
-          filtered = filtered.filter((p) => !p.subject_code || p.subject_code === subjectFilter || p.subject_code === 'ALL');
+          const sFilter = String(subjectFilter).toUpperCase().trim();
+          filtered = filtered.filter((p) => {
+            if (!p.subject_code || p.subject_code === 'ALL') return true;
+            const pCode = String(p.subject_code).toUpperCase().trim();
+            if (pCode === sFilter) return true;
+            const idloCodes = ['IDLO', 'IEOD', 'ICSO', 'CYBER', 'DIGITAL LITERACY'];
+            if (idloCodes.includes(sFilter) && idloCodes.includes(pCode)) return true;
+            const imoCodes = ['IMO', 'IEOM', 'MATH', 'MATHEMATICS'];
+            if (imoCodes.includes(sFilter) && imoCodes.includes(pCode)) return true;
+            const isoCodes = ['ISO', 'IEOS', 'NSO', 'SCIENCE'];
+            if (isoCodes.includes(sFilter) && isoCodes.includes(pCode)) return true;
+            const ieoCodes = ['IEO', 'IEOE', 'ENGLISH'];
+            if (ieoCodes.includes(sFilter) && ieoCodes.includes(pCode)) return true;
+            const igkoCodes = ['IGKO', 'IEOG', 'GK', 'GENERAL KNOWLEDGE'];
+            if (igkoCodes.includes(sFilter) && igkoCodes.includes(pCode)) return true;
+            const ihoCodes = ['IHO', 'IEOH', 'HINDI'];
+            if (ihoCodes.includes(sFilter) && ihoCodes.includes(pCode)) return true;
+            return false;
+          });
         }
         return { success: true, data: filtered };
       }

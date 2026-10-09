@@ -28,7 +28,10 @@ import {
   Lock,
   QrCode,
   CreditCard,
-  Copy
+  Copy,
+  Package,
+  Eye,
+  RefreshCw
 } from 'lucide-react';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 import { isSubjectPurchased, savePurchasedSubject, getPurchasedTests, getTestPricing } from '../../utils/purchaseUtils';
@@ -78,15 +81,35 @@ export const StudentMyContentPage = ({
     };
   });
 
+  // Packages list loaded from API / Super Admin
+  const [packagesList, setPackagesList] = useState([]);
+  // View mode on Level 1: 'smart' (Locked = Study Package [Image 1], Unlocked = Subject Cover [Image 2]) | 'packages' | 'covers'
+  const [viewMode, setViewMode] = useState('smart');
+  const [previewCoverSubject, setPreviewCoverSubject] = useState(null);
+
+  // Helper to normalize subject codes and aliases
+  const normalizeCode = (raw) => {
+    if (!raw) return 'ALL';
+    const s = String(raw).replace('content_', '').toUpperCase().trim();
+    if (s === 'IMO' || s === 'IEOM' || s === 'MATH' || s === 'MATHEMATICS') return 'IMO';
+    if (s === 'ISO' || s === 'IEOS' || s === 'NSO' || s === 'SCIENCE') return 'ISO';
+    if (s === 'IDLO' || s === 'IEOD' || s === 'ICSO' || s === 'CYBER' || s === 'DIGITAL') return 'IDLO';
+    if (s === 'IEO' || s === 'IEOE' || s === 'ENGLISH') return 'IEO';
+    if (s === 'IGKO' || s === 'IEOG' || s === 'GK' || s === 'GENERAL KNOWLEDGE') return 'IGKO';
+    if (s === 'IHO' || s === 'IEOH' || s === 'HINDI') return 'IHO';
+    if (s === 'MY_CONTENT' || s === 'ALL') return 'ALL';
+    return s;
+  };
+
   // Active selected subject filter: 'ALL' or 'IGKO', 'IMO', 'ISO', etc.
   const [selectedSubject, setSelectedSubject] = useState(() => {
-    if (activeSubjectCode && activeSubjectCode.startsWith('content_')) {
-      return activeSubjectCode.replace('content_', '').toUpperCase();
+    if (activeSubjectCode) {
+      return normalizeCode(activeSubjectCode);
     }
     return 'ALL';
   });
 
-  // Level 2: Which subject's mock tests are open (null = showing covers, 'IGKO' = showing mock tests)
+  // Level 2: Which subject's mock tests are open (null = showing covers/packages, 'IMO' = showing mock tests)
   const [openedMockSeries, setOpenedMockSeries] = useState(null);
 
   const [selectedPaperForInstructions, setSelectedPaperForInstructions] = useState(null);
@@ -94,13 +117,14 @@ export const StudentMyContentPage = ({
   const [hasAgreedToRules, setHasAgreedToRules] = useState(true);
   const [myTestResults, setMyTestResults] = useState([]);
 
-  // Fetch real exam papers and results
+  // Fetch real exam papers, packages, and results
   const fetchMyContentData = async () => {
     try {
       setLoading(true);
-      const [papersRes, resultsRes] = await Promise.all([
+      const [papersRes, resultsRes, pkgsRes] = await Promise.all([
         apiClient.get('/exam-papers').catch(() => ({ success: false })),
-        apiClient.get('/results', { scope: 'all' }).catch(() => ({ success: false }))
+        apiClient.get('/results', { scope: 'all' }).catch(() => ({ success: false })),
+        apiClient.get('/packages').catch(() => ({ success: false }))
       ]);
 
       let allPapers = [];
@@ -135,6 +159,22 @@ export const StudentMyContentPage = ({
       }
 
       setExamPapers(allPapers);
+
+      // Packages
+      let allPkgs = [];
+      if (pkgsRes && pkgsRes.success && Array.isArray(pkgsRes.data)) {
+        allPkgs = [...pkgsRes.data];
+      }
+      const localPkgs = JSON.parse(localStorage.getItem('olympiadhub_db_packages') || '[]');
+      if (Array.isArray(localPkgs)) {
+        localPkgs.forEach(lp => {
+          if (!allPkgs.some(p => String(p.id) === String(lp.id))) {
+            allPkgs.push(lp);
+          }
+        });
+      }
+      setPackagesList(allPkgs);
+
       if (resultsRes && resultsRes.success && Array.isArray(resultsRes.data)) {
         const filtered = resultsRes.data.filter(
           r => r.student_id === user?.id || (r.student_login_id && r.student_login_id === user?.login_id)
@@ -154,9 +194,11 @@ export const StudentMyContentPage = ({
       fetchMyContentData();
     };
     window.addEventListener('olympiadhub-admin-papers-updated', handleSync);
+    window.addEventListener('olympiadhub-package-updated', handleSync);
     window.addEventListener('storage', handleSync);
     return () => {
       window.removeEventListener('olympiadhub-admin-papers-updated', handleSync);
+      window.removeEventListener('olympiadhub-package-updated', handleSync);
       window.removeEventListener('storage', handleSync);
     };
   }, [user]);
@@ -213,10 +255,23 @@ export const StudentMyContentPage = ({
     setTimeout(() => setCopiedUpi(false), 2000);
   };
 
+  const handleOpenPayment = (sub, pkg = null) => {
+    const pkgPrice = pkg ? (pkg.price || bankSettings.test_pack_price || 99) : (bankSettings.test_pack_price || 99);
+    setPurchasingSubject({
+      ...sub,
+      packageId: pkg?.id,
+      packageTitle: pkg?.title,
+      price: pkgPrice
+    });
+    setPaymentStep('method');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleCompleteMockPurchase = async () => {
     if (!purchasingSubject) return;
     setIsProcessingPayment(true);
     try {
+      const payAmount = purchasingSubject.price || bankSettings.test_pack_price || 99;
       const updated = savePurchasedSubject(
         purchasingSubject.code,
         purchasingSubject.altCode,
@@ -224,7 +279,8 @@ export const StudentMyContentPage = ({
         {
           order_id: `ORD-MOCK-${Date.now().toString().slice(-6)}`,
           subject_name: purchasingSubject.title,
-          amount: bankSettings.test_pack_price || 99,
+          package_title: purchasingSubject.packageTitle || purchasingSubject.title,
+          amount: payAmount,
           payment_method: selectedPayMethod,
           utr_number: utrNumber || `UPI-TXN-${Date.now().toString().slice(-8)}`
         }
@@ -236,8 +292,10 @@ export const StudentMyContentPage = ({
         const boughtCode = purchasingSubject.code;
         setPaymentStep('method');
         setPurchasingSubject(null);
-        setOpenedMockSeries(boughtCode);
         setSelectedSubject(boughtCode);
+        // User requested: "tb show ho y cover or iske andr ka test"
+        // Open the mock series directly so they see the test papers inside it!
+        setOpenedMockSeries(boughtCode);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 1200);
     } catch (err) {
@@ -248,15 +306,11 @@ export const StudentMyContentPage = ({
   };
 
   // When activeSubjectCode changes from the sidebar (e.g. student clicks IGKO or ISO)
-  // We ALWAYS show the Subject Cover first (openedMockSeries = null) as requested!
   useEffect(() => {
-    if (activeSubjectCode && activeSubjectCode.startsWith('content_')) {
-      const code = activeSubjectCode.replace('content_', '').toUpperCase();
+    if (activeSubjectCode) {
+      const code = normalizeCode(activeSubjectCode);
       setSelectedSubject(code);
-      setOpenedMockSeries(null); // Show the Cover first!
-    } else if (activeSubjectCode === 'my_content') {
-      setSelectedSubject('ALL');
-      setOpenedMockSeries(null);
+      setOpenedMockSeries(null); // Return to Level 1
     }
   }, [activeSubjectCode]);
 
@@ -448,10 +502,138 @@ export const StudentMyContentPage = ({
     return ALL_SUBJECT_COVERS;
   }, [selectedSubject, ALL_SUBJECT_COVERS]);
 
+  // Default subject study packages (Image 1 style) for all 6 subjects
+  const DEFAULT_SUBJECT_PACKAGES = useMemo(() => ({
+    IMO: [
+      {
+        id: 'def_pkg_imo',
+        title: `Olympiads Level-2 Champs Package - IMO ${studentClass}`,
+        class_name: studentClass,
+        subject_code: 'IMO',
+        subject_name: 'International Mathematics Olympiad',
+        price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
+        original_price: bankSettings.original_price || 299,
+        header_color: '#d97706',
+        points: [
+          '5 Grand Level-1 & Level-2 National Math Mock Tests',
+          'Speed Arithmetic & Mental Shortcuts Guide',
+          'Step-by-Step Problem Solving Breakdown',
+          'Achievers HOTS Math Section with Master Answers',
+          'Unlimited Test Retake Attempts & Instant Scorecards'
+        ]
+      }
+    ],
+    ISO: [
+      {
+        id: 'def_pkg_iso',
+        title: `Olympiads Level-2 Champs Package - ISO Science ${studentClass}`,
+        class_name: studentClass,
+        subject_code: 'ISO',
+        subject_name: 'International Science Olympiad',
+        price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
+        original_price: bankSettings.original_price || 299,
+        header_color: '#8b5cf6',
+        points: [
+          '5 NSO / ISO Science Olympiad Mock Papers',
+          'Concepts, Diagram Analysis & Practical Reasoning',
+          'Previous Solved Papers with Explanations',
+          'Rank Booster High-Yield Questions',
+          'Step-by-Step Concept Breakdown & Solutions'
+        ]
+      }
+    ],
+    IDLO: [
+      {
+        id: 'def_pkg_idlo',
+        title: `Olympiads Level-2 Champs Package - ${studentClass}`,
+        class_name: studentClass,
+        subject_code: 'ICSO',
+        subject_name: 'International Cyber Olympiad',
+        price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
+        original_price: bankSettings.original_price || 299,
+        header_color: '#4895d9',
+        points: [
+          '5 Grand Level-2 National Mock Tests',
+          'Advanced HOTS & Tie-Breaker Problem Sets',
+          'Detailed Video Solutions & Step-by-Step Analysis',
+          'National Benchmark Percentile & AIR Ranking',
+          'Unlimited Test Retake Attempts for 365 Days'
+        ]
+      }
+    ],
+    IEO: [
+      {
+        id: 'def_pkg_ieo',
+        title: `Olympiads Level-2 Champs Package - IEO English ${studentClass}`,
+        class_name: studentClass,
+        subject_code: 'IEO',
+        subject_name: 'International English Olympiad',
+        price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
+        original_price: bankSettings.original_price || 299,
+        header_color: '#06b6d4',
+        points: [
+          '5 Complete IEO Model Test Papers with Solutions',
+          'Grammar, Vocabulary & Reading Comprehension Booster',
+          'Idioms, Proverbs & Sentence Structure Mastery',
+          'National Percentile & Real Examination Simulation',
+          'Detailed Explanations & Error Diagnostic Report'
+        ]
+      }
+    ],
+    IGKO: [
+      {
+        id: 'def_pkg_igko',
+        title: `Olympiads Level-2 Champs Package - IGKO ${studentClass}`,
+        class_name: studentClass,
+        subject_code: 'IGKO',
+        subject_name: 'International General Knowledge Olympiad',
+        price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
+        original_price: bankSettings.original_price || 299,
+        header_color: '#f59e0b',
+        points: [
+          '5 Full-Length IGKO Grand Mock Test Papers',
+          'Current Affairs Digest & Global News Summaries',
+          'India & World Factbook with Life Skills Guide',
+          'Instant Scoring & Section-wise Performance Heatmap',
+          'Comprehensive Answer Keys & Explanations'
+        ]
+      }
+    ],
+    IHO: [
+      {
+        id: 'def_pkg_iho',
+        title: `Olympiads Level-2 Champs Package - IHO Hindi ${studentClass}`,
+        class_name: studentClass,
+        subject_code: 'IHO',
+        subject_name: 'International Hindi Olympiad',
+        price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
+        original_price: bankSettings.original_price || 299,
+        header_color: '#10b981',
+        points: [
+          '5 Full-Length IHO Hindi Mock Test Papers',
+          'हिंदी व्याकरण, मुहावरे और लोकोक्तियाँ अभ्यास सेट',
+          'पठन कौशल, शब्द भंडार और वर्तनी शुद्धि',
+          'परीक्षा पैटर्न अनुसार तुरंत परिणाम और विश्लेषण',
+          'संपूर्ण उत्तर कुंजी एवं विस्तृत समाधान'
+        ]
+      }
+    ]
+  }), [studentClass, bankSettings]);
+
+  const getPackagesForSubject = (subCode) => {
+    const norm = normalizeCode(subCode);
+    const matched = packagesList.filter(p => {
+      const pNorm = normalizeCode(p.subject_code || p.subject || '');
+      return pNorm === norm;
+    });
+    if (matched.length > 0) return matched;
+    return DEFAULT_SUBJECT_PACKAGES[norm] || [];
+  };
+
   // Dedicated Step 2: Payment & QR Checkout Screen for Mock Test Series
   if (purchasingSubject) {
     const sub = purchasingSubject;
-    const upiAmount = bankSettings.test_pack_price || 99;
+    const upiAmount = purchasingSubject.price || bankSettings.test_pack_price || 99;
     const upiPayUrl = `upi://pay?pa=${bankSettings.upi_id || 'olympiadhub@icici'}&pn=${encodeURIComponent(bankSettings.merchant_name || 'Olympiad Foundation')}&am=${upiAmount}&cu=INR&tn=${encodeURIComponent(`${studentClass} ${sub.code} Mock Series`)}`;
     const qrImageSrc = bankSettings.qr_code_url || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiPayUrl)}`;
 
@@ -468,7 +650,7 @@ export const StudentMyContentPage = ({
             className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-indigo-600 px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 text-indigo-600" />
-            <span>← Back to Mock Test Covers</span>
+            <span>← Back to Mock Test Series</span>
           </button>
           <span className="text-xs font-bold text-slate-400">Step 2 of 2: Payment Checkout</span>
         </div>
@@ -705,7 +887,7 @@ export const StudentMyContentPage = ({
                         ₹{bankSettings.original_price || 299}
                       </span>
                       <span className="text-3xl font-black text-[#6d3a68]">
-                        ₹{bankSettings.test_pack_price || 99}
+                        ₹{upiAmount}
                       </span>
                     </div>
                   </div>
@@ -738,7 +920,7 @@ export const StudentMyContentPage = ({
                     ) : (
                       <>
                         <Check className="w-4 h-4 stroke-[3]" />
-                        <span>I Have Paid ₹{bankSettings.test_pack_price || 99} - Unlock Now</span>
+                        <span>I Have Paid ₹{upiAmount} - Unlock Now</span>
                       </>
                     )}
                   </button>
@@ -1113,27 +1295,28 @@ export const StudentMyContentPage = ({
         })()
       ) : (
         /* ========================================================================= */
-        /* LEVEL 1: SUBJECT COVER(S) VIEW (Shown First when clicking subject)        */
+        /* LEVEL 1: STUDY PACKAGES (LOCKED) & SUBJECT COVERS (UNLOCKED)              */
         /* ========================================================================= */
-        <div className="space-y-5 animate-in fade-in duration-150">
-          <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="space-y-6 animate-in fade-in duration-150">
+          {/* Header Row: Title + Class Dropdown */}
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-                <BookOpen className="w-6 h-6 text-indigo-600" />
+                <Package className="w-6 h-6 text-indigo-600" />
                 <span>
                   {selectedSubject !== 'ALL'
-                    ? `${selectedSubject} Subject Cover & Mock Test Series`
-                    : 'Olympiad Subject Series & Mock Tests'}
+                    ? `${selectedSubject} Study Packages & Mock Test Series`
+                    : 'Olympiad Study Packages & Mock Test Series'}
                 </span>
               </h2>
-              <p className="text-xs text-slate-500 font-semibold mt-0.5">
+              <p className="text-xs text-slate-500 font-semibold mt-1">
                 {selectedSubject !== 'ALL'
-                  ? `Click "Start Mock Test" below to view all official mock test papers for ${selectedSubject}.`
-                  : 'Select any Olympiad subject cover below to view all official mock tests, previous year papers & sample tests.'}
+                  ? `Purchase the official package to unlock ${selectedSubject} mock tests, timer, scorecards and solutions.`
+                  : 'Unlock official All-in-One Study Packages. Once purchased, access your subject cover and full mock test series.'}
               </p>
             </div>
 
-            {/* Class Dropdown placed right where View All Subject Covers was */}
+            {/* Class Dropdown */}
             <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-indigo-300 transition-colors">
               <GraduationCap className="w-4 h-4 text-indigo-600 shrink-0" />
               <span className="text-xs font-bold text-slate-500">Class:</span>
@@ -1152,20 +1335,236 @@ export const StudentMyContentPage = ({
             </div>
           </div>
 
-          {/* Grid of Subject Covers (Vibrant 2-3 Mix Pastel Gradient Cards) */}
+          {/* Subheader Toolbar: Subject Filter Pills + View Mode Tabs */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
+            {/* Quick Subject Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
+              {[
+                { code: 'ALL', label: 'All Subjects' },
+                { code: 'IMO', label: 'IEOM (Math)', icon: Calculator },
+                { code: 'ISO', label: 'IEOS (Science)', icon: Rocket },
+                { code: 'IDLO', label: 'IEOD (Digital)', icon: Laptop },
+                { code: 'IEO', label: 'IEOE (English)', icon: BookOpen },
+                { code: 'IGKO', label: 'IEOG (GK)', icon: Globe },
+                { code: 'IHO', label: 'IEOH (Hindi)', icon: Languages }
+              ].map((tab) => {
+                const isSelected = selectedSubject === tab.code;
+                const TabIcon = tab.icon;
+                return (
+                  <button
+                    key={tab.code}
+                    type="button"
+                    onClick={() => {
+                      setSelectedSubject(tab.code);
+                      if (onNavigateTab) {
+                        onNavigateTab(tab.code === 'ALL' ? 'my_content' : `content_${tab.code.toLowerCase()}`);
+                      }
+                    }}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                      isSelected
+                        ? 'bg-indigo-600 text-white shadow-2xs'
+                        : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+                    }`}
+                  >
+                    {TabIcon && <TabIcon className="w-3.5 h-3.5" />}
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* View Mode Switcher */}
+            <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200 shrink-0 self-start sm:self-auto">
+              <button
+                type="button"
+                onClick={() => setViewMode('smart')}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === 'smart'
+                    ? 'bg-white text-indigo-700 shadow-2xs font-black'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+                title="Shows Study Package when locked and Subject Cover when unlocked"
+              >
+                ✨ Auto Flow
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('packages')}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === 'packages'
+                    ? 'bg-white text-indigo-700 shadow-2xs font-black'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+                title="All-in-One Study Packages (Image 1 style)"
+              >
+                📦 Packages
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('covers')}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === 'covers'
+                    ? 'bg-white text-indigo-700 shadow-2xs font-black'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+                title="Subject Series Covers (Image 2 style)"
+              >
+                🎨 Covers
+              </button>
+            </div>
+          </div>
+
+          {/* Grid of Cards */}
           <div className={`grid gap-6 w-full ${
             visibleCovers.length === 1
-              ? 'grid-cols-1 max-w-[440px]'
-              : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+              ? 'grid-cols-1 max-w-[480px]'
+              : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
           }`}>
             {visibleCovers.map((sub) => {
-              const subPapers = getSubjectPapers(sub.code, sub.altCode);
-              const SubIcon = sub.icon;
               const isUnlocked = isSubjectPurchased(sub.code, studentClass, purchasedTests);
+              const subjectPkgs = getPackagesForSubject(sub.code);
+              const primaryPkg = subjectPkgs[0] || {
+                id: `pkg_${sub.code.toLowerCase()}`,
+                title: `Olympiads Level-2 Champs Package - ${studentClass}`,
+                class_name: studentClass,
+                subject_code: sub.code,
+                price: bankSettings.mock_test_price || bankSettings.test_pack_price || 99,
+                original_price: bankSettings.original_price || 299,
+                header_color: '#4895d9',
+                points: [
+                  '5 Grand Level-1 & Level-2 National Mock Tests',
+                  'Detailed Step-by-Step Solutions & Explanations',
+                  'All India Rank & Benchmark Percentile',
+                  'Timed CBT Online Exam Simulator',
+                  'Unlimited Re-attempts for Academic Year'
+                ]
+              };
+              const SubIcon = sub.icon;
+              const effectivePrice = primaryPkg.price || bankSettings.mock_test_price || bankSettings.test_pack_price || 99;
+              const origPrice = primaryPkg.original_price || bankSettings.original_price || 299;
 
+              // Decide whether to render the Package Card (Image 1) or Cover Card (Image 2)
+              const renderAsPackage = viewMode === 'packages' || (viewMode === 'smart' && !isUnlocked);
+
+              if (renderAsPackage) {
+                /* ================================================================= */
+                /* IMAGE 1: ALL-IN-ONE STUDY PACKAGE CARD                            */
+                /* ================================================================= */
+                return (
+                  <div
+                    key={`pkg_card_${sub.code}`}
+                    className="bg-white rounded-2xl border-2 border-sky-300 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4 relative overflow-hidden text-slate-900"
+                  >
+                    <div>
+                      {/* Colored Header Banner (Image 1 Style) */}
+                      <div
+                        className="text-white text-center py-2.5 px-3 rounded-t-xl -mt-5 -mx-5 font-black text-xs sm:text-sm shadow-xs mb-3 truncate"
+                        style={{ backgroundColor: primaryPkg.header_color || '#4895d9' }}
+                      >
+                        {primaryPkg.title}
+                      </div>
+
+                      {/* Class & Features Badges */}
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px]">
+                          {primaryPkg.class_name || studentClass} &bull; {primaryPkg.subject_code || sub.code}
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px]">
+                          {(primaryPkg.points || []).length} Key Features
+                        </span>
+                      </div>
+
+                      {/* Key Features Checklist with Green Checkmarks */}
+                      <div className="space-y-2 text-xs text-slate-700 min-h-[140px]">
+                        {(primaryPkg.points || []).map((pt, pIdx) => (
+                          <div key={pIdx} className="flex items-start gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-[#00b074] shrink-0 mt-0.5" />
+                            <span className="leading-snug text-[11px] font-medium text-slate-800">{pt}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Price & Action Row */}
+                    <div className="pt-3 border-t border-slate-100 space-y-3">
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-600">
+                        <div>
+                          <span>Price: </span>
+                          <span className="font-black text-base text-[#6d3a68]">
+                            ₹{parseFloat(effectivePrice).toFixed(2)}
+                          </span>
+                          {origPrice && (
+                            <span className="ml-2 text-slate-400 line-through text-[11px]">
+                              ₹{parseFloat(origPrice).toFixed(2)}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          Live
+                        </span>
+                      </div>
+
+                      {/* Action Button */}
+                      {isUnlocked ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpenedMockSeries(sub.code);
+                            setSelectedSubject(sub.code);
+                          }}
+                          className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-98 transition-all"
+                        >
+                          <Check className="w-4 h-4 stroke-[3]" />
+                          <span>✓ UNLOCKED - Open Mock Tests &rarr;</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleOpenPayment(sub, primaryPkg)}
+                          className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-98 transition-all cursor-pointer border border-emerald-600"
+                        >
+                          <Lock className="w-4 h-4" />
+                          <span>🔒 Unlock &amp; Buy Test Series (₹{parseFloat(effectivePrice).toFixed(2)})</span>
+                        </button>
+                      )}
+
+                      {/* Preview Subject Cover Peek */}
+                      <button
+                        type="button"
+                        onClick={() => setPreviewCoverSubject(previewCoverSubject === sub.code ? null : sub.code)}
+                        className="text-[11px] font-bold text-slate-500 hover:text-indigo-600 flex items-center justify-center gap-1 w-full text-center cursor-pointer transition-colors pt-1"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>{previewCoverSubject === sub.code ? 'Hide Subject Cover Preview' : 'Preview Subject Cover'}</span>
+                      </button>
+
+                      {/* Inline Subject Cover Preview if toggled */}
+                      {previewCoverSubject === sub.code && (
+                        <div className={`mt-3 p-4 rounded-2xl ${sub.cardBg} border space-y-2 animate-in fade-in`}>
+                          <div className="flex items-center gap-2">
+                            <div className={`w-8 h-8 rounded-xl ${sub.iconBg} flex items-center justify-center text-white shrink-0`}>
+                              <SubIcon className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-black text-slate-900">{sub.title}</h4>
+                              <p className="text-[10px] text-slate-600 font-bold">{sub.subtitle}</p>
+                            </div>
+                          </div>
+                          <p className="text-[10px] text-slate-600 line-clamp-2">{sub.description}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+
+              /* ================================================================= */
+              /* IMAGE 2: SUBJECT COVER CARD (Revealed when Unlocked / Bought)     */
+              /* ================================================================= */
               return (
                 <div
-                  key={sub.code}
+                  key={`cover_card_${sub.code}`}
                   className={`${sub.cardBg} rounded-3xl p-6 sm:p-7 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group relative overflow-hidden aspect-square min-h-[380px] sm:min-h-[400px] w-full text-slate-900 hover:-translate-y-1`}
                 >
                   <div className="space-y-3.5">
@@ -1194,7 +1593,7 @@ export const StudentMyContentPage = ({
                       ) : (
                         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-xs font-black shrink-0 shadow-2xs">
                           <Lock className="w-3.5 h-3.5" />
-                          <span>LOCKED (₹{bankSettings.test_pack_price || 99})</span>
+                          <span>LOCKED (₹{effectivePrice})</span>
                         </div>
                       )}
                     </div>
@@ -1230,11 +1629,11 @@ export const StudentMyContentPage = ({
                     ) : (
                       <button
                         type="button"
-                        onClick={() => setPurchasingSubject(sub)}
+                        onClick={() => handleOpenPayment(sub, primaryPkg)}
                         className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-98 transition-all cursor-pointer border border-emerald-600"
                       >
                         <Lock className="w-4 h-4" />
-                        <span>Unlock &amp; Buy Test Series (₹{bankSettings.test_pack_price || 99})</span>
+                        <span>Unlock &amp; Buy Test Series (₹{effectivePrice})</span>
                       </button>
                     )}
 
