@@ -180,6 +180,7 @@ const emailApiPlugin = () => ({
 });
 
 export default defineConfig({
+  base: './',
   plugins: [react(), emailApiPlugin()],
   server: {
     port: 3000,
