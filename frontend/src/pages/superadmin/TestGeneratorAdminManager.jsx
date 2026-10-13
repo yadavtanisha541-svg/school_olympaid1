@@ -42,6 +42,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 import { getTestPricing, saveTestPricing } from '../../utils/purchaseUtils';
 import { extractTextFromFile } from '../../utils/universalDocumentParser';
+import { UniversalQuestionImportModal } from '../../components/common/UniversalQuestionImportModal';
 
 const SUBJECT_OPTIONS = [
   { id: 'math', name: 'IMO (Mathematics)', code: 'IMO', color: '#d97706', icon: '📐' },
@@ -418,6 +419,9 @@ export const TestGeneratorAdminManager = () => {
   const [bulkInputText, setBulkInputText] = useState('');
   const [bulkParsedCount, setBulkParsedCount] = useState(0);
 
+  // Universal Word/PDF/CSV Importer Modal State
+  const [showUniversalImportModal, setShowUniversalImportModal] = useState(false);
+
   // Form State
   const [paperCategory, setPaperCategory] = useState('practice_test'); // 'practice_test' | 'generator'
   const [examYear, setExamYear] = useState('2024');
@@ -707,6 +711,47 @@ export const TestGeneratorAdminManager = () => {
     setBulkInputText('');
   };
 
+  // Universal Word / PDF / CSV Importer Handler
+  const handleUniversalQuestionsImported = (imported) => {
+    if (!Array.isArray(imported) || imported.length === 0) return;
+
+    const formatted = imported.map((item, idx) => {
+      const qText = item.question_text || item.q || item.title || `Question ${idx + 1}`;
+      const opts = [
+        item.option_a || item.options?.[0] || 'Option A',
+        item.option_b || item.options?.[1] || 'Option B',
+        item.option_c || item.options?.[2] || 'Option C',
+        item.option_d || item.options?.[3] || 'Option D'
+      ];
+      let corr = 0;
+      if (typeof item.correct === 'number') {
+        corr = Math.max(0, Math.min(3, item.correct));
+      } else {
+        const letter = String(item.correct_option || item.answer || item.correct || 'A').toUpperCase().trim();
+        const idxLetter = ['A', 'B', 'C', 'D'].indexOf(letter);
+        if (idxLetter >= 0) corr = idxLetter;
+        else if (!isNaN(parseInt(letter))) corr = Math.max(0, Math.min(3, parseInt(letter) - 1));
+      }
+      return {
+        q: qText,
+        options: opts,
+        correct: corr,
+        explanation: item.explanation || item.solution || '',
+        marks: Number(item.marks) || 1
+      };
+    });
+
+    if (!showCreateModal) {
+      handleOpenCreateModal(activeCategoryTab);
+      setQuestionsList(formatted);
+    } else {
+      const existing = (questionsList.length === 1 && !questionsList[0].q.trim()) ? [] : questionsList;
+      setQuestionsList([...existing, ...formatted]);
+    }
+
+    setShowUniversalImportModal(false);
+  };
+
   // =========================================================================
   // PRINT & EXPORT UTILITIES (PDF, CSV, JSON)
   // =========================================================================
@@ -952,6 +997,16 @@ export const TestGeneratorAdminManager = () => {
             <div className="flex items-center gap-2.5">
               <button
                 type="button"
+                onClick={() => setShowUniversalImportModal(true)}
+                className="px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-black transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                title="Import Questions directly from Word (.docx), PDF (.pdf), or CSV file"
+              >
+                <Upload className="w-4 h-4" />
+                <span>Import (Word / PDF)</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => handleExportCurrentPaperPdf(true)}
                 className="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
                 title="Download / Save complete Question Paper with Answers & Solutions as PDF file"
@@ -1103,7 +1158,15 @@ export const TestGeneratorAdminManager = () => {
                 </div>
 
                 <div className="flex items-center gap-2.5">
-
+                  <button
+                    type="button"
+                    onClick={() => setShowUniversalImportModal(true)}
+                    className="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                    title="Import Questions directly from Word (.docx), PDF (.pdf), or CSV file"
+                  >
+                    <Upload className="w-4 h-4" />
+                    <span>Import Word / PDF</span>
+                  </button>
 
                   <button
                     type="button"
@@ -1130,10 +1193,18 @@ export const TestGeneratorAdminManager = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={handleOpenBulkModal}
-                      className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold cursor-pointer"
+                      onClick={() => setShowUniversalImportModal(true)}
+                      className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold cursor-pointer flex items-center gap-1.5 shadow-2xs"
                     >
-                      ⚡ Bulk Import Q&amp;A
+                      <Upload className="w-4 h-4" />
+                      <span>Import Word / PDF File</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleOpenBulkModal}
+                      className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold cursor-pointer"
+                    >
+                      ⚡ Bulk Text Paste
                     </button>
                   </div>
                 </div>
@@ -1391,6 +1462,17 @@ export const TestGeneratorAdminManager = () => {
             </div>
           </div>
         )}
+
+        {/* Universal Word / PDF / CSV Import Modal */}
+        <UniversalQuestionImportModal
+          isOpen={showUniversalImportModal}
+          onClose={() => setShowUniversalImportModal(false)}
+          title="Import Questions (Word / PDF / CSV)"
+          subtitle="Upload your Word (.docx), PDF (.pdf), or CSV file. Questions, options, and answers will be automatically extracted."
+          targetClassId={paperClass}
+          targetSubjectId={paperSubject}
+          onQuestionsImported={handleUniversalQuestionsImported}
+        />
       </div>
     );
   }
@@ -1583,6 +1665,18 @@ export const TestGeneratorAdminManager = () => {
             <span className="truncate">
               <span className="sm:hidden">Price: ₹{testPricing.practice_test_price || 99}</span>
               <span className="hidden sm:inline">Practice Test Price: ₹{testPricing.practice_test_price || 99}</span>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowUniversalImportModal(true)}
+            className="w-full sm:w-auto px-2.5 sm:px-4 py-2 sm:py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-black rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 shrink-0 text-center min-w-0"
+            title="Import Word / PDF Questions directly to create a new paper"
+          >
+            <Upload className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 shrink-0" />
+            <span className="truncate">
+              <span>Import Word / PDF</span>
             </span>
           </button>
 
@@ -2079,6 +2173,15 @@ export const TestGeneratorAdminManager = () => {
           </div>
         </div>
       )}
+
+      {/* Universal Word / PDF / CSV Import Modal */}
+      <UniversalQuestionImportModal
+        isOpen={showUniversalImportModal}
+        onClose={() => setShowUniversalImportModal(false)}
+        title="Import Questions (Word / PDF / CSV)"
+        subtitle="Upload your Word (.docx), PDF (.pdf), or CSV file. Questions, options, and answers will be automatically extracted."
+        onQuestionsImported={handleUniversalQuestionsImported}
+      />
 
     </div>
   );
