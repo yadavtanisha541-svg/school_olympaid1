@@ -12,9 +12,10 @@ import {
   ArrowRight,
   RefreshCw,
   Eye,
-  Check
+  Check,
+  Image as ImageIcon
 } from 'lucide-react';
-import { extractTextFromFile, parseQuestionsFromText } from '../../utils/universalDocumentParser';
+import { extractFromFile, parseQuestionsFromText, getExtractedImages } from '../../utils/universalDocumentParser';
 import { syncManager } from '../../utils/syncManager';
 
 export const UniversalQuestionImportModal = ({
@@ -32,6 +33,7 @@ export const UniversalQuestionImportModal = ({
   const [isParsing, setIsParsing] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [parsedQuestions, setParsedQuestions] = useState([]);
+  const [extractedImgs, setExtractedImgs] = useState({});
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
@@ -46,17 +48,31 @@ export const UniversalQuestionImportModal = ({
     setErrorMsg('');
     setSuccessMsg('');
     setIsParsing(true);
+    setExtractedImgs({});
+    setParsedQuestions([]);
 
     try {
-      const text = await extractTextFromFile(selected);
+      const { text, images } = await extractFromFile(selected);
       setRawText(text);
+      setExtractedImgs(images || {});
+
       const questions = parseQuestionsFromText(text);
 
       if (questions.length === 0) {
         setErrorMsg('No structured questions could be detected. Please check the file formatting or use the Paste Text option.');
       } else {
-        setParsedQuestions(questions);
-        setSuccessMsg(`Extracted ${questions.length} questions successfully!`);
+        // Attach extracted images to questions that reference them
+        const withImages = questions.map(q => ({
+          ...q,
+          _extractedImages: images || {}
+        }));
+        setParsedQuestions(withImages);
+        const imgCount = Object.keys(images || {}).length;
+        setSuccessMsg(
+          `Extracted ${questions.length} question${questions.length > 1 ? 's' : ''}` +
+          (imgCount > 0 ? ` + ${imgCount} diagram/image${imgCount > 1 ? 's' : ''}` : '') +
+          ' successfully!'
+        );
       }
     } catch (err) {
       console.error('File parsing error:', err);
@@ -98,22 +114,20 @@ export const UniversalQuestionImportModal = ({
 
     setIsImporting(true);
     try {
-      // Attach target class/subject if provided
+      // Attach target class/subject and clean up internal fields
       const formatted = parsedQuestions.map(q => ({
         ...q,
         class_id: targetClassId || q.class_id,
-        subject_id: targetSubjectId || q.subject_id
+        subject_id: targetSubjectId || q.subject_id,
+        // Remove internal helper field before saving
+        _extractedImages: undefined
       }));
 
-      // Call parent import handler
       if (onQuestionsImported) {
         await onQuestionsImported(formatted);
       }
 
-      // Sync across Vercel and Localhost
-      syncManager.pushToVercel({
-        last_imported_questions: Date.now()
-      });
+      syncManager.schedulePush();
 
       setSuccessMsg(`Successfully imported ${formatted.length} questions!`);
       setTimeout(() => {
@@ -121,12 +135,53 @@ export const UniversalQuestionImportModal = ({
         setParsedQuestions([]);
         setFile(null);
         setRawText('');
+        setExtractedImgs({});
       }, 1200);
     } catch (err) {
       setErrorMsg('Import error: ' + (err.message || 'Failed to save questions.'));
     } finally {
       setIsImporting(false);
     }
+  };
+
+  const imgCount = Object.keys(extractedImgs).length;
+
+  // Render question text, replacing image placeholders with actual <img> previews
+  const renderQuestionText = (q) => {
+    const imgs = q._extractedImages || extractedImgs || {};
+    const text = q.question_text || '';
+    const imgPlaceholderRe = /__IMG__([^_]+)__/g;
+    const parts = [];
+    let lastIndex = 0;
+    let m;
+    while ((m = imgPlaceholderRe.exec(text)) !== null) {
+      if (m.index > lastIndex) {
+        parts.push(<span key={`t${lastIndex}`}>{text.slice(lastIndex, m.index)}</span>);
+      }
+      const imgKey = m[1];
+      const dataUrl = imgs[imgKey];
+      if (dataUrl) {
+        parts.push(
+          <img
+            key={`img_${imgKey}`}
+            src={dataUrl}
+            alt="Question diagram"
+            className="max-w-full max-h-48 rounded-lg border border-slate-200 my-2 shadow-xs object-contain"
+          />
+        );
+      } else {
+        parts.push(
+          <span key={`ref_${imgKey}`} className="inline-flex items-center gap-1 text-indigo-600 text-[10px] font-bold bg-indigo-50 px-2 py-0.5 rounded-md">
+            <ImageIcon className="w-3 h-3" /> [Diagram]
+          </span>
+        );
+      }
+      lastIndex = m.index + m[0].length;
+    }
+    if (lastIndex < text.length) {
+      parts.push(<span key="tail">{text.slice(lastIndex)}</span>);
+    }
+    return parts.length > 0 ? parts : text;
   };
 
   return (
@@ -240,7 +295,7 @@ export const UniversalQuestionImportModal = ({
                     {file ? file.name : 'Click to Upload Word (.docx), PDF (.pdf), or CSV'}
                   </p>
                   <p className="text-xs text-slate-400 mt-1">
-                    Drag and drop your file here, or click to browse files
+                    Questions, options A/B/C/D, answers, and diagrams will all be extracted automatically
                   </p>
                 </div>
                 {file && (
@@ -249,6 +304,34 @@ export const UniversalQuestionImportModal = ({
                   </span>
                 )}
               </div>
+
+              {/* Diagram Preview Strip */}
+              {imgCount > 0 && (
+                <div className="mt-3 p-3 rounded-2xl border border-indigo-100 bg-indigo-50/40">
+                  <p className="text-[11px] font-bold text-indigo-700 mb-2 flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    {imgCount} Diagram{imgCount > 1 ? 's' : ''} / Image{imgCount > 1 ? 's' : ''} Extracted
+                  </p>
+                  <div className="flex gap-2 flex-wrap">
+                    {Object.entries(extractedImgs).map(([key, dataUrl]) => (
+                      <img
+                        key={key}
+                        src={dataUrl}
+                        alt={`Extracted diagram: ${key}`}
+                        className="h-20 max-w-[160px] object-contain rounded-lg border border-indigo-200 shadow-xs"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Parsing spinner */}
+              {isParsing && (
+                <div className="flex items-center justify-center gap-2 py-4 text-xs text-indigo-700 font-bold">
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  Extracting questions, options and diagrams...
+                </div>
+              )}
             </div>
           )}
 
@@ -269,7 +352,7 @@ export const UniversalQuestionImportModal = ({
               <textarea
                 value={rawText}
                 onChange={(e) => setRawText(e.target.value)}
-                placeholder="Example:&#10;1. What is the value of 3/4 + 1/2?&#10;A) 1/4&#10;B) 5/4&#10;C) 3/8&#10;D) 7/4&#10;Answer: B&#10;Explanation: 3/4 + 2/4 = 5/4&#10;&#10;Q2. Name the planet closest to the Sun:&#10;A) Venus&#10;B) Mars&#10;C) Mercury&#10;D) Jupiter&#10;Ans: C"
+                placeholder={`Example:\n1. What is the value of 3/4 + 1/2?\nA) 1/4\nB) 5/4\nC) 3/8\nD) 7/4\nAnswer: B\nExplanation: 3/4 + 2/4 = 5/4\n\nQ2. Name the planet closest to the Sun:\nA) Venus\nB) Mars\nC) Mercury\nD) Jupiter\nAns: C`}
                 rows={9}
                 className="w-full p-4 rounded-2xl border border-slate-200 text-xs font-mono text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-slate-50"
               />
@@ -283,36 +366,88 @@ export const UniversalQuestionImportModal = ({
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                   <Eye className="w-4 h-4 text-indigo-600" />
                   <span>Preview Extracted Questions ({parsedQuestions.length})</span>
+                  {imgCount > 0 && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200 flex items-center gap-1">
+                      <ImageIcon className="w-3 h-3" />{imgCount} Diagram{imgCount > 1 ? 's' : ''}
+                    </span>
+                  )}
                 </h4>
                 <span className="text-[11px] text-emerald-700 font-bold bg-emerald-100 px-2.5 py-0.5 rounded-full">
                   All Questions Formatted
                 </span>
               </div>
 
-              <div className="max-h-56 overflow-y-auto divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-slate-50/40 p-2">
+              <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white shadow-xs">
                 {parsedQuestions.map((q, idx) => (
-                  <div key={q.id || idx} className="p-3 text-xs space-y-1.5">
+                  <div key={q.id || idx} className="p-4 text-xs space-y-2">
+                    {/* Question */}
                     <div className="flex items-start justify-between gap-2">
-                      <p className="font-bold text-slate-900">
+                      <p className="font-bold text-slate-900 leading-relaxed flex-1">
                         <span className="text-indigo-600 mr-1.5">Q{idx + 1}.</span>
-                        {q.question_text}
+                        <span>{renderQuestionText(q)}</span>
                       </p>
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-extrabold text-[10px] shrink-0">
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-extrabold text-[10px] shrink-0 whitespace-nowrap">
                         Correct: {q.correct_option}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-1.5 text-[11px] text-slate-600 pl-4">
-                      <div className={q.correct_option === 'A' ? 'font-bold text-emerald-700' : ''}>A: {q.option_a}</div>
-                      <div className={q.correct_option === 'B' ? 'font-bold text-emerald-700' : ''}>B: {q.option_b}</div>
-                      <div className={q.correct_option === 'C' ? 'font-bold text-emerald-700' : ''}>C: {q.option_c}</div>
-                      <div className={q.correct_option === 'D' ? 'font-bold text-emerald-700' : ''}>D: {q.option_d}</div>
+                    {/* Options — 2 column grid */}
+                    <div className="grid grid-cols-2 gap-1.5 pl-4">
+                      {['A', 'B', 'C', 'D'].map(letter => {
+                        const optKey = `option_${letter.toLowerCase()}`;
+                        const optText = q[optKey] || '';
+                        const isCorrect = q.correct_option === letter;
+                        const isPlaceholder = optText.startsWith('Option ');
+                        return (
+                          <div
+                            key={letter}
+                            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg border text-[11px] ${
+                              isCorrect
+                                ? 'bg-emerald-50 border-emerald-300 font-bold text-emerald-800'
+                                : isPlaceholder
+                                ? 'bg-slate-50 border-slate-100 text-slate-400 italic'
+                                : 'bg-slate-50 border-slate-200 text-slate-700'
+                            }`}
+                          >
+                            <span className={`w-5 h-5 rounded-md flex items-center justify-center font-black text-[9px] shrink-0 ${
+                              isCorrect ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'
+                            }`}>
+                              {letter}
+                            </span>
+                            <span className="truncate">{optText || <span className="text-slate-300">—</span>}</span>
+                            {isCorrect && <Check className="w-3 h-3 text-emerald-600 shrink-0 ml-auto" />}
+                          </div>
+                        );
+                      })}
                     </div>
 
-                    {q.explanation && (
-                      <p className="text-[10px] text-slate-400 italic pl-4">
+                    {/* Explanation */}
+                    {q.explanation && q.explanation !== 'Step-by-step reasoning verified by Olympiad expert.' && (
+                      <p className="text-[10px] text-slate-500 italic pl-4">
                         💡 {q.explanation}
                       </p>
+                    )}
+
+                    {/* Diagram placeholder indicators */}
+                    {q.question_images && q.question_images.length > 0 && (
+                      <div className="pl-4 flex items-center gap-1.5 flex-wrap">
+                        {q.question_images.map(key => {
+                          const imgs = q._extractedImages || extractedImgs;
+                          const dataUrl = imgs?.[key];
+                          return dataUrl ? (
+                            <img
+                              key={key}
+                              src={dataUrl}
+                              alt="Question diagram"
+                              className="h-16 max-w-[120px] object-contain rounded-lg border border-indigo-200 shadow-xs"
+                            />
+                          ) : (
+                            <span key={key} className="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-md flex items-center gap-1">
+                              <ImageIcon className="w-3 h-3" /> [Diagram]
+                            </span>
+                          );
+                        })}
+                      </div>
                     )}
                   </div>
                 ))}
@@ -325,8 +460,8 @@ export const UniversalQuestionImportModal = ({
         <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
           <div className="text-xs text-slate-500 font-medium hidden sm:block">
             {parsedQuestions.length > 0
-              ? `Ready to save ${parsedQuestions.length} questions into repository.`
-              : 'Supports Word documents, PDF papers, and CSV templates.'}
+              ? `Ready to save ${parsedQuestions.length} question${parsedQuestions.length > 1 ? 's' : ''}${imgCount > 0 ? ` + ${imgCount} diagram${imgCount > 1 ? 's' : ''}` : ''} into repository.`
+              : 'Supports Word documents (.docx), PDF papers, and CSV templates.'}
           </div>
 
           <div className="flex items-center gap-2.5 ml-auto">
