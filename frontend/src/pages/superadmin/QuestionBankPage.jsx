@@ -29,6 +29,7 @@ import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
 import { Modal } from '../../components/Modal';
 import { useAuth } from '../../contexts/AuthContext';
+import { UniversalQuestionImportModal } from '../../components/common/UniversalQuestionImportModal';
 
 export const QuestionBankPage = () => {
   const { user } = useAuth();
@@ -631,8 +632,9 @@ export const QuestionBankPage = () => {
             size="sm"
             icon={Upload}
             onClick={() => setShowImportModal(true)}
+            className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-bold"
           >
-            Import CSV
+            Import (Word / PDF / CSV)
           </Button>
           <Button
             variant="secondary"
@@ -895,75 +897,27 @@ export const QuestionBankPage = () => {
         </div>
       )}
 
-      {/* Bulk CSV Import Modal */}
-      {showImportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 animate-in fade-in zoom-in duration-150">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-                <Upload className="w-5 h-5 text-indigo-600" />
-                <span>Bulk Import Questions via CSV</span>
-              </h3>
-              <button onClick={() => setShowImportModal(false)} className="text-slate-400 hover:text-slate-600">✕</button>
-            </div>
-
-            <div className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 uppercase mb-1.5">Choose CSV File</label>
-                <input
-                  type="file"
-                  accept=".csv"
-                  onChange={handleFileUpload}
-                  className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 uppercase mb-1.5">Or Paste Raw CSV Data</label>
-                <textarea
-                  rows={5}
-                  value={importCsvText}
-                  onChange={(e) => setImportCsvText(e.target.value)}
-                  placeholder="class_id,subject_id,question_text,option_a,option_b,option_c,option_d,correct_option,difficulty,marks,negative_marks,explanation..."
-                  className="w-full px-3 py-2 font-mono text-[11px] border border-slate-200 rounded-xl bg-slate-50"
-                />
-              </div>
-
-              {/* Validation & Results Summary */}
-              {importResult && (
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-                  <h4 className="font-bold text-slate-900 text-sm">Import Validation Analysis</h4>
-                  <div className="grid grid-cols-4 gap-2 text-center font-mono">
-                    <div className="p-2 bg-white rounded-lg border">
-                      <span className="text-slate-500 block text-[10px]">Total Rows</span>
-                      <span className="font-bold text-slate-900">{importResult.total_rows}</span>
-                    </div>
-                    <div className="p-2 bg-white rounded-lg border border-emerald-200">
-                      <span className="text-emerald-600 block text-[10px]">Imported</span>
-                      <span className="font-bold text-emerald-600">{importResult.imported_questions}</span>
-                    </div>
-                    <div className="p-2 bg-white rounded-lg border border-amber-200">
-                      <span className="text-amber-600 block text-[10px]">Valid</span>
-                      <span className="font-bold text-amber-600">{importResult.valid_questions}</span>
-                    </div>
-                    <div className="p-2 bg-white rounded-lg border border-rose-200">
-                      <span className="text-rose-600 block text-[10px]">Skipped</span>
-                      <span className="font-bold text-rose-600">{importResult.invalid_questions}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <Button variant="secondary" size="sm" onClick={() => setShowImportModal(false)}>Close</Button>
-                <Button variant="primary" size="sm" loading={importLoading} onClick={handleImportSubmit}>
-                  Upload &amp; Validate CSV
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Universal Question Import Modal (Word, PDF, CSV, TXT) */}
+      <UniversalQuestionImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        title="Import Questions (Word / PDF / CSV)"
+        subtitle="Upload your Word (.docx), PDF (.pdf), or CSV file. Questions, options, and answers will be automatically extracted."
+        targetClassId={filterClass || classes[0]?.id}
+        targetSubjectId={filterSubject || subjects[0]?.id}
+        onQuestionsImported={async (importedQuestions) => {
+          const res = await apiClient.post('/questions-import', {
+            questions: importedQuestions
+          });
+          if (res.success) {
+            setFeedback({
+              type: 'success',
+              message: `Successfully imported ${importedQuestions.length} questions from document!`
+            });
+            fetchQuestions(1);
+          }
+        }}
+      />
     </div>
   );
 };

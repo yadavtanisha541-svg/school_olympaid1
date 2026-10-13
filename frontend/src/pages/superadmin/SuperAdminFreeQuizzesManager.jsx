@@ -21,6 +21,7 @@ import {
   Upload,
   FileText
 } from 'lucide-react';
+import { UniversalQuestionImportModal } from '../../components/common/UniversalQuestionImportModal';
 
 const SUBJECT_OPTIONS = [
   { name: 'Mathematics (IMO)', code: 'IMO', color: '#eab308' },
@@ -413,10 +414,10 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
               type="button"
               onClick={() => setIsImportModalOpen(true)}
               className="px-2 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-indigo-700 font-bold text-[10px] min-[360px]:text-[11px] sm:text-xs flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer border border-indigo-200 shadow-2xs whitespace-nowrap"
-              title="Import questions from CSV / Excel"
+              title="Import questions from Word, PDF or CSV"
             >
               <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600 shrink-0" />
-              <span>Import CSV</span>
+              <span>Import (Word / PDF / CSV)</span>
             </button>
             <button
               type="button"
@@ -901,81 +902,37 @@ export const SuperAdminFreeQuizzesManager = ({ onNavigateTab }) => {
         </div>
       )}
 
-      {/* CSV / JSON Import Modal */}
-      {isImportModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                  <Upload className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-base">Import Quiz Questions</h3>
-                  <p className="text-xs text-slate-500">Upload CSV file or paste formatted CSV / JSON data</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsImportModalOpen(false)}
-                className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* File Upload Zone */}
-            <div className="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/40 rounded-2xl p-5 text-center transition-colors">
-              <Upload className="w-7 h-7 text-indigo-500 mx-auto mb-2" />
-              <p className="text-xs font-bold text-slate-700">Choose a CSV or JSON file from your computer</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">Supports standard Olympiad quiz questions format</p>
-              <div className="mt-3 flex items-center justify-center gap-3">
-                <label className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer transition-all">
-                  Browse File
-                  <input type="file" accept=".csv, .json, text/csv, application/json" className="hidden" onChange={handleImportFile} />
-                </label>
-                <button
-                  type="button"
-                  onClick={handleDownloadTemplate}
-                  className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl shadow-2xs cursor-pointer"
-                >
-                  Download Template
-                </button>
-              </div>
-            </div>
-
-            {/* Paste Data Textarea */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Or Paste CSV / JSON Content Directly:</label>
-              <textarea
-                rows={5}
-                value={importText}
-                onChange={(e) => setImportText(e.target.value)}
-                placeholder='Class,Subject,Subject Code,Question Text,Option A,Option B,Option C,Option D,Correct Option (0-3),Difficulty,Hint,Explanation,Status&#10;"Class 6","Mathematics (IMO)","IMO","What is 15% of 200?","25","30","35","40",1,"Foundation","Think 15*2","15% of 200 = 30","active"'
-                className="w-full p-3 font-mono text-[11px] bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={() => setIsImportModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                disabled={importing || !importText.trim()}
-                onClick={() => processImportData(importText)}
-                className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs disabled:opacity-50"
-              >
-                {importing ? 'Importing...' : 'Parse & Import Now'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Universal Question Import Modal (Word, PDF, CSV, TXT) */}
+      <UniversalQuestionImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        title="Import Quiz Questions (Word / PDF / CSV)"
+        subtitle="Upload your Word (.docx), PDF (.pdf), or CSV file to auto-extract and publish daily quiz questions."
+        onQuestionsImported={async (questions) => {
+          let count = 0;
+          for (const q of questions) {
+            const payload = {
+              class_name: selectedClass !== 'All' ? selectedClass : (q.class_name || 'All'),
+              subject: selectedSubject !== 'All' ? selectedSubject : (q.subject_name || 'Mathematics (IMO)'),
+              subject_code: selectedSubject !== 'All' ? (SUBJECT_OPTIONS.find(s => s.name === selectedSubject)?.code || 'IMO') : 'IMO',
+              question_text: q.question_text,
+              option_a: q.option_a,
+              option_b: q.option_b,
+              option_c: q.option_c,
+              option_d: q.option_d,
+              correct_option: ['A', 'B', 'C', 'D'].indexOf(q.correct_option) >= 0 ? ['A', 'B', 'C', 'D'].indexOf(q.correct_option) : 0,
+              difficulty: q.difficulty || 'Foundation',
+              hint: q.hint || '',
+              explanation: q.explanation || '',
+              status: 'active'
+            };
+            await apiClient.post('/free-quizzes', payload);
+            count++;
+          }
+          setSuccessMsg(`Successfully imported and published ${count} quiz questions!`);
+          fetchQuizzes();
+        }}
+      />
     </div>
   );
 };

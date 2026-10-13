@@ -1113,7 +1113,14 @@ function saveDb(table, data) {
 
 export const mockEngine = {
   handleRequest(method, endpoint, body = {}, params = {}) {
-    const cleanEndpoint = endpoint.split('?')[0].replace(/^\/api/, '').replace(/^\//, '');
+    const [pathPart, queryPart] = endpoint.split('?');
+    const queryParams = { ...params };
+    if (queryPart) {
+      new URLSearchParams(queryPart).forEach((val, key) => {
+        queryParams[key] = val;
+      });
+    }
+    const cleanEndpoint = pathPart.replace(/^\/api/, '').replace(/^\//, '');
     const segments = cleanEndpoint.split('/');
     const root = segments[0];
     const sub = segments[1];
@@ -3110,6 +3117,212 @@ export const mockEngine = {
           }
         } catch (e) {}
         return { success: true, message: 'Model Test Paper deleted successfully' };
+      }
+    }
+
+    // QUESTIONS & QUESTION BANK
+    if (root === 'questions' || root === 'questions-import') {
+      let questions = getDb('questions');
+      if (!questions || questions.length === 0) {
+        const papers = getDb('exam_papers') || [];
+        const extracted = [];
+        let qCounter = 1;
+        for (const p of papers) {
+          if (Array.isArray(p.questions)) {
+            for (const pq of p.questions) {
+              const opts = pq.options || [];
+              extracted.push({
+                id: qCounter++,
+                class_id: p.class_name ? (parseInt(p.class_name.replace(/\D/g, '')) || 6) : 6,
+                class_name: p.class_name || 'Class 6',
+                subject_id: p.subject_code === 'ISO' ? 2 : (p.subject_code === 'IEO' ? 4 : 1),
+                subject_name: p.subject_name || 'Mathematics (IMO)',
+                question_text: pq.q || pq.question_text || '',
+                option_a: opts[0] || 'Option A',
+                option_b: opts[1] || 'Option B',
+                option_c: opts[2] || 'Option C',
+                option_d: opts[3] || 'Option D',
+                correct_option: ['A', 'B', 'C', 'D'][pq.correct] || 'A',
+                difficulty: 'medium',
+                marks: pq.marks || 1,
+                negative_marks: 0.25,
+                explanation: pq.explanation || '',
+                status: 'active',
+                author_name: 'Super Administrator',
+                created_at: new Date().toISOString()
+              });
+            }
+          }
+        }
+        questions = extracted.length > 0 ? extracted : [
+          {
+            id: 1,
+            class_id: 6,
+            class_name: 'Class 6',
+            subject_id: 1,
+            subject_name: 'Mathematics (IMO)',
+            question_text: 'What is the sum of angles of a triangle?',
+            option_a: '90 degrees',
+            option_b: '180 degrees',
+            option_c: '270 degrees',
+            option_d: '360 degrees',
+            correct_option: 'B',
+            difficulty: 'easy',
+            marks: 1,
+            negative_marks: 0.25,
+            explanation: 'The interior angles of any triangle always add up to 180 degrees.',
+            status: 'active',
+            author_name: 'Super Administrator',
+            created_at: new Date().toISOString()
+          }
+        ];
+        saveDb('questions', questions);
+      }
+
+      // IMPORT
+      if (root === 'questions-import' || sub === 'import') {
+        let importedList = [];
+        if (Array.isArray(body.questions)) {
+          importedList = body.questions;
+        } else if (body.csv_content) {
+          const lines = body.csv_content.split(/\r?\n/).filter(l => l.trim().length > 0);
+          for (let i = 1; i < lines.length; i++) {
+            const parts = lines[i].split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+            if (parts.length >= 7) {
+              importedList.push({
+                class_id: parseInt(parts[0]) || 6,
+                subject_id: parseInt(parts[1]) || 1,
+                question_text: parts[2],
+                option_a: parts[3],
+                option_b: parts[4],
+                option_c: parts[5],
+                option_d: parts[6],
+                correct_option: parts[7] || 'A',
+                difficulty: parts[8] || 'medium',
+                marks: parseFloat(parts[9]) || 1,
+                negative_marks: parseFloat(parts[10]) || 0.25,
+                explanation: parts[11] || '',
+                status: 'active'
+              });
+            }
+          }
+        }
+
+        const formatted = importedList.map((item, idx) => ({
+          id: Date.now() + idx,
+          class_id: item.class_id || 6,
+          class_name: item.class_name || `Class ${item.class_id || 6}`,
+          subject_id: item.subject_id || 1,
+          subject_name: item.subject_name || 'Mathematics (IMO)',
+          question_text: item.question_text || item.q || '',
+          option_a: item.option_a || (item.options?.[0] || ''),
+          option_b: item.option_b || (item.options?.[1] || ''),
+          option_c: item.option_c || (item.options?.[2] || ''),
+          option_d: item.option_d || (item.options?.[3] || ''),
+          correct_option: (item.correct_option || (typeof item.correct === 'number' ? ['A', 'B', 'C', 'D'][item.correct] : 'A')).toUpperCase(),
+          difficulty: item.difficulty || 'medium',
+          marks: Number(item.marks) || 1,
+          negative_marks: Number(item.negative_marks) || 0.25,
+          explanation: item.explanation || '',
+          status: item.status || 'active',
+          author_name: item.author_name || 'Super Administrator',
+          created_at: new Date().toISOString()
+        })).filter(q => q.question_text.trim().length > 0);
+
+        questions = [...formatted, ...questions];
+        saveDb('questions', questions);
+
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+        }
+
+        return {
+          success: true,
+          message: `Successfully imported ${formatted.length} questions`,
+          data: {
+            total_rows: importedList.length,
+            imported_questions: formatted.length,
+            valid_questions: formatted.length,
+            invalid_questions: Math.max(0, importedList.length - formatted.length),
+            questions: formatted
+          }
+        };
+      }
+
+      // GET ALL / FILTERED
+      if (method === 'GET' && !sub) {
+        let filtered = [...questions];
+        const page = parseInt(queryParams.page) || 1;
+        const limit = parseInt(queryParams.limit) || 10;
+        
+        if (queryParams.class_id) {
+          filtered = filtered.filter(q => String(q.class_id) === String(queryParams.class_id));
+        }
+        if (queryParams.subject_id) {
+          filtered = filtered.filter(q => String(q.subject_id) === String(queryParams.subject_id));
+        }
+        if (queryParams.difficulty) {
+          filtered = filtered.filter(q => q.difficulty === queryParams.difficulty);
+        }
+        if (queryParams.search) {
+          const s = queryParams.search.toLowerCase();
+          filtered = filtered.filter(q => 
+            (q.question_text || '').toLowerCase().includes(s) ||
+            (q.explanation || '').toLowerCase().includes(s)
+          );
+        }
+
+        const total = filtered.length;
+        const total_pages = Math.ceil(total / limit) || 1;
+        const startIdx = (page - 1) * limit;
+        const pageQuestions = filtered.slice(startIdx, startIdx + limit);
+
+        return {
+          success: true,
+          data: {
+            questions: pageQuestions,
+            pagination: { page, limit, total, total_pages }
+          }
+        };
+      }
+
+      // GET SINGLE
+      if (method === 'GET' && sub) {
+        const found = questions.find(q => String(q.id) === String(sub));
+        return { success: true, data: found || null };
+      }
+
+      // POST SINGLE
+      if (method === 'POST') {
+        const newQ = {
+          id: Date.now(),
+          ...body,
+          created_at: new Date().toISOString()
+        };
+        questions.unshift(newQ);
+        saveDb('questions', questions);
+        return { success: true, message: 'Question created successfully', data: newQ };
+      }
+
+      // PUT SINGLE
+      if (method === 'PUT' && sub) {
+        let updatedQ = null;
+        questions = questions.map(q => {
+          if (String(q.id) === String(sub)) {
+            updatedQ = { ...q, ...body };
+            return updatedQ;
+          }
+          return q;
+        });
+        saveDb('questions', questions);
+        return { success: true, message: 'Question updated successfully', data: updatedQ };
+      }
+
+      // DELETE SINGLE
+      if (method === 'DELETE' && sub) {
+        questions = questions.filter(q => String(q.id) !== String(sub));
+        saveDb('questions', questions);
+        return { success: true, message: 'Question deleted successfully' };
       }
     }
 

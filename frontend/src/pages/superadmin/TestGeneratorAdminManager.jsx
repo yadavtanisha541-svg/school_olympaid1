@@ -41,6 +41,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 import { getTestPricing, saveTestPricing } from '../../utils/purchaseUtils';
+import { extractTextFromFile } from '../../utils/universalDocumentParser';
 
 const SUBJECT_OPTIONS = [
   { id: 'math', name: 'IMO (Mathematics)', code: 'IMO', color: '#d97706', icon: '📐' },
@@ -684,15 +685,15 @@ export const TestGeneratorAdminManager = () => {
     handleBulkTextChange(SAMPLE_BULK_TEXT);
   };
 
-  const handleBulkFileUpload = (e) => {
+  const handleBulkFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const content = ev.target?.result || '';
+    try {
+      const content = await extractTextFromFile(file);
       handleBulkTextChange(content);
-    };
-    reader.readAsText(file);
+    } catch (err) {
+      alert(err.message || 'Error parsing document. Please check the file.');
+    }
   };
 
   const handleApplyBulkImport = (mode = 'append') => {
@@ -1323,10 +1324,10 @@ export const TestGeneratorAdminManager = () => {
                     </button>
                     <label className="px-2.5 py-1 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-900 font-bold text-xs flex items-center gap-1 cursor-pointer transition-all">
                       <Upload className="w-3.5 h-3.5 text-sky-700" />
-                      <span>📁 Import File</span>
+                      <span>📁 Import (Word/PDF/CSV)</span>
                       <input
                         type="file"
-                        accept=".txt,.csv,.json"
+                        accept=".docx,.doc,.pdf,.txt,.csv,.json"
                         onChange={handleBulkFileUpload}
                         className="hidden"
                       />

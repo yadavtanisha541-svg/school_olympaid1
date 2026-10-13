@@ -33,6 +33,7 @@ import {
   Download,
   Upload
 } from 'lucide-react';
+import { extractTextFromFile } from '../../utils/universalDocumentParser';
 
 const DEFAULT_PROGRAMS_INITIAL = {
   rsdp: {
@@ -655,10 +656,10 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
                   type="button"
                   onClick={() => setShowImportModal(true)}
                   className="px-2 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-[10px] min-[360px]:text-[11px] sm:text-sm flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer border border-slate-200 shadow-2xs whitespace-nowrap"
-                  title="Import CSV"
+                  title="Import Word, PDF or CSV"
                 >
                   <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#16327a] shrink-0" />
-                  <span>Import CSV</span>
+                  <span>Import (Word / PDF / CSV)</span>
                 </button>
                 <button
                   type="button"
@@ -1430,16 +1431,19 @@ export const SuperAdminSkillDevelopmentManager = ({ onNavigateTab }) => {
 
             <div className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 uppercase mb-1.5">Choose CSV File</label>
+                <label className="block font-bold text-slate-700 uppercase mb-1.5">Choose Document (Word / PDF / CSV / JSON)</label>
                 <input
                   type="file"
-                  accept=".csv,.json"
-                  onChange={(e) => {
+                  accept=".docx,.doc,.pdf,.csv,.json"
+                  onChange={async (e) => {
                     const file = e.target.files[0];
                     if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (evt) => setImportText(evt.target.result);
-                    reader.readAsText(file);
+                    try {
+                      const text = await extractTextFromFile(file);
+                      setImportText(text);
+                    } catch (err) {
+                      alert(err.message || 'Error parsing file');
+                    }
                   }}
                   className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-[#7c3aed] hover:file:bg-purple-100 cursor-pointer"
                 />

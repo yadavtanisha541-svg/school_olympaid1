@@ -27,6 +27,7 @@ import {
 import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
 import { useAuth } from '../../contexts/AuthContext';
+import { UniversalQuestionImportModal } from '../../components/common/UniversalQuestionImportModal';
 
 export const ExamManagementPage = () => {
   const { user } = useAuth();
@@ -599,7 +600,7 @@ export const ExamManagementPage = () => {
 
           {/* SECTION 3: Select Questions from Question Bank */}
           <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs">
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 flex-wrap gap-2">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-xs">
                   3
@@ -610,9 +611,21 @@ export const ExamManagementPage = () => {
                 </div>
               </div>
 
-              <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-xl border border-indigo-100">
-                {examForm.question_ids.length} Questions Selected
-              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  icon={Upload}
+                  onClick={() => setShowImportModal(true)}
+                  className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-bold"
+                >
+                  Import (Word / PDF / CSV)
+                </Button>
+                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-xl border border-indigo-100">
+                  {examForm.question_ids.length} Questions Selected
+                </span>
+              </div>
             </div>
 
             {allQuestions.length === 0 ? (
@@ -736,8 +749,9 @@ export const ExamManagementPage = () => {
             size="sm"
             icon={Upload}
             onClick={() => setShowImportModal(true)}
+            className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-bold"
           >
-            Import CSV
+            Import (Word / PDF / CSV)
           </Button>
           <Button
             variant="secondary"
@@ -890,56 +904,35 @@ export const ExamManagementPage = () => {
         )}
       </div>
 
-      {/* Bulk Exams Import Modal */}
-      {showImportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 animate-in fade-in zoom-in duration-150">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-                <Upload className="w-5 h-5 text-indigo-600" />
-                <span>Import Examinations (CSV / JSON)</span>
-              </h3>
-              <button onClick={() => setShowImportModal(false)} className="text-slate-400 hover:text-slate-600 font-bold cursor-pointer">✕</button>
-            </div>
-
-            <div className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 uppercase mb-1.5">Choose CSV File</label>
-                <input
-                  type="file"
-                  accept=".csv,.json"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (evt) => setImportText(evt.target.result);
-                    reader.readAsText(file);
-                  }}
-                  className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 uppercase mb-1.5">Or Paste Raw CSV / JSON Data</label>
-                <textarea
-                  rows={5}
-                  value={importText}
-                  onChange={(e) => setImportText(e.target.value)}
-                  placeholder="title,exam_code,exam_type,duration_minutes,passing_percentage,instructions,status&#10;National Science Olympiad,NSO-2026,mock,60,40.0,Follow rules.,published"
-                  className="w-full px-3 py-2 font-mono text-[11px] border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <Button variant="secondary" size="sm" onClick={() => setShowImportModal(false)}>Cancel</Button>
-                <Button variant="primary" size="sm" loading={importLoading} onClick={handleImportExamsSubmit}>
-                  Upload &amp; Save Exams
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Universal Question & Exam Import Modal (Word, PDF, CSV, TXT) */}
+      <UniversalQuestionImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        title="Import Questions (Word / PDF / CSV)"
+        subtitle="Upload your Word (.docx), PDF (.pdf), or CSV question paper. Questions and answers will be automatically extracted."
+        targetClassId={examForm.class_id || classes[0]?.id}
+        targetSubjectId={examForm.subject_id || subjects[0]?.id}
+        onQuestionsImported={async (importedQuestions) => {
+          const res = await apiClient.post('/questions-import', {
+            questions: importedQuestions
+          });
+          if (res.success) {
+            setFeedback({
+              type: 'success',
+              message: `Successfully imported ${importedQuestions.length} questions into Question Bank!`
+            });
+            await loadMetadata();
+            // Automatically select imported questions if in create/edit view
+            if (viewMode === 'create' || viewMode === 'edit') {
+              const newIds = (res.data?.questions || importedQuestions).map(q => q.id);
+              setExamForm(prev => ({
+                ...prev,
+                question_ids: Array.from(new Set([...prev.question_ids, ...newIds]))
+              }));
+            }
+          }
+        }}
+      />
     </div>
   );
 };

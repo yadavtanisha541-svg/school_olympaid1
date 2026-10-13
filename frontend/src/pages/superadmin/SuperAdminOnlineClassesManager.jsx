@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
+import { extractTextFromFile } from '../../utils/universalDocumentParser';
 
 const CLASSES_LIST = [
   'All Classes',
@@ -562,8 +563,9 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
               size="sm"
               icon={Upload}
               onClick={() => setShowImportModal(true)}
+              className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-bold"
             >
-              Import CSV
+              Import (Word / PDF / CSV)
             </Button>
             <Button
               variant="secondary"
@@ -1813,16 +1815,19 @@ export const SuperAdminOnlineClassesManager = ({ onNavigateTab }) => {
 
             <div className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 uppercase mb-1.5">Choose CSV File</label>
+                <label className="block font-bold text-slate-700 uppercase mb-1.5">Choose Document (Word / PDF / CSV / JSON)</label>
                 <input
                   type="file"
-                  accept=".csv,.json"
-                  onChange={(e) => {
+                  accept=".docx,.doc,.pdf,.csv,.json"
+                  onChange={async (e) => {
                     const file = e.target.files[0];
                     if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (evt) => setImportText(evt.target.result);
-                    reader.readAsText(file);
+                    try {
+                      const text = await extractTextFromFile(file);
+                      setImportText(text);
+                    } catch (err) {
+                      alert(err.message || 'Error parsing file');
+                    }
                   }}
                   className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-[#80497D] hover:file:bg-purple-100 cursor-pointer"
                 />
