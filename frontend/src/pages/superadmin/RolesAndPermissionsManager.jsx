@@ -147,15 +147,6 @@ const DEFAULT_PERMISSIONS_CATALOG = [
     icon: Bookmark
   },
   {
-    key: 'manage_free_quizzes',
-    module: 'Super Admin: FREE Quizzes Manager',
-    name: 'FREE Quizzes Manager',
-    description: 'Create 5-minute daily speed quizzes, riddles, and free diagnostic tests.',
-    studentDefault: false,
-    level: 'Standard',
-    icon: HelpCircle
-  },
-  {
     key: 'manage_faqs_keyinfo',
     module: 'Super Admin: FAQs & Key Info Manager',
     name: 'FAQs & Key Info Manager',

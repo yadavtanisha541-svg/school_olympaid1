@@ -2737,61 +2737,6 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
             </div>
           </div>
 
-          {/* PRO PACKAGE BANNER */}
-          <div className="bg-white rounded-3xl border-2 border-[#00b074] p-6 sm:p-7 shadow-sm">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-              <div className="space-y-4 flex-1">
-                <div>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#059669] font-black text-[10px] uppercase tracking-wider border border-[#a7f3d0]">
-                    PRO PACKAGE
-                  </span>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 mt-1.5">
-                    Olympiads Intelligent Test Generator Pro — {selectedGrade}
-                  </h3>
-                  <p className="text-xs text-slate-500 font-semibold">
-                    Don&apos;t Just Practice. Practice Intelligently.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                  <div className="flex items-center gap-2 text-slate-700">
-                    <CheckCircle2 className="w-4 h-4 text-[#00b074] shrink-0" />
-                    <span>Generate 25 personalised Olympiad tests across IMO, NSO &amp; IEO</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-700">
-                    <CheckCircle2 className="w-4 h-4 text-[#00b074] shrink-0" />
-                    <span>Choose your subject, topics &amp; difficulty level</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-700">
-                    <CheckCircle2 className="w-4 h-4 text-[#00b074] shrink-0" />
-                    <span>Expert-curated question bank built by experienced Olympiad experts</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-700">
-                    <CheckCircle2 className="w-4 h-4 text-[#00b074] shrink-0" />
-                    <span>Generated tests stay in your login for future reference</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Pricing Box */}
-              <div className="lg:w-60 p-5 rounded-2xl bg-[#faf5fa] border border-[#edd6ed] text-center space-y-3 shrink-0">
-                <div>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase">Special Launch Price</p>
-                  <p className="text-2xl font-black text-[#4e2a4a]">
-                    ₹ 499 <span className="text-xs text-slate-400 font-normal">/- only</span>
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleProceedToInstructions}
-                  className="w-full py-2.5 bg-[#00b074] hover:bg-[#009260] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-                >
-                  <span>Proceed to Test</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          </div>
 
           {/* SECTION 2: OFFICIAL PRACTICE MOCK TESTS SERIES (SUPER ADMIN AUTHORED) */}
           <div className="space-y-5 pt-4">
