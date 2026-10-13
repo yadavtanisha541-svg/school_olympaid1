@@ -57,15 +57,6 @@ const DEFAULT_PERMISSIONS_CATALOG = [
     icon: CreditCard
   },
   {
-    key: 'manage_online_classes',
-    module: 'Super Admin: Online Classes Studio',
-    name: 'Online Classes Studio',
-    description: 'Schedule live class batches, manage instructors, stream links and video archives.',
-    studentDefault: false,
-    level: 'Advanced',
-    icon: Video
-  },
-  {
     key: 'manage_skill_programs',
     module: 'Super Admin: Skill Programs Studio',
     name: 'Skill Programs Studio',

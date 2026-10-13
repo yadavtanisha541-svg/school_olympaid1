@@ -376,11 +376,11 @@ export const CartDrawer = ({ onNavigateTab }) => {
                     type="button"
                     onClick={() => {
                       closeCart();
-                      if (onNavigateTab) onNavigateTab('online_classes');
+                      if (onNavigateTab) onNavigateTab('practice_tests');
                     }}
                     className="px-6 py-2.5 bg-[#f5b82e] hover:bg-[#e2a823] text-slate-950 font-black rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-sm transition-all"
                   >
-                    Browse Online Classes
+                    Explore Practice Tests
                   </button>
                 </div>
               ) : (
@@ -1121,7 +1121,7 @@ export const CartDrawer = ({ onNavigateTab }) => {
 
             <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 font-medium flex items-center gap-2 text-left">
               <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
-              <span>Aapka package aur access portal me activate kar diya gaya hai. Aap turant apni Online Classes aur Mock Tests start kar sakte hain!</span>
+              <span>Aapka package aur access portal me activate kar diya gaya hai. Aap turant apne Practice Tests aur Mock Tests start kar sakte hain!</span>
             </div>
 
             <div className="pt-2 flex flex-col sm:flex-row gap-3">
@@ -1130,11 +1130,11 @@ export const CartDrawer = ({ onNavigateTab }) => {
                 onClick={() => {
                   setCheckoutStep('cart_view');
                   closeCart();
-                  if (onNavigateTab) onNavigateTab('online_classes');
+                  if (onNavigateTab) onNavigateTab('practice_tests');
                 }}
                 className="flex-1 py-3 bg-[#f5b82e] hover:bg-[#e2a823] text-slate-950 font-black rounded-xl text-xs uppercase tracking-wider shadow-md transition-all cursor-pointer"
               >
-                Go to Online Classes
+                Go to Practice Tests & Papers
               </button>
               <button
                 type="button"

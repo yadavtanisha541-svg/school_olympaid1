@@ -117,7 +117,6 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
   const superAdminNav = [
     { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, perm: 'access_superadmin_dashboard' },
     { id: 'payment_bank_manager', label: 'Payment, QR & Orders', icon: CreditCard, perm: 'manage_payments_qr' },
-    { id: 'online_classes_manager', label: 'Online Classes Studio', icon: Video, perm: 'manage_online_classes' },
     { id: 'skill_programs_manager', label: 'Skill Programs Studio', icon: Rocket, perm: 'manage_skill_programs' },
     { id: 'superadmin_packages', label: 'Subject Model Tests & Packages', icon: BookOpen, perm: 'manage_superadmin_packages' },
     { id: 'practice_tests_manager', label: 'Practice Tests & Papers', icon: Sparkles, perm: 'manage_test_generator' },
@@ -285,7 +284,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
           {(!user || user?.role === 'student') && (
             <div className="space-y-3.5 pt-2">
               {/* SECTION A: OLYMPIADS & LEARNING */}
-              {(hasPermission('access_mock_tests') || hasPermission('use_test_generator') || hasPermission('access_online_classes') || hasPermission('access_skill_programs')) && (
+              {(hasPermission('access_mock_tests') || hasPermission('use_test_generator') || hasPermission('access_skill_programs')) && (
                 <div className="space-y-1.5">
                   <p className="px-3 text-xs font-black uppercase tracking-wider text-red-500">
                     OLYMPIADS &amp; LEARNING
@@ -392,25 +391,6 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     >
                       <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
                       <span>Practice Tests & Papers</span>
-                    </button>
-                  )}
-
-                  {/* Online Classes Studio */}
-                  {hasPermission('access_online_classes') && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onSelectTab('my_classes');
-                        if (onClose) onClose();
-                      }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
-                        currentTab === 'my_classes'
-                          ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
-                          : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
-                      }`}
-                    >
-                      <Video className="w-5 h-5 text-sky-400 shrink-0" />
-                      <span>Online Classes</span>
                     </button>
                   )}
 
