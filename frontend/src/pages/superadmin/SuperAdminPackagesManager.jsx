@@ -1734,38 +1734,6 @@ export const SuperAdminPackagesManager = () => {
                 </div>
               </div>
 
-              {/* Subject Syllabus Topic Filter / Tagging */}
-              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-50 via-pink-50/40 to-amber-50/40 border border-purple-200/80 space-y-2">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-purple-700" />
-                    <span className="text-xs font-black text-purple-950 uppercase tracking-wider">
-                      Subject Topics ({SUBJECTS_LIST.find(s => s.code === paperSubjectCode)?.label || paperSubjectCode}):
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-purple-700 font-bold bg-white px-2 py-0.5 rounded-full border border-purple-200">
-                    Exact from Student Panel
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-1.5 pt-0.5">
-                  {getTopicsForSubject(paperSubjectCode).map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => {
-                        const topicHeader = `\nSection: ${t}\n`;
-                        setBulkQuestionsInput(prev => (prev ? prev + topicHeader : `Section: ${t}\n`));
-                      }}
-                      className="px-2.5 py-1 rounded-xl text-xs font-bold bg-white hover:bg-purple-100 text-purple-900 border border-purple-200 shadow-2xs hover:border-purple-300 transition-all cursor-pointer flex items-center gap-1"
-                      title={`Click to insert "${t}" section header into text`}
-                    >
-                      <span className="text-[10px] text-purple-600 font-black">+</span>
-                      <span>{t}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Textarea */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
