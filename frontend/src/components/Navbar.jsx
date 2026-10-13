@@ -335,15 +335,7 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
         icon: Trophy,
         keywords: 'leaderboard ranks rank top scores standing winners'
       },
-      {
-        id: 'student_certificates',
-        title: 'My Merit Certificates',
-        description: 'Download signed examination certificates and achievement badges',
-        category: 'Modules',
-        tab: 'certificates',
-        icon: Award,
-        keywords: 'certificates merit awards download certificate pdf badge'
-      },
+
       {
         id: 'student_profile',
         title: 'Profile & Account Settings',

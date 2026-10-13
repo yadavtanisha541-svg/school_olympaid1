@@ -53,33 +53,8 @@ export const apiClient = {
       headers
     };
 
-    // Proactively persist write operations to local state immediately
-    if (method !== 'GET') {
-      try {
-        mockEngine.handleRequest(method, endpoint, body);
-      } catch (e) {}
-    }
-
-    try {
-      const response = await fetch(`${API_BASE}${endpoint}`, config);
-      const data = await response.json().catch(() => null);
-
-      if (response.ok && data) {
-        // When MySQL/backend successfully responds, also update local mockEngine if relevant
-        if (data.data && typeof data.data === 'object' && method !== 'GET') {
-          try {
-            mockEngine.handleRequest(method, endpoint, data.data);
-          } catch (e) {}
-        }
-        return data;
-      }
-
-      // Fallback to client mock engine if API returned error/HTML/404
-      return mockEngine.handleRequest(method, endpoint, body);
-    } catch (networkError) {
-      // Fallback for Vercel / serverless / offline environment
-      return mockEngine.handleRequest(method, endpoint, body);
-    }
+    // 100% Vercel Mode: All operations (CRUD, Auth, Exams, Packages) run via Client Mock & Persistence Engine
+    return mockEngine.handleRequest(method, endpoint, body);
   },
 
   get(endpoint, params = {}) {

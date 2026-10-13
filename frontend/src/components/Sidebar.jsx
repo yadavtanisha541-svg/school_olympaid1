@@ -518,23 +518,6 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                               <span className="truncate">Exam History</span>
                             </button>
                           )}
-                          {hasPermission('download_merit_certificates') && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                onSelectTab('certificates');
-                                if (onClose) onClose();
-                              }}
-                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
-                                currentTab === 'certificates'
-                                  ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
-                                  : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
-                              }`}
-                            >
-                              <Award className="w-4 h-4 text-amber-400 shrink-0" />
-                              <span className="truncate">Merit Certificates</span>
-                            </button>
-                          )}
                         </div>
                       )}
                     </div>
@@ -559,24 +542,6 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     </button>
                   )}
 
-                  {/* Previous Year Papers */}
-                  {hasPermission('access_previous_year_papers') && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onSelectTab('free_past_papers');
-                        if (onClose) onClose();
-                      }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
-                        currentTab === 'free_past_papers'
-                          ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
-                          : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
-                      }`}
-                    >
-                      <BookOpen className="w-5 h-5 text-slate-400 shrink-0" />
-                      <span>Past Papers (PYQs)</span>
-                    </button>
-                  )}
                 </div>
               )}
 
