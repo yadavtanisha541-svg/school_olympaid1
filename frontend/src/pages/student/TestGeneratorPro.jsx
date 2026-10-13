@@ -40,7 +40,7 @@ import {
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 import { DetailedSolutionsPage } from './DetailedSolutionsPage';
 import { getTestPricing } from '../../utils/purchaseUtils';
-import { CHAPTERS_BY_SUBJECT } from '../../data/subjectTopics';
+import { CHAPTERS_BY_SUBJECT, getTopicsForSubject } from '../../data/subjectTopics';
 
 const subjectsMap = {
   math: { name: 'IMO (Maths)', code: 'IMO', color: '#eab308', letter: 'M' },
@@ -285,8 +285,9 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
 
   // Update selected chapters when subject changes
   useEffect(() => {
-    if (CHAPTERS_BY_SUBJECT[selectedSubject]) {
-      setSelectedChapters(CHAPTERS_BY_SUBJECT[selectedSubject]);
+    const topics = getTopicsForSubject(selectedSubject);
+    if (topics && topics.length > 0) {
+      setSelectedChapters(topics);
     }
   }, [selectedSubject]);
 
@@ -301,7 +302,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
 
   // Toggle select all chapters
   const handleToggleAllChapters = () => {
-    const allForSub = CHAPTERS_BY_SUBJECT[selectedSubject] || [];
+    const allForSub = getTopicsForSubject(selectedSubject) || [];
     if (selectedChapters.length === allForSub.length) {
       setSelectedChapters([]);
     } else {
@@ -2281,6 +2282,72 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                   </div>
                 </div>
 
+                {/* Step 3: Choose Syllabus Topics / Chapters */}
+                <div className="space-y-3 pt-4 border-t border-[#f4ebf4]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] font-black flex items-center justify-center">
+                        3
+                      </span>
+                      <span className="text-xs font-black text-slate-800">
+                        Select Syllabus Topics / Chapters:
+                      </span>
+                      <span className="text-[10px] font-bold text-[#6d3a68] bg-[#f4ebf4] px-2 py-0.5 rounded-full">
+                        {selectedChapters.length} of {(getTopicsForSubject(selectedSubject) || []).length} Selected
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleToggleAllChapters}
+                        className="text-[11px] font-black text-[#6d3a68] hover:text-[#582d54] px-2.5 py-1 rounded-lg bg-[#faf5fa] hover:bg-[#f4ebf4] border border-[#edd6ed] transition-all cursor-pointer flex items-center gap-1"
+                      >
+                        <Check className="w-3 h-3 stroke-[3]" />
+                        <span>
+                          {selectedChapters.length === (getTopicsForSubject(selectedSubject) || []).length
+                            ? 'Deselect All'
+                            : 'Select All Topics'}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Topics Grid with Checkbox Pills */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto p-2.5 bg-[#faf5fa]/80 rounded-2xl border border-[#edd6ed]">
+                    {(getTopicsForSubject(selectedSubject) || []).map((topic, idx) => {
+                      const isSelected = selectedChapters.includes(topic);
+                      return (
+                        <button
+                          key={topic}
+                          type="button"
+                          onClick={() => handleToggleChapter(topic)}
+                          className={`text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2.5 transition-all cursor-pointer border ${
+                            isSelected
+                              ? 'bg-white text-slate-900 border-[#6d3a68] shadow-xs ring-1 ring-[#6d3a68]/20'
+                              : 'bg-white/60 text-slate-600 border-slate-200 hover:bg-white hover:text-slate-800'
+                          }`}
+                        >
+                          <span
+                            className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 border transition-all ${
+                              isSelected
+                                ? 'bg-[#6d3a68] border-[#6d3a68] text-white shadow-2xs'
+                                : 'bg-white border-slate-300 text-transparent'
+                            }`}
+                          >
+                            <Check className="w-3 h-3 stroke-[3]" />
+                          </span>
+                          <span className="truncate flex-1 text-[11.5px] leading-snug">
+                            <span className="font-mono text-[10px] text-slate-400 mr-1.5 font-bold">
+                              {String(idx + 1).padStart(2, '0')}.
+                            </span>
+                            {topic}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
                 {/* Next Step Button */}
                 <div className="pt-3 border-t border-[#f4ebf4] flex justify-end">
@@ -2425,9 +2492,9 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                       <div className="flex-1 min-w-0">
                         <p className="text-[10px] text-slate-400 font-bold uppercase">Chapters Selected</p>
                         <p className="text-xs font-black text-slate-800 truncate">
-                          {selectedChapters.length === (CHAPTERS_BY_SUBJECT[selectedSubject]?.length || 0)
+                          {selectedChapters.length === (getTopicsForSubject(selectedSubject)?.length || 0)
                             ? `All Topics (${selectedChapters.length})`
-                            : `${selectedChapters.length} of ${CHAPTERS_BY_SUBJECT[selectedSubject]?.length || 0} Selected`}
+                            : `${selectedChapters.length} of ${getTopicsForSubject(selectedSubject)?.length || 0} Selected`}
                         </p>
                       </div>
                     </div>
