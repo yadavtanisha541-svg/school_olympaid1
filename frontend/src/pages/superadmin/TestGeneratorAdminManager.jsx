@@ -165,7 +165,9 @@ const parseBulkQuestions = (rawText) => {
             options: opts,
             correct: corr,
             explanation: String(item.explanation || item.solution || item.hint || '').trim(),
-            marks: parseInt(item.marks || item.points || 1) || 1
+            marks: parseInt(item.marks || item.points || 1) || 1,
+            question_image: item.question_image || item.image_url || '',
+            image_url: item.image_url || item.question_image || ''
           };
         }).filter(q => q.q.length > 0);
       }
@@ -738,7 +740,9 @@ export const TestGeneratorAdminManager = () => {
         options: opts,
         correct: corr,
         explanation: item.explanation || item.solution || '',
-        marks: Number(item.marks) || 1
+        marks: Number(item.marks) || 1,
+        question_image: item.question_image || item.image_url || '',
+        image_url: item.image_url || item.question_image || ''
       };
     });
 
@@ -781,7 +785,9 @@ export const TestGeneratorAdminManager = () => {
         correct: corr,
         correct_option: ['A', 'B', 'C', 'D'][corr] || 'A',
         explanation: item.explanation || item.solution || '',
-        marks: Number(item.marks) || 1
+        marks: Number(item.marks) || 1,
+        question_image: item.question_image || item.image_url || '',
+        image_url: item.image_url || item.question_image || ''
       };
     });
 
@@ -827,7 +833,9 @@ export const TestGeneratorAdminManager = () => {
         correct_option: fq.correct_option,
         marks: fq.marks,
         explanation: fq.explanation,
-        status: 'active'
+        status: 'active',
+        question_image: fq.question_image || fq.image_url || '',
+        image_url: fq.image_url || fq.question_image || ''
       }));
       localStorage.setItem('olympiadhub_db_questions', JSON.stringify([...existingQs, ...newBankQs]));
     } catch (e) {
@@ -913,6 +921,11 @@ export const TestGeneratorAdminManager = () => {
             <span><strong>Q${idx + 1}.</strong> ${q.q}</span>
             <span style="font-size:10.5px;color:#64748b;white-space:nowrap;">[${q.marks || 1} Mark]</span>
           </div>
+          ${q.question_image || q.image_url ? `
+            <div style="margin: 8px 0; text-align: center;">
+              <img src="${q.question_image || q.image_url}" style="max-height: 180px; max-width: 90%; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 6px;" alt="Question Diagram" />
+            </div>
+          ` : ''}
           <div class="options-grid">
             ${(q.options || []).map((opt, oIdx) => `
               <div class="opt-item">
@@ -1331,6 +1344,33 @@ export const TestGeneratorAdminManager = () => {
                         </button>
                       </div>
 
+                      {/* Question Diagram / Image */}
+                      {(qItem.question_image || qItem.image_url) ? (
+                        <div className="pl-8 pt-1">
+                          <div className="relative inline-block border border-indigo-200 rounded-xl p-2 bg-white shadow-xs">
+                            <div className="text-[10px] font-bold text-indigo-700 mb-1 flex items-center gap-1">
+                              <span>📸 Question Diagram:</span>
+                            </div>
+                            <img
+                              src={qItem.question_image || qItem.image_url}
+                              alt="Question Diagram"
+                              className="max-h-56 max-w-full rounded-lg object-contain bg-white"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                handleUpdateQuestion(qIdx, 'question_image', '');
+                                handleUpdateQuestion(qIdx, 'image_url', '');
+                              }}
+                              className="absolute top-2 right-2 w-5 h-5 bg-rose-600 text-white rounded-full text-xs font-bold flex items-center justify-center hover:bg-rose-700 shadow-sm cursor-pointer"
+                              title="Remove Diagram"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      ) : null}
+
                       {/* 4 Options Grid */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-8">
                         {['A', 'B', 'C', 'D'].map((letter, optIdx) => (
@@ -1351,14 +1391,24 @@ export const TestGeneratorAdminManager = () => {
                               className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer ml-1"
                             />
                             <span className="text-xs font-black text-slate-700 w-5">{letter}:</span>
-                            <input
-                              type="text"
-                              required
-                              placeholder={`Option ${letter}`}
-                              value={qItem.options?.[optIdx] || ''}
-                              onChange={(e) => handleUpdateOption(qIdx, optIdx, e.target.value)}
-                              className="w-full px-2 py-1 bg-transparent border-none text-xs font-medium text-slate-800 focus:outline-none"
-                            />
+                            {typeof qItem.options?.[optIdx] === 'string' && (qItem.options[optIdx].startsWith('data:image') || qItem.options[optIdx].includes('__IMG__')) ? (
+                              <div className="flex-1 flex items-center gap-2">
+                                <img
+                                  src={qItem.options[optIdx]}
+                                  alt={`Option ${letter}`}
+                                  className="max-h-12 max-w-full object-contain rounded-md border border-slate-200 bg-white"
+                                />
+                              </div>
+                            ) : (
+                              <input
+                                type="text"
+                                required
+                                placeholder={`Option ${letter}`}
+                                value={qItem.options?.[optIdx] || ''}
+                                onChange={(e) => handleUpdateOption(qIdx, optIdx, e.target.value)}
+                                className="w-full px-2 py-1 bg-transparent border-none text-xs font-medium text-slate-800 focus:outline-none"
+                              />
+                            )}
                           </div>
                         ))}
                       </div>
@@ -1693,6 +1743,17 @@ export const TestGeneratorAdminManager = () => {
                     <span className="text-[11px] font-bold text-slate-400">[{q.marks || 1} Mark]</span>
                   </div>
 
+                  {/* Question Diagram */}
+                  {(q.question_image || q.image_url) && (
+                    <div className="pl-9 my-2">
+                      <img
+                        src={q.question_image || q.image_url}
+                        alt="Question Diagram"
+                        className="max-h-56 max-w-full object-contain rounded-xl border border-indigo-200 bg-white p-1 shadow-xs"
+                      />
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-9 text-xs">
                     {q.options?.map((opt, optIdx) => (
                       <div
@@ -1703,7 +1764,7 @@ export const TestGeneratorAdminManager = () => {
                             : 'bg-slate-50 border-slate-200 text-slate-700'
                         }`}
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-1">
                           <span className={`w-5 h-5 rounded-md flex items-center justify-center font-black text-[10px] shrink-0 ${
                             optIdx === 0
                               ? 'bg-red-50 border border-red-200 text-red-700'
@@ -1717,7 +1778,11 @@ export const TestGeneratorAdminManager = () => {
                           }`}>
                             {String.fromCharCode(65 + optIdx)}
                           </span>
-                          <span>{opt}</span>
+                          {typeof opt === 'string' && (opt.startsWith('data:image') || opt.includes('http')) ? (
+                            <img src={opt} alt={`Option ${String.fromCharCode(65 + optIdx)}`} className="max-h-12 max-w-full object-contain rounded-md border border-slate-200 bg-white" />
+                          ) : (
+                            <span>{opt}</span>
+                          )}
                         </div>
                         {q.correct === optIdx && <span className="text-emerald-600 font-black">✓ Correct</span>}
                       </div>
