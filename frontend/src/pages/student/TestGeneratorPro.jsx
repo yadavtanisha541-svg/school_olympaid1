@@ -151,17 +151,10 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   });
 
   const isTestUnlocked = (grade, subject) => {
-    if (!grade || !subject) return false;
-    const key1 = `${grade}_${subject}`.toLowerCase();
-    const key2 = `${grade}_all`.toLowerCase();
-    const key3 = `all_practice_tests`;
-    return purchasedTests.some(k => {
-      const s = String(k).toLowerCase();
-      return s === key1 || s === key2 || s === key3 || s === subject.toLowerCase();
-    });
+    return true; // Bypass payment: all tests unlocked directly without payment
   };
 
-  const isCurrentTestUnlocked = isTestUnlocked(selectedGrade, selectedSubject);
+  const isCurrentTestUnlocked = true;
 
   // Payment Checkout State
   const [pendingAdminPaper, setPendingAdminPaper] = useState(null);
@@ -231,31 +224,23 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   };
 
   const handleCompletePayment = async () => {
-    const cleanUtr = String(utrNumber || '').trim();
-    if (!cleanUtr) {
-      setPaymentError('Payment Verification Required: Please make payment and enter your 12-digit UPI / UTR Transaction ID from Google Pay, PhonePe, Paytm, etc.');
-      return;
-    }
-    if (cleanUtr.length < 8) {
-      setPaymentError('Invalid Reference Number: Transaction ID / UTR must be at least 8 to 12 digits/characters.');
-      return;
-    }
     setPaymentError('');
     setIsProcessingPayment(true);
     try {
+      const cleanUtr = String(utrNumber || `FREE-AUTO-${Date.now()}`).trim();
       const purchaseKey = `${selectedGrade}_${selectedSubject}`.toLowerCase();
       const updatedPurchases = Array.from(new Set([...purchasedTests, purchaseKey, selectedSubject.toLowerCase()]));
       setPurchasedTests(updatedPurchases);
       localStorage.setItem('olympiadhub_purchased_tests', JSON.stringify(updatedPurchases));
 
-      // Record order in backend / local storage
+      // Record order
       const orderPayload = {
-        order_id: `ORD-PRAC-${Date.now().toString().slice(-6)}`,
+        order_id: `ORD-FREE-${Date.now().toString().slice(-6)}`,
         grade: selectedGrade,
         subject: selectedSubject,
         subject_name: subjectsMap[selectedSubject]?.name || selectedSubject,
-        amount: bankSettings.test_pack_price || 99,
-        payment_method: selectedPayMethod,
+        amount: 0,
+        payment_method: selectedPayMethod || 'free_direct',
         utr_number: cleanUtr,
         status: 'completed',
         date: new Date().toISOString()
@@ -282,9 +267,9 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
         }
         setGeneratorStep('instructions');
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 1200);
+      }, 400);
     } catch (err) {
-      setPaymentError('Payment confirmation failed. Please try again.');
+      setGeneratorStep('instructions');
     } finally {
       setIsProcessingPayment(false);
     }
@@ -488,14 +473,8 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Proceed to Instructions
+  // Proceed to Instructions - Enters directly without payment
   const handleProceedToInstructions = () => {
-    // If not purchased yet, go directly to Step 2: Payment & QR Scanner Page!
-    if (!isCurrentTestUnlocked) {
-      setGeneratorStep('checkout');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
     if (selectedChapters.length === 0) {
       setSelectedChapters(CHAPTERS_BY_SUBJECT[selectedSubject] || []);
     }
@@ -1807,26 +1786,17 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                     type="button"
                     disabled={isProcessingPayment}
                     onClick={handleCompletePayment}
-                    className={`w-full py-3.5 rounded-2xl ${
-                      !utrNumber.trim()
-                        ? 'bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white shadow-md'
-                        : 'bg-[#00b074] hover:bg-[#009260] text-white shadow-lg hover:shadow-xl'
-                    } text-sm font-black uppercase tracking-wider transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2`}
+                    className="w-full py-3.5 rounded-2xl bg-[#00b074] hover:bg-[#009260] text-white shadow-lg hover:shadow-xl text-sm font-black uppercase tracking-wider transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
                   >
                     {isProcessingPayment ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Verifying Payment with Bank Gateway...</span>
-                      </>
-                    ) : !utrNumber.trim() ? (
-                      <>
-                        <Lock className="w-4 h-4 text-amber-400" />
-                        <span>Enter UTR No. to Unlock (₹{bankSettings.test_pack_price || 99})</span>
+                        <span>Unlocking Test...</span>
                       </>
                     ) : (
                       <>
                         <Zap className="w-4 h-4 text-amber-300 fill-current" />
-                        <span>✓ Verify &amp; Unlock Practice Test (₹{bankSettings.test_pack_price || 99})</span>
+                        <span>✓ Instant Unlock &amp; Start Test (Free Access)</span>
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}
@@ -2385,18 +2355,8 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                     onClick={handleProceedToInstructions}
                     className="px-5 py-2.5 bg-[#6d3a68] hover:bg-[#582d54] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
                   >
-                    {isCurrentTestUnlocked ? (
-                      <>
-                        <span>Next: Instructions &amp; Start</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </>
-                    ) : (
-                      <>
-                        <Lock className="w-3.5 h-3.5 text-amber-300" />
-                        <span>Next: Pay &amp; Unlock Test (₹{bankSettings.test_pack_price || 99})</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </>
-                    )}
+                    <span>Next: Instructions &amp; Start</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
