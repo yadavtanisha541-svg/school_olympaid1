@@ -275,80 +275,109 @@ export function parseQuestionsFromText(text) {
 // EXAM TEXT PARSER
 // ─────────────────────────────────────────────────────────────────────────────
 function parseExamText(raw) {
-  const text = raw
+  let text = raw
     .replace(/\r\n/g, '\n').replace(/\r/g, '\n')
     .replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"')
     .replace(/[ \t]+/g, ' ')
     .replace(/^ /gm, '')
     .replace(/\n{3,}/g, '\n\n');
 
-  const blocks = splitIntoQuestionBlocks(text);
-  if (blocks.length === 0) return [];
+  // Fix: when <li><p>text</p></li> puts the number on its own line,
+  // merge "1.\nIf a pen costs" → "1. If a pen costs"
+  text = text.replace(/(\n|^)(\d{1,3}[.)]) *\n+(?![a-dA-D][.)\s])/gm, '$1$2 ');
 
-  return blocks
+  const blocks = splitIntoQuestionBlocks(text);
+
+  // Fallback: if numbered detection found ≤1 block, try option-based splitting
+  const finalBlocks = blocks.length <= 1 ? splitByOptions(text) : blocks;
+  if (finalBlocks.length === 0) return [];
+
+  return finalBlocks
     .map((block, i) => parseBlock(block, i))
-    .filter(q => q && (q.option_a || q.option_b || q.option_c || q.option_d)); // skip header-only blocks with no options
+    .filter(q => q && (q.option_a || q.option_b || q.option_c || q.option_d));
 }
 
-// ─── Split text into individual question blocks ───────────────────────────────
+// ─── Split by numbered question markers ──────────────────────────────────────
 function splitIntoQuestionBlocks(text) {
   const lines = text.split('\n');
   const blocks = [];
   let current = [];
 
-  /**
-   * Detect if a line is the START of a new question.
-   * Patterns supported:
-   *   1. text       — digit + period + space
-   *   1) text       — digit + paren + space
-   *   Q1. text      — Q + digit + period
-   *   Q1) text      — Q + digit + paren
-   *   Question 1:   — "Question" keyword
-   *   (1) text      — paren-wrapped digit
-   */
   const isQStart = (line) => {
     const t = line.trim();
     if (!t) return false;
     return (
-      /^\d{1,3}[.)]\s+\S/.test(t)              ||  // "1. text" or "1) text"
-      /^Q(?:uestion)?\s*\.?\s*\d{1,3}\s*[.:\)]/i.test(t)  ||  // "Q1." "Q1)" "Question 1:"
-      /^\(\d{1,3}\)\s+\S/.test(t)              ||  // "(1) text"
-      /^\[\s*Q?\d{1,3}\s*\]\s+\S/.test(t)          // "[1] text" "[Q1] text"
+      /^\d{1,3}[.)]\s+\S/.test(t) ||
+      /^Q(?:uestion)?\s*\.?\s*\d{1,3}\s*[.:\)]/i.test(t) ||
+      /^\(\d{1,3}\)\s+\S/.test(t) ||
+      /^\[\s*Q?\d{1,3}\s*\]\s+\S/.test(t)
     );
   };
 
-  // Strip question-number prefix from the first line of a block
   const stripPrefix = (line) =>
     line.trim().replace(
       /^(?:\d{1,3}[.)]\s+|Q(?:uestion)?\s*\.?\s*\d{1,3}\s*[.:\)]\s*|\(\d{1,3}\)\s+|\[\s*Q?\d{1,3}\s*\]\s+)/i,
       ''
     );
 
-  let foundFirstQuestion = false; // ignore everything before Q1 (title, section headers)
-
+  let foundFirst = false;
   for (const line of lines) {
     if (isQStart(line)) {
-      foundFirstQuestion = true;
+      foundFirst = true;
       if (current.length > 0) {
         const b = current.join('\n').trim();
         if (b.length > 3) blocks.push(b);
       }
       const stripped = stripPrefix(line);
       current = stripped ? [stripped] : [];
-    } else {
-      // Only collect lines after we've seen at least one question number
-      if (foundFirstQuestion) {
-        current.push(line);
-      }
-      // else: skip — it's title / section header / instructions before Q1
+    } else if (foundFirst) {
+      current.push(line);
     }
+    // before first question: skip (title, section header, etc.)
   }
-
   if (current.length > 0) {
     const b = current.join('\n').trim();
     if (b.length > 3) blocks.push(b);
   }
+  return blocks;
+}
 
+// ─── Fallback: split by option-pattern boundaries ────────────────────────────
+// Handles Word docs where question numbers are list-generated (no "1." in text)
+// A new question starts when we see non-option text AFTER we've already seen options
+function splitByOptions(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const blocks = [];
+  let current = [];
+  let seenOpts = false;
+
+  const isOption  = l => /^[a-dA-D]\s*[.)\s]/.test(l);
+  const isAnswer  = l => /^(?:Ans(?:wer)?|Correct|Key)\s*[:=\-–]/i.test(l);
+  const isImg     = l => /^__IMG__/.test(l);
+  const isHeader  = l => /^(?:Section|Part|Chapter|Grade|Class|Subject|Instructions?)/i.test(l);
+
+  for (const line of lines) {
+    if (isHeader(line) && !seenOpts) continue; // skip doc headers before any question
+
+    if (isOption(line) || isAnswer(line) || isImg(line)) {
+      seenOpts = true;
+      current.push(line);
+    } else {
+      // Non-option text: if we were already in options, this is a NEW question
+      if (seenOpts) {
+        const b = current.join('\n').trim();
+        if (b.length > 3) blocks.push(b);
+        current = [line];   // start new block with this question text
+        seenOpts = false;
+      } else {
+        current.push(line);
+      }
+    }
+  }
+  if (current.length > 0) {
+    const b = current.join('\n').trim();
+    if (b.length > 3) blocks.push(b);
+  }
   return blocks;
 }
 
@@ -375,11 +404,12 @@ function parseBlock(blockText, idx) {
     if (/^---\s*Page\s*\d+\s*---$/.test(line)) continue;
 
     // ── Image placeholder ─────────────────────────────────────────
-    if (/^__IMG__[^_]+__$/.test(line)) {
+    // Use \S+ to handle keys with underscores like docx_img_1
+    if (/^__IMG__\S+__$/.test(line)) {
       const key = line.replace(/^__IMG__/, '').replace(/__$/, '');
       imageKeys.push(key);
-      // Also embed placeholder in question text if no options seen yet
-      if (!seenOptions) questionLines.push(line);
+      // Embed in question text regardless (image may appear alongside or after options)
+      questionLines.push(line);
       continue;
     }
 

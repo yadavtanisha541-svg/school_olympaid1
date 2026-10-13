@@ -95,7 +95,7 @@ export const UniversalQuestionImportModal = ({
 
   // ─── Render question text — replace __IMG__key__ with <img> ──────────────────
   const renderQText = (qText, imgStore) => {
-    const re = /__IMG__([^_]+)__/g;
+    const re = /__IMG__(\S+?)__/g;   // \S+? handles keys like docx_img_1 (contain underscores)
     const parts = [];
     let last = 0, m, hasImg = false;
     while ((m = re.exec(qText)) !== null) {
