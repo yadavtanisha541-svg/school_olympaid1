@@ -615,23 +615,27 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
 
         {/* Right: Quick actions, Light/Dark toggle, notifications, cart, logout */}
         <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
-          {/* Real-Time Cloud Sync Button */}
-          <div className="relative">
+          {/* Real-Time Cloud Sync Button & Status Badge */}
+          <div className="relative flex items-center gap-1.5">
             <button
               type="button"
               onClick={handleSyncClick}
               disabled={isSyncing}
-              className={`p-1.5 min-[360px]:p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border transition-all cursor-pointer flex items-center justify-center shadow-2xs group active:scale-95 shrink-0 ${
+              className={`p-1.5 min-[360px]:p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs group active:scale-95 shrink-0 ${
                 isSyncing ? 'text-indigo-500 bg-indigo-50/50 border-indigo-200' : ''
               } ${
                 theme === 'dark'
                   ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-indigo-400 hover:text-indigo-300'
                   : 'bg-white hover:bg-slate-50 border-slate-200 text-indigo-600 hover:text-indigo-800'
               }`}
-              title="Sync All Data (Vercel ⇄ Localhost)"
+              title="Real-Time Cloud Auto-Sync Active (Vercel ⇄ Localhost)"
               aria-label="Sync Data"
             >
               <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${isSyncing ? 'animate-spin text-indigo-500' : 'transition-transform group-hover:rotate-180'}`} />
+              <span className="hidden xl:inline-flex items-center gap-1 text-[11px] font-black text-emerald-700 bg-emerald-50 border border-emerald-300/80 px-2 py-0.5 rounded-full">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Live Cloud Sync</span>
+              </span>
             </button>
             {syncToast && (
               <div className="absolute top-full right-0 mt-2 px-3 py-1.5 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-lg whitespace-nowrap animate-in fade-in zoom-in z-50">
@@ -741,6 +745,40 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
                 {syncSuccessMsg}
               </div>
             )}
+
+            {/* Real-Time Central Cloud DB Auto-Sync Status */}
+            <div className="bg-gradient-to-r from-emerald-950/80 to-teal-950/80 border border-emerald-500/50 rounded-2xl p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <h4 className="text-sm font-black text-emerald-200">
+                    🟢 Real-Time Cloud Auto-Sync Active
+                  </h4>
+                </div>
+                <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 px-2 py-0.5 rounded-full font-bold">
+                  Zero-Click Live
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Aap jo bhi <strong>Vercel</strong> ya <strong>Localhost</strong> par create ya change karenge, wo automatically Cloud Database ke zariye bina kisi click ke real-time me dono jagah sync rehta hai!
+              </p>
+              <button
+                type="button"
+                onClick={async () => {
+                  setIsSyncing(true);
+                  await syncManager.pullFromCloud();
+                  await syncManager.pushToCloud();
+                  setIsSyncing(false);
+                  setSyncSuccessMsg('✓ Live Cloud database synchronized successfully!');
+                  setTimeout(() => setSyncSuccessMsg(''), 3000);
+                }}
+                disabled={isSyncing}
+                className="w-full mt-1 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center justify-center gap-2"
+              >
+                <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>{isSyncing ? 'Synchronizing Live Cloud...' : '⚡ Force Immediate Cloud Sync Now'}</span>
+              </button>
+            </div>
 
             {/* Method 1: Instant 1-Click Popup Pull */}
             <div className="bg-slate-800/70 border border-slate-700 rounded-2xl p-4 space-y-2">
