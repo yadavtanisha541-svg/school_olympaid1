@@ -373,14 +373,20 @@ export const PublicNavbar = ({
                             <span>Olympiad Books</span>
                           </button>
 
-                          {/* 2. Live Classes */}
+                          {/* 2. Practice Tests & Papers */}
                           <button
                             type="button"
                             onMouseEnter={() => setHoveredPrepId(null)}
                             onClick={() => handleLinkClick('practice-hub')}
-                            className="w-full text-left px-4 py-2.5 text-xs font-bold text-[#4e2a4a] hover:bg-[#f4ebf4] hover:text-[#6d3a68] transition-colors cursor-pointer flex items-center justify-between"
+                            className="w-full text-left px-4 py-2.5 text-xs font-bold text-[#4e2a4a] hover:bg-[#f4ebf4] hover:text-[#6d3a68] transition-colors cursor-pointer flex items-center justify-between group"
                           >
-                            <span>Live Classes</span>
+                            <span className="flex items-center gap-1.5">
+                              <Sparkles className="w-3.5 h-3.5 text-[#e7b84b]" />
+                              <span>Practice Tests &amp; Papers</span>
+                            </span>
+                            <span className="text-[10px] font-bold text-[#d9775b] opacity-0 group-hover:opacity-100 transition-opacity">
+                              ▶
+                            </span>
                           </button>
 
                           {/* 3. Ask & Answer */}
@@ -760,9 +766,10 @@ export const PublicNavbar = ({
             <button
               type="button"
               onClick={() => handleLinkClick('practice-hub')}
-              className="w-full text-left px-3 py-2 rounded-sm text-xs font-bold text-[#4e2a4a] hover:bg-[#f4ebf4]"
+              className="w-full text-left px-3 py-2 rounded-sm text-xs font-bold text-[#4e2a4a] hover:bg-[#f4ebf4] flex items-center gap-2"
             >
-              Online Practice Hub
+              <Sparkles className="w-3.5 h-3.5 text-[#e7b84b]" />
+              <span>Practice Tests &amp; Papers</span>
             </button>
             <button
               type="button"

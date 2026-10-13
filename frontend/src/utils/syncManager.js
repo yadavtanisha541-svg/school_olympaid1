@@ -44,6 +44,9 @@ export const syncManager = {
           if (updatedCount > 0) {
             console.log(`[SyncManager] Synchronized ${updatedCount} items from Vercel!`);
             window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+            window.dispatchEvent(new CustomEvent('olympiadhub-pricing-updated'));
+            window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated'));
+            window.dispatchEvent(new CustomEvent('role-permissions-updated'));
             window.dispatchEvent(new Event('storage'));
           }
           notifyListeners({ status: 'synced', count: updatedCount });

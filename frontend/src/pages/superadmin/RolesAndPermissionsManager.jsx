@@ -175,9 +175,9 @@ const DEFAULT_PERMISSIONS_CATALOG = [
   },
   {
     key: 'manage_test_generator',
-    module: 'Super Admin: Sample & Past Papers',
-    name: 'Sample & Past Papers',
-    description: 'Manage and publish official sample papers, previous year question sets (PYQs).',
+    module: 'Super Admin: Practice Tests & Papers',
+    name: 'Practice Tests & Papers',
+    description: 'Create, author questions, configure duration/marks, and manage practice tests & papers.',
     studentDefault: false,
     level: 'Advanced',
     icon: Sparkles

@@ -721,6 +721,10 @@ export const App = () => {
       switch (currentTab) {
         case 'overview':
           return <TeacherOverview onNavigateTab={setCurrentTab} />;
+        case 'practice_tests_manager':
+        case 'test_generator_manager':
+        case 'practice_tests':
+          return <TestGeneratorAdminManager onNavigateTab={setCurrentTab} />;
         case 'question_bank':
           return <QuestionBankPage />;
         case 'exams':

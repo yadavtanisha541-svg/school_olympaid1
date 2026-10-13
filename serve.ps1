@@ -1,6 +1,11 @@
 # PowerShell Lightweight Static Web Server for OlympiadHub
 $port = 8080
-$path = $PSScriptRoot
+$distPath = Join-Path $PSScriptRoot "frontend\dist"
+if (Test-Path $distPath) {
+    $path = $distPath
+} else {
+    $path = $PSScriptRoot
+}
 
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$port/")

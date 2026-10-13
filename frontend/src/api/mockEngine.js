@@ -2866,7 +2866,21 @@ export const mockEngine = {
         const subjectFilter = rawSubject.replace(/\+/g, ' ').trim();
         const categoryFilter = queryParams.category || queryParams.paper_category || (endpoint.includes('category=') ? decodeURIComponent(endpoint.split('category=')[1].split('&')[0]) : '');
 
-        let filtered = [...papers];
+        let localAdminPapers = [];
+        try {
+          localAdminPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+        } catch (e) {}
+
+        let allAvailable = [...papers];
+        if (Array.isArray(localAdminPapers)) {
+          localAdminPapers.forEach((lp) => {
+            if (lp && !allAvailable.some(p => String(p.id) === String(lp.id))) {
+              allAvailable.unshift(lp);
+            }
+          });
+        }
+
+        let filtered = [...allAvailable];
         if (classFilter && classFilter !== 'All' && classFilter !== 'ALL') {
           filtered = filtered.filter((p) => {
             const pCls = p.class_name || p.class || '';
@@ -3104,16 +3118,17 @@ export const mockEngine = {
         return { success: true, message: 'Model Test Paper updated successfully', data: updatedPaper };
       }
 
-      if (method === 'DELETE' && sub) {
-        papers = papers.filter((p) => String(p.id) !== String(sub));
+      if (method === 'DELETE' && (sub || subId)) {
+        const targetDelId = (sub && sub !== 'admin-papers') ? sub : subId;
+        papers = papers.filter((p) => String(p.id) !== String(targetDelId));
         saveDb('exam_papers', papers);
         try {
           const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
-          localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockDb.filter(p => String(p.id) !== String(sub))));
+          localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockDb.filter(p => String(p.id) !== String(targetDelId))));
           const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-          localStorage.setItem('admin_generator_papers', JSON.stringify(genPapers.filter(p => String(p.id) !== String(sub))));
+          localStorage.setItem('admin_generator_papers', JSON.stringify(genPapers.filter(p => String(p.id) !== String(targetDelId))));
           if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedId: sub } }));
+            window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedId: targetDelId } }));
           }
         } catch (e) {}
         return { success: true, message: 'Model Test Paper deleted successfully' };

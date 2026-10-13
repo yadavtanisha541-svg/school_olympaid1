@@ -432,27 +432,34 @@ export const TestGeneratorAdminManager = () => {
   const fetchPapers = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/test-generator/admin-papers', {
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        }
-      });
-      const data = await res.json();
-      if (data && data.success && Array.isArray(data.data)) {
-        setPapers(data.data);
-        localStorage.setItem('admin_generator_papers', JSON.stringify(data.data));
-      } else {
-        const local = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-        setPapers(local);
+      const res = await apiClient.get('/test-generator/admin-papers');
+      if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+        setPapers(res.data);
+        localStorage.setItem('admin_generator_papers', JSON.stringify(res.data));
+        setLoading(false);
+        return;
       }
     } catch (e) {
-      console.warn('API fetch error, falling back to local:', e);
-      const local = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-      setPapers(local);
-    } finally {
-      setLoading(false);
+      console.warn('apiClient fetch error, falling back to local:', e);
     }
+
+    const local = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+    if (local && local.length > 0) {
+      setPapers(local);
+    } else {
+      try {
+        const epRes = await apiClient.get('/exam-papers');
+        if (epRes && epRes.success && Array.isArray(epRes.data) && epRes.data.length > 0) {
+          setPapers(epRes.data);
+          localStorage.setItem('admin_generator_papers', JSON.stringify(epRes.data));
+        } else {
+          setPapers([]);
+        }
+      } catch (err) {
+        setPapers([]);
+      }
+    }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -604,16 +611,7 @@ export const TestGeneratorAdminManager = () => {
     };
 
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/test-generator/admin-papers', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify(payload)
-      });
-      await res.json();
+      await apiClient.post('/test-generator/admin-papers', payload);
     } catch (err) {
       console.warn('API error, persisting locally:', err);
     }
@@ -644,13 +642,7 @@ export const TestGeneratorAdminManager = () => {
     setPapers((prev) => prev.filter((p) => p.id !== paperId));
 
     try {
-      const token = localStorage.getItem('token');
-      await fetch(`/api/test-generator/admin-papers/${paperId}`, {
-        method: 'DELETE',
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        }
-      });
+      await apiClient.delete(`/test-generator/admin-papers/${paperId}`);
     } catch (e) {
       console.warn('Delete error', e);
     }

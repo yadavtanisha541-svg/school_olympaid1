@@ -45,6 +45,10 @@
               localStorage.setItem(key, typeof payload[key] === 'string' ? payload[key] : JSON.stringify(payload[key]));
             }
           });
+          window.dispatchEvent(new Event('storage'));
+          window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+          window.dispatchEvent(new CustomEvent('olympiadhub-pricing-updated'));
+          window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated'));
           event.source.postMessage({
             type: 'UPDATE_VERCEL_DATA_ACK',
             success: true

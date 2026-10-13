@@ -1,13 +1,13 @@
 @echo off
-title OlympiadHub - Online Olympiad Examination Platform
+title SkillRise Olympiad Platform
 echo ===================================================
-echo Starting OlympiadHub Examination System
+echo Starting SkillRise Olympiad Platform
 echo ===================================================
-
-echo Opening OlympiadHub in your default web browser...
-start "" "%~dp0index.html"
-
-echo OlympiadHub is now running!
-echo URL: file:///%~dp0index.html
+echo.
+echo Opening OlympiadHub in your default web browser (http://localhost:3000)...
+start "" "http://localhost:3000"
+echo.
+echo Local dev server: http://localhost:3000
+echo Live Vercel site: https://school-olympaid1.vercel.app
 echo.
 pause

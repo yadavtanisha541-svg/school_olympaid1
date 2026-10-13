@@ -120,6 +120,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
     { id: 'online_classes_manager', label: 'Online Classes Studio', icon: Video, perm: 'manage_online_classes' },
     { id: 'skill_programs_manager', label: 'Skill Programs Studio', icon: Rocket, perm: 'manage_skill_programs' },
     { id: 'superadmin_packages', label: 'Subject Model Tests & Packages', icon: BookOpen, perm: 'manage_superadmin_packages' },
+    { id: 'practice_tests_manager', label: 'Practice Tests & Papers', icon: Sparkles, perm: 'manage_test_generator' },
     { id: 'applicant_leads', label: 'New Applicant Leads', icon: UserCheck, perm: 'manage_applicant_leads' },
     { id: 'coordinators', label: 'Coordinator Applicants', icon: UserCheck, perm: 'manage_coordinators' },
     { id: 'workbook_orders', label: 'Workbook Orders', icon: ShoppingBag, perm: 'manage_workbook_orders' },
@@ -130,7 +131,6 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
     { id: 'revision_vault', label: 'Revision Vault & Bookmarks', icon: Bookmark, perm: 'manage_revision_vault' },
     { id: 'free_quizzes_manager', label: 'FREE Quizzes Manager', icon: HelpCircle, perm: 'manage_free_quizzes' },
     { id: 'faqs_key_info', label: 'FAQs & Key Info Manager', icon: HelpCircle, perm: 'manage_faqs_keyinfo' },
-    { id: 'practice_tests_manager', label: 'Practice Tests & Papers', icon: Sparkles, perm: 'manage_test_generator' },
     { id: 'results', label: 'Exam Results & Reports', icon: FileCheck2, perm: 'publish_exam_results' },
     { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy, perm: 'manage_leaderboard' },
     { id: 'certificates', label: 'Certificates Manager', icon: Award, perm: 'manage_certificates' },
@@ -140,6 +140,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
   const teacherNav = [
     { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'practice_tests_manager', label: 'Practice Tests & Papers', icon: Sparkles },
     { id: 'students', label: 'Student Management', icon: Users, perm: 'view_students' },
     { id: 'results', label: 'Exam Results & Reports', icon: FileCheck2, perm: 'view_results' },
     { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy, perm: 'view_leaderboards' }
@@ -375,8 +376,8 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                     </div>
                   )}
 
-                  {/* Practice Tests */}
-                  {hasPermission('use_test_generator') && (
+                  {/* Practice Tests & Papers */}
+                  {(hasPermission('use_test_generator') !== false) && (
                     <button
                       type="button"
                       onClick={() => {
@@ -390,7 +391,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                       }`}
                     >
                       <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
-                      <span>Practice Tests</span>
+                      <span>Practice Tests & Papers</span>
                     </button>
                   )}
 
