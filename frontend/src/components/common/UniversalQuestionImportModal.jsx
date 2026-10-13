@@ -3,7 +3,7 @@ import {
   Upload, FileText, FileCode, CheckCircle2, AlertCircle,
   X, RefreshCw, Eye, Check, Image as ImageIcon
 } from 'lucide-react';
-import { extractFromFile, parseQuestionsFromText } from '../../utils/universalDocumentParser';
+import { extractFromFile, parseQuestionsFromText, getExtractedImages } from '../../utils/universalDocumentParser';
 import { syncManager } from '../../utils/syncManager';
 
 export const UniversalQuestionImportModal = ({
@@ -35,15 +35,20 @@ export const UniversalQuestionImportModal = ({
     setIsParsing(true); setParsedQuestions([]); setAllImages({});
     try {
       const { text, images } = await extractFromFile(sel);
+      const imgMap = images || {};
       setRawText(text);
-      setAllImages(images || {});
-      const qs = parseQuestionsFromText(text);
+      setAllImages(imgMap);
+      const qs = parseQuestionsFromText(text, imgMap);
       if (qs.length === 0) {
         setErrorMsg('No questions found. Check the file format or use "Paste Text" tab.');
       } else {
         // Attach image store reference to each question for preview
-        setParsedQuestions(qs.map(q => ({ ...q, _imgStore: images || {} })));
-        const ic = Object.keys(images || {}).length;
+        setParsedQuestions(qs.map(q => ({
+          ...q,
+          _imgStore: imgMap,
+          question_image: q.question_image || (q.question_image_keys?.[0] ? imgMap[q.question_image_keys[0]] : '') || ''
+        })));
+        const ic = Object.keys(imgMap).length;
         setSuccessMsg(`Extracted ${qs.length} question${qs.length > 1 ? 's' : ''}${ic > 0 ? ` + ${ic} diagram${ic > 1 ? 's' : ''}` : ''} ✓`);
       }
     } catch (err) {
@@ -58,11 +63,11 @@ export const UniversalQuestionImportModal = ({
     if (!rawText.trim()) { setErrorMsg('Please paste some text first.'); return; }
     setErrorMsg(''); setSuccessMsg(''); setIsParsing(true);
     try {
-      const qs = parseQuestionsFromText(rawText);
+      const qs = parseQuestionsFromText(rawText, allImages);
       if (qs.length === 0) {
         setErrorMsg('No questions detected. Each question must start with a number (1., Q1.) and have options A) B) C) D).');
       } else {
-        setParsedQuestions(qs);
+        setParsedQuestions(qs.map(q => ({ ...q, _imgStore: allImages })));
         setSuccessMsg(`Extracted ${qs.length} question${qs.length > 1 ? 's' : ''} ✓`);
       }
     } catch (err) {
@@ -77,11 +82,16 @@ export const UniversalQuestionImportModal = ({
     if (parsedQuestions.length === 0) { setErrorMsg('No questions to import.'); return; }
     setIsImporting(true);
     try {
-      const formatted = parsedQuestions.map(({ _imgStore, question_image_keys, ...q }) => ({
-        ...q,
-        class_id: targetClassId || q.class_id,
-        subject_id: targetSubjectId || q.subject_id,
-      }));
+      const formatted = parsedQuestions.map(({ _imgStore, question_image_keys, ...q }) => {
+        const primaryImg = q.question_image || (question_image_keys?.[0] ? ((_imgStore || allImages)[question_image_keys[0]]) : '') || '';
+        return {
+          ...q,
+          question_image: primaryImg,
+          image_url: primaryImg,
+          class_id: targetClassId || q.class_id,
+          subject_id: targetSubjectId || q.subject_id,
+        };
+      });
       if (onQuestionsImported) await onQuestionsImported(formatted);
       try { syncManager.schedulePush?.(); } catch (_) {}
       setSuccessMsg(`Imported ${formatted.length} questions successfully!`);
@@ -95,15 +105,16 @@ export const UniversalQuestionImportModal = ({
 
   // ─── Render question text — replace __IMG__key__ with <img> ──────────────────
   const renderQText = (qText, imgStore) => {
-    const re = /__IMG__(\S+?)__/g;   // \S+? handles keys like docx_img_1 (contain underscores)
+    if (!qText) return '';
+    const re = /['"]?__IMG__(\S+?)__['"]?/g;
     const parts = [];
     let last = 0, m, hasImg = false;
     while ((m = re.exec(qText)) !== null) {
       hasImg = true;
       if (m.index > last) parts.push(<span key={`t${last}`}>{qText.slice(last, m.index)}</span>);
-      const src = (imgStore || {})[m[1]];
+      const src = (imgStore || {})[m[1]] || allImages[m[1]] || getExtractedImages()[m[1]];
       parts.push(src
-        ? <img key={m[1]} src={src} alt="diagram" className="block max-w-full max-h-52 my-2 rounded-xl border border-indigo-200 shadow-sm object-contain" />
+        ? <img key={m[1]} src={src} alt="diagram" className="block max-w-full max-h-52 my-2 rounded-xl border border-indigo-200 shadow-sm object-contain bg-white" />
         : <span key={m[1]} className="inline-flex items-center gap-1 text-[10px] font-bold bg-indigo-50 border border-indigo-200 text-indigo-600 px-2 py-0.5 rounded-md mx-0.5"><ImageIcon className="w-3 h-3" />[Diagram]</span>
       );
       last = m.index + m[0].length;
@@ -112,11 +123,53 @@ export const UniversalQuestionImportModal = ({
     return hasImg ? <>{parts}</> : qText;
   };
 
+  // ─── Render option content (supports base64 image and __IMG__ markers) ───────
+  const renderOptionContent = (val, imgStore) => {
+    if (!val) return '—';
+    if (typeof val === 'string' && val.startsWith('data:image')) {
+      return (
+        <img
+          src={val}
+          alt="Option diagram"
+          className="max-h-16 max-w-full object-contain rounded-lg border border-slate-200 bg-white"
+        />
+      );
+    }
+    const re = /['"]?__IMG__(\S+?)__['"]?/g;
+    if (typeof val === 'string' && re.test(val)) {
+      re.lastIndex = 0;
+      const parts = [];
+      let last = 0, m;
+      while ((m = re.exec(val)) !== null) {
+        if (m.index > last) parts.push(<span key={`t${last}`}>{val.slice(last, m.index)}</span>);
+        const src = (imgStore || {})[m[1]] || allImages[m[1]] || getExtractedImages()[m[1]];
+        parts.push(src ? (
+          <img key={m[1]} src={src} alt="Option Diagram" className="max-h-16 max-w-full object-contain inline-block my-1 rounded-md border border-indigo-200 bg-white" />
+        ) : (
+          <span key={m[1]} className="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-1 py-0.5 rounded">[Diagram]</span>
+        ));
+        last = m.index + m[0].length;
+      }
+      if (last < val.length) parts.push(<span key="tail">{val.slice(last)}</span>);
+      return <>{parts}</>;
+    }
+    return val;
+  };
+
   // ─── Get diagram images for a question ───────────────────────────────────────
-  const getQDiagrams = (q) =>
-    (q.question_image_keys || [])
-      .map(k => ({ key: k, src: (q._imgStore || allImages)[k] }))
-      .filter(d => d.src);
+  const getQDiagrams = (q) => {
+    const list = [];
+    if (q.question_image) {
+      list.push({ key: 'main_diagram', src: q.question_image });
+    }
+    (q.question_image_keys || []).forEach(k => {
+      const src = (q._imgStore || allImages)[k] || getExtractedImages()[k];
+      if (src && !list.some(item => item.src === src)) {
+        list.push({ key: k, src });
+      }
+    });
+    return list;
+  };
 
   const totalImgs = Object.keys(allImages).length;
 
@@ -305,7 +358,7 @@ export const UniversalQuestionImportModal = ({
                                 <span className={`w-5 h-5 rounded-md flex items-center justify-center font-black text-[9px] shrink-0 ${
                                   isCorrect ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'
                                 }`}>{letter}</span>
-                                <span className="truncate">{isEmpty ? '—' : val}</span>
+                                <div className="truncate flex-1">{isEmpty ? '—' : renderOptionContent(val, q._imgStore || allImages)}</div>
                                 {isCorrect && <Check className="w-3 h-3 text-emerald-600 ml-auto shrink-0" />}
                               </div>
                             );

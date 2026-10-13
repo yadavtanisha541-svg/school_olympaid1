@@ -3241,6 +3241,8 @@ export const mockEngine = {
           explanation: item.explanation || '',
           status: item.status || 'active',
           author_name: item.author_name || 'Super Administrator',
+          question_image: item.question_image || item.image_url || '',
+          image_url: item.image_url || item.question_image || '',
           created_at: new Date().toISOString()
         })).filter(q => q.question_text.trim().length > 0);
 

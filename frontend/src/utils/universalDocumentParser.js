@@ -259,22 +259,23 @@ function decodeHtmlEntities(str) {
 // ─────────────────────────────────────────────────────────────────────────────
 // PUBLIC PARSE ENTRY POINT
 // ─────────────────────────────────────────────────────────────────────────────
-export function parseQuestionsFromText(text) {
+export function parseQuestionsFromText(text, images = {}) {
   if (!text || typeof text !== 'string') return [];
   const t = text.trim();
+  const allImgs = { ...getExtractedImages(), ...(images || {}) };
 
   // CSV with standard headers
   if (t.includes(',') && (t.toLowerCase().includes('question_text') || t.toLowerCase().includes('option_a'))) {
-    return parseCsv(t);
+    return parseCsv(t, allImgs);
   }
 
-  return parseExamText(t);
+  return parseExamText(t, allImgs);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // EXAM TEXT PARSER
 // ─────────────────────────────────────────────────────────────────────────────
-function parseExamText(raw) {
+function parseExamText(raw, images = {}) {
   let text = raw
     .replace(/\r\n/g, '\n').replace(/\r/g, '\n')
     .replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"')
@@ -293,7 +294,7 @@ function parseExamText(raw) {
   if (finalBlocks.length === 0) return [];
 
   return finalBlocks
-    .map((block, i) => parseBlock(block, i))
+    .map((block, i) => parseBlock(block, i, images))
     .filter(q => q && (q.option_a || q.option_b || q.option_c || q.option_d));
 }
 
@@ -333,7 +334,6 @@ function splitIntoQuestionBlocks(text) {
     } else if (foundFirst) {
       current.push(line);
     }
-    // before first question: skip (title, section header, etc.)
   }
   if (current.length > 0) {
     const b = current.join('\n').trim();
@@ -343,8 +343,6 @@ function splitIntoQuestionBlocks(text) {
 }
 
 // ─── Fallback: split by option-pattern boundaries ────────────────────────────
-// Handles Word docs where question numbers are list-generated (no "1." in text)
-// A new question starts when we see non-option text AFTER we've already seen options
 function splitByOptions(text) {
   const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
   const blocks = [];
@@ -353,14 +351,17 @@ function splitByOptions(text) {
 
   const isOption  = l => /^[a-dA-D]\s*[.)\s]/.test(l);
   const isAnswer  = l => /^(?:Ans(?:wer)?|Correct|Key)\s*[:=\-–]/i.test(l);
-  const isImg     = l => /^__IMG__/.test(l);
+  const isImg     = l => /^['"]?__IMG__/.test(l);
   const isHeader  = l => /^(?:Section|Part|Chapter|Grade|Class|Subject|Instructions?)/i.test(l);
 
   for (const line of lines) {
     if (isHeader(line) && !seenOpts) continue; // skip doc headers before any question
 
-    if (isOption(line) || isAnswer(line) || isImg(line)) {
+    if (isOption(line) || isAnswer(line)) {
       seenOpts = true;
+      current.push(line);
+    } else if (isImg(line)) {
+      // Keep image in question or options without forcing seenOpts
       current.push(line);
     } else {
       // Non-option text: if we were already in options, this is a NEW question
@@ -382,14 +383,14 @@ function splitByOptions(text) {
 }
 
 // ─── Parse one question block ─────────────────────────────────────────────────
-function parseBlock(blockText, idx) {
+function parseBlock(blockText, idx, images = {}) {
   if (!blockText || blockText.trim().length < 3) return null;
 
   const lines = blockText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
   if (lines.length === 0) return null;
 
   // Option pattern: "(A)", "A)", "A.", "A:", "[A]", lowercase same, also 1-4
-  const OPT_RE = /^[\(\[]?\s*([A-Da-d1-4])\s*[\)\]\.\:]\s+(.+)$/;
+  const OPT_RE = /^[\(\[]?\s*([A-Da-d1-4])\s*[\)\]\.\:]\s*(.*)$/;
 
   const questionLines = [];
   const imageKeys = [];       // __IMG__ keys found in this block
@@ -404,13 +405,16 @@ function parseBlock(blockText, idx) {
     if (/^---\s*Page\s*\d+\s*---$/.test(line)) continue;
 
     // ── Image placeholder ─────────────────────────────────────────
-    // Use \S+ to handle keys with underscores like docx_img_1
-    if (/^__IMG__\S+__$/.test(line)) {
-      const key = line.replace(/^__IMG__/, '').replace(/__$/, '');
-      imageKeys.push(key);
-      // Embed in question text regardless (image may appear alongside or after options)
-      questionLines.push(line);
-      continue;
+    const imgMatches = line.match(/['"]?__IMG__(\S+?)__['"]?/g);
+    if (imgMatches) {
+      imgMatches.forEach(m => {
+        const k = m.replace(/['"]?__IMG__/, '').replace(/__['"]?/, '');
+        if (k && !imageKeys.includes(k)) imageKeys.push(k);
+      });
+      // If line only contains the image placeholder, don't pollute questionLines
+      if (/^['"]?__IMG__\S+?__['"]?$/.test(line)) {
+        continue;
+      }
     }
 
     // ── Answer indicator ──────────────────────────────────────────
@@ -436,9 +440,8 @@ function parseBlock(blockText, idx) {
       if (key === '2') key = 'B';
       if (key === '3') key = 'C';
       if (key === '4') key = 'D';
-      const val = optM[2].trim();
-      if (['A', 'B', 'C', 'D'].includes(key) && val) {
-        // Append if already has value (shouldn't normally happen)
+      const val = (optM[2] || '').trim();
+      if (['A', 'B', 'C', 'D'].includes(key)) {
         optionMap[key] = optionMap[key] ? optionMap[key] + ' ' + val : val;
         seenOptions = true;
         continue;
@@ -475,10 +478,34 @@ function parseBlock(blockText, idx) {
     }
   }
 
+  // Resolve option images: if an option value has __IMG__key__ or is an image placeholder
+  ['A', 'B', 'C', 'D'].forEach(opt => {
+    let optVal = optionMap[opt] || '';
+    const optImgMatch = optVal.match(/['"]?__IMG__(\S+?)__['"]?/);
+    if (optImgMatch) {
+      const k = optImgMatch[1];
+      const src = (images && images[k]) || (getExtractedImages()[k]);
+      if (src) {
+        optVal = optVal.replace(optImgMatch[0], src).trim();
+      }
+    }
+    optionMap[opt] = optVal;
+  });
+
   // Build question text
-  const questionText = questionLines.join('\n').trim();
-  if (questionText.length < 3 && imageKeys.length === 0) return null;
-  if (questionText.length < 3) return null;   // must have text
+  let questionText = questionLines.join('\n').trim();
+  // Strip raw __IMG__ tokens from questionText to avoid showing raw text
+  let cleanedQuestionText = questionText.replace(/['"]?__IMG__\S+?__['"]?/g, '').trim();
+
+  // Primary image
+  const primaryImgKey = imageKeys[0] || '';
+  const primaryImgSrc = (images && primaryImgKey && images[primaryImgKey]) || (getExtractedImages()[primaryImgKey]) || '';
+
+  if (!cleanedQuestionText && primaryImgSrc) {
+    cleanedQuestionText = `Look at the given diagram and choose the correct option:`;
+  }
+
+  if (cleanedQuestionText.length < 2 && !primaryImgSrc) return null;
 
   // Detect correct answer
   let correctOption = 'A';
@@ -501,18 +528,21 @@ function parseBlock(blockText, idx) {
 
   return {
     id: Date.now() + idx * 1000 + Math.floor(Math.random() * 999),
-    question_text: questionText,
+    question_text: cleanedQuestionText || questionText,
     option_a: optionMap['A'] || '',
     option_b: optionMap['B'] || '',
     option_c: optionMap['C'] || '',
     option_d: optionMap['D'] || '',
     correct_option: correctOption,
     explanation,
-    difficulty: detectDifficulty(questionText),
+    difficulty: detectDifficulty(cleanedQuestionText || questionText),
     marks: 1.0,
     negative_marks: 0.25,
     status: 'active',
-    question_image_keys: imageKeys    // which images belong to this question
+    question_image: primaryImgSrc,
+    image_url: primaryImgSrc,
+    question_image_keys: imageKeys,
+    _imgStore: images || {}
   };
 }
 

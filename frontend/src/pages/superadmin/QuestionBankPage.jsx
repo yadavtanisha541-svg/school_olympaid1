@@ -69,7 +69,8 @@ export const QuestionBankPage = () => {
     marks: 1.00,
     negative_marks: 0.25,
     explanation: '',
-    status: 'active'
+    status: 'active',
+    question_image: ''
   });
 
   // Import State
@@ -136,7 +137,8 @@ export const QuestionBankPage = () => {
       marks: 1.00,
       negative_marks: 0.25,
       explanation: '',
-      status: 'active'
+      status: 'active',
+      question_image: ''
     });
     setViewMode('create');
   };
@@ -157,7 +159,8 @@ export const QuestionBankPage = () => {
       marks: parseFloat(q.marks) || 1.00,
       negative_marks: parseFloat(q.negative_marks) || 0.25,
       explanation: q.explanation || '',
-      status: q.status || 'active'
+      status: q.status || 'active',
+      question_image: q.question_image || q.image_url || ''
     });
     setViewMode('edit');
   };
@@ -476,6 +479,38 @@ export const QuestionBankPage = () => {
                 placeholder="Enter the complete question problem statement here..."
                 className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed"
               />
+            </div>
+
+            {/* Diagram / Image Preview and URL */}
+            <div className="mt-4">
+              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                Question Diagram / Image (Optional)
+              </label>
+              {qForm.question_image ? (
+                <div className="relative inline-block border border-indigo-200 rounded-2xl p-2 bg-slate-50 shadow-xs">
+                  <img
+                    src={qForm.question_image}
+                    alt="Diagram Preview"
+                    className="max-h-48 rounded-xl object-contain bg-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setQForm({ ...qForm, question_image: '' })}
+                    className="absolute top-3 right-3 w-6 h-6 bg-rose-600 text-white rounded-full text-xs font-bold flex items-center justify-center hover:bg-rose-700 shadow-md cursor-pointer"
+                    title="Remove Image"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <input
+                  type="text"
+                  value={qForm.question_image || ''}
+                  onChange={(e) => setQForm({ ...qForm, question_image: e.target.value })}
+                  placeholder="Paste image URL or data:image URL..."
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              )}
             </div>
           </div>
 
@@ -805,11 +840,23 @@ export const QuestionBankPage = () => {
                     {q.question_text}
                   </h3>
 
+                  {/* Question Diagram / Image */}
+                  {(q.question_image || q.image_url) && (
+                    <div className="my-3">
+                      <img
+                        src={q.question_image || q.image_url}
+                        alt="Question Diagram"
+                        className="max-h-56 max-w-full rounded-2xl border border-indigo-200/80 shadow-xs object-contain bg-white p-1"
+                      />
+                    </div>
+                  )}
+
                   {/* 4 Options Grid Preview */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-xs">
                     {['A', 'B', 'C', 'D'].map((opt) => {
                       const text = q[`option_${(opt || '').toString().toLowerCase()}`];
                       const isCorrect = q.correct_option === opt;
+                      const isImgOpt = typeof text === 'string' && (text.startsWith('data:image') || text.includes('http'));
                       return (
                         <div
                           key={opt}
@@ -820,13 +867,19 @@ export const QuestionBankPage = () => {
                           }`}
                         >
                           <span
-                            className={`w-5 h-5 rounded-md flex items-center justify-center font-bold text-[10px] ${
+                            className={`w-5 h-5 rounded-md flex items-center justify-center font-bold text-[10px] shrink-0 ${
                               isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'
                             }`}
                           >
                             {opt}
                           </span>
-                          <span className="truncate">{text || '—'}</span>
+                          <div className="truncate flex-1">
+                            {isImgOpt ? (
+                              <img src={text} alt={`Option ${opt}`} className="max-h-12 max-w-full object-contain rounded-md border border-slate-200 bg-white" />
+                            ) : (
+                              <span>{text || '—'}</span>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
