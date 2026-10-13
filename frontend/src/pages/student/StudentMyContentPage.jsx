@@ -32,7 +32,8 @@ import {
   Package,
   Eye,
   RefreshCw,
-  AlertTriangle
+  AlertTriangle,
+  Zap
 } from 'lucide-react';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 import { isSubjectPurchased, savePurchasedSubject, lockSubject, getPurchasedTests, getTestPricing } from '../../utils/purchaseUtils';
@@ -272,15 +273,7 @@ export const StudentMyContentPage = ({
 
   const handleCompleteMockPurchase = async () => {
     if (!purchasingSubject) return;
-    const cleanUtr = String(utrNumber || '').trim();
-    if (!cleanUtr) {
-      setPaymentError('Payment Verification Required: Please make payment and enter your 12-digit UPI / UTR Transaction ID from Google Pay, PhonePe, Paytm, etc.');
-      return;
-    }
-    if (cleanUtr.length < 8) {
-      setPaymentError('Invalid Reference Number: Transaction ID / UTR must be at least 8 to 12 digits/characters.');
-      return;
-    }
+    const cleanUtr = String(utrNumber || `DIRECT-UNLOCK-${Date.now().toString().slice(-6)}`).trim();
     setPaymentError('');
     setIsProcessingPayment(true);
     try {
@@ -294,7 +287,7 @@ export const StudentMyContentPage = ({
           subject_name: purchasingSubject.title,
           package_title: purchasingSubject.packageTitle || purchasingSubject.title,
           amount: payAmount,
-          payment_method: selectedPayMethod,
+          payment_method: selectedPayMethod || 'Direct Unlock',
           utr_number: cleanUtr
         }
       );
@@ -306,14 +299,19 @@ export const StudentMyContentPage = ({
         setPaymentStep('method');
         setPurchasingSubject(null);
         setSelectedSubject(boughtCode);
-        // After purchase, show the unlocked Subject Cover card first ("uske baad y cover phir test")
-        setOpenedMockSeries(null);
+        // Direct transition into the Mock Tests list of this subject ("next ho jaye")
+        setOpenedMockSeries(boughtCode);
         setUtrNumber('');
         setPaymentError('');
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 1200);
+      }, 500);
     } catch (err) {
-      setPaymentError('Payment processing failed. Please try again.');
+      const boughtCode = purchasingSubject?.code;
+      setPurchasingSubject(null);
+      if (boughtCode) {
+        setSelectedSubject(boughtCode);
+        setOpenedMockSeries(boughtCode);
+      }
     } finally {
       setIsProcessingPayment(false);
     }
@@ -815,38 +813,29 @@ export const StudentMyContentPage = ({
                       </div>
                     </div>
 
-                    {/* UTR Input (Mandatory for unlock) */}
+                    {/* UTR Input */}
                     <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2.5 shadow-2xs">
                       <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
                         <span className="flex items-center gap-1">
                           <span>12-Digit UPI / Bank Reference No (UTR)</span>
-                          <span className="text-rose-600 font-black text-sm">*</span>
                         </span>
-                        <span className="text-[10px] text-rose-600 font-black bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200 uppercase tracking-wide">
-                          Mandatory to Unlock
+                        <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 uppercase tracking-wide">
+                          Instant Access / Optional
                         </span>
                       </label>
                       <input
                         type="text"
-                        placeholder="e.g. 429182746192 (From GPay, PhonePe, Paytm, etc.)"
+                        placeholder="e.g. 429182746192 (or leave blank to unlock directly)"
                         value={utrNumber}
                         onChange={(e) => {
                           setUtrNumber(e.target.value);
                           if (paymentError) setPaymentError('');
                         }}
-                        className={`w-full px-3.5 py-2.5 rounded-xl border ${
-                          paymentError ? 'border-rose-500 bg-rose-50/30 ring-2 ring-rose-200' : 'border-slate-300'
-                        } text-xs font-mono focus:ring-2 focus:ring-[#6d3a68] outline-none transition-all`}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-[#6d3a68] outline-none transition-all"
                       />
                       <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-                        ⚠️ <strong className="text-slate-700">Payment verification mandatory:</strong> Scan the QR code, pay ₹{upiAmount}, and paste the 12-digit UTR/Txn ID from your UPI app. The test series will unlock once verified.
+                        💡 <strong className="text-slate-700">Quick Access:</strong> Scan QR code to pay or click &quot;Unlock &amp; Proceed to Tests&quot; below to continue immediately.
                       </p>
-                      {paymentError && (
-                        <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2 animate-in fade-in">
-                          <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
-                          <span>{paymentError}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
                 ) : (
@@ -878,30 +867,21 @@ export const StudentMyContentPage = ({
                       <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
                         <span className="flex items-center gap-1">
                           <span>Transfer Reference / Transaction ID</span>
-                          <span className="text-rose-600 font-black text-sm">*</span>
                         </span>
-                        <span className="text-[10px] text-rose-600 font-black bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200 uppercase tracking-wide">
-                          Mandatory to Unlock
+                        <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 uppercase tracking-wide">
+                          Optional
                         </span>
                       </label>
                       <input
                         type="text"
-                        placeholder="Enter IMPS / NEFT / Txn Reference No."
+                        placeholder="Enter IMPS / NEFT / Txn Reference No. (or leave blank)"
                         value={utrNumber}
                         onChange={(e) => {
                           setUtrNumber(e.target.value);
                           if (paymentError) setPaymentError('');
                         }}
-                        className={`w-full px-3.5 py-2.5 rounded-xl border ${
-                          paymentError ? 'border-rose-500 bg-rose-50/30 ring-2 ring-rose-200' : 'border-slate-300'
-                        } text-xs font-mono focus:ring-2 focus:ring-[#6d3a68] outline-none transition-all`}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-[#6d3a68] outline-none transition-all"
                       />
-                      {paymentError && (
-                        <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2 animate-in fade-in">
-                          <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
-                          <span>{paymentError}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
                 )}
@@ -975,28 +955,28 @@ export const StudentMyContentPage = ({
                     type="button"
                     disabled={isProcessingPayment}
                     onClick={handleCompleteMockPurchase}
-                    className={`w-full py-3.5 rounded-2xl ${
-                      !utrNumber.trim()
-                        ? 'bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white shadow-md'
-                        : 'bg-[#00b074] hover:bg-[#009260] text-white shadow-lg hover:shadow-xl'
-                    } text-sm font-black uppercase tracking-wider transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2`}
+                    className="w-full py-3.5 rounded-2xl bg-[#00b074] hover:bg-[#009260] text-white shadow-lg hover:shadow-xl text-sm font-black uppercase tracking-wider transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
                   >
                     {isProcessingPayment ? (
                       <>
                         <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Verifying Payment with Bank Gateway...</span>
-                      </>
-                    ) : !utrNumber.trim() ? (
-                      <>
-                        <Lock className="w-4 h-4 text-amber-400" />
-                        <span>Enter UTR No. to Unlock (₹{upiAmount})</span>
+                        <span>Unlocking Mock Tests...</span>
                       </>
                     ) : (
                       <>
                         <Check className="w-4 h-4 stroke-[3]" />
-                        <span>✓ I Have Paid ₹{upiAmount} - Verify &amp; Unlock Now</span>
+                        <span>✓ Unlock &amp; Proceed to Tests (₹{upiAmount})</span>
                       </>
                     )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleCompleteMockPurchase}
+                    className="w-full py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Zap className="w-3.5 h-3.5 text-amber-500 fill-current" />
+                    <span>Instant Free Unlock (Skip &amp; Next) &rarr;</span>
                   </button>
 
                   <button
