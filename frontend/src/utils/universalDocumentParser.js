@@ -285,7 +285,9 @@ function parseExamText(raw) {
   const blocks = splitIntoQuestionBlocks(text);
   if (blocks.length === 0) return [];
 
-  return blocks.map((block, i) => parseBlock(block, i)).filter(Boolean);
+  return blocks
+    .map((block, i) => parseBlock(block, i))
+    .filter(q => q && (q.option_a || q.option_b || q.option_c || q.option_d)); // skip header-only blocks with no options
 }
 
 // ─── Split text into individual question blocks ───────────────────────────────
@@ -322,8 +324,11 @@ function splitIntoQuestionBlocks(text) {
       ''
     );
 
+  let foundFirstQuestion = false; // ignore everything before Q1 (title, section headers)
+
   for (const line of lines) {
     if (isQStart(line)) {
+      foundFirstQuestion = true;
       if (current.length > 0) {
         const b = current.join('\n').trim();
         if (b.length > 3) blocks.push(b);
@@ -331,7 +336,11 @@ function splitIntoQuestionBlocks(text) {
       const stripped = stripPrefix(line);
       current = stripped ? [stripped] : [];
     } else {
-      current.push(line);
+      // Only collect lines after we've seen at least one question number
+      if (foundFirstQuestion) {
+        current.push(line);
+      }
+      // else: skip — it's title / section header / instructions before Q1
     }
   }
 
