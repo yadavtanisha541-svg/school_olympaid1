@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 import { getTestPricing } from '../../utils/purchaseUtils';
+import { getTopicsForSubject } from '../../data/subjectTopics';
 import {
   ShoppingBag,
   Package,
@@ -1297,41 +1298,88 @@ export const SuperAdminPackagesManager = () => {
                   <label className="block text-xs font-black text-slate-700 mb-1.5">
                     Exam Sections (Shown in Question Studio &amp; Exam Header)
                   </label>
-                  <div className="flex flex-wrap gap-2 items-center p-3 rounded-2xl bg-slate-50 border border-slate-200">
-                    {paperSections.map((sec, sIdx) => (
-                      <span
-                        key={sIdx}
-                        className="px-3 py-1.5 rounded-xl bg-purple-100 text-[#4e2a4a] border border-purple-300 text-xs font-black flex items-center gap-2"
-                      >
-                        {sec}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div className="flex flex-wrap gap-2 items-center">
+                      {paperSections.map((sec, sIdx) => (
+                        <span
+                          key={sIdx}
+                          className="px-3 py-1.5 rounded-xl bg-purple-100 text-[#4e2a4a] border border-purple-300 text-xs font-black flex items-center gap-2"
+                        >
+                          {sec}
+                          <button
+                            type="button"
+                            onClick={() => setPaperSections(paperSections.filter((_, i) => i !== sIdx))}
+                            className="text-slate-400 hover:text-red-600 cursor-pointer font-black"
+                          >
+                            &times;
+                          </button>
+                        </span>
+                      ))}
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="text"
+                          placeholder="+ Add new section"
+                          value={newSectionInput}
+                          onChange={(e) => setNewSectionInput(e.target.value)}
+                          className="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-semibold outline-none w-44 bg-white"
+                        />
                         <button
                           type="button"
-                          onClick={() => setPaperSections(paperSections.filter((_, i) => i !== sIdx))}
-                          className="text-slate-400 hover:text-red-600 cursor-pointer font-black"
+                          onClick={() => {
+                            if (!newSectionInput.trim()) return;
+                            setPaperSections([...paperSections, newSectionInput.trim()]);
+                            setNewSectionInput('');
+                          }}
+                          className="px-3 py-1.5 bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-[#3d203a]"
                         >
-                          &times;
+                          Add
                         </button>
-                      </span>
-                    ))}
-                    <div className="flex items-center gap-1.5">
-                      <input
-                        type="text"
-                        placeholder="+ Add new section"
-                        value={newSectionInput}
-                        onChange={(e) => setNewSectionInput(e.target.value)}
-                        className="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-semibold outline-none w-44 bg-white"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!newSectionInput.trim()) return;
-                          setPaperSections([...paperSections, newSectionInput.trim()]);
-                          setNewSectionInput('');
-                        }}
-                        className="px-3 py-1.5 bg-gradient-to-r from-[#1e1b4b] via-[#3b0764] to-[#1e3a8a] text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-[#3d203a]"
-                      >
-                        Add
-                      </button>
+                      </div>
+                    </div>
+
+                    {/* Quick Subject Syllabus Topics (Identical to Student Panel) */}
+                    <div className="pt-2.5 border-t border-slate-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[11px] font-black text-purple-900 flex items-center gap-1.5">
+                          <BookOpen className="w-3.5 h-3.5 text-purple-700" />
+                          <span>Curriculum Subject Topics (Click to add):</span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const topics = getTopicsForSubject(paperSubjectCode);
+                            setPaperSections(Array.from(new Set([...paperSections, ...topics])));
+                          }}
+                          className="text-[10px] font-black text-purple-700 hover:underline cursor-pointer"
+                        >
+                          + Add All ({getTopicsForSubject(paperSubjectCode).length} Topics)
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {getTopicsForSubject(paperSubjectCode).map((t) => {
+                          const isAlreadyAdded = paperSections.includes(t);
+                          return (
+                            <button
+                              key={t}
+                              type="button"
+                              onClick={() => {
+                                if (!isAlreadyAdded) {
+                                  setPaperSections([...paperSections, t]);
+                                }
+                              }}
+                              disabled={isAlreadyAdded}
+                              className={`px-2.5 py-1 rounded-xl text-xs font-bold border transition-all flex items-center gap-1 cursor-pointer ${
+                                isAlreadyAdded
+                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300 opacity-80 cursor-default'
+                                  : 'bg-white hover:bg-purple-100 text-slate-700 border-slate-300 shadow-2xs hover:border-purple-400'
+                              }`}
+                            >
+                              <span>{isAlreadyAdded ? '✓' : '+'}</span>
+                              <span>{t}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1472,18 +1520,34 @@ export const SuperAdminPackagesManager = () => {
                   {/* Section & Marks row */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-xs font-black text-slate-700 mb-1">Section</label>
+                      <label className="block text-xs font-black text-slate-700 mb-1">Section / Topic</label>
                       <select
-                        value={activeQ.section || paperSections[0]}
+                        value={activeQ.section || paperSections[0] || getTopicsForSubject(paperSubjectCode)[0] || ''}
                         onChange={(e) => handleUpdateQuestion(activeQuestionIndex, 'section', e.target.value)}
                         className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold bg-slate-50 cursor-pointer"
                       >
-                        {paperSections.map((sec) => (
+                        {Array.from(new Set([...paperSections, ...getTopicsForSubject(paperSubjectCode)])).map((sec) => (
                           <option key={sec} value={sec}>
                             {sec}
                           </option>
                         ))}
                       </select>
+                      <div className="flex items-center gap-1 overflow-x-auto py-1 mt-1">
+                        {getTopicsForSubject(paperSubjectCode).slice(0, 3).map((t) => (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => handleUpdateQuestion(activeQuestionIndex, 'section', t)}
+                            className={`text-[9px] px-1.5 py-0.5 rounded border whitespace-nowrap cursor-pointer transition-all ${
+                              activeQ.section === t
+                                ? 'bg-purple-600 text-white border-purple-600 font-bold'
+                                : 'bg-white text-slate-600 border-slate-200 hover:bg-purple-50'
+                            }`}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     <div>
@@ -1670,6 +1734,37 @@ export const SuperAdminPackagesManager = () => {
                 </div>
               </div>
 
+              {/* Subject Syllabus Topic Filter / Tagging */}
+              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-50 via-pink-50/40 to-amber-50/40 border border-purple-200/80 space-y-2">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-purple-700" />
+                    <span className="text-xs font-black text-purple-950 uppercase tracking-wider">
+                      Subject Topics ({SUBJECTS_LIST.find(s => s.code === paperSubjectCode)?.label || paperSubjectCode}):
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-purple-700 font-bold bg-white px-2 py-0.5 rounded-full border border-purple-200">
+                    Exact from Student Panel
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1.5 pt-0.5">
+                  {getTopicsForSubject(paperSubjectCode).map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => {
+                        const topicHeader = `\nSection: ${t}\n`;
+                        setBulkQuestionsInput(prev => (prev ? prev + topicHeader : `Section: ${t}\n`));
+                      }}
+                      className="px-2.5 py-1 rounded-xl text-xs font-bold bg-white hover:bg-purple-100 text-purple-900 border border-purple-200 shadow-2xs hover:border-purple-300 transition-all cursor-pointer flex items-center gap-1"
+                      title={`Click to insert "${t}" section header into text`}
+                    >
+                      <span className="text-[10px] text-purple-600 font-black">+</span>
+                      <span>{t}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               {/* Textarea */}
               <div>

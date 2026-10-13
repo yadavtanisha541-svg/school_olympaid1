@@ -43,6 +43,7 @@ import { apiClient } from '../../api/client';
 import { getTestPricing, saveTestPricing } from '../../utils/purchaseUtils';
 import { extractTextFromFile } from '../../utils/universalDocumentParser';
 import { UniversalQuestionImportModal } from '../../components/common/UniversalQuestionImportModal';
+import { getTopicsForSubject } from '../../data/subjectTopics';
 
 const SUBJECT_OPTIONS = [
   { id: 'math', name: 'IMO (Mathematics)', code: 'IMO', color: '#d97706', icon: '📐' },
@@ -76,7 +77,8 @@ const createBlankQuestion = () => ({
   options: ['', '', '', ''],
   correct: 0,
   explanation: '',
-  marks: 1
+  marks: 1,
+  chapter: ''
 });
 
 // Sample Bulk Template for easy copy-paste / instant loading
@@ -433,6 +435,8 @@ export const TestGeneratorAdminManager = () => {
   const [paperSubject, setPaperSubject] = useState('math');
   const [paperDuration, setPaperDuration] = useState(60);
   const [paperDifficulty, setPaperDifficulty] = useState('Standard');
+  const [selectedPaperChapters, setSelectedPaperChapters] = useState(() => getTopicsForSubject('math'));
+  const [bulkTargetTopic, setBulkTargetTopic] = useState('');
   const [questionsList, setQuestionsList] = useState([]);
 
   // Load published papers directly from API / Local Storage
@@ -491,10 +495,13 @@ export const TestGeneratorAdminManager = () => {
     setExamYear('2024');
     setPaperClass('Class 6');
     setPaperSubject('math');
+    setSelectedPaperChapters(getTopicsForSubject('math'));
     setPaperDuration(cat === 'generator' ? 15 : 60);
     setPaperDifficulty('Standard');
     setPaperTitle(generateTitle(cat, 'Class 6', 'math', '2024'));
-    setQuestionsList([createBlankQuestion()]);
+    const initialBlank = createBlankQuestion();
+    initialBlank.chapter = getTopicsForSubject('math')[0] || '';
+    setQuestionsList([initialBlank]);
     setShowCreateModal(true);
   };
 
@@ -508,6 +515,8 @@ export const TestGeneratorAdminManager = () => {
   // Change subject in modal
   const handleSubjectChangeInModal = (subKey) => {
     setPaperSubject(subKey);
+    const newTopics = getTopicsForSubject(subKey);
+    setSelectedPaperChapters(newTopics);
     setPaperTitle(generateTitle(paperCategory, paperClass, subKey, examYear));
   };
 
@@ -525,9 +534,11 @@ export const TestGeneratorAdminManager = () => {
 
   // Add blank question
   const handleAddQuestion = () => {
+    const newQ = createBlankQuestion();
+    newQ.chapter = selectedPaperChapters[0] || getTopicsForSubject(paperSubject)[0] || '';
     setQuestionsList([
       ...questionsList,
-      createBlankQuestion()
+      newQ
     ]);
   };
 
@@ -613,6 +624,8 @@ export const TestGeneratorAdminManager = () => {
       total_questions: questionsList.length,
       total_marks: totalMarks,
       difficulty: paperDifficulty,
+      chapters: selectedPaperChapters,
+      topics: selectedPaperChapters,
       questions: questionsList,
       created_at: new Date().toISOString()
     };
@@ -696,10 +709,17 @@ export const TestGeneratorAdminManager = () => {
   };
 
   const handleApplyBulkImport = (mode = 'append') => {
-    const parsed = parseBulkQuestions(bulkInputText);
+    let parsed = parseBulkQuestions(bulkInputText);
     if (parsed.length === 0) {
       alert('No valid questions could be detected. Please check format or load sample template.');
       return;
+    }
+
+    if (bulkTargetTopic) {
+      parsed = parsed.map(q => ({
+        ...q,
+        chapter: q.chapter || bulkTargetTopic
+      }));
     }
 
     if (mode === 'replace') {
@@ -712,6 +732,7 @@ export const TestGeneratorAdminManager = () => {
 
     setShowBulkModal(false);
     setBulkInputText('');
+    setBulkTargetTopic('');
   };
 
   // Universal Word / PDF / CSV Importer Handler
@@ -1241,6 +1262,74 @@ export const TestGeneratorAdminManager = () => {
               </div>
             </div>
 
+            {/* Section 2.5: Subject Topics & Syllabus Chapters (Exact Match to Student Panel) */}
+            <div className="bg-gradient-to-r from-purple-50/80 via-pink-50/50 to-amber-50/50 rounded-xl border-2 border-purple-200/80 p-5 space-y-3.5 shadow-2xs">
+              <div className="flex items-center justify-between flex-wrap gap-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-[#4e2a4a] text-white flex items-center justify-center font-black text-xs shadow-2xs">
+                    <BookOpen className="w-4 h-4 text-amber-300" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <span>Curriculum Topics &amp; Chapters</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-900 border border-purple-300">
+                        {selectedPaperChapters.length} of {getTopicsForSubject(paperSubject).length} Selected
+                      </span>
+                    </h3>
+                    <p className="text-[11px] text-slate-500 font-medium">
+                      Exact topics synchronized with Student Panel for {SUBJECT_OPTIONS.find(s => s.id === paperSubject)?.name || paperSubject}.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPaperChapters(getTopicsForSubject(paperSubject))}
+                    className="px-2.5 py-1 rounded-lg bg-white hover:bg-purple-100 text-purple-900 font-black text-[11px] border border-purple-200 shadow-2xs cursor-pointer transition-all"
+                  >
+                    ✓ Select All ({getTopicsForSubject(paperSubject).length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPaperChapters([])}
+                    className="px-2.5 py-1 rounded-lg bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-700 font-bold text-[11px] border border-slate-200 cursor-pointer transition-all"
+                  >
+                    ✕ Clear
+                  </button>
+                </div>
+              </div>
+
+              {/* Topics Pills Bar - Identical to Student Dashboard */}
+              <div className="flex flex-wrap gap-2 pt-1">
+                {getTopicsForSubject(paperSubject).map((topic) => {
+                  const isSelected = selectedPaperChapters.includes(topic);
+                  return (
+                    <button
+                      key={topic}
+                      type="button"
+                      onClick={() => {
+                        if (isSelected) {
+                          setSelectedPaperChapters(selectedPaperChapters.filter(t => t !== topic));
+                        } else {
+                          setSelectedPaperChapters([...selectedPaperChapters, topic]);
+                        }
+                      }}
+                      className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
+                        isSelected
+                          ? 'bg-white text-purple-950 border-purple-400 ring-2 ring-purple-400/30 font-black scale-102'
+                          : 'bg-white/80 text-slate-600 border-slate-200 hover:bg-white hover:text-slate-900'
+                      }`}
+                    >
+                      <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-purple-600' : 'bg-slate-300'}`} />
+                      <span>{topic}</span>
+                      {isSelected && <span className="text-[10px] text-purple-600 font-black">✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Section 3: Question Builder with Bulk Tool */}
             <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 space-y-6 shadow-2xs">
               <div className="flex items-center justify-between flex-wrap gap-4 pb-4 border-b border-slate-100">
@@ -1342,6 +1431,42 @@ export const TestGeneratorAdminManager = () => {
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
+                      </div>
+
+                      {/* Question Chapter / Topic Selector */}
+                      <div className="pl-8 flex flex-col sm:flex-row sm:items-center gap-2">
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <Tag className="w-3.5 h-3.5 text-purple-600" />
+                          <span className="text-[11px] font-black text-slate-700">Topic / Chapter:</span>
+                        </div>
+                        <div className="flex-1 flex items-center gap-2 flex-wrap">
+                          <select
+                            value={qItem.chapter || ''}
+                            onChange={(e) => handleUpdateQuestion(qIdx, 'chapter', e.target.value)}
+                            className="px-3 py-1.5 bg-white rounded-lg border border-slate-300 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-400 max-w-xs cursor-pointer"
+                          >
+                            <option value="">-- Choose Topic --</option>
+                            {getTopicsForSubject(paperSubject).map((t) => (
+                              <option key={t} value={t}>{t}</option>
+                            ))}
+                          </select>
+                          <div className="flex items-center gap-1 overflow-x-auto py-0.5 max-w-full">
+                            {getTopicsForSubject(paperSubject).slice(0, 3).map((t) => (
+                              <button
+                                key={t}
+                                type="button"
+                                onClick={() => handleUpdateQuestion(qIdx, 'chapter', t)}
+                                className={`text-[10px] px-2 py-0.5 rounded-full border transition-all cursor-pointer whitespace-nowrap ${
+                                  qItem.chapter === t
+                                    ? 'bg-purple-100 text-purple-900 border-purple-400 font-bold'
+                                    : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
+                                }`}
+                              >
+                                {t}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
 
                       {/* Question Diagram / Image */}
@@ -1554,6 +1679,40 @@ export const TestGeneratorAdminManager = () => {
                   <span className="bg-white px-2 py-0.5 rounded border border-amber-200">✓ Plain Questions (without options)</span>
                   <span className="bg-white px-2 py-0.5 rounded border border-amber-200">✓ JSON Array</span>
                   <span className="bg-white px-2 py-0.5 rounded border border-amber-200">✓ CSV</span>
+                </div>
+
+                {/* Optional Topic Tagging for this batch */}
+                <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-purple-900">
+                      🎯 Assign All Imported Questions to Topic:
+                    </span>
+                    {bulkTargetTopic && (
+                      <button
+                        type="button"
+                        onClick={() => setBulkTargetTopic('')}
+                        className="text-[10px] text-purple-700 hover:underline font-bold"
+                      >
+                        Clear Topic
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {getTopicsForSubject(paperSubject).map((topic) => (
+                      <button
+                        key={topic}
+                        type="button"
+                        onClick={() => setBulkTargetTopic(bulkTargetTopic === topic ? '' : topic)}
+                        className={`text-[11px] px-2.5 py-1 rounded-lg border font-bold transition-all cursor-pointer ${
+                          bulkTargetTopic === topic
+                            ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
+                            : 'bg-white text-slate-700 border-slate-200 hover:border-purple-300'
+                        }`}
+                      >
+                        {topic}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <textarea

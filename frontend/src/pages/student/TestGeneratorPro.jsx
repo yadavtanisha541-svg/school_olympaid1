@@ -40,73 +40,7 @@ import {
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 import { DetailedSolutionsPage } from './DetailedSolutionsPage';
 import { getTestPricing } from '../../utils/purchaseUtils';
-
-const CHAPTERS_BY_SUBJECT = {
-  math: [
-    'Number Sense and Numeration',
-    'Computation Operations (Add, Sub, Mul, Div)',
-    'Fractions and Decimals',
-    'Geometry and Spatial Understanding',
-    'Perimeter, Area and Volume',
-    'Data Handling and Graphical Representation',
-    'Algebraic Expressions and Equations',
-    'Ratio, Proportion and Unitary Method',
-    'Everyday Mathematics Word Problems',
-    'Achievers Section (HOTS Questions)'
-  ],
-  science: [
-    'Plants and Animal Kingdom',
-    'Human Body Systems and Nutrition',
-    'Matter, Materials and States of Matter',
-    'Force, Work, Energy and Simple Machines',
-    'Light, Shadows and Reflections',
-    'Electricity, Circuits and Magnetism',
-    'Air, Water and Our Environment',
-    'Natural Resources and Conservation',
-    'Earth, Universe and Space Sciences',
-    'Scientific Inquiry & HOTS'
-  ],
-  digital: [
-    'Fundamentals of Computer & OS',
-    'Hardware, Storage & Memory Devices',
-    'Software & Application Tools',
-    'Internet, Networking & Cyber Safety',
-    'MS Office Tools (Word, Excel, PowerPoint)',
-    'Algorithms, Flowcharts & AI Basics',
-    'Achievers Section (Advanced Computing)'
-  ],
-  english: [
-    'Nouns, Pronouns and Determiners',
-    'Verbs, Tenses and Modal Auxiliaries',
-    'Adjectives, Adverbs and Prepositions',
-    'Conjunctions and Sentence Structure',
-    'Active and Passive Voice',
-    'Direct and Indirect Speech',
-    'Vocabulary, Synonyms and Antonyms',
-    'Idioms, Proverbs and Phrasal Verbs',
-    'Reading Comprehension Passages',
-    'Spoken and Written Expression'
-  ],
-  gk: [
-    'Our Body and Health',
-    'Plants, Animals & Environment',
-    'India: States, Capitals & Culture',
-    'World Geography & Landmarks',
-    'Science and Technology Discoveries',
-    'Current National & International Affairs',
-    'Sports, Games & Awards',
-    'Life Skills & Quantitative Aptitude'
-  ],
-  hindi: [
-    'वर्ण विचार एवं वर्तनी शुद्धि',
-    'शब्द विचार (संज्ञा, सर्वनाम, विशेषण)',
-    'क्रिया, काल एवं कारक',
-    'संधि, समास, उपसर्ग एवं प्रत्यय',
-    'पर्यायवाची एवं विलोम शब्द',
-    'मुहावरे, लोकोक्तियाँ एवं वाक्य शुद्धि',
-    'अपठित गद्यांश एवं भाषा बोध'
-  ]
-};
+import { CHAPTERS_BY_SUBJECT } from '../../data/subjectTopics';
 
 const subjectsMap = {
   math: { name: 'IMO (Maths)', code: 'IMO', color: '#eab308', letter: 'M' },

@@ -46,6 +46,7 @@ import {
   getClassBenefits,
   getClassFAQs
 } from '../../data/olympiadClassData';
+import { getTopicsForSubject } from '../../data/subjectTopics';
 
 export const buildDefaultSubjectClassContent = (slug = 'math', clsName = 'Class 1') => {
   const meta = OLYMPIAD_SUBJECT_METADATA[slug] || OLYMPIAD_SUBJECT_METADATA.english;
@@ -761,6 +762,27 @@ export const AcademicStructure = ({ defaultTab = 'subjects', onNavigateTab }) =>
               </div>
 
               <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const stdTopics = getTopicsForSubject(subjectForm.code || subjectForm.slug || subjectForm.name || subjectForm.category);
+                    if (stdTopics.length > 0) {
+                      const formatted = stdTopics.map(t => ({
+                        name: t,
+                        description: 'Foundational Olympiad concepts, formula practice and competitive drills'
+                      }));
+                      setSubjectForm({
+                        ...subjectForm,
+                        topics: formatted
+                      });
+                    }
+                  }}
+                  className="text-xs font-bold bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 px-3 py-1 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                  title="Load exact topics from Student Panel"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                  <span>⚡ Sync Topics with Student Panel</span>
+                </button>
                 <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-200">
                   ✓ {subjectForm.topics?.length || 0} Total Topics
                 </span>
