@@ -104,6 +104,10 @@ export const AuthProvider = ({ children }) => {
       ? 'superadmin'
       : (normalizedRole === 'teacher' ? 'teacher' : 'student');
 
+    // 1. Super Admin always has full access to everything
+    if (roleKey === 'superadmin') return true;
+
+    // 2. Check if a customized role-permissions map exists in localStorage
     try {
       const savedMapStr = localStorage.getItem('olympiadhub_role_permissions_map_v2');
       if (savedMapStr) {
@@ -114,10 +118,36 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (e) {}
 
-    if (roleKey === 'superadmin') return true;
-    if (Array.isArray(user?.permissions)) {
-      return user.permissions.includes('all') || user.permissions.includes(permCode);
+    // 3. Check explicit user permissions array if non-empty
+    if (Array.isArray(user?.permissions) && user.permissions.length > 0) {
+      if (user.permissions.includes('all') || user.permissions.includes(permCode)) {
+        return true;
+      }
     }
+
+    // 4. Student role defaults: All student portal features must be accessible by default!
+    if (roleKey === 'student') {
+      // Disallow Super Admin and Teacher management tools by default
+      if (
+        (permCode.startsWith('manage_') && permCode !== 'manage_student_profile') ||
+        permCode.startsWith('audit_') ||
+        permCode.startsWith('publish_') ||
+        permCode === 'access_superadmin_dashboard'
+      ) {
+        return false;
+      }
+      // Everything else (student dashboard, mock tests, generator, history, analytics, solutions, etc.) is allowed
+      return true;
+    }
+
+    // 5. Teacher role defaults
+    if (roleKey === 'teacher') {
+      if (permCode.startsWith('manage_system_') || permCode.startsWith('manage_roles_') || permCode.startsWith('manage_payments_')) {
+        return false;
+      }
+      return true;
+    }
+
     return true;
   };
 
