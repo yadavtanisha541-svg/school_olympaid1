@@ -615,34 +615,7 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
 
         {/* Right: Quick actions, Light/Dark toggle, notifications, cart, logout */}
         <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
-          {/* Real-Time Cloud Sync Button & Status Badge */}
-          <div className="relative flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={handleSyncClick}
-              disabled={isSyncing}
-              className={`p-1.5 min-[360px]:p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs group active:scale-95 shrink-0 ${
-                isSyncing ? 'text-indigo-500 bg-indigo-50/50 border-indigo-200' : ''
-              } ${
-                theme === 'dark'
-                  ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-indigo-400 hover:text-indigo-300'
-                  : 'bg-white hover:bg-slate-50 border-slate-200 text-indigo-600 hover:text-indigo-800'
-              }`}
-              title="Real-Time Cloud Auto-Sync Active (Vercel ⇄ Localhost)"
-              aria-label="Sync Data"
-            >
-              <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${isSyncing ? 'animate-spin text-indigo-500' : 'transition-transform group-hover:rotate-180'}`} />
-              <span className="hidden xl:inline-flex items-center gap-1 text-[11px] font-black text-emerald-700 bg-emerald-50 border border-emerald-300/80 px-2 py-0.5 rounded-full">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Live Cloud Sync</span>
-              </span>
-            </button>
-            {syncToast && (
-              <div className="absolute top-full right-0 mt-2 px-3 py-1.5 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-lg whitespace-nowrap animate-in fade-in zoom-in z-50">
-                ✓ {syncToast}
-              </div>
-            )}
-          </div>
+
           {/* Light / Dark Mode Toggle Button */}
           <button
             type="button"

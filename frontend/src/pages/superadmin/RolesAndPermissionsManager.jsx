@@ -201,15 +201,6 @@ const DEFAULT_PERMISSIONS_CATALOG = [
     icon: Trophy
   },
   {
-    key: 'manage_certificates',
-    module: 'Super Admin: Certificates Manager',
-    name: 'Certificates Manager',
-    description: 'Batch generate digitally verified PDF merit certificates with official QR seals.',
-    studentDefault: false,
-    level: 'Advanced',
-    icon: Award
-  },
-  {
     key: 'audit_activity_logs',
     module: 'Super Admin: Audit Activity Logs',
     name: 'Audit Activity Logs',
