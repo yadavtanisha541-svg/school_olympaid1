@@ -19,7 +19,7 @@ export const syncManager = {
     // Listen to messages from Vercel bridge iframe
     window.addEventListener('message', (event) => {
       const origin = event.origin || '';
-      if (!origin.includes('school-olympaid1.vercel.app') && !origin.includes('localhost') && !origin.includes('127.0.0.1')) {
+      if (!origin.includes('vercel.app') && !origin.includes('localhost') && !origin.includes('127.0.0.1')) {
         return;
       }
 
@@ -87,9 +87,29 @@ export const syncManager = {
         const val = localStorage.getItem(key);
         if (val) {
           this.pushToVercel({ [key]: val });
+          return;
         }
       }
+      this.pushToVercel(this.getAllLocalData());
     });
+  },
+
+  getAllLocalData() {
+    const data = {};
+    if (typeof localStorage === 'undefined') return data;
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && (k.startsWith('olympiadhub_') || k.startsWith('admin_') || k.startsWith('mock_') || k === 'token' || k === 'user')) {
+        data[k] = localStorage.getItem(k);
+      }
+    }
+    return data;
+  },
+
+  syncAll() {
+    const localData = this.getAllLocalData();
+    this.pushToVercel(localData);
+    this.pullFromVercel();
   },
 
   pullFromVercel() {

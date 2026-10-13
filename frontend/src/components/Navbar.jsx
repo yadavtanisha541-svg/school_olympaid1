@@ -51,12 +51,12 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
 
   const handleSyncClick = () => {
     setIsSyncing(true);
-    syncManager.pullFromVercel();
+    syncManager.syncAll();
     setTimeout(() => {
       setIsSyncing(false);
-      setSyncToast('Vercel ⇄ Localhost Synced!');
+      setSyncToast('Vercel ⇄ Localhost Synced Successfully!');
       setTimeout(() => setSyncToast(''), 3000);
-    }, 1000);
+    }, 1200);
   };
 
   // Search Items definition tailored to user role

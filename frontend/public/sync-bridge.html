@@ -11,7 +11,7 @@
       const data = {};
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && (key.startsWith('olympiadhub_') || key.startsWith('admin_') || key === 'token' || key === 'user')) {
+        if (key && (key.startsWith('olympiadhub_') || key.startsWith('admin_') || key.startsWith('mock_') || key === 'token' || key === 'user')) {
           data[key] = localStorage.getItem(key);
         }
       }
@@ -20,10 +20,10 @@
 
     window.addEventListener('message', (event) => {
       const origin = event.origin || '';
-      // Allow localhost, 127.0.0.1, and vercel domains
+      // Allow localhost, 127.0.0.1, and all vercel.app domains
       const isAllowed = origin.includes('localhost') || 
                         origin.includes('127.0.0.1') || 
-                        origin.includes('school-olympaid1.vercel.app');
+                        origin.includes('vercel.app');
       if (!isAllowed) return;
 
       const { type, payload } = event.data || {};
