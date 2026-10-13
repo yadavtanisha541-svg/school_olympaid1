@@ -421,6 +421,7 @@ export const TestGeneratorAdminManager = () => {
 
   // Universal Word/PDF/CSV Importer Modal State
   const [showUniversalImportModal, setShowUniversalImportModal] = useState(false);
+  const [showPaperImportModal, setShowPaperImportModal] = useState(false);
 
   // Form State
   const [paperCategory, setPaperCategory] = useState('practice_test'); // 'practice_test' | 'generator'
@@ -750,6 +751,96 @@ export const TestGeneratorAdminManager = () => {
     }
 
     setShowUniversalImportModal(false);
+  };
+
+  // Import Questions directly into currently viewed paper (previewPaper)
+  const handleImportQuestionsIntoPreviewPaper = (imported) => {
+    if (!Array.isArray(imported) || imported.length === 0 || !previewPaper) return;
+
+    const formatted = imported.map((item, idx) => {
+      const qText = item.question_text || item.q || item.title || `Question ${idx + 1}`;
+      const opts = [
+        item.option_a || item.options?.[0] || 'Option A',
+        item.option_b || item.options?.[1] || 'Option B',
+        item.option_c || item.options?.[2] || 'Option C',
+        item.option_d || item.options?.[3] || 'Option D'
+      ];
+      let corr = 0;
+      if (typeof item.correct === 'number') {
+        corr = Math.max(0, Math.min(3, item.correct));
+      } else {
+        const letter = String(item.correct_option || item.answer || item.correct || 'A').toUpperCase().trim();
+        const idxLetter = ['A', 'B', 'C', 'D'].indexOf(letter);
+        if (idxLetter >= 0) corr = idxLetter;
+        else if (!isNaN(parseInt(letter))) corr = Math.max(0, Math.min(3, parseInt(letter) - 1));
+      }
+      return {
+        id: item.id || Date.now() + idx,
+        q: qText,
+        options: opts,
+        correct: corr,
+        correct_option: ['A', 'B', 'C', 'D'][corr] || 'A',
+        explanation: item.explanation || item.solution || '',
+        marks: Number(item.marks) || 1
+      };
+    });
+
+    const existingQuestions = Array.isArray(previewPaper.questions) ? previewPaper.questions : [];
+    const combinedQuestions = [...existingQuestions, ...formatted];
+
+    const updatedPaper = {
+      ...previewPaper,
+      questions: combinedQuestions,
+      total_questions: combinedQuestions.length,
+      total_marks: combinedQuestions.reduce((acc, q) => acc + (parseFloat(q.marks) || 1), 0)
+    };
+
+    // 1. Update preview state
+    setPreviewPaper(updatedPaper);
+
+    // 2. Update papers list state
+    setPapers((prev) => prev.map((p) => (p.id === updatedPaper.id ? updatedPaper : p)));
+
+    // 3. Persist in localStorage
+    try {
+      const localAdmin = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+      const updatedAdmin = localAdmin.map((p) => (p.id === updatedPaper.id ? updatedPaper : p));
+      localStorage.setItem('admin_generator_papers', JSON.stringify(updatedAdmin));
+
+      const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+      const updatedMock = mockDb.map((p) => (p.id === updatedPaper.id ? updatedPaper : p));
+      localStorage.setItem('mock_db_exam_papers', JSON.stringify(updatedMock));
+
+      const olympExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+      const updatedOlymp = olympExams.map((p) => (p.id === updatedPaper.id ? updatedPaper : p));
+      localStorage.setItem('olympiadhub_db_exams', JSON.stringify(updatedOlymp));
+
+      // Also save questions to Question Bank
+      const existingQs = JSON.parse(localStorage.getItem('olympiadhub_db_questions') || '[]');
+      const newBankQs = formatted.map((fq) => ({
+        id: fq.id,
+        question_text: fq.q,
+        option_a: fq.options[0],
+        option_b: fq.options[1],
+        option_c: fq.options[2],
+        option_d: fq.options[3],
+        correct_option: fq.correct_option,
+        marks: fq.marks,
+        explanation: fq.explanation,
+        status: 'active'
+      }));
+      localStorage.setItem('olympiadhub_db_questions', JSON.stringify([...existingQs, ...newBankQs]));
+    } catch (e) {
+      console.warn('Storage sync error:', e);
+    }
+
+    // 4. Dispatch events & Trigger Cloud + MySQL Sync
+    window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedPaper }));
+    window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+    syncManager.schedulePush();
+
+    // Close modal
+    setShowPaperImportModal(false);
   };
 
   // =========================================================================
@@ -1508,6 +1599,16 @@ export const TestGeneratorAdminManager = () => {
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 type="button"
+                onClick={() => setShowPaperImportModal(true)}
+                className="px-3.5 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 shadow-xs active:scale-95"
+                title="Import questions from Word (.docx), PDF (.pdf), CSV, or paste text into this paper"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>Import (Word / PDF)</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => handlePrintPaper(previewPaper, false)}
                 className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
                 title="Print candidate question paper only"
@@ -1568,6 +1669,15 @@ export const TestGeneratorAdminManager = () => {
               <span className="px-3 py-1 bg-amber-50 text-amber-800 rounded-lg">{previewPaper.subject_code || 'IMO'}</span>
               <span className="px-3 py-1 bg-sky-50 text-sky-700 rounded-lg">{previewPaper.duration_minutes || 60} Mins</span>
               <span className="px-3 py-1 bg-emerald-50 text-emerald-800 rounded-lg">{qCount} Questions</span>
+              <button
+                type="button"
+                onClick={() => setShowPaperImportModal(true)}
+                className="px-3 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-lg text-xs font-black transition-colors cursor-pointer flex items-center gap-1.5"
+                title="Import Word / PDF questions into this paper"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>+ Import Word / PDF</span>
+              </button>
             </div>
           </div>
 
@@ -1628,6 +1738,17 @@ export const TestGeneratorAdminManager = () => {
             )}
           </div>
         </div>
+
+        {/* Word / PDF / CSV Import Modal for Preview Paper */}
+        <UniversalQuestionImportModal
+          isOpen={showPaperImportModal}
+          onClose={() => setShowPaperImportModal(false)}
+          title={`Import Questions into "${previewPaper.title}"`}
+          subtitle="Upload Word (.docx), PDF (.pdf), CSV, or paste question text. Questions will be extracted and added directly into this paper."
+          targetClassId={previewPaper.class_name || previewPaper.class}
+          targetSubjectId={previewPaper.subject_code || previewPaper.subject_id}
+          onQuestionsImported={handleImportQuestionsIntoPreviewPaper}
+        />
       </div>
     );
   }
