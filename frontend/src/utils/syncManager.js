@@ -16,7 +16,7 @@ export const syncManager = {
   init() {
     if (typeof window === 'undefined') return;
 
-    // Listen to messages from Vercel bridge iframe
+    // Listen to messages from Vercel bridge iframe OR popup window
     window.addEventListener('message', (event) => {
       const origin = event.origin || '';
       if (!origin.includes('vercel.app') && !origin.includes('localhost') && !origin.includes('127.0.0.1')) {
@@ -32,7 +32,6 @@ export const syncManager = {
           Object.keys(data).forEach((key) => {
             const vercelVal = data[key];
             if (vercelVal !== null && vercelVal !== undefined) {
-              // Apply keys to localhost
               const localVal = localStorage.getItem(key);
               if (!localVal || localVal !== vercelVal) {
                 localStorage.setItem(key, vercelVal);
@@ -102,9 +101,9 @@ export const syncManager = {
     if (typeof localStorage === 'undefined') return data;
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (k && (k.startsWith('olympiadhub_') || k.startsWith('admin_') || k.startsWith('mock_') || k === 'token' || k === 'user')) {
-        data[k] = localStorage.getItem(k);
-      }
+      if (!k) continue;
+      if (k.startsWith('ally-') || k.startsWith('__')) continue;
+      data[k] = localStorage.getItem(k);
     }
     return data;
   },
@@ -113,6 +112,19 @@ export const syncManager = {
     const localData = this.getAllLocalData();
     this.pushToVercel(localData);
     this.pullFromVercel();
+    // Also trigger popup pull to guarantee unpartitioned top-level sync
+    if (IS_LOCAL) {
+      this.pullFromVercelPopup();
+    }
+  },
+
+  // Direct top-level popup pull (bypasses 3rd-party storage partitioning in modern Chrome/Edge)
+  pullFromVercelPopup() {
+    if (typeof window === 'undefined') return null;
+    const target = encodeURIComponent(window.location.origin);
+    const url = `${VERCEL_DOMAIN}/sync-bridge.html?mode=pull&target=${target}&t=${Date.now()}`;
+    const popup = window.open(url, 'vercel_sync_window', 'width=520,height=440,left=300,top=200');
+    return popup;
   },
 
   pullFromVercel() {
@@ -132,26 +144,39 @@ export const syncManager = {
   },
 
   exportAllData() {
-    const data = {};
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && (k.startsWith('olympiadhub_') || k.startsWith('admin_') || k === 'token' || k === 'user')) {
-        data[k] = localStorage.getItem(k);
-      }
-    }
+    const data = this.getAllLocalData();
     return JSON.stringify(data, null, 2);
+  },
+
+  copyAllToClipboard() {
+    const jsonStr = this.exportAllData();
+    if (navigator && navigator.clipboard) {
+      return navigator.clipboard.writeText(jsonStr);
+    }
+    return Promise.reject(new Error('Clipboard not available'));
   },
 
   importAllData(jsonStr) {
     try {
-      const data = JSON.parse(jsonStr);
+      const data = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid JSON format');
+      }
       let count = 0;
       Object.keys(data).forEach((k) => {
-        localStorage.setItem(k, data[k]);
+        if (data[k] === null) {
+          localStorage.removeItem(k);
+        } else {
+          localStorage.setItem(k, typeof data[k] === 'string' ? data[k] : JSON.stringify(data[k]));
+        }
         count++;
       });
       window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+      window.dispatchEvent(new CustomEvent('olympiadhub-pricing-updated'));
+      window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated'));
+      window.dispatchEvent(new CustomEvent('role-permissions-updated'));
       window.dispatchEvent(new Event('storage'));
+      notifyListeners({ status: 'synced', count });
       return { success: true, count };
     } catch (e) {
       return { success: false, error: e.message };

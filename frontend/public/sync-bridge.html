@@ -1,70 +1,193 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>OlympiadHub Real-Time Storage Bridge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillRise Olympiad - Real-Time Data Sync Bridge</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background: #0f172a; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 20px; padding: 28px; max-width: 520px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    .header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 16px; }
+    .icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #ec4899, #8b5cf6); display: flex; align-items: center; justify-content: center; font-size: 22px; shrink: 0; }
+    h1 { font-size: 18px; font-weight: 800; color: #fff; }
+    p { font-size: 13px; color: #94a3b8; line-height: 1.5; margin-top: 4px; }
+    .stats { background: #0f172a; border: 1px solid #334155; border-radius: 14px; padding: 14px 18px; margin: 18px 0; display: flex; justify-content: space-between; align-items: center; }
+    .stat-label { font-size: 12px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-val { font-size: 20px; font-weight: 800; color: #38bdf8; }
+    .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+    button { padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s; }
+    .btn-primary { background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: #fff; }
+    .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+    .btn-secondary { background: #334155; color: #f8fafc; }
+    .btn-secondary:hover { background: #475569; }
+    .toast { display: none; padding: 10px 14px; background: #059669; color: #fff; border-radius: 10px; font-size: 12px; font-weight: 700; margin-top: 14px; text-align: center; }
+    .status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #064e3b; color: #34d399; }
+  </style>
 </head>
 <body>
-<script>
-  (function() {
+  <div class="card">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <h1>Vercel ⇄ Localhost Sync Bridge</h1>
+          <span class="status-badge" id="bridgeStatus">Active</span>
+        </div>
+        <p id="bridgeSubtitle">Synchronizing live changes between Vercel and Localhost</p>
+      </div>
+    </div>
+
+    <div class="stats">
+      <span class="stat-label">Stored Items on Vercel</span>
+      <span class="stat-val" id="itemCount">0</span>
+    </div>
+
+    <div id="transferBanner" style="display:none; padding:12px; border-radius:12px; background:#064e3b; border:1px solid #059669; color:#a7f3d0; font-size:13px; font-weight:700; margin-bottom:14px; text-align:center;">
+      ✓ Connected with Localhost! Sending state...
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" id="copyBtn" onclick="copyAllData()">
+        📋 Copy All Vercel Data to Clipboard
+      </button>
+      <button class="btn-secondary" id="downloadBtn" onclick="downloadDataJson()">
+        💾 Download Data as JSON File
+      </button>
+      <button class="btn-secondary" onclick="sendToLocalhost()">
+        🚀 Direct Transfer to http://localhost:3000
+      </button>
+    </div>
+
+    <div class="toast" id="toastMsg"></div>
+  </div>
+
+  <script>
     function getAllOlympiadData() {
       const data = {};
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && (key.startsWith('olympiadhub_') || key.startsWith('admin_') || key.startsWith('mock_') || key === 'token' || key === 'user')) {
-          data[key] = localStorage.getItem(key);
-        }
+        if (!key) continue;
+        if (key.startsWith('ally-') || key.startsWith('__')) continue;
+        data[key] = localStorage.getItem(key);
       }
       return data;
     }
 
-    window.addEventListener('message', (event) => {
-      const origin = event.origin || '';
-      // Allow localhost, 127.0.0.1, and all vercel.app domains
-      const isAllowed = origin.includes('localhost') || 
-                        origin.includes('127.0.0.1') || 
-                        origin.includes('vercel.app');
-      if (!isAllowed) return;
+    function updateStats() {
+      const data = getAllOlympiadData();
+      const count = Object.keys(data).length;
+      document.getElementById('itemCount').innerText = count;
+    }
 
-      const { type, payload } = event.data || {};
+    function showToast(msg) {
+      const t = document.getElementById('toastMsg');
+      t.innerText = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3500);
+    }
 
-      if (type === 'REQUEST_VERCEL_DATA') {
+    function copyAllData() {
+      const data = getAllOlympiadData();
+      const jsonStr = JSON.stringify(data, null, 2);
+      navigator.clipboard.writeText(jsonStr).then(() => {
+        showToast('✓ Copied ' + Object.keys(data).length + ' items to clipboard! Open Localhost and click Paste & Sync.');
+      }).catch(() => {
+        showToast('Could not access clipboard. Please use Download JSON.');
+      });
+    }
+
+    function downloadDataJson() {
+      const data = getAllOlympiadData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'olympiadhub-vercel-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('✓ Backup file downloaded!');
+    }
+
+    function sendToLocalhost() {
+      const data = getAllOlympiadData();
+      const targetWin = window.open('http://localhost:3000/#/sync', '_blank');
+      showToast('Opening Localhost...');
+    }
+
+    // Auto-detect if opened as a popup by Localhost
+    (function initBridge() {
+      updateStats();
+      const params = new URLSearchParams(window.location.search);
+      const isPullMode = params.get('mode') === 'pull';
+      const targetOrigin = params.get('target') || 'http://localhost:3000';
+
+      // 1. If opened by Localhost window.open
+      if (window.opener && !window.opener.closed) {
+        document.getElementById('transferBanner').style.display = 'block';
         const currentData = getAllOlympiadData();
-        event.source.postMessage({
-          type: 'RESPONSE_VERCEL_DATA',
-          data: currentData
-        }, origin);
-      }
-
-      if (type === 'UPDATE_VERCEL_DATA') {
-        if (payload && typeof payload === 'object') {
-          Object.keys(payload).forEach(key => {
-            if (payload[key] === null) {
-              localStorage.removeItem(key);
-            } else {
-              localStorage.setItem(key, typeof payload[key] === 'string' ? payload[key] : JSON.stringify(payload[key]));
-            }
-          });
-          window.dispatchEvent(new Event('storage'));
-          window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
-          window.dispatchEvent(new CustomEvent('olympiadhub-pricing-updated'));
-          window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated'));
-          event.source.postMessage({
-            type: 'UPDATE_VERCEL_DATA_ACK',
-            success: true
-          }, origin);
+        try {
+          window.opener.postMessage({
+            type: 'RESPONSE_VERCEL_DATA',
+            data: currentData
+          }, '*');
+          document.getElementById('transferBanner').innerText = '✓ ' + Object.keys(currentData).length + ' items transferred to Localhost! Closing...';
+          setTimeout(() => {
+            window.close();
+          }, 1200);
+        } catch (e) {
+          console.warn('Opener postMessage error:', e);
         }
       }
-    });
 
-    // Notify parent if embedded
-    if (window.parent && window.parent !== window) {
-      window.parent.postMessage({
-        type: 'VERCEL_BRIDGE_LOADED',
-        data: getAllOlympiadData()
-      }, '*');
-    }
-  })();
-</script>
+      // 2. Iframe communication support
+      window.addEventListener('message', (event) => {
+        const origin = event.origin || '';
+        const isAllowed = origin.includes('localhost') || 
+                          origin.includes('127.0.0.1') || 
+                          origin.includes('vercel.app');
+        if (!isAllowed) return;
+
+        const { type, payload } = event.data || {};
+
+        if (type === 'REQUEST_VERCEL_DATA') {
+          const currentData = getAllOlympiadData();
+          event.source.postMessage({
+            type: 'RESPONSE_VERCEL_DATA',
+            data: currentData
+          }, origin);
+        }
+
+        if (type === 'UPDATE_VERCEL_DATA') {
+          if (payload && typeof payload === 'object') {
+            Object.keys(payload).forEach(key => {
+              if (payload[key] === null) {
+                localStorage.removeItem(key);
+              } else {
+                localStorage.setItem(key, typeof payload[key] === 'string' ? payload[key] : JSON.stringify(payload[key]));
+              }
+            });
+            window.dispatchEvent(new Event('storage'));
+            window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+            window.dispatchEvent(new CustomEvent('olympiadhub-pricing-updated'));
+            window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated'));
+            updateStats();
+            event.source.postMessage({
+              type: 'UPDATE_VERCEL_DATA_ACK',
+              success: true
+            }, origin);
+          }
+        }
+      });
+
+      // Notify parent if embedded inside iframe
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({
+          type: 'VERCEL_BRIDGE_LOADED',
+          data: getAllOlympiadData()
+        }, '*');
+      }
+    })();
+  </script>
 </body>
 </html>

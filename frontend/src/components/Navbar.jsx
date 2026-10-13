@@ -48,15 +48,46 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
 
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncToast, setSyncToast] = useState('');
+  const [showSyncModal, setShowSyncModal] = useState(false);
+  const [pasteJsonInput, setPasteJsonInput] = useState('');
+  const [syncSuccessMsg, setSyncSuccessMsg] = useState('');
+
+  useEffect(() => {
+    const unsub = syncManager.subscribe((state) => {
+      if (state.status === 'synced') {
+        setSyncToast(`✓ Synced ${state.count || 0} items from Vercel!`);
+        setSyncSuccessMsg(`✓ Synced ${state.count || 0} items from Vercel!`);
+        setTimeout(() => setSyncToast(''), 4000);
+      }
+    });
+    return unsub;
+  }, []);
 
   const handleSyncClick = () => {
+    setShowSyncModal(true);
+  };
+
+  const handleQuickPullFromVercel = () => {
     setIsSyncing(true);
-    syncManager.syncAll();
+    syncManager.pullFromVercelPopup();
     setTimeout(() => {
       setIsSyncing(false);
-      setSyncToast('Vercel ⇄ Localhost Synced Successfully!');
-      setTimeout(() => setSyncToast(''), 3000);
-    }, 1200);
+    }, 1500);
+  };
+
+  const handleApplyPastedData = () => {
+    if (!pasteJsonInput.trim()) return;
+    const res = syncManager.importAllData(pasteJsonInput);
+    if (res.success) {
+      setSyncSuccessMsg(`✓ Successfully applied ${res.count} items!`);
+      setTimeout(() => {
+        setSyncSuccessMsg('');
+        setShowSyncModal(false);
+        setPasteJsonInput('');
+      }, 1500);
+    } else {
+      alert('Invalid JSON data: ' + res.error);
+    }
   };
 
   // Search Items definition tailored to user role
@@ -681,6 +712,131 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
           </button>
         </div>
       </div>
+
+      {/* Vercel ⇄ Localhost Sync Center Modal */}
+      {showSyncModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-lg w-full text-slate-100 shadow-2xl space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shrink-0">
+                  <RefreshCw className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white">Vercel ⇄ Localhost Sync Center</h3>
+                  <p className="text-xs text-slate-400">Transfer all papers, questions, prices and student data</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSyncModal(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {syncSuccessMsg && (
+              <div className="p-3 bg-emerald-950/80 border border-emerald-500/50 rounded-xl text-xs font-bold text-emerald-300 text-center animate-in zoom-in">
+                {syncSuccessMsg}
+              </div>
+            )}
+
+            {/* Method 1: Instant 1-Click Popup Pull */}
+            <div className="bg-slate-800/70 border border-slate-700 rounded-2xl p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
+                    <span>⚡ 1-Click Pull from Vercel</span>
+                    <span className="text-[10px] bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded-full font-bold">Fastest</span>
+                  </h4>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Opens a 1-second transfer window to grab everything you changed on Vercel.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleQuickPullFromVercel}
+                disabled={isSyncing}
+                className="w-full mt-2 py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center justify-center gap-2"
+              >
+                <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>{isSyncing ? 'Pulling from Vercel...' : 'Pull All Vercel Changes Now'}</span>
+              </button>
+            </div>
+
+            {/* Method 2: Paste Clipboard / JSON */}
+            <div className="bg-slate-800/70 border border-slate-700 rounded-2xl p-4 space-y-2.5">
+              <h4 className="text-sm font-bold text-white">📋 Paste Data JSON Directly</h4>
+              <p className="text-xs text-slate-400">
+                Agar aapne Vercel se "Copy Data" kiya hai, toh niche paste karke apply karein:
+              </p>
+              <textarea
+                rows={3}
+                value={pasteJsonInput}
+                onChange={(e) => setPasteJsonInput(e.target.value)}
+                placeholder='{"olympiadhub_db_...": "..."}'
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-indigo-500 resize-none"
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const text = await navigator.clipboard.readText();
+                      setPasteJsonInput(text);
+                    } catch (e) {
+                      alert('Please paste directly using Ctrl+V');
+                    }
+                  }}
+                  className="flex-1 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl text-xs cursor-pointer transition-all"
+                >
+                  📋 Paste from Clipboard
+                </button>
+                <button
+                  type="button"
+                  onClick={handleApplyPastedData}
+                  disabled={!pasteJsonInput.trim()}
+                  className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold rounded-xl text-xs cursor-pointer transition-all"
+                >
+                  ✓ Apply &amp; Sync Localhost
+                </button>
+              </div>
+            </div>
+
+            {/* Method 3: Push Localhost to Vercel & Backup */}
+            <div className="flex gap-2 pt-1 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => {
+                  syncManager.syncAll();
+                  alert('✓ Sync triggered to Vercel bridge!');
+                }}
+                className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs cursor-pointer"
+              >
+                📤 Push Localhost to Vercel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const dataStr = syncManager.exportAllData();
+                  const blob = new Blob([dataStr], { type: 'application/json' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `localhost-data-backup-${new Date().toISOString().slice(0, 10)}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs cursor-pointer"
+              >
+                💾 Download Backup JSON
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
