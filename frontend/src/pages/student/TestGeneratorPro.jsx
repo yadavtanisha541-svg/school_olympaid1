@@ -2462,82 +2462,26 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                   </div>
                 </div>
 
-                {/* Step 6: Select Chapters / Topics */}
-                <div className="space-y-3 pt-3 border-t border-[#f4ebf4]">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] font-black flex items-center justify-center">
-                        6
-                      </span>
-                      <span className="text-xs font-black text-slate-700">
-                        Select Chapters ({subjectsMap[selectedSubject]?.name || selectedSubject}):
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleToggleAllChapters}
-                      className={`px-3 py-1 rounded-full text-xs font-black transition-all border cursor-pointer ${
-                        selectedChapters.length === (CHAPTERS_BY_SUBJECT[selectedSubject]?.length || 0)
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
-                          : 'bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100'
-                      }`}
-                    >
-                      {selectedChapters.length === (CHAPTERS_BY_SUBJECT[selectedSubject]?.length || 0)
-                        ? '✓ Deselect All'
-                        : '+ Select All'}
-                    </button>
-                  </div>
-
-                  {/* Topic Checkboxes Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto pr-1">
-                    {(CHAPTERS_BY_SUBJECT[selectedSubject] || []).map((ch) => {
-                      const isChecked = selectedChapters.includes(ch);
-                      return (
-                        <div
-                          key={ch}
-                          onClick={() => handleToggleChapter(ch)}
-                          className={`flex items-start gap-2.5 p-2.5 rounded-xl border text-xs font-medium cursor-pointer transition-all select-none ${
-                            isChecked
-                              ? 'bg-[#faf5fa] border-[#d4b5d4] text-[#4e2a4a] shadow-2xs font-semibold'
-                              : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => {}}
-                            className="mt-0.5 rounded border-slate-300 text-[#6d3a68] focus:ring-[#6d3a68] accent-[#6d3a68] cursor-pointer"
-                          />
-                          <span className="leading-snug">{ch}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Next Step Button below Step 6 */}
-                  <div className="pt-2 flex items-center justify-between">
-                    <span className="text-[11px] text-slate-500 font-medium">
-                      {selectedChapters.length} of {CHAPTERS_BY_SUBJECT[selectedSubject]?.length || 0} topics selected
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleProceedToInstructions}
-                      className="px-5 py-2.5 bg-[#6d3a68] hover:bg-[#582d54] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
-                    >
-                      {isCurrentTestUnlocked ? (
-                        <>
-                          <span>Next: Instructions &amp; Start</span>
-                          <ArrowRight className="w-4 h-4" />
-                        </>
-                      ) : (
-                        <>
-                          <Lock className="w-3.5 h-3.5 text-amber-300" />
-                          <span>Next: Pay &amp; Unlock Test (₹{bankSettings.test_pack_price || 99})</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </>
-                      )}
-                    </button>
-                  </div>
+                {/* Next Step Button */}
+                <div className="pt-3 border-t border-[#f4ebf4] flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleProceedToInstructions}
+                    className="px-5 py-2.5 bg-[#6d3a68] hover:bg-[#582d54] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
+                  >
+                    {isCurrentTestUnlocked ? (
+                      <>
+                        <span>Next: Instructions &amp; Start</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-3.5 h-3.5 text-amber-300" />
+                        <span>Next: Pay &amp; Unlock Test (₹{bankSettings.test_pack_price || 99})</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
 
