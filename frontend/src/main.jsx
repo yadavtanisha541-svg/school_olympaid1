@@ -4,7 +4,11 @@ import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { App } from './App';
+import { syncManager } from './utils/syncManager';
 import './index.css';
+
+// Automatically establish real-time cross-origin data sync between Localhost and Vercel
+syncManager.init();
 
 class ErrorBoundary extends React.Component {
   constructor(props) {

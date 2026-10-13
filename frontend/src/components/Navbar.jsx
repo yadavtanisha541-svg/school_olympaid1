@@ -29,8 +29,10 @@ import {
   CornerDownLeft,
   HelpCircle,
   Sun,
-  Moon
+  Moon,
+  RefreshCw
 } from 'lucide-react';
+import { syncManager } from '../utils/syncManager';
 
 export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) => {
   const { user, logout } = useAuth();
@@ -43,6 +45,19 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
 
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
+
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncToast, setSyncToast] = useState('');
+
+  const handleSyncClick = () => {
+    setIsSyncing(true);
+    syncManager.pullFromVercel();
+    setTimeout(() => {
+      setIsSyncing(false);
+      setSyncToast('Vercel ⇄ Localhost Synced!');
+      setTimeout(() => setSyncToast(''), 3000);
+    }, 1000);
+  };
 
   // Search Items definition tailored to user role
   const searchableItems = useMemo(() => {
@@ -604,6 +619,30 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
 
         {/* Right: Quick actions, Light/Dark toggle, notifications, cart, logout */}
         <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
+          {/* Real-Time Cloud Sync Button */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={handleSyncClick}
+              disabled={isSyncing}
+              className={`p-1.5 min-[360px]:p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border transition-all cursor-pointer flex items-center justify-center shadow-2xs group active:scale-95 shrink-0 ${
+                isSyncing ? 'text-indigo-500 bg-indigo-50/50 border-indigo-200' : ''
+              } ${
+                theme === 'dark'
+                  ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-indigo-400 hover:text-indigo-300'
+                  : 'bg-white hover:bg-slate-50 border-slate-200 text-indigo-600 hover:text-indigo-800'
+              }`}
+              title="Sync All Data (Vercel ⇄ Localhost)"
+              aria-label="Sync Data"
+            >
+              <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${isSyncing ? 'animate-spin text-indigo-500' : 'transition-transform group-hover:rotate-180'}`} />
+            </button>
+            {syncToast && (
+              <div className="absolute top-full right-0 mt-2 px-3 py-1.5 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-lg whitespace-nowrap animate-in fade-in zoom-in z-50">
+                ✓ {syncToast}
+              </div>
+            )}
+          </div>
           {/* Light / Dark Mode Toggle Button */}
           <button
             type="button"

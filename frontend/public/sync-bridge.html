@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>OlympiadHub Real-Time Storage Bridge</title>
+</head>
+<body>
+<script>
+  (function() {
+    function getAllOlympiadData() {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('olympiadhub_') || key.startsWith('admin_') || key === 'token' || key === 'user')) {
+          data[key] = localStorage.getItem(key);
+        }
+      }
+      return data;
+    }
+
+    window.addEventListener('message', (event) => {
+      const origin = event.origin || '';
+      // Allow localhost, 127.0.0.1, and vercel domains
+      const isAllowed = origin.includes('localhost') || 
+                        origin.includes('127.0.0.1') || 
+                        origin.includes('school-olympaid1.vercel.app');
+      if (!isAllowed) return;
+
+      const { type, payload } = event.data || {};
+
+      if (type === 'REQUEST_VERCEL_DATA') {
+        const currentData = getAllOlympiadData();
+        event.source.postMessage({
+          type: 'RESPONSE_VERCEL_DATA',
+          data: currentData
+        }, origin);
+      }
+
+      if (type === 'UPDATE_VERCEL_DATA') {
+        if (payload && typeof payload === 'object') {
+          Object.keys(payload).forEach(key => {
+            if (payload[key] === null) {
+              localStorage.removeItem(key);
+            } else {
+              localStorage.setItem(key, typeof payload[key] === 'string' ? payload[key] : JSON.stringify(payload[key]));
+            }
+          });
+          event.source.postMessage({
+            type: 'UPDATE_VERCEL_DATA_ACK',
+            success: true
+          }, origin);
+        }
+      }
+    });
+
+    // Notify parent if embedded
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'VERCEL_BRIDGE_LOADED',
+        data: getAllOlympiadData()
+      }, '*');
+    }
+  })();
+</script>
+</body>
+</html>
