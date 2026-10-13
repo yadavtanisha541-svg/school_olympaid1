@@ -122,42 +122,7 @@ export const Navbar = ({ onToggleSidebar, onNavigateTab, onOpenNotifications }) 
           icon: Users,
           keywords: 'teachers faculty staff coordinators mentors permissions'
         },
-        {
-          id: 'admin_questions',
-          title: 'Question Bank & MCQs',
-          description: 'Create, edit and manage Olympiad question repository',
-          category: 'Modules',
-          tab: 'question_bank',
-          icon: FileQuestion,
-          keywords: 'questions mcq bank test series options mathematics science computers'
-        },
-        {
-          id: 'admin_add_mcq',
-          title: 'Create New Question / MCQ',
-          description: 'Author a new question with 4 options and explanation',
-          category: 'Quick Actions',
-          tab: 'question_bank',
-          icon: PlusCircle,
-          keywords: 'add mcq new question question bank add question author'
-        },
-        {
-          id: 'admin_exams',
-          title: 'Exam Management & Schedules',
-          description: 'Configure Olympiads, schedule live windows and timer rules',
-          category: 'Modules',
-          tab: 'exams',
-          icon: BookOpen,
-          keywords: 'exams tests olympiads schedule publish timing live window'
-        },
-        {
-          id: 'admin_exam_cs_live',
-          title: 'Class 1 Digital Literacy Live Olympiad 2026',
-          description: 'Live test paper with 10 questions for Class 1',
-          category: 'Olympiads',
-          tab: 'exams',
-          icon: BookOpen,
-          keywords: 'digital literacy live olympiad 2026 class 1 test paper exam'
-        },
+
         {
           id: 'admin_exam_math',
           title: 'Mathematics Olympiad 2026',

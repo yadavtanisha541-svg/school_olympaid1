@@ -131,8 +131,6 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
     { id: 'free_quizzes_manager', label: 'FREE Quizzes Manager', icon: HelpCircle, perm: 'manage_free_quizzes' },
     { id: 'faqs_key_info', label: 'FAQs & Key Info Manager', icon: HelpCircle, perm: 'manage_faqs_keyinfo' },
     { id: 'practice_tests_manager', label: 'Practice Tests & Papers', icon: Sparkles, perm: 'manage_test_generator' },
-    { id: 'question_bank', label: 'Question Bank', icon: HelpCircle, perm: 'manage_question_bank' },
-    { id: 'exams', label: 'Exams & Mock Paper Scheduler', icon: FileSpreadsheet, perm: 'manage_exams' },
     { id: 'results', label: 'Exam Results & Reports', icon: FileCheck2, perm: 'publish_exam_results' },
     { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy, perm: 'manage_leaderboard' },
     { id: 'certificates', label: 'Certificates Manager', icon: Award, perm: 'manage_certificates' },
@@ -142,8 +140,6 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
 
   const teacherNav = [
     { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'question_bank', label: 'Question Bank', icon: HelpCircle, perm: 'manage_questions' },
-    { id: 'exams', label: 'Exam Management', icon: FileSpreadsheet, perm: 'manage_exams' },
     { id: 'students', label: 'Student Management', icon: Users, perm: 'view_students' },
     { id: 'results', label: 'Exam Results & Reports', icon: FileCheck2, perm: 'view_results' },
     { id: 'leaderboard', label: 'Rankings & Leaderboard', icon: Trophy, perm: 'view_leaderboards' }
