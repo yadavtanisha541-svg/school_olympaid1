@@ -1,7 +1,7 @@
 // OlympiadHub - Bidirectional Real-Time Cloud Sync Engine (Vercel ⇄ Localhost)
 // Provides 100% zero-click, automatic real-time sync across Localhost and Vercel.
 
-const CLOUD_SYNC_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a1349d43f752db';
+const CLOUD_SYNC_URL = 'https://kvdb.io/NpN11X2B7WSSTib7UTAT5n/olympiadhub_data';
 const VERCEL_DOMAIN = 'https://school-olympaid1.vercel.app';
 const IS_LOCAL = typeof window !== 'undefined' && (
   window.location.hostname === 'localhost' ||
@@ -30,11 +30,11 @@ export const syncManager = {
       this.pullFromCloud();
     }, 400);
 
-    // 2. Continuous real-time background polling (every 12 seconds)
+    // 2. Continuous real-time background polling (every 10 seconds)
     if (pollInterval) clearInterval(pollInterval);
     pollInterval = setInterval(() => {
       this.pullFromCloud();
-    }, 12000);
+    }, 10000);
 
     // 3. Tab focus & visibility change: Pull immediately when user switches to this tab
     window.addEventListener('focus', () => {
@@ -110,7 +110,7 @@ export const syncManager = {
       }
 
       const payload = await res.json();
-      const cloudData = payload?.data;
+      const cloudData = payload?.data || payload;
 
       // If cloud has no data yet, initialize cloud with local data!
       if (!cloudData || typeof cloudData !== 'object' || Object.keys(cloudData).length === 0) {
@@ -127,6 +127,7 @@ export const syncManager = {
 
       // Merge Cloud Data into Local Storage
       Object.keys(cloudData).forEach((key) => {
+        if (key === 'name') return;
         const cloudVal = cloudData[key];
         if (cloudVal !== null && cloudVal !== undefined) {
           const currentLocalVal = localStorage.getItem(key);
@@ -178,7 +179,7 @@ export const syncManager = {
       }
 
       const res = await fetch(CLOUD_SYNC_URL, {
-        method: 'PUT',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
