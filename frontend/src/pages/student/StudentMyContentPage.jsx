@@ -104,6 +104,17 @@ export const StudentMyContentPage = ({
     return s;
   };
 
+  const cleanMockTitle = (title) => {
+    if (!title) return 'Mock Test';
+    return title
+      .replace(/Previous\s*Year\s*Paper/gi, 'Mock Test')
+      .replace(/Previous\s*Year/gi, 'Mock Test')
+      .replace(/\bPYQs?\b/gi, 'Mock Test')
+      .replace(/\b(201[5-9]|202[0-9])\b/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
   // Active selected subject filter: 'ALL' or 'IGKO', 'IMO', 'ISO', etc.
   const [selectedSubject, setSelectedSubject] = useState(() => {
     if (activeSubjectCode) {
@@ -135,26 +146,32 @@ export const StudentMyContentPage = ({
         allPapers = [...papersRes.data];
       }
 
-      // Also include any mock tests authored in admin generator or local storage
-      const localAdminPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+      // Only include pure Mock Tests from database and local storage (EXCLUDE Practice Tests)
       const mockDbPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
       const olympiadDbPapers = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
-      const combinedLocal = [...localAdminPapers, ...mockDbPapers, ...olympiadDbPapers];
+      const olympiadExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+      const combinedLocal = [...mockDbPapers, ...olympiadDbPapers, ...olympiadExams];
 
       if (Array.isArray(combinedLocal)) {
         combinedLocal.forEach((lp) => {
-          if (lp && !allPapers.some(p => String(p.id) === String(lp.id) || (p.title === lp.title && p.class_name === (lp.class_name || lp.class)))) {
+          if (!lp) return;
+          const cat = (lp.paper_category || lp.category || lp.exam_type || 'mock_test').toLowerCase();
+          // STRICT SEPARATION: Never load Practice Tests or AI Generators into Mock Tests
+          if (cat.includes('practice') || cat.includes('generator') || (lp.exam_type === 'practice')) {
+            return;
+          }
+          if (!allPapers.some(p => String(p.id) === String(lp.id) || (p.title === lp.title && p.class_name === (lp.class_name || lp.class)))) {
             allPapers.push({
               id: lp.id,
               title: lp.title,
               short_code: lp.shortCode || lp.short_code || `${lp.subject_code || 'OLY'} - Mock`,
               subject_code: (lp.subject_code || lp.subject || '').toUpperCase(),
               class_name: lp.class_name || lp.class,
-              category: lp.paper_category || 'mock_test',
+              category: 'mock_test',
               duration_minutes: lp.duration_minutes || 60,
               total_marks: lp.total_marks || 60,
               cutoff_marks: lp.cutoff_marks || 42,
-              status: 'published',
+              status: lp.status || 'published',
               questions: lp.questions || []
             });
           }
@@ -424,14 +441,15 @@ export const StudentMyContentPage = ({
       const matchS = sCls.match(/\d+/);
       const classMatches = (matchP && matchS) ? matchP[0] === matchS[0] : (pCls === sCls || !pCls || pCls === 'all');
       
-      // Strict exclusion: NEVER show Previous Year Papers or Sample Papers in My Content
+      // Strict exclusion: NEVER show Practice Tests, Generators, Previous Year Papers or Sample Papers in Mock Tests
       const titleLower = (p.title || '').toLowerCase();
-      const catLower = (p.category || p.paper_category || p.paper_type || '').toLowerCase();
+      const catLower = (p.category || p.paper_category || p.paper_type || p.exam_type || '').toLowerCase();
       
+      const isPractice = catLower.includes('practice') || catLower.includes('generator') || (p.exam_type === 'practice') || titleLower.includes('practice');
       const isPreviousYear = catLower.includes('previous') || catLower.includes('pyq') || catLower.includes('past') || titleLower.includes('previous year') || titleLower.includes('pyq');
       const isSamplePaper = catLower.includes('sample') || titleLower.includes('sample paper');
       
-      if (isPreviousYear || isSamplePaper) {
+      if (isPractice || isPreviousYear || isSamplePaper) {
         return false;
       }
 
@@ -1029,7 +1047,7 @@ export const StudentMyContentPage = ({
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                {paper.title}
+                {cleanMockTitle(paper.title)}
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 mt-1">
                 All India National Ranking Mock Test with Instant Analysis &amp; Answer Keys.
@@ -1283,7 +1301,7 @@ export const StudentMyContentPage = ({
 
                           <div>
                             <h4 className="font-black text-slate-900 text-base sm:text-lg tracking-tight leading-snug">
-                              {paper.title}
+                              {cleanMockTitle(paper.title)}
                             </h4>
                             <p className="text-xs sm:text-sm font-bold text-slate-500 mt-0.5">
                               {paper.class_name || studentClass}

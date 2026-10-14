@@ -583,13 +583,18 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
                   {currentQuestion.question_text || currentQuestion.q || currentQuestion.question || currentQuestion.title || 'Question Statement'}
                 </div>
 
-                {currentQuestion.question_image && (
-                  <div className="my-4">
-                    <img
-                      src={currentQuestion.question_image}
-                      alt="Question Diagram"
-                      className="max-h-60 rounded-xl border border-slate-200 shadow-sm object-contain"
-                    />
+                {(currentQuestion.question_image || currentQuestion.image_url || currentQuestion.diagram || currentQuestion.image || currentQuestion.figure) && (
+                  <div className="my-4 text-left">
+                    <div className="inline-block border-2 border-indigo-200 rounded-2xl p-3 bg-white shadow-xs max-w-full">
+                      <div className="text-xs font-bold text-indigo-700 mb-2 border-b border-indigo-100 pb-1 flex items-center gap-1.5">
+                        <span>📸 Question Diagram / Figure:</span>
+                      </div>
+                      <img
+                        src={currentQuestion.question_image || currentQuestion.image_url || currentQuestion.diagram || currentQuestion.image || currentQuestion.figure}
+                        alt="Question Diagram"
+                        className="max-h-72 sm:max-h-80 rounded-xl border border-slate-100 shadow-sm object-contain bg-white"
+                      />
+                    </div>
                   </div>
                 )}
 

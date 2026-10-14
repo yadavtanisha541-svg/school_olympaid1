@@ -805,7 +805,7 @@ export const SubjectContentPackagesPage = ({
         <div className="bg-white rounded-2xl p-3 border border-slate-200 shadow-xs flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <span className="px-3 py-1 rounded-lg bg-[#d99b26] text-white font-black text-xs shadow-2xs">
-              {liveExamPaper.short_code || `${liveExamPaper.subject_code} - ${liveExamPaper.exam_year || '2019'}`}
+              {(liveExamPaper.short_code || liveExamPaper.subject_code || 'EXAM').replace(/\s*-\s*\d{4}/g, '')}
             </span>
             <span className="text-xs sm:text-sm font-bold text-slate-800 hidden sm:inline">
               {liveExamPaper.title}
@@ -1137,7 +1137,7 @@ export const SubjectContentPackagesPage = ({
                     Test Name:
                   </span>
                   <span className="px-3 py-1 rounded-lg bg-[#27ae60] text-white font-black text-xs shadow-2xs">
-                    {p.short_code || `${p.subject_code} - ${p.exam_year || '2019'}`}
+                    {(p.short_code || p.subject_code || 'EXAM').replace(/\s*-\s*\d{4}/g, '')}
                   </span>
                 </div>
 

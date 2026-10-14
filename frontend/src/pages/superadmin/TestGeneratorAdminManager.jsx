@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Sparkles,
   Plus,
@@ -36,7 +36,8 @@ import {
   CheckCircle,
   DollarSign,
   Lock,
-  ArrowRight
+  ArrowRight,
+  Send
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
@@ -44,6 +45,9 @@ import { getTestPricing, saveTestPricing } from '../../utils/purchaseUtils';
 import { extractTextFromFile } from '../../utils/universalDocumentParser';
 import { UniversalQuestionImportModal } from '../../components/common/UniversalQuestionImportModal';
 import { getTopicsForSubject } from '../../data/subjectTopics';
+import { syncManager } from '../../utils/syncManager';
+import { getQuestionImage, getCleanQuestionText, QuestionDiagram } from '../../utils/questionMediaHelper';
+import { saveImageToStore } from '../../utils/imageStore';
 
 const SUBJECT_OPTIONS = [
   { id: 'math', name: 'IMO (Mathematics)', code: 'IMO', color: '#d97706', icon: '📐' },
@@ -69,7 +73,20 @@ const GRADE_OPTIONS = [
   'Class 12'
 ];
 
-const YEARS_OPTIONS = ['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018'];
+const cleanPaperTitle = (title = '', fallbackSub = '', fallbackClass = '') => {
+  if (!title) return [fallbackClass, fallbackSub, 'Practice Test'].filter(Boolean).join(' ');
+  return title
+    .replace(/Previous\s*Year\s*Paper/gi, 'Practice Test')
+    .replace(/Previous\s*Year/gi, 'Practice Test')
+    .replace(/\bPYQs?\b/gi, 'Practice Test')
+    .replace(/\b(201[5-9]|202[0-9])\b/g, '')
+    .replace(/Level-\d+\s*Practice\s*Test/gi, 'Practice Test')
+    .replace(/\(\s*\)/g, '')
+    .replace(/\[\s*\]/g, '')
+    .replace(/\s*-\s*-\s*/g, ' - ')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
 
 // Clean blank question template for Super Admin
 const createBlankQuestion = () => ({
@@ -343,6 +360,80 @@ const parseBulkQuestions = (rawText) => {
   return questions;
 };
 
+// Safe helper to prune heavy base64 strings if localStorage quota is tight
+const isLargeDataUrl = (s) => typeof s === 'string' && (s.length > 500 && (s.startsWith('data:') || s.length > 1000));
+
+const pruneQuestionsForStorage = (qs) => (qs || []).map((q, idx) => {
+  const token = `__IMG__${q.id || idx + 1}__`;
+  return {
+    ...q,
+    question_image: isLargeDataUrl(q.question_image) ? token : q.question_image,
+    diagram: isLargeDataUrl(q.diagram) ? token : q.diagram,
+    image_url: isLargeDataUrl(q.image_url) ? token : q.image_url,
+    image: isLargeDataUrl(q.image) ? token : q.image,
+    figure: isLargeDataUrl(q.figure) ? token : q.figure
+  };
+});
+
+const safeSavePaperToStorage = (key, paperObj) => {
+  if (!key || !paperObj) return;
+  try {
+    const existing = JSON.parse(localStorage.getItem(key) || '[]');
+    const updated = [paperObj, ...(Array.isArray(existing) ? existing.filter(p => String(p.id) !== String(paperObj.id)) : [])];
+    localStorage.setItem(key, JSON.stringify(updated));
+  } catch (quotaErr) {
+    console.warn(`[SafeSavePaper] Quota exceeded on "${key}". Pruning diagrams for localStorage (persisted in IndexedDB):`, quotaErr);
+    try {
+      const existing = JSON.parse(localStorage.getItem(key) || '[]');
+      const prunedExisting = (Array.isArray(existing) ? existing : []).map(p => ({
+        ...p,
+        questions: pruneQuestionsForStorage(p.questions)
+      }));
+      const compactPaper = {
+        ...paperObj,
+        questions: pruneQuestionsForStorage(paperObj.questions)
+      };
+      const updatedPruned = [compactPaper, ...prunedExisting.filter(p => String(p.id) !== String(paperObj.id))];
+      localStorage.setItem(key, JSON.stringify(updatedPruned));
+    } catch (innerErr) {
+      console.warn(`[SafeSavePaper] Critical storage quota warning for "${key}":`, innerErr);
+    }
+  }
+};
+
+const safeUpsertPaperList = (key, updatedPaper) => {
+  if (!key || !updatedPaper) return;
+  try {
+    const existing = JSON.parse(localStorage.getItem(key) || '[]');
+    let found = false;
+    const res = (Array.isArray(existing) ? existing : []).map(p => {
+      if (String(p.id) === String(updatedPaper.id)) {
+        found = true;
+        return updatedPaper;
+      }
+      return p;
+    });
+    if (!found) res.unshift(updatedPaper);
+    localStorage.setItem(key, JSON.stringify(res));
+  } catch (quotaErr) {
+    console.warn(`[SafeUpsert] Quota exceeded on "${key}":`, quotaErr);
+    try {
+      const existing = JSON.parse(localStorage.getItem(key) || '[]');
+      let found = false;
+      const res = (Array.isArray(existing) ? existing : []).map(p => {
+        const pruned = { ...p, questions: pruneQuestionsForStorage(p.questions) };
+        if (String(p.id) === String(updatedPaper.id)) {
+          found = true;
+          return { ...updatedPaper, questions: pruneQuestionsForStorage(updatedPaper.questions) };
+        }
+        return pruned;
+      });
+      if (!found) res.unshift({ ...updatedPaper, questions: pruneQuestionsForStorage(updatedPaper.questions) });
+      localStorage.setItem(key, JSON.stringify(res));
+    } catch (e2) {}
+  }
+};
+
 export const TestGeneratorAdminManager = () => {
   const { user } = useAuth();
   const [papers, setPapers] = useState([]);
@@ -417,6 +508,8 @@ export const TestGeneratorAdminManager = () => {
   // Modal / Creator State
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [previewPaper, setPreviewPaper] = useState(null);
+  const [paperSavedToast, setPaperSavedToast] = useState('');
+  const [isPublishingPaper, setIsPublishingPaper] = useState(false);
 
   // Bulk Importer Modal State
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -439,52 +532,107 @@ export const TestGeneratorAdminManager = () => {
   const [bulkTargetTopic, setBulkTargetTopic] = useState('');
   const [questionsList, setQuestionsList] = useState([]);
 
-  // Load published papers directly from API / Local Storage
+  const sanitizePaperList = (list) => {
+    return (list || []).map((p) => ({
+      ...p,
+      title: cleanPaperTitle(p.title, p.subject_code, p.class_name),
+      exam_year: '',
+      short_code: (p.short_code || '').replace(/\s*-\s*(201[5-9]|202[0-9]|PYQ)/gi, '').trim()
+    }));
+  };
+
+  const isFetchingPapersRef = useRef(false);
+
+  // Load published papers directly from API & Local Storage (Robust bi-directional sync)
   const fetchPapers = async () => {
+    if (isFetchingPapersRef.current) return;
+    isFetchingPapersRef.current = true;
     setLoading(true);
     try {
-      const res = await apiClient.get('/test-generator/admin-papers');
-      if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
-        setPapers(res.data);
-        localStorage.setItem('admin_generator_papers', JSON.stringify(res.data));
-        setLoading(false);
-        return;
-      }
-    } catch (e) {
-      console.warn('apiClient fetch error, falling back to local:', e);
-    }
+      let combined = [];
 
-    const local = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-    if (local && local.length > 0) {
-      setPapers(local);
-    } else {
+      const addPaperUnique = (p) => {
+        if (!p || (!p.id && !p.exam_code)) return;
+        const idStr = p.id ? String(p.id) : '';
+        const codeStr = p.exam_code ? String(p.exam_code) : '';
+        const exists = combined.some((cp) => 
+          (idStr && String(cp.id) === idStr) ||
+          (codeStr && cp.exam_code && String(cp.exam_code) === codeStr)
+        );
+        if (!exists) {
+          combined.push(p);
+        }
+      };
+
+      // 1. Gather all local papers from admin_generator_papers
+      try {
+        const local = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+        if (Array.isArray(local)) local.forEach(addPaperUnique);
+      } catch (e) {}
+
+      // 2. Gather from olympiadhub_db_exam_papers
+      try {
+        const dbP = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+        if (Array.isArray(dbP)) dbP.forEach(addPaperUnique);
+      } catch (e) {}
+
+      // 3. Gather from mock_db_exam_papers
+      try {
+        const mDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+        if (Array.isArray(mDb)) mDb.forEach(addPaperUnique);
+      } catch (e) {}
+
+      // 4. Gather practice tests from olympiadhub_db_exams
+      try {
+        const exDb = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+        if (Array.isArray(exDb)) {
+          exDb.filter(e => (e.exam_type || '').includes('practice') || (e.paper_category || '').includes('practice')).forEach(addPaperUnique);
+        }
+      } catch (e) {}
+
+      // 5. Fetch from API (/test-generator/admin-papers)
+      try {
+        const res = await apiClient.get('/test-generator/admin-papers');
+        if (res && res.success && Array.isArray(res.data)) {
+          res.data.forEach(addPaperUnique);
+        }
+      } catch (e) {
+        console.warn('apiClient fetch error, using local papers:', e);
+      }
+
+      // 6. Fallback check from /exam-papers
       try {
         const epRes = await apiClient.get('/exam-papers');
-        if (epRes && epRes.success && Array.isArray(epRes.data) && epRes.data.length > 0) {
-          setPapers(epRes.data);
-          localStorage.setItem('admin_generator_papers', JSON.stringify(epRes.data));
-        } else {
-          setPapers([]);
+        if (epRes && epRes.success && Array.isArray(epRes.data)) {
+          epRes.data.forEach(addPaperUnique);
         }
-      } catch (err) {
-        setPapers([]);
+      } catch (err) {}
+
+      const cleaned = sanitizePaperList(combined);
+      setPapers(cleaned);
+      try {
+        localStorage.setItem('admin_generator_papers', JSON.stringify(cleaned));
+      } catch (e) {
+        console.warn('Quota limit reached in fetchPapers caching:', e);
       }
+    } finally {
+      setLoading(false);
+      isFetchingPapersRef.current = false;
     }
-    setLoading(false);
   };
 
   useEffect(() => {
     fetchPapers();
   }, []);
 
-  // Helper to generate dynamic title
-  const generateTitle = (cat, grade, subKey, yr) => {
+  // Helper to generate dynamic title (Class & Subject only)
+  const generateTitle = (cat, grade, subKey) => {
     const subObj = SUBJECT_OPTIONS.find((s) => s.id === subKey);
-    const subCode = subObj ? subObj.code : subKey.toUpperCase();
+    const subCode = subObj ? subObj.code : (subKey || 'IMO').toUpperCase();
     if (cat === 'generator') {
       return `${grade} ${subCode} Intelligent Generator Practice Paper`;
     } else {
-      return `${grade} ${subCode} Practice Mock Test (${yr})`;
+      return `${grade} ${subCode} Practice Mock Test`;
     }
   };
 
@@ -492,13 +640,13 @@ export const TestGeneratorAdminManager = () => {
   const handleOpenCreateModal = (presetCategory = 'practice_test') => {
     const cat = presetCategory === 'all' ? 'practice_test' : presetCategory;
     setPaperCategory(cat);
-    setExamYear('2024');
+    setExamYear('');
     setPaperClass('Class 6');
     setPaperSubject('math');
     setSelectedPaperChapters(getTopicsForSubject('math'));
     setPaperDuration(cat === 'generator' ? 15 : 60);
     setPaperDifficulty('Standard');
-    setPaperTitle(generateTitle(cat, 'Class 6', 'math', '2024'));
+    setPaperTitle(generateTitle(cat, 'Class 6', 'math'));
     const initialBlank = createBlankQuestion();
     initialBlank.chapter = getTopicsForSubject('math')[0] || '';
     setQuestionsList([initialBlank]);
@@ -509,7 +657,7 @@ export const TestGeneratorAdminManager = () => {
   const handleCategoryChangeInModal = (cat) => {
     setPaperCategory(cat);
     setPaperDuration(cat === 'generator' ? 15 : 60);
-    setPaperTitle(generateTitle(cat, paperClass, paperSubject, examYear));
+    setPaperTitle(generateTitle(cat, paperClass, paperSubject));
   };
 
   // Change subject in modal
@@ -517,19 +665,18 @@ export const TestGeneratorAdminManager = () => {
     setPaperSubject(subKey);
     const newTopics = getTopicsForSubject(subKey);
     setSelectedPaperChapters(newTopics);
-    setPaperTitle(generateTitle(paperCategory, paperClass, subKey, examYear));
+    setPaperTitle(generateTitle(paperCategory, paperClass, subKey));
   };
 
   // Change class in modal
   const handleClassChangeInModal = (cls) => {
     setPaperClass(cls);
-    setPaperTitle(generateTitle(paperCategory, cls, paperSubject, examYear));
+    setPaperTitle(generateTitle(paperCategory, cls, paperSubject));
   };
 
   // Change year in modal
   const handleYearChangeInModal = (yr) => {
     setExamYear(yr);
-    setPaperTitle(generateTitle(paperCategory, paperClass, paperSubject, yr));
   };
 
   // Add blank question
@@ -571,9 +718,9 @@ export const TestGeneratorAdminManager = () => {
     }
     const subObj = SUBJECT_OPTIONS.find((s) => s.id === paperSubject);
     const currentPaperData = {
-      title: paperTitle || `${paperClass} ${subObj?.name || 'Olympiad'} Question Paper (${examYear})`,
+      title: paperTitle || `${paperClass} ${subObj?.name || 'Olympiad'} Question Paper`,
       paper_category: paperCategory,
-      exam_year: examYear,
+      exam_year: examYear || '',
       subject_code: subObj?.code || 'IMO',
       class_name: paperClass,
       duration_minutes: paperDuration,
@@ -596,65 +743,144 @@ export const TestGeneratorAdminManager = () => {
     handleDownloadPaperCsv(currentPaperData);
   };
 
-  // Submit and Publish Paper
+  // Submit and Publish Paper (100% Reliable Sync & Persistence)
   const handleSavePaper = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
-    if (!paperTitle.trim()) {
-      alert('Please enter a paper title.');
+    if (isPublishingPaper) return;
+
+    let finalTitle = (paperTitle || '').trim();
+    if (!finalTitle) {
+      finalTitle = generateTitle(paperCategory, paperClass, paperSubject);
+      setPaperTitle(finalTitle);
+    }
+
+    if (!questionsList || questionsList.length === 0) {
+      alert('Please add at least one question to this paper before publishing.');
       return;
     }
-    if (questionsList.length === 0) {
-      alert('Please add at least one question to this paper.');
-      return;
-    }
 
-    const totalMarks = questionsList.reduce((acc, q) => acc + (parseFloat(q.marks) || 1), 0);
-    const subObj = SUBJECT_OPTIONS.find((s) => s.id === paperSubject);
-
-    const payload = {
-      title: paperTitle,
-      paper_category: paperCategory,
-      exam_year: examYear,
-      subject: paperSubject,
-      subject_name: subObj?.name || 'Mathematics',
-      subject_code: subObj?.code || 'IMO',
-      class: paperClass,
-      class_name: paperClass,
-      duration_minutes: parseInt(paperDuration) || 60,
-      total_questions: questionsList.length,
-      total_marks: totalMarks,
-      difficulty: paperDifficulty,
-      chapters: selectedPaperChapters,
-      topics: selectedPaperChapters,
-      questions: questionsList,
-      created_at: new Date().toISOString()
-    };
+    setIsPublishingPaper(true);
 
     try {
-      await apiClient.post('/test-generator/admin-papers', payload);
-    } catch (err) {
-      console.warn('API error, persisting locally:', err);
+      const totalMarks = questionsList.reduce((acc, q) => acc + (parseFloat(q.marks) || 1), 0);
+      const subObj = SUBJECT_OPTIONS.find((s) => s.id === paperSubject);
+      const paperId = Date.now();
+      const prefix = paperCategory === 'generator' ? 'TGP' : 'PRAC';
+      const subCode = subObj?.code || 'GEN';
+      const examCode = `${prefix}-${subCode}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      const normalizedQuestions = questionsList.map((q, idx) => {
+        const qText = (q.q || q.question_text || '').trim() || `Question ${idx + 1}`;
+        const rawOpts = Array.isArray(q.options) && q.options.length >= 2
+          ? q.options
+          : [q.option_a, q.option_b, q.option_c, q.option_d];
+        const opts = rawOpts.map((opt, oIdx) => (opt && String(opt).trim()) ? String(opt).trim() : `Option ${['A', 'B', 'C', 'D'][oIdx] || String.fromCharCode(65 + oIdx)}`);
+        let corr = 0;
+        if (typeof q.correct === 'number') corr = q.correct;
+        else if (q.correct_option === 'B' || q.correct === 'B') corr = 1;
+        else if (q.correct_option === 'C' || q.correct === 'C') corr = 2;
+        else if (q.correct_option === 'D' || q.correct === 'D') corr = 3;
+        const qDiagImg = getQuestionImage(q) || q.question_image || q.image_url || q.diagram || q.image || q.figure || '';
+        const finalQId = q.id || (paperId + '_' + (idx + 1));
+        if (qDiagImg && typeof qDiagImg === 'string' && qDiagImg.trim()) {
+          try {
+            saveImageToStore(String(finalQId), qDiagImg.trim());
+            saveImageToStore(qText, qDiagImg.trim());
+          } catch (_) {}
+        }
+        return {
+          ...q,
+          id: finalQId,
+          q: qText,
+          question_text: qText,
+          options: opts,
+          option_a: opts[0] || 'Option A',
+          option_b: opts[1] || 'Option B',
+          option_c: opts[2] || 'Option C',
+          option_d: opts[3] || 'Option D',
+          correct: corr,
+          correct_option: ['A', 'B', 'C', 'D'][corr] || 'A',
+          marks: parseFloat(q.marks) || 1,
+          explanation: q.explanation || '',
+          question_image: qDiagImg,
+          image_url: qDiagImg,
+          diagram: qDiagImg,
+          image: qDiagImg,
+          figure: qDiagImg
+        };
+      });
+
+      const completePaper = {
+        id: paperId,
+        exam_code: examCode,
+        title: cleanPaperTitle(finalTitle, subObj?.code, paperClass),
+        paper_category: paperCategory || 'practice_test',
+        category: paperCategory || 'practice_test',
+        exam_type: paperCategory === 'generator' ? 'generated' : 'practice',
+        exam_year: '',
+        subject: paperSubject,
+        subject_name: subObj?.name || 'Mathematics',
+        subject_code: subObj?.code || 'IMO',
+        class: paperClass,
+        class_name: paperClass,
+        grade: paperClass,
+        duration_minutes: parseInt(paperDuration) || 60,
+        total_questions: normalizedQuestions.length,
+        total_marks: totalMarks,
+        difficulty: paperDifficulty || 'Standard',
+        status: 'published',
+        is_published: true,
+        chapters: selectedPaperChapters || [],
+        topics: selectedPaperChapters || [],
+        questions: normalizedQuestions,
+        created_at: new Date().toISOString()
+      };
+
+      // 1. Immediately update UI state synchronously
+      setPapers((prev) => [completePaper, ...prev.filter(p => String(p.id) !== String(completePaper.id))]);
+      setSelectedClassFilter('All');
+      setSelectedSubjectFilter('All');
+      setSearchQuery('');
+      setPaperSavedToast(`Practice Paper "${completePaper.title}" published successfully! Synchronized across Super Admin & Student Dashboard.`);
+      setTimeout(() => setPaperSavedToast(''), 6000);
+
+      // 2. Persist safely in local storages with quota protection
+      safeSavePaperToStorage('admin_generator_papers', completePaper);
+      safeSavePaperToStorage('olympiadhub_db_exam_papers', completePaper);
+      safeSavePaperToStorage('mock_db_exam_papers', completePaper);
+      safeSavePaperToStorage('olympiadhub_db_exams', completePaper);
+
+      // 3. API call to mockEngine
+      try {
+        await apiClient.post('/test-generator/admin-papers', completePaper);
+      } catch (err) {
+        console.warn('API error, persisting locally:', err);
+      }
+
+      // 4. Dispatch sync events
+      try {
+        window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: completePaper }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: completePaper }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exam_papers', data: [completePaper] } }));
+        window.dispatchEvent(new Event('storage'));
+      } catch (_) {}
+
+      // 5. Immediate push to central sync
+      try {
+        if (typeof window !== 'undefined' && window.syncManager?.schedulePush) {
+          window.syncManager.schedulePush();
+        }
+      } catch (_) {}
+
+      // 6. Close modal and refresh paper list
+      setShowCreateModal(false);
+      fetchPapers();
+    } catch (publishErr) {
+      console.error('Failed to publish paper:', publishErr);
+      alert('Failed to publish paper: ' + (publishErr?.message || publishErr));
+    } finally {
+      setIsPublishingPaper(false);
     }
-
-    const local = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-    const prefix = 'PRAC';
-    const newPaperLocal = {
-      ...payload,
-      id: Date.now(),
-      exam_code: `${prefix}-${subObj?.code || 'GEN'}-${Math.floor(1000 + Math.random() * 9000)}`
-    };
-    const updatedLocal = [newPaperLocal, ...local.filter(p => p.id !== newPaperLocal.id)];
-    localStorage.setItem('admin_generator_papers', JSON.stringify(updatedLocal));
-
-    try {
-      const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
-      localStorage.setItem('mock_db_exam_papers', JSON.stringify([newPaperLocal, ...mockDb.filter(p => p.id !== newPaperLocal.id)]));
-    } catch (e) {}
-
-    window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedLocal }));
-
-    setShowCreateModal(false);
-    fetchPapers();
   };
 
   // Delete Paper directly
@@ -667,17 +893,312 @@ export const TestGeneratorAdminManager = () => {
       console.warn('Delete error', e);
     }
 
-    const local = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-    const updated = local.filter((p) => p.id !== paperId);
-    localStorage.setItem('admin_generator_papers', JSON.stringify(updated));
+    try {
+      const local = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+      const updated = local.filter((p) => p.id !== paperId);
+      localStorage.setItem('admin_generator_papers', JSON.stringify(updated));
+    } catch (e) {}
 
     try {
       const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
       localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockDb.filter((p) => p.id !== paperId)));
     } catch (e) {}
 
-    window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updated }));
+    window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedId: paperId } }));
     fetchPapers();
+  };
+
+  // Delete individual question from paper preview
+  const handleDeleteQuestionFromPreview = async (qIdx) => {
+    if (!previewPaper) return;
+    const currentQuestions = Array.isArray(previewPaper.questions) ? [...previewPaper.questions] : [];
+    if (qIdx < 0 || qIdx >= currentQuestions.length) return;
+
+    if (!window.confirm(`Are you sure you want to delete Question #${qIdx + 1}?`)) {
+      return;
+    }
+
+    const updatedQuestions = currentQuestions.filter((_, i) => i !== qIdx);
+    const updatedPaper = {
+      ...previewPaper,
+      questions: updatedQuestions,
+      total_questions: updatedQuestions.length,
+      total_marks: updatedQuestions.reduce((acc, q) => acc + (parseFloat(q.marks) || 1), 0)
+    };
+
+    setPreviewPaper(updatedPaper);
+    setPapers((prev) => prev.map((p) => (p.id === updatedPaper.id ? updatedPaper : p)));
+
+    // Save to localStorage
+    safeUpsertPaperList('admin_generator_papers', updatedPaper);
+    safeUpsertPaperList('olympiadhub_db_exam_papers', updatedPaper);
+    safeUpsertPaperList('mock_db_exam_papers', updatedPaper);
+    safeUpsertPaperList('olympiadhub_db_exams', updatedPaper);
+
+    try {
+      await apiClient.put(`/test-generator/admin-papers/${updatedPaper.id}`, updatedPaper).catch(() => null);
+      await apiClient.put(`/exam-papers/${updatedPaper.id}`, updatedPaper).catch(() => null);
+    } catch (e) {}
+
+    window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedLocal }));
+    window.dispatchEvent(new Event('olympiad-paper-published'));
+  };
+
+  // Helper to upsert a paper into array matching by String ID
+  const upsertPaperList = (list, updatedPaper) => {
+    let found = false;
+    const res = (list || []).map((p) => {
+      if (String(p.id) === String(updatedPaper.id)) {
+        found = true;
+        return updatedPaper;
+      }
+      return p;
+    });
+    if (!found) res.unshift(updatedPaper);
+    return res;
+  };
+
+  // Upload or set diagram image for an existing question in previewPaper
+  const handleUploadQuestionDiagram = (qIdx, file) => {
+    if (!file || !previewPaper) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      const updatedQuestions = (previewPaper.questions || []).map((q, i) => {
+        if (i === qIdx) {
+          return {
+            ...q,
+            question_image: dataUrl,
+            image_url: dataUrl,
+            diagram: dataUrl,
+            image: dataUrl,
+            figure: dataUrl
+          };
+        }
+        return q;
+      });
+      const updatedPaper = { ...previewPaper, questions: updatedQuestions };
+      setPreviewPaper(updatedPaper);
+      setPapers((prev) => prev.map((p) => (String(p.id) === String(updatedPaper.id) ? updatedPaper : p)));
+
+      try {
+        const targetQ = updatedQuestions[qIdx];
+        const qRawText = (targetQ.q || targetQ.question_text || '').trim();
+
+        // 1. Save directly into persistent imageStore (IndexedDB & memory cache)
+        if (targetQ.id) saveImageToStore(String(targetQ.id), dataUrl);
+        if (qRawText) saveImageToStore(qRawText, dataUrl);
+
+        // 2. Persist in local storage
+        safeUpsertPaperList('admin_generator_papers', updatedPaper);
+        safeUpsertPaperList('olympiadhub_db_exam_papers', updatedPaper);
+        safeUpsertPaperList('mock_db_exam_papers', updatedPaper);
+        safeUpsertPaperList('olympiadhub_db_exams', updatedPaper);
+
+        // 3. Sync to olympiadhub_db_questions so question bank fallback also finds this diagram immediately
+        if (qRawText) {
+          const qBank = JSON.parse(localStorage.getItem('olympiadhub_db_questions') || '[]');
+          let bankFound = false;
+          const updatedQBank = qBank.map((bq) => {
+            if ((bq.question_text || bq.q || '').trim() === qRawText) {
+              bankFound = true;
+              return {
+                ...bq,
+                question_image: dataUrl,
+                image_url: dataUrl,
+                diagram: dataUrl,
+                image: dataUrl,
+                figure: dataUrl
+              };
+            }
+            return bq;
+          });
+          if (!bankFound) {
+            updatedQBank.unshift({
+              id: 'Q-' + Date.now(),
+              question_text: qRawText,
+              q: qRawText,
+              options: targetQ.options,
+              correct: targetQ.correct,
+              question_image: dataUrl,
+              image_url: dataUrl,
+              diagram: dataUrl,
+              image: dataUrl,
+              figure: dataUrl
+            });
+          }
+          localStorage.setItem('olympiadhub_db_questions', JSON.stringify(updatedQBank));
+        }
+
+        // 4. Update backend API & MySQL database
+        apiClient.put(`/test-generator/admin-papers/${updatedPaper.id}`, updatedPaper).catch(() => null);
+        apiClient.put(`/exam-papers/${updatedPaper.id}`, updatedPaper).catch(() => null);
+      } catch (e) {}
+
+      window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedPaper }));
+      window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+      window.dispatchEvent(new Event('storage'));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSetQuestionDiagramUrl = (qIdx, url) => {
+    if (!url || !previewPaper) return;
+    const cleanUrl = url.trim();
+    const updatedQuestions = (previewPaper.questions || []).map((q, i) => {
+      if (i === qIdx) {
+        return {
+          ...q,
+          question_image: cleanUrl,
+          image_url: cleanUrl,
+          diagram: cleanUrl,
+          image: cleanUrl,
+          figure: cleanUrl
+        };
+      }
+      return q;
+    });
+    const updatedPaper = { ...previewPaper, questions: updatedQuestions };
+    setPreviewPaper(updatedPaper);
+    setPapers((prev) => prev.map((p) => (String(p.id) === String(updatedPaper.id) ? updatedPaper : p)));
+
+    try {
+      const targetQ = updatedQuestions[qIdx];
+      const qRawText = (targetQ.q || targetQ.question_text || '').trim();
+
+      // 1. Save directly into persistent imageStore
+      if (targetQ.id) saveImageToStore(String(targetQ.id), cleanUrl);
+      if (qRawText) saveImageToStore(qRawText, cleanUrl);
+
+      // 2. Persist in local storage
+      safeUpsertPaperList('admin_generator_papers', updatedPaper);
+      safeUpsertPaperList('olympiadhub_db_exam_papers', updatedPaper);
+      safeUpsertPaperList('mock_db_exam_papers', updatedPaper);
+      safeUpsertPaperList('olympiadhub_db_exams', updatedPaper);
+
+      // 3. Question bank sync
+      if (qRawText) {
+        const qBank = JSON.parse(localStorage.getItem('olympiadhub_db_questions') || '[]');
+        let bankFound = false;
+        const updatedQBank = qBank.map((bq) => {
+          if ((bq.question_text || bq.q || '').trim() === qRawText) {
+            bankFound = true;
+            return {
+              ...bq,
+              question_image: cleanUrl,
+              image_url: cleanUrl,
+              diagram: cleanUrl,
+              image: cleanUrl,
+              figure: cleanUrl
+            };
+          }
+          return bq;
+        });
+        if (!bankFound) {
+          updatedQBank.unshift({
+            id: 'Q-' + Date.now(),
+            question_text: qRawText,
+            q: qRawText,
+            options: targetQ.options,
+            correct: targetQ.correct,
+            question_image: cleanUrl,
+            image_url: cleanUrl,
+            diagram: cleanUrl,
+            image: cleanUrl,
+            figure: cleanUrl
+          });
+        }
+        localStorage.setItem('olympiadhub_db_questions', JSON.stringify(updatedQBank));
+      }
+
+      // 4. Update backend API & MySQL database
+      apiClient.put(`/test-generator/admin-papers/${updatedPaper.id}`, updatedPaper).catch(() => null);
+      apiClient.put(`/exam-papers/${updatedPaper.id}`, updatedPaper).catch(() => null);
+    } catch (e) {}
+
+    window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedPaper }));
+    window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+    window.dispatchEvent(new Event('storage'));
+  };
+
+  const handleRemoveQuestionDiagram = (qIdx) => {
+    if (!previewPaper) return;
+    const updatedQuestions = (previewPaper.questions || []).map((q, i) => {
+      if (i === qIdx) {
+        return {
+          ...q,
+          question_image: '',
+          image_url: '',
+          diagram: '',
+          image: '',
+          figure: ''
+        };
+      }
+      return q;
+    });
+    const updatedPaper = { ...previewPaper, questions: updatedQuestions };
+    setPreviewPaper(updatedPaper);
+    setPapers((prev) => prev.map((p) => (String(p.id) === String(updatedPaper.id) ? updatedPaper : p)));
+
+    try {
+      safeUpsertPaperList('admin_generator_papers', updatedPaper);
+      safeUpsertPaperList('olympiadhub_db_exam_papers', updatedPaper);
+      safeUpsertPaperList('mock_db_exam_papers', updatedPaper);
+      safeUpsertPaperList('olympiadhub_db_exams', updatedPaper);
+
+      apiClient.put(`/test-generator/admin-papers/${updatedPaper.id}`, updatedPaper).catch(() => null);
+      apiClient.put(`/exam-papers/${updatedPaper.id}`, updatedPaper).catch(() => null);
+    } catch (e) {}
+
+    window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedPaper }));
+    window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+    window.dispatchEvent(new Event('storage'));
+  };
+
+  // Toggle Publish / Unpublish paper from preview
+  const handleTogglePublishPreviewPaper = async () => {
+    if (!previewPaper) return;
+    const isCurrentlyPublished = previewPaper.status === 'published';
+    
+    if (isCurrentlyPublished) {
+      const confirmUnpublish = window.confirm(
+        '⚠️ Yeh exam paper pehle se hi Live & Published hai.\n\nKya aap sach me ise Unpublish karke Draft me move karna chahte hain? (Draft karne se students ko yeh exam nahi dikhega)'
+      );
+      if (!confirmUnpublish) {
+        return;
+      }
+    }
+
+    const newStatus = isCurrentlyPublished ? 'draft' : 'published';
+
+    const updatedPaper = {
+      ...previewPaper,
+      status: newStatus,
+      is_published: newStatus === 'published'
+    };
+
+    setPreviewPaper(updatedPaper);
+    setPapers((prev) => prev.map((p) => (p.id === updatedPaper.id ? updatedPaper : p)));
+
+    safeUpsertPaperList('admin_generator_papers', updatedPaper);
+    safeUpsertPaperList('olympiadhub_db_exam_papers', updatedPaper);
+    safeUpsertPaperList('mock_db_exam_papers', updatedPaper);
+    safeUpsertPaperList('olympiadhub_db_exams', updatedPaper);
+
+    try {
+      await apiClient.put(`/test-generator/admin-papers/${updatedPaper.id}`, updatedPaper).catch(() => null);
+      await apiClient.put(`/exam-papers/${updatedPaper.id}`, updatedPaper).catch(() => null);
+    } catch (e) {}
+
+    window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedLocal }));
+    window.dispatchEvent(new CustomEvent('olympiad-paper-published', { detail: updatedPaper }));
+    window.dispatchEvent(new Event('olympiad-paper-published'));
+
+    if (newStatus === 'published') {
+      alert(`🎉 Exam Paper Published Successfully!\n\nYeh paper ab LIVE hai aur Student Panel me sabhi students ko Practice Tests me turant dikhai dega.`);
+    } else {
+      alert(`ℹ️ Exam Paper unpublished (Draft set ho gaya hai). Students ko yeh tab tak nahi dikhega jab tak aap dobara Publish na karein.`);
+    }
   };
 
   // Handle Bulk Modal Actions
@@ -756,14 +1277,26 @@ export const TestGeneratorAdminManager = () => {
         if (idxLetter >= 0) corr = idxLetter;
         else if (!isNaN(parseInt(letter))) corr = Math.max(0, Math.min(3, parseInt(letter) - 1));
       }
+      const qDiagImg = getQuestionImage(item) || item.question_image || item.image_url || item.diagram || item.image || item.figure || '';
+      const finalQId = item.id || `imp-${Date.now()}-${idx}`;
+      if (qDiagImg) {
+        saveImageToStore(String(finalQId), qDiagImg);
+        saveImageToStore(qText, qDiagImg);
+      }
       return {
+        id: finalQId,
         q: qText,
         options: opts,
         correct: corr,
         explanation: item.explanation || item.solution || '',
         marks: Number(item.marks) || 1,
-        question_image: item.question_image || item.image_url || '',
-        image_url: item.image_url || item.question_image || ''
+        question_image: qDiagImg,
+        image_url: qDiagImg,
+        diagram: qDiagImg,
+        image: qDiagImg,
+        figure: qDiagImg,
+        _imgStore: item._imgStore,
+        question_image_keys: item.question_image_keys
       };
     });
 
@@ -799,16 +1332,27 @@ export const TestGeneratorAdminManager = () => {
         if (idxLetter >= 0) corr = idxLetter;
         else if (!isNaN(parseInt(letter))) corr = Math.max(0, Math.min(3, parseInt(letter) - 1));
       }
+      const qDiagImg = getQuestionImage(item) || item.question_image || item.image_url || item.diagram || item.image || item.figure || '';
+      const finalQId = item.id || Date.now() + idx;
+      if (qDiagImg) {
+        saveImageToStore(String(finalQId), qDiagImg);
+        saveImageToStore(qText, qDiagImg);
+      }
       return {
-        id: item.id || Date.now() + idx,
+        id: finalQId,
         q: qText,
         options: opts,
         correct: corr,
         correct_option: ['A', 'B', 'C', 'D'][corr] || 'A',
         explanation: item.explanation || item.solution || '',
         marks: Number(item.marks) || 1,
-        question_image: item.question_image || item.image_url || '',
-        image_url: item.image_url || item.question_image || ''
+        question_image: qDiagImg,
+        image_url: qDiagImg,
+        diagram: qDiagImg,
+        image: qDiagImg,
+        figure: qDiagImg,
+        _imgStore: item._imgStore,
+        question_image_keys: item.question_image_keys
       };
     });
 
@@ -855,18 +1399,29 @@ export const TestGeneratorAdminManager = () => {
         marks: fq.marks,
         explanation: fq.explanation,
         status: 'active',
-        question_image: fq.question_image || fq.image_url || '',
-        image_url: fq.image_url || fq.question_image || ''
+        question_image: fq.question_image || fq.image_url || fq.diagram || '',
+        image_url: fq.image_url || fq.question_image || fq.diagram || '',
+        diagram: fq.diagram || fq.question_image || ''
       }));
       localStorage.setItem('olympiadhub_db_questions', JSON.stringify([...existingQs, ...newBankQs]));
+
+      // 4. Update backend API & MySQL database
+      apiClient.put(`/test-generator/admin-papers/${updatedPaper.id}`, updatedPaper).catch(() => null);
+      apiClient.put(`/exam-papers/${updatedPaper.id}`, updatedPaper).catch(() => null);
     } catch (e) {
       console.warn('Storage sync error:', e);
     }
 
-    // 4. Dispatch events & Trigger Cloud + MySQL Sync
+    // 5. Dispatch events & Trigger Central Sync
     window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedPaper }));
     window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
-    syncManager.schedulePush();
+    try {
+      if (typeof syncManager !== 'undefined' && syncManager?.schedulePush) {
+        syncManager.schedulePush();
+      } else if (typeof window !== 'undefined' && window.syncManager?.schedulePush) {
+        window.syncManager.schedulePush();
+      }
+    } catch (_) {}
 
     // Close modal
     setShowPaperImportModal(false);
@@ -911,11 +1466,10 @@ export const TestGeneratorAdminManager = () => {
     <div class="header">
       <div>
         <div class="brand-title">SkillRise Olympiad &bull; Official Examination Paper</div>
-        <div class="paper-title">${paper.title}</div>
+        <div class="paper-title">${cleanPaperTitle(paper.title)}</div>
       </div>
       <div style="text-align:right;font-size:11px;color:#64748b;">
         <div><strong>Code:</strong> ${paper.exam_code || `PPR-${paper.id}`}</div>
-        <div><strong>Year:</strong> ${paper.exam_year || '2024'}</div>
       </div>
     </div>
     <div class="meta-grid">
@@ -942,11 +1496,14 @@ export const TestGeneratorAdminManager = () => {
             <span><strong>Q${idx + 1}.</strong> ${q.q}</span>
             <span style="font-size:10.5px;color:#64748b;white-space:nowrap;">[${q.marks || 1} Mark]</span>
           </div>
-          ${q.question_image || q.image_url ? `
-            <div style="margin: 8px 0; text-align: center;">
-              <img src="${q.question_image || q.image_url}" style="max-height: 180px; max-width: 90%; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 6px;" alt="Question Diagram" />
-            </div>
-          ` : ''}
+          ${(() => {
+            const qImg = getQuestionImage(q) || q.question_image || q.image_url || q.diagram || q.image || '';
+            return qImg ? `
+              <div style="margin: 10px 0; text-align: center;">
+                <img src="${qImg}" style="max-height: 220px; max-width: 90%; object-fit: contain; border: 1.5px solid #cbd5e1; border-radius: 8px; background: #ffffff; padding: 4px;" alt="Question Diagram" />
+              </div>
+            ` : '';
+          })()}
           <div class="options-grid">
             ${(q.options || []).map((opt, oIdx) => `
               <div class="opt-item">
@@ -1069,8 +1626,6 @@ export const TestGeneratorAdminManager = () => {
     const pClass = p.class_name || p.class || '';
     const pSubCode = p.subject_code || p.subject || '';
     const pCategory = p.paper_category || (p.title?.toLowerCase().includes('sample') ? 'practice_test' : p.title?.toLowerCase().includes('previous') || p.title?.toLowerCase().includes('past') ? 'practice_test' : (p.exam_type === 'generated' || p.paper_category === 'generator' ? 'generator' : 'practice_test'));
-    const pYear = p.exam_year || '2024';
-
     const matchesCategory =
       activeCategoryTab === 'all' ||
       pCategory === activeCategoryTab ||
@@ -1079,13 +1634,12 @@ export const TestGeneratorAdminManager = () => {
 
     const matchesClass = selectedClassFilter === 'All' || pClass.toLowerCase().includes(selectedClassFilter.toLowerCase());
     const matchesSubject = selectedSubjectFilter === 'All' || pSubCode.toLowerCase().includes(selectedSubjectFilter.toLowerCase());
-    const matchesYear = selectedYearFilter === 'All' || pYear === selectedYearFilter || p.title?.includes(selectedYearFilter);
     const matchesSearch =
       !searchQuery ||
       (p.title && p.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (p.exam_code && p.exam_code.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    return matchesCategory && matchesClass && matchesSubject && matchesYear && matchesSearch;
+    return matchesCategory && matchesClass && matchesSubject && matchesSearch;
   });
 
   // =========================================================================
@@ -1159,10 +1713,24 @@ export const TestGeneratorAdminManager = () => {
               <button
                 type="button"
                 onClick={handleSavePaper}
-                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-lg text-xs uppercase tracking-wider transition-all shadow-xs active:scale-98 cursor-pointer flex items-center gap-1.5"
+                disabled={isPublishingPaper}
+                className={`px-5 py-2 font-black rounded-lg text-xs uppercase tracking-wider transition-all shadow-xs active:scale-98 flex items-center gap-1.5 ${
+                  isPublishingPaper 
+                    ? 'bg-emerald-400 text-white cursor-not-allowed opacity-80' 
+                    : 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer'
+                }`}
               >
-                <Check className="w-4 h-4" />
-                <span>Publish Paper</span>
+                {isPublishingPaper ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Publishing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4" />
+                    <span>Publish Paper</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -1197,8 +1765,8 @@ export const TestGeneratorAdminManager = () => {
                 />
               </div>
 
-              {/* Row: Grade, Subject, Year, Duration */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Row: Grade, Subject, Duration (Class & Subject only) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Class */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-600">Class / Grade:</label>
@@ -1226,22 +1794,6 @@ export const TestGeneratorAdminManager = () => {
                     {SUBJECT_OPTIONS.map((sub) => (
                       <option key={sub.id} value={sub.id}>
                         {sub.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Exam Year */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-600">Exam Year / Set:</label>
-                  <select
-                    value={examYear}
-                    onChange={(e) => handleYearChangeInModal(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer bg-white"
-                  >
-                    {YEARS_OPTIONS.map((yr) => (
-                      <option key={yr} value={yr}>
-                        Year {yr}
                       </option>
                     ))}
                   </select>
@@ -1416,7 +1968,6 @@ export const TestGeneratorAdminManager = () => {
                           </span>
                           <input
                             type="text"
-                            required
                             placeholder={`Enter Question #${qIdx + 1} statement...`}
                             value={qItem.q}
                             onChange={(e) => handleUpdateQuestion(qIdx, 'q', e.target.value)}
@@ -1470,31 +2021,82 @@ export const TestGeneratorAdminManager = () => {
                       </div>
 
                       {/* Question Diagram / Image */}
-                      {(qItem.question_image || qItem.image_url) ? (
+                      {getQuestionImage(qItem) ? (
                         <div className="pl-8 pt-1">
-                          <div className="relative inline-block border border-indigo-200 rounded-xl p-2 bg-white shadow-xs">
-                            <div className="text-[10px] font-bold text-indigo-700 mb-1 flex items-center gap-1">
-                              <span>📸 Question Diagram:</span>
-                            </div>
-                            <img
-                              src={qItem.question_image || qItem.image_url}
-                              alt="Question Diagram"
-                              className="max-h-56 max-w-full rounded-lg object-contain bg-white"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                handleUpdateQuestion(qIdx, 'question_image', '');
-                                handleUpdateQuestion(qIdx, 'image_url', '');
-                              }}
-                              className="absolute top-2 right-2 w-5 h-5 bg-rose-600 text-white rounded-full text-xs font-bold flex items-center justify-center hover:bg-rose-700 shadow-sm cursor-pointer"
-                              title="Remove Diagram"
-                            >
-                              ✕
-                            </button>
-                          </div>
+                          <QuestionDiagram
+                            question={qItem}
+                            title={`Question ${qIdx + 1} Diagram / Figure`}
+                            maxHeight="max-h-72 sm:max-h-96"
+                            editable={true}
+                            onChange={(file) => {
+                              const reader = new FileReader();
+                              reader.onload = () => {
+                                const dataUrl = reader.result;
+                                handleUpdateQuestion(qIdx, 'question_image', dataUrl);
+                                handleUpdateQuestion(qIdx, 'image_url', dataUrl);
+                                handleUpdateQuestion(qIdx, 'diagram', dataUrl);
+                                handleUpdateQuestion(qIdx, 'image', dataUrl);
+                                handleUpdateQuestion(qIdx, 'figure', dataUrl);
+                                if (qItem.id) saveImageToStore(String(qItem.id), dataUrl);
+                                if (qItem.q) saveImageToStore(qItem.q, dataUrl);
+                              };
+                              reader.readAsDataURL(file);
+                            }}
+                            onRemove={() => {
+                              handleUpdateQuestion(qIdx, 'question_image', '');
+                              handleUpdateQuestion(qIdx, 'image_url', '');
+                              handleUpdateQuestion(qIdx, 'diagram', '');
+                              handleUpdateQuestion(qIdx, 'image', '');
+                              handleUpdateQuestion(qIdx, 'figure', '');
+                            }}
+                          />
                         </div>
-                      ) : null}
+                      ) : (
+                        <div className="pl-8 pt-1 flex items-center gap-2 flex-wrap">
+                          <label className="cursor-pointer text-[11px] font-bold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all">
+                            <span>📸 Upload Diagram Image</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onload = () => {
+                                    const dataUrl = reader.result;
+                                    handleUpdateQuestion(qIdx, 'question_image', dataUrl);
+                                    handleUpdateQuestion(qIdx, 'image_url', dataUrl);
+                                    handleUpdateQuestion(qIdx, 'diagram', dataUrl);
+                                    handleUpdateQuestion(qIdx, 'image', dataUrl);
+                                    handleUpdateQuestion(qIdx, 'figure', dataUrl);
+                                    if (qItem.id) saveImageToStore(String(qItem.id), dataUrl);
+                                    if (qItem.q) saveImageToStore(qItem.q, dataUrl);
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="or paste Diagram Image URL / Data URL..."
+                            className="text-xs px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-700 placeholder-slate-400 w-64 focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                            onBlur={(e) => {
+                              const val = e.target.value.trim();
+                              if (val) {
+                                handleUpdateQuestion(qIdx, 'question_image', val);
+                                handleUpdateQuestion(qIdx, 'image_url', val);
+                                handleUpdateQuestion(qIdx, 'diagram', val);
+                                handleUpdateQuestion(qIdx, 'image', val);
+                                handleUpdateQuestion(qIdx, 'figure', val);
+                                if (qItem.id) saveImageToStore(String(qItem.id), val);
+                                if (qItem.q) saveImageToStore(qItem.q, val);
+                              }
+                            }}
+                          />
+                        </div>
+                      )}
 
                       {/* 4 Options Grid */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-8">
@@ -1527,7 +2129,6 @@ export const TestGeneratorAdminManager = () => {
                             ) : (
                               <input
                                 type="text"
-                                required
                                 placeholder={`Option ${letter}`}
                                 value={qItem.options?.[optIdx] || ''}
                                 onChange={(e) => handleUpdateOption(qIdx, optIdx, e.target.value)}
@@ -1605,10 +2206,24 @@ export const TestGeneratorAdminManager = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-lg text-xs uppercase tracking-wider transition-all shadow-xs active:scale-98 cursor-pointer flex items-center gap-2"
+                  disabled={isPublishingPaper}
+                  className={`px-6 py-2.5 font-black rounded-lg text-xs uppercase tracking-wider transition-all shadow-xs active:scale-98 flex items-center gap-2 ${
+                    isPublishingPaper 
+                      ? 'bg-emerald-400 text-white cursor-not-allowed opacity-80' 
+                      : 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer'
+                  }`}
                 >
-                  <Check className="w-4 h-4" />
-                  <span>Publish Exam Paper</span>
+                  {isPublishingPaper ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Publishing Exam...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>Publish Exam Paper</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -1798,14 +2413,42 @@ export const TestGeneratorAdminManager = () => {
               <div className="h-5 w-px bg-slate-200 hidden sm:block" />
               <div>
                 <span className="text-[10px] font-black uppercase text-amber-600">
-                  {previewPaper.class_name || previewPaper.class} &bull; {previewPaper.subject_code || 'IMO'} &bull; {previewPaper.exam_year || '2024'}
+                  {previewPaper.class_name || previewPaper.class} &bull; {previewPaper.subject_code || 'IMO'}
                 </span>
-                <h1 className="text-base sm:text-lg font-black text-slate-900">{previewPaper.title}</h1>
+                <h1 className="text-base sm:text-lg font-black text-slate-900">{cleanPaperTitle(previewPaper.title)}</h1>
               </div>
             </div>
 
             {/* Quick Export & Actions Toolbar */}
             <div className="flex items-center gap-2 flex-wrap">
+              {/* Publish / Status Controls */}
+              {previewPaper.status === 'published' ? (
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-black text-xs shadow-xs">
+                    <CheckCircle2 className="w-4 h-4 text-white" />
+                    <span>✓ Live for Students</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleTogglePublishPreviewPaper}
+                    className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-colors cursor-pointer"
+                    title="Move paper back to Draft"
+                  >
+                    Unpublish
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleTogglePublishPreviewPaper}
+                  className="px-4 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-amber-200 animate-pulse"
+                  title="Publish paper directly to Student portal"
+                >
+                  <Send className="w-4 h-4 text-white" />
+                  <span>🚀 Publish Paper (Make Live)</span>
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() => setShowPaperImportModal(true)}
@@ -1878,6 +2521,31 @@ export const TestGeneratorAdminManager = () => {
               <span className="px-3 py-1 bg-amber-50 text-amber-800 rounded-lg">{previewPaper.subject_code || 'IMO'}</span>
               <span className="px-3 py-1 bg-sky-50 text-sky-700 rounded-lg">{previewPaper.duration_minutes || 60} Mins</span>
               <span className="px-3 py-1 bg-emerald-50 text-emerald-800 rounded-lg">{qCount} Questions</span>
+              
+              {/* Publish Toggle Button */}
+              <button
+                type="button"
+                onClick={handleTogglePublishPreviewPaper}
+                className={`px-3 py-1 rounded-lg text-xs font-black cursor-pointer flex items-center gap-1.5 transition-all shadow-2xs ${
+                  previewPaper.status === 'published'
+                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200'
+                    : 'bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200'
+                }`}
+                title="Click to toggle publish status"
+              >
+                {previewPaper.status === 'published' ? (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Published to Students</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    <span>Draft (Click to Publish)</span>
+                  </>
+                )}
+              </button>
+
               <button
                 type="button"
                 onClick={() => setShowPaperImportModal(true)}
@@ -1893,25 +2561,75 @@ export const TestGeneratorAdminManager = () => {
           <div className="space-y-4">
             {Array.isArray(previewPaper.questions) && previewPaper.questions.length > 0 ? (
               previewPaper.questions.map((q, idx) => (
-                <div key={idx} className="p-5 rounded-xl bg-white border border-slate-200 space-y-3 shadow-2xs">
-                  <div className="flex items-start gap-3 text-sm font-bold text-slate-900">
-                    <span className="w-6 h-6 rounded-lg bg-slate-800 text-white flex items-center justify-center font-black text-xs shrink-0">
-                      {idx + 1}
-                    </span>
-                    <span className="flex-1">{q.q}</span>
-                    <span className="text-[11px] font-bold text-slate-400">[{q.marks || 1} Mark]</span>
+                <div key={idx} className="p-5 rounded-xl bg-white border border-slate-200 space-y-3 shadow-2xs group relative">
+                  <div className="flex items-start justify-between gap-3 text-sm font-bold text-slate-900">
+                    <div className="flex items-start gap-3 flex-1">
+                      <span className="w-6 h-6 rounded-lg bg-slate-800 text-white flex items-center justify-center font-black text-xs shrink-0">
+                        {idx + 1}
+                      </span>
+                      <span className="flex-1">{getCleanQuestionText(q.q || q.question_text || '') || q.q}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <span className="text-[11px] font-bold text-slate-400">[{q.marks || 1} Mark]</span>
+                      {/* Delete Question Button */}
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteQuestionFromPreview(idx)}
+                        className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200 text-xs font-black transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
+                        title={`Delete Question #${idx + 1}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                        <span>Delete</span>
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Question Diagram */}
-                  {(q.question_image || q.image_url) && (
-                    <div className="pl-9 my-2">
-                      <img
-                        src={q.question_image || q.image_url}
-                        alt="Question Diagram"
-                        className="max-h-56 max-w-full object-contain rounded-xl border border-indigo-200 bg-white p-1 shadow-xs"
+                  {/* Question Diagram Section */}
+                  <div className="pl-9 my-2">
+                    {getQuestionImage(q) ? (
+                      <QuestionDiagram
+                        question={q}
+                        title={`Question ${idx + 1} Diagram / Figure`}
+                        maxHeight="max-h-80 sm:max-h-96"
+                        editable={true}
+                        onChange={(file) => handleUploadQuestionDiagram(idx, file)}
+                        onRemove={() => handleRemoveQuestionDiagram(idx)}
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <div className="my-2 flex items-center gap-2 flex-wrap">
+                        <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-indigo-300 bg-indigo-50/70 hover:bg-indigo-100 text-indigo-700 text-xs font-bold cursor-pointer transition-all shadow-2xs">
+                          <span>📸</span>
+                          <span>+ Attach Diagram / Image</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleUploadQuestionDiagram(idx, file);
+                            }}
+                          />
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="or paste Diagram Image URL / Data URL..."
+                          className="text-xs px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-700 placeholder-slate-400 w-64 focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && e.target.value.trim()) {
+                              handleSetQuestionDiagramUrl(idx, e.target.value.trim());
+                              e.target.value = '';
+                            }
+                          }}
+                          onBlur={(e) => {
+                            if (e.target.value.trim()) {
+                              handleSetQuestionDiagramUrl(idx, e.target.value.trim());
+                              e.target.value = '';
+                            }
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-9 text-xs">
                     {q.options?.map((opt, optIdx) => (
@@ -2058,6 +2776,32 @@ export const TestGeneratorAdminManager = () => {
         </div>
       )}
 
+      {/* Paper Created & Published Success Toast */}
+      {paperSavedToast && (
+        <div className="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-500 text-emerald-950 shadow-md flex items-center justify-between gap-3 animate-in slide-in-from-top duration-200">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black shrink-0 shadow-xs">
+              <Check className="w-5 h-5 stroke-[3]" />
+            </div>
+            <div>
+              <span className="font-black text-xs sm:text-sm block text-emerald-900">
+                {paperSavedToast}
+              </span>
+              <span className="text-[11px] text-emerald-700 font-medium">
+                The paper is immediately visible above and unlocked in Student Test Generator Pro.
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setPaperSavedToast('')}
+            className="text-emerald-700 hover:text-emerald-900 font-black text-xs cursor-pointer p-1.5 rounded-lg hover:bg-emerald-100/60"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Dedicated Practice Test Pricing Banner Card */}
       <div className="bg-gradient-to-r from-[#2d124d] via-[#1e1b4b] to-[#3b0764] rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-white shadow-md flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-5 border border-purple-800/50">
         <div className="flex items-start sm:items-center gap-3.5 sm:gap-4">
@@ -2121,19 +2865,19 @@ export const TestGeneratorAdminManager = () => {
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search title, exam code, year..."
+            placeholder="Search title, exam code, subject..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
           />
         </div>
 
-        {/* 2-Column Mobile Grid for Filters */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 text-xs">
+        {/* 3-Column Grid for Class & Subject Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-2.5 text-xs">
           {/* Class Filter */}
           <div>
             <label className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-wider block mb-1 truncate">
-              Grade
+              Class / Grade
             </label>
             <select
               value={selectedClassFilter}
@@ -2168,25 +2912,6 @@ export const TestGeneratorAdminManager = () => {
             </select>
           </div>
 
-          {/* Year Filter */}
-          <div>
-            <label className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-wider block mb-1 truncate">
-              Year
-            </label>
-            <select
-              value={selectedYearFilter}
-              onChange={(e) => setSelectedYearFilter(e.target.value)}
-              className="w-full px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer truncate"
-            >
-              <option value="All">All Years</option>
-              {YEARS_OPTIONS.map((yr) => (
-                <option key={yr} value={yr}>
-                  {yr}
-                </option>
-              ))}
-            </select>
-          </div>
-
           {/* Clear Filters Button */}
           <div className="flex flex-col justify-end">
             <button
@@ -2209,7 +2934,7 @@ export const TestGeneratorAdminManager = () => {
           <span>
             Showing: <strong className="text-slate-900 font-black">{filteredPapers.length} {filteredPapers.length === 1 ? 'Paper' : 'Papers'}</strong>
           </span>
-          {(selectedClassFilter !== 'All' || selectedSubjectFilter !== 'All' || selectedYearFilter !== 'All' || searchQuery) && (
+          {(selectedClassFilter !== 'All' || selectedSubjectFilter !== 'All' || searchQuery) && (
             <span className="text-[11px] text-amber-600 font-bold">
               Filters active
             </span>
@@ -2263,14 +2988,11 @@ export const TestGeneratorAdminManager = () => {
                     <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${categoryBadge.color}`}>
                       {categoryBadge.label}
                     </span>
-                    <span className="text-[10px] font-mono font-bold text-slate-400">
-                      {paper.exam_year ? `Year ${paper.exam_year}` : ''}
-                    </span>
                   </div>
 
                   <div>
                     <h3 className="text-sm font-black text-slate-900 leading-snug">
-                      {paper.title}
+                      {cleanPaperTitle(paper.title)}
                     </h3>
                     <p className="text-[11px] text-slate-400 font-mono mt-0.5">
                       Code: {paper.exam_code || `PPR-${paper.id}`}

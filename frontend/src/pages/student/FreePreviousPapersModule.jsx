@@ -4,6 +4,13 @@ import { apiClient } from '../../api/client';
 import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfModal';
 import { DetailedSolutionsPage } from './DetailedSolutionsPage';
 import {
+  getQuestionImage,
+  getCleanQuestionText,
+  isImageString,
+  getOptionImageSrc,
+  QuestionDiagram
+} from '../../utils/questionMediaHelper';
+import {
   FileText,
   Clock,
   CheckCircle2,
@@ -159,7 +166,7 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
         const subCode = (p.subject_code || p.subject || 'IMO').toUpperCase();
         const subLower = (p.subject || p.subject_name || '').toLowerCase();
         const color =
-          subLower.includes('cyber') || subLower.includes('icso') || subLower.includes('ico')
+          subLower.includes('cyber') || subLower.includes('icso') || subLower.includes('ico') || subLower.includes('digital') || subLower.includes('idlo')
             ? '#0284c7'
             : subLower.includes('sci') || subLower.includes('iso') || subLower.includes('nso')
             ? '#16a34a'
@@ -169,30 +176,41 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
             ? '#ea580c'
             : subLower.includes('gk') || subLower.includes('igko')
             ? '#e7b84b'
+            : subLower.includes('hin') || subLower.includes('iho')
+            ? '#dc2626'
             : '#7c3aed';
 
         const qs = Array.isArray(p.questions)
-          ? p.questions.map((q, idx) => ({
-              id: q.id || idx + 1,
-              section: q.section || 'General Section',
-              q: q.q || q.question_text || `Question ${idx + 1}`,
-              options:
-                Array.isArray(q.options) && q.options.length >= 2
-                  ? q.options
-                  : [q.option_a || 'Option A', q.option_b || 'Option B', q.option_c || 'Option C', q.option_d || 'Option D'],
-              correct:
-                typeof q.correct === 'number'
-                  ? q.correct
-                  : q.correct_option === 'B'
-                  ? 1
-                  : q.correct_option === 'C'
-                  ? 2
-                  : q.correct_option === 'D'
-                  ? 3
-                  : 0,
-              marks: q.marks || 1,
-              explanation: q.explanation || ''
-            }))
+          ? p.questions.map((q, idx) => {
+              const rawImg = q.question_image || q.image_url || q.diagram || q.image || q.figure || '';
+              const qImg = getQuestionImage(q) || rawImg;
+              return {
+                ...q,
+                id: q.id || idx + 1,
+                section: q.section || 'General Section',
+                q: q.q || q.question_text || `Question ${idx + 1}`,
+                question_text: q.q || q.question_text || `Question ${idx + 1}`,
+                question_image: qImg,
+                image_url: qImg,
+                diagram: qImg,
+                options:
+                  Array.isArray(q.options) && q.options.length >= 2
+                    ? q.options
+                    : [q.option_a || 'Option A', q.option_b || 'Option B', q.option_c || 'Option C', q.option_d || 'Option D'],
+                correct:
+                  typeof q.correct === 'number'
+                    ? q.correct
+                    : q.correct_option === 'B'
+                    ? 1
+                    : q.correct_option === 'C'
+                    ? 2
+                    : q.correct_option === 'D'
+                    ? 3
+                    : 0,
+                marks: q.marks || 1,
+                explanation: q.explanation || ''
+              };
+            })
           : [];
 
         // Extract class name
@@ -245,9 +263,11 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
     const subMap = {
       math: ['imo', 'math', 'mathematics'],
       science: ['iso', 'science', 'nso'],
-      cyber: ['ico', 'icso', 'cyber', 'computer', 'computers', 'ai'],
+      digital: ['ico', 'icso', 'cyber', 'computer', 'computers', 'ai', 'digital', 'idlo', 'it'],
+      cyber: ['ico', 'icso', 'cyber', 'computer', 'computers', 'ai', 'digital', 'idlo', 'it'],
       english: ['ieo', 'english'],
       gk: ['igko', 'gk', 'general knowledge'],
+      hindi: ['iho', 'hindi'],
       reasoning: ['lro', 'iro', 'isso', 'reasoning', 'social studies', 'aptitude']
     };
     const validCodes = subMap[subKey] || [subKey];
@@ -388,6 +408,9 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
         id: q.id || idx + 1,
         question_text: q.q || q.question_text || `Question ${idx + 1}`,
         q: q.q || q.question_text,
+        question_image: q.question_image || q.image_url || q.diagram || null,
+        image_url: q.image_url || q.question_image || null,
+        diagram: q.diagram || null,
         options: q.options,
         option_a: q.options?.[0] || q.option_a || 'Option A',
         option_b: q.options?.[1] || q.option_b || 'Option B',
@@ -663,8 +686,14 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
               {/* Question Statement */}
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-[#321630] leading-relaxed">
-                  {currentQ.q || 'Question statement loading...'}
+                  {getCleanQuestionText(currentQ.q || 'Question statement loading...')}
                 </h3>
+                {/* Diagram / Figure Display */}
+                <QuestionDiagram
+                  question={currentQ}
+                  title="Question Diagram / Figure"
+                  maxHeight="max-h-80 sm:max-h-96"
+                />
               </div>
 
               {/* 4 Selectable Options (A, B, C, D) */}
@@ -672,6 +701,7 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
                 {currentQ.options?.map((optionText, optIdx) => {
                   const isSelected = selectedAnswers[activeQuestionIdx] === optIdx;
                   const optionLabel = String.fromCharCode(65 + optIdx);
+                  const isImg = isImageString(optionText);
 
                   return (
                     <button
@@ -710,7 +740,15 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
                         >
                           {optionLabel}
                         </span>
-                        <span className="leading-snug">{optionText}</span>
+                        {isImg ? (
+                          <img
+                            src={getOptionImageSrc(optionText)}
+                            alt={`Option ${optionLabel}`}
+                            className="max-h-24 max-w-full rounded-lg object-contain border border-slate-200 bg-white p-1"
+                          />
+                        ) : (
+                          <span className="leading-snug">{optionText}</span>
+                        )}
                       </div>
 
                       {isSelected && (
@@ -1104,13 +1142,21 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
                     </span>
                   </div>
 
-                  <p className="text-xs sm:text-sm font-bold text-slate-900 mt-3 leading-relaxed">{item.questionText}</p>
+                  <p className="text-xs sm:text-sm font-bold text-slate-900 mt-3 leading-relaxed">
+                    {getCleanQuestionText(item.questionText || item.q || '')}
+                  </p>
+
+                  {/* Diagram / Figure Display */}
+                  <div className="mt-2.5">
+                    <QuestionDiagram question={item} title="Question Diagram / Figure" />
+                  </div>
 
                   {/* Options Display */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3">
                     {item.options.map((opt, optIdx) => {
                       const isUserChoice = item.userAnswerIndex === optIdx;
                       const isCorrectChoice = item.correctAnswerIndex === optIdx;
+                      const isImg = isImageString(opt);
 
                       let optClass = 'bg-white border-slate-200 text-slate-700';
                       if (isCorrectChoice) {
@@ -1138,7 +1184,15 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
                             }`}>
                               {String.fromCharCode(65 + optIdx)}
                             </span>
-                            <span>{opt}</span>
+                            {isImg ? (
+                              <img
+                                src={getOptionImageSrc(opt)}
+                                alt={`Option ${String.fromCharCode(65 + optIdx)}`}
+                                className="max-h-20 max-w-full rounded-md object-contain border border-slate-200 bg-white p-1"
+                              />
+                            ) : (
+                              <span>{opt}</span>
+                            )}
                           </div>
                           {isCorrectChoice && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
                           {isUserChoice && !isCorrectChoice && <XCircle className="w-4 h-4 text-rose-600 shrink-0" />}
@@ -1462,95 +1516,32 @@ export const FreePreviousPapersModule = ({ mode = 'previous_year', onNavigateTab
                 <span className="text-xs font-black text-slate-700">Select Olympiad:</span>
               </div>
               <div className="flex flex-wrap items-center gap-2.5 flex-1">
-                {/* IEO */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedSubjectKey('english')}
-                  className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
-                    selectedSubjectKey === 'english'
-                      ? 'bg-[#df7950] text-white border-[#df7950] shadow-sm ring-2 ring-[#df7950]/30'
-                      : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
-                  }`}
-                >
-                  <input type="radio" checked={selectedSubjectKey === 'english'} readOnly className="accent-white" />
-                  <span className="font-black font-mono tracking-wider">I E O</span>
-                  <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
-                </button>
-
-                {/* IMO */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedSubjectKey('math')}
-                  className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
-                    selectedSubjectKey === 'math'
-                      ? 'bg-[#e8ac2c] text-white border-[#e8ac2c] shadow-sm ring-2 ring-[#e8ac2c]/30'
-                      : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
-                  }`}
-                >
-                  <input type="radio" checked={selectedSubjectKey === 'math'} readOnly className="accent-white" />
-                  <span className="font-black font-mono tracking-wider">I M O</span>
-                  <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
-                </button>
-
-                {/* ISO */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedSubjectKey('science')}
-                  className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
-                    selectedSubjectKey === 'science'
-                      ? 'bg-[#9db83b] text-white border-[#9db83b] shadow-sm ring-2 ring-[#9db83b]/30'
-                      : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
-                  }`}
-                >
-                  <input type="radio" checked={selectedSubjectKey === 'science'} readOnly className="accent-white" />
-                  <span className="font-black font-mono tracking-wider">I S O</span>
-                  <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
-                </button>
-
-                {/* ICSO */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedSubjectKey('cyber')}
-                  className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
-                    selectedSubjectKey === 'cyber'
-                      ? 'bg-[#0284c7] text-white border-[#0284c7] shadow-sm ring-2 ring-[#0284c7]/30'
-                      : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
-                  }`}
-                >
-                  <input type="radio" checked={selectedSubjectKey === 'cyber'} readOnly className="accent-white" />
-                  <span className="font-black font-mono tracking-wider">I C S O</span>
-                  <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
-                </button>
-
-                {/* IGKO */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedSubjectKey('gk')}
-                  className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
-                    selectedSubjectKey === 'gk'
-                      ? 'bg-[#eab308] text-white border-[#eab308] shadow-sm ring-2 ring-[#eab308]/30'
-                      : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
-                  }`}
-                >
-                  <input type="radio" checked={selectedSubjectKey === 'gk'} readOnly className="accent-white" />
-                  <span className="font-black font-mono tracking-wider">I G K O</span>
-                  <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
-                </button>
-
-                {/* ISSO */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedSubjectKey('reasoning')}
-                  className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
-                    selectedSubjectKey === 'reasoning'
-                      ? 'bg-[#b97fa8] text-white border-[#b97fa8] shadow-sm ring-2 ring-[#b97fa8]/30'
-                      : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
-                  }`}
-                >
-                  <input type="radio" checked={selectedSubjectKey === 'reasoning'} readOnly className="accent-white" />
-                  <span className="font-black text-xs uppercase tracking-wider">ISSO (Reasoning)</span>
-                  <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
-                </button>
+                {[
+                  { id: 'english', code: 'I E O', name: 'IEO (English)', activeBg: 'bg-[#df7950] text-white border-[#df7950] shadow-sm ring-2 ring-[#df7950]/30' },
+                  { id: 'math', code: 'I M O', name: 'IMO (Maths)', activeBg: 'bg-[#e8ac2c] text-white border-[#e8ac2c] shadow-sm ring-2 ring-[#e8ac2c]/30' },
+                  { id: 'science', code: 'I S O', name: 'ISO (Science)', activeBg: 'bg-[#9db83b] text-white border-[#9db83b] shadow-sm ring-2 ring-[#9db83b]/30' },
+                  { id: 'digital', code: 'I D L O', name: 'IDLO (Digital Literacy)', activeBg: 'bg-[#0284c7] text-white border-[#0284c7] shadow-sm ring-2 ring-[#0284c7]/30' },
+                  { id: 'gk', code: 'I G K O', name: 'IGKO (GK)', activeBg: 'bg-[#eab308] text-white border-[#eab308] shadow-sm ring-2 ring-[#eab308]/30' },
+                  { id: 'hindi', code: 'I H O', name: 'IHO (Hindi)', activeBg: 'bg-[#dc2626] text-white border-[#dc2626] shadow-sm ring-2 ring-[#dc2626]/30' }
+                ].map((sub) => {
+                  const isSelected = selectedSubjectKey === sub.id;
+                  return (
+                    <button
+                      key={sub.id}
+                      type="button"
+                      onClick={() => setSelectedSubjectKey(sub.id)}
+                      className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
+                        isSelected
+                          ? sub.activeBg
+                          : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
+                      }`}
+                    >
+                      <input type="radio" checked={isSelected} readOnly className="accent-white" />
+                      <span className="font-black font-mono tracking-wider">{sub.code}</span>
+                      <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

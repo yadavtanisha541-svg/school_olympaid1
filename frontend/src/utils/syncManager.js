@@ -125,7 +125,7 @@ export const syncManager = {
       let updatedCount = 0;
       const localData = this.getAllLocalData();
 
-      // Merge Cloud Data into Local Storage
+      // Merge Cloud Data into Local Storage safely without wiping newer local records
       Object.keys(cloudData).forEach((key) => {
         if (key === 'name') return;
         const cloudVal = cloudData[key];
@@ -133,10 +133,56 @@ export const syncManager = {
           const currentLocalVal = localStorage.getItem(key);
           const normalizedCloudVal = typeof cloudVal === 'string' ? cloudVal : JSON.stringify(cloudVal);
 
-          if (!currentLocalVal || currentLocalVal !== normalizedCloudVal) {
+          if (!currentLocalVal) {
             localStorage.setItem(key, normalizedCloudVal);
             updatedCount++;
+            return;
           }
+
+            // Check if both are JSON arrays (e.g., papers, exams, results, questions)
+            let isArrayMerge = false;
+            try {
+              const localParsed = JSON.parse(currentLocalVal);
+              const cloudParsed = typeof cloudVal === 'string' ? JSON.parse(cloudVal) : cloudVal;
+              if (Array.isArray(localParsed) && Array.isArray(cloudParsed)) {
+                isArrayMerge = true;
+                let deletedIds = [];
+                try {
+                  deletedIds = JSON.parse(localStorage.getItem('olympiadhub_deleted_ids') || '[]');
+                } catch (e) {}
+
+                const mergedMap = new Map();
+                // 1. Cloud items first as baseline (skip if deleted locally)
+                cloudParsed.forEach((item) => {
+                  if (!item) return;
+                  if (item.id && deletedIds.includes(String(item.id))) return;
+                  const itemKey = String(item.id || item.exam_code || item.login_id || item.email || JSON.stringify(item));
+                  mergedMap.set(itemKey, item);
+                });
+                // 2. Local items (which have newly created or edited items) take precedence & are kept!
+                localParsed.forEach((item) => {
+                  if (!item) return;
+                  if (item.id && deletedIds.includes(String(item.id))) return;
+                  const itemKey = String(item.id || item.exam_code || item.login_id || item.email || JSON.stringify(item));
+                  mergedMap.set(itemKey, item);
+                });
+                const mergedArray = Array.from(mergedMap.values());
+                const mergedStr = JSON.stringify(mergedArray);
+                if (mergedStr !== currentLocalVal) {
+                  localStorage.setItem(key, mergedStr);
+                  updatedCount++;
+                }
+              }
+            } catch (err) {}
+
+            if (!isArrayMerge) {
+              // Non-array object or primitive: Preserve local modifications!
+              // Only adopt cloud value if local does not exist yet.
+              if (!currentLocalVal) {
+                localStorage.setItem(key, normalizedCloudVal);
+                updatedCount++;
+              }
+            }
         }
       });
 
@@ -217,6 +263,7 @@ export const syncManager = {
   dispatchUpdateEvents() {
     if (typeof window === 'undefined') return;
     window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+    window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated'));
     window.dispatchEvent(new CustomEvent('olympiadhub-pricing-updated'));
     window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated'));
     window.dispatchEvent(new CustomEvent('role-permissions-updated'));
@@ -323,6 +370,10 @@ function notifyListeners(state) {
       l(state);
     } catch (e) {}
   });
+}
+
+if (typeof window !== 'undefined') {
+  window.syncManager = syncManager;
 }
 
 export default syncManager;

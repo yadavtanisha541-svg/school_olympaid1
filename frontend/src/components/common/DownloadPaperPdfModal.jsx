@@ -61,11 +61,10 @@ export const generateAndPrintPaperPdf = (paper, includeAnswers = true) => {
     <div class="header">
       <div>
         <div class="brand-title">SkillRise Olympiad &bull; Official Examination Paper</div>
-        <div class="paper-title">${paper.title || 'Level-1 Olympiad Paper'}</div>
+        <div class="paper-title">${(paper.title || 'Practice Test').replace(/Previous\s*Year\s*Paper/gi, 'Practice Test').replace(/Previous\s*Year/gi, 'Practice Test').replace(/\b(201[5-9]|202[0-9])\b/g, '').trim()}</div>
       </div>
       <div style="text-align:right;font-size:11px;color:#64748b;">
-        <div><strong>Code:</strong> ${paper.exam_code || paper.short_code || `PPR-${paper.id || '2026'}`}</div>
-        <div><strong>Year:</strong> ${paper.exam_year || '2026'}</div>
+        <div><strong>Code:</strong> ${(paper.exam_code || paper.short_code || `PPR-${paper.id || 'EXAM'}`).replace(/\s*-\s*\d{4}/g, '')}</div>
       </div>
     </div>
     <div class="meta-grid">

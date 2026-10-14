@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { extractFromFile, parseQuestionsFromText, getExtractedImages } from '../../utils/universalDocumentParser';
 import { syncManager } from '../../utils/syncManager';
+import { saveImageToStore, saveMultipleImages } from '../../utils/imageStore';
 
 export const UniversalQuestionImportModal = ({
   isOpen, onClose,
@@ -82,20 +83,47 @@ export const UniversalQuestionImportModal = ({
     if (parsedQuestions.length === 0) { setErrorMsg('No questions to import.'); return; }
     setIsImporting(true);
     try {
-      const formatted = parsedQuestions.map(({ _imgStore, question_image_keys, ...q }) => {
-        const primaryImg = q.question_image || (question_image_keys?.[0] ? ((_imgStore || allImages)[question_image_keys[0]]) : '') || '';
+      const formatted = parsedQuestions.map((q) => {
+        const primaryImg = q.question_image || q.image_url || q.diagram || (q.question_image_keys?.[0] ? ((q._imgStore || allImages)[q.question_image_keys[0]]) : '') || '';
+        const qText = q.question_text || q.q || '';
         return {
           ...q,
+          q: qText,
+          question_text: qText,
           question_image: primaryImg,
           image_url: primaryImg,
+          diagram: primaryImg,
+          image: primaryImg,
+          figure: primaryImg,
+          _imgStore: q._imgStore || allImages,
+          question_image_keys: q.question_image_keys || [],
           class_id: targetClassId || q.class_id,
           subject_id: targetSubjectId || q.subject_id,
         };
       });
+
+      // Save all images to persistent imageStore
+      if (typeof window !== 'undefined') {
+        saveMultipleImages(allImages);
+        formatted.forEach(item => {
+          if (item.question_image) {
+            saveImageToStore(String(item.id), item.question_image);
+            const raw = (item.question_text || item.q || '').trim();
+            const norm = raw.replace(/^(\d+[\.\)\s]+)/, '').replace(/\s+/g, ' ').trim().toLowerCase();
+            if (norm) saveImageToStore(norm, item.question_image);
+          }
+        });
+      }
+
       if (onQuestionsImported) await onQuestionsImported(formatted);
       try { syncManager.schedulePush?.(); } catch (_) {}
       setSuccessMsg(`Imported ${formatted.length} questions successfully!`);
-      setTimeout(() => { onClose(); setParsedQuestions([]); setFile(null); setRawText(''); setAllImages({}); }, 1200);
+      setTimeout(() => {
+        onClose();
+        setParsedQuestions([]);
+        setFile(null);
+        setRawText('');
+      }, 1200);
     } catch (err) {
       setErrorMsg('Import error: ' + (err.message || 'Unknown error'));
     } finally {

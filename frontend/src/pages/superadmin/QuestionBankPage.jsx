@@ -30,7 +30,7 @@ import { Badge } from '../../components/Badge';
 import { Modal } from '../../components/Modal';
 import { useAuth } from '../../contexts/AuthContext';
 import { UniversalQuestionImportModal } from '../../components/common/UniversalQuestionImportModal';
-import { getTopicsForSubject } from '../../data/subjectTopics';
+import { getQuestionImage, QuestionDiagram } from '../../utils/questionMediaHelper';
 
 export const QuestionBankPage = () => {
   const { user } = useAuth();
@@ -877,15 +877,11 @@ export const QuestionBankPage = () => {
                   </h3>
 
                   {/* Question Diagram / Image */}
-                  {(q.question_image || q.image_url) && (
-                    <div className="my-3">
-                      <img
-                        src={q.question_image || q.image_url}
-                        alt="Question Diagram"
-                        className="max-h-56 max-w-full rounded-2xl border border-indigo-200/80 shadow-xs object-contain bg-white p-1"
-                      />
-                    </div>
-                  )}
+                  <QuestionDiagram
+                    question={q}
+                    title="Question Diagram / Figure"
+                    maxHeight="max-h-72 sm:max-h-80"
+                  />
 
                   {/* 4 Options Grid Preview */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-xs">

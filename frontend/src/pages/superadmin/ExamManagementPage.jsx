@@ -178,7 +178,55 @@ export const ExamManagementPage = () => {
     try {
       setLoading(true);
       const res = await apiClient.get('/exams', { search, exam_type: filterType });
-      if (res.success) setExams(res.data || []);
+      let combinedExams = (res && res.success && Array.isArray(res.data)) ? [...res.data] : [];
+
+      // Multi-source local storage fallback to ensure zero loss across reloads
+      const addUniqueExam = (item) => {
+        if (!item || (!item.id && !item.exam_code)) return;
+        const idStr = item.id ? String(item.id) : '';
+        const codeStr = item.exam_code ? String(item.exam_code) : '';
+        const exists = combinedExams.some(e => 
+          (idStr && String(e.id) === idStr) ||
+          (codeStr && e.exam_code && String(e.exam_code) === codeStr)
+        );
+        if (!exists) {
+          combinedExams.unshift(item);
+        }
+      };
+
+      try {
+        const storedExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+        if (Array.isArray(storedExams)) storedExams.forEach(addUniqueExam);
+      } catch (e) {}
+
+      try {
+        const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+        if (Array.isArray(genPapers)) genPapers.forEach(addUniqueExam);
+      } catch (e) {}
+
+      try {
+        const mockPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+        if (Array.isArray(mockPapers)) mockPapers.forEach(addUniqueExam);
+      } catch (e) {}
+
+      try {
+        const epPapers = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+        if (Array.isArray(epPapers)) epPapers.forEach(addUniqueExam);
+      } catch (e) {}
+
+      // Apply filterType and search
+      if (filterType && filterType !== 'all') {
+        combinedExams = combinedExams.filter(e => {
+          const t = (e.exam_type || e.paper_category || 'mock').toLowerCase();
+          return t === filterType.toLowerCase() || (filterType === 'practice' && (t.includes('practice') || t.includes('generator'))) || (filterType === 'mock' && t.includes('mock'));
+        });
+      }
+      if (search && search.trim()) {
+        const s = search.trim().toLowerCase();
+        combinedExams = combinedExams.filter(e => (e.title || '').toLowerCase().includes(s) || (e.exam_code || '').toLowerCase().includes(s));
+      }
+
+      setExams(combinedExams);
     } catch (err) {
       console.error(err);
     } finally {
@@ -203,6 +251,22 @@ export const ExamManagementPage = () => {
 
   useEffect(() => {
     fetchExams();
+  }, [search, filterType]);
+
+  useEffect(() => {
+    const handleSyncUpdate = () => {
+      fetchExams();
+    };
+    window.addEventListener('olympiadhub-exams-updated', handleSyncUpdate);
+    window.addEventListener('olympiadhub-data-updated', handleSyncUpdate);
+    window.addEventListener('olympiadhub-admin-papers-updated', handleSyncUpdate);
+    window.addEventListener('storage', handleSyncUpdate);
+    return () => {
+      window.removeEventListener('olympiadhub-exams-updated', handleSyncUpdate);
+      window.removeEventListener('olympiadhub-data-updated', handleSyncUpdate);
+      window.removeEventListener('olympiadhub-admin-papers-updated', handleSyncUpdate);
+      window.removeEventListener('storage', handleSyncUpdate);
+    };
   }, [search, filterType]);
 
   const handleOpenCreate = () => {
@@ -296,13 +360,74 @@ export const ExamManagementPage = () => {
 
     setActionLoading(true);
     try {
+      const isPractice = examForm.exam_type === 'practice';
+      
+      const matchedClass = classes.find(c => String(c.id) === String(examForm.class_id));
+      const matchedSubject = subjects.find(s => String(s.id) === String(examForm.subject_id));
+      const className = matchedClass ? matchedClass.name : (examForm.class_name || 'Class 6');
+      const subjectName = matchedSubject ? matchedSubject.name : (examForm.subject_name || 'Mathematics');
+      const subjectCode = matchedSubject ? (matchedSubject.code || 'IMO') : (examForm.subject_code || 'IMO');
+
+      const payload = {
+        ...examForm,
+        class_name: className,
+        class: className,
+        subject_name: subjectName,
+        subject_code: subjectCode,
+        subject: subjectName,
+        total_questions: Array.isArray(examForm.question_ids) ? examForm.question_ids.length : (allQuestions.length || 10),
+        paper_category: isPractice ? 'practice_test' : 'mock_test',
+        category: isPractice ? 'practice_test' : 'mock_test',
+        status: examForm.status || 'published'
+      };
+
+      let savedExam = null;
       if (editingExam) {
-        await apiClient.put(`/exams/${editingExam.id}`, examForm);
-        setFeedback({ type: 'success', message: 'Exam updated and published!' });
+        const res = await apiClient.put(`/exams/${editingExam.id}`, payload);
+        savedExam = res?.data || { ...editingExam, ...payload };
+        setFeedback({ type: 'success', message: `${isPractice ? 'Practice Test' : 'Mock Test'} updated and published!` });
       } else {
-        await apiClient.post('/exams', examForm);
-        setFeedback({ type: 'success', message: 'New Olympiad Exam published successfully for students!' });
+        const res = await apiClient.post('/exams', payload);
+        savedExam = res?.data || { id: Date.now(), ...payload };
+        setFeedback({ type: 'success', message: `New ${isPractice ? 'Practice Test' : 'Mock Test'} published successfully for students!` });
       }
+
+      // Sync across all 4 target stores immediately & synchronously to prevent any data loss on refresh
+      try {
+        // 1. olympiadhub_db_exams
+        const allExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+        const updatedExams = [savedExam, ...allExams.filter(p => String(p.id) !== String(savedExam.id))];
+        localStorage.setItem('olympiadhub_db_exams', JSON.stringify(updatedExams));
+
+        // 2. admin_generator_papers
+        const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+        const updatedGen = [savedExam, ...genPapers.filter(p => String(p.id) !== String(savedExam.id))];
+        localStorage.setItem('admin_generator_papers', JSON.stringify(updatedGen));
+
+        // 3. mock_db_exam_papers
+        const mockPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+        const updatedMock = [savedExam, ...mockPapers.filter(p => String(p.id) !== String(savedExam.id))];
+        localStorage.setItem('mock_db_exam_papers', JSON.stringify(updatedMock));
+
+        // 4. olympiadhub_db_exam_papers
+        const dbPapers = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+        const updatedDb = [savedExam, ...dbPapers.filter(p => String(p.id) !== String(savedExam.id))];
+        localStorage.setItem('olympiadhub_db_exam_papers', JSON.stringify(updatedDb));
+
+        // Dispatch sync events across UI
+        window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: savedExam }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: savedExam }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams', data: updatedExams } }));
+        window.dispatchEvent(new Event('storage'));
+
+        // Proactive sync to cloud
+        if (typeof window !== 'undefined' && window.syncManager?.schedulePush) {
+          window.syncManager.schedulePush();
+        }
+      } catch (e) {
+        console.warn('Storage sync error:', e);
+      }
+
       setViewMode('list');
       fetchExams();
     } catch (err) {

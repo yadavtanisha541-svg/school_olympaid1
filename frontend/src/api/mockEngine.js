@@ -1075,6 +1075,18 @@ function getDb(table) {
   }
 }
 
+export function registerDeletedId(id) {
+  try {
+    if (!id) return;
+    const raw = localStorage.getItem('olympiadhub_deleted_ids');
+    const list = raw ? JSON.parse(raw) : [];
+    if (!list.includes(String(id))) {
+      list.push(String(id));
+      localStorage.setItem('olympiadhub_deleted_ids', JSON.stringify(list));
+    }
+  } catch (e) {}
+}
+
 function saveDb(table, data) {
   try {
     localStorage.setItem(STORAGE_PREFIX + table, JSON.stringify(data));
@@ -2093,17 +2105,45 @@ export const mockEngine = {
     // SUBJECT-WISE & CLASS-WISE EXAM PAPERS & MOCK TESTS (Super Admin & Student synced)
     if (root === 'exam-papers' || root === 'test-generator' || root === 'test_papers') {
       let papers = getDb('exam_papers');
+      if (papers && papers.length > 0) {
+        // Automatically sanitize legacy stored titles that had "Previous Year" or year numbers
+        let modified = false;
+        papers = papers.map(p => {
+          let t = p.title || '';
+          const hasLegacy = /Previous\s*Year/i.test(t) || /\b(201[5-9]|202[0-9])\b/.test(t) || p.exam_year;
+          if (hasLegacy) {
+            modified = true;
+            t = t.replace(/Previous\s*Year\s*Paper/gi, 'Practice Test')
+                 .replace(/Previous\s*Year/gi, 'Practice Test')
+                 .replace(/\b(201[5-9]|202[0-9])\b/g, '')
+                 .replace(/\s+/g, ' ')
+                 .trim();
+            const sc = (p.short_code || '').replace(/\s*-\s*(201[5-9]|202[0-9]|PYQ)/gi, '').trim();
+            return {
+              ...p,
+              title: t || `${p.class_name || 'Class 6'} ${p.subject_code || 'IMO'} Practice Test`,
+              short_code: sc || p.subject_code,
+              exam_year: '',
+              paper_category: p.paper_category === 'previous_year' ? 'practice_test' : (p.paper_category || 'practice_test')
+            };
+          }
+          return p;
+        });
+        if (modified) {
+          saveDb('exam_papers', papers);
+        }
+      }
+
       if (!papers || papers.length === 0) {
         papers = [
           {
             id: 1001,
-            title: 'Class 6 IGKO Previous Year Paper 2019',
-            short_code: 'IGKO - 2019',
+            title: 'Class 6 IGKO Practice Test',
+            short_code: 'IGKO',
             subject_code: 'IGKO',
             subject_name: 'IGKO (General Knowledge)',
             class_name: 'Class 6',
-            paper_category: 'previous_year',
-            exam_year: '2019',
+            paper_category: 'practice_test',
             duration_minutes: 60,
             total_marks: 60,
             status: 'published',
@@ -2160,13 +2200,12 @@ export const mockEngine = {
           },
           {
             id: 1002,
-            title: 'Class 6 ICSO Previous Year Paper 2018',
-            short_code: 'ICSO - 2018',
+            title: 'Class 6 ICSO Practice Test',
+            short_code: 'ICSO',
             subject_code: 'ICSO',
             subject_name: 'ICSO (Cyber & AI Olympiad)',
             class_name: 'Class 6',
-            paper_category: 'previous_year',
-            exam_year: '2018',
+            paper_category: 'practice_test',
             duration_minutes: 60,
             total_marks: 60,
             status: 'published',
@@ -2205,13 +2244,12 @@ export const mockEngine = {
           },
           {
             id: 1003,
-            title: 'Class 6 IEO Level-1 Previous Year Paper 2019',
-            short_code: 'IEO - 2019',
+            title: 'Class 6 IEO Practice Test',
+            short_code: 'IEO',
             subject_code: 'IEO',
             subject_name: 'IEO (English Olympiad)',
             class_name: 'Class 6',
-            paper_category: 'previous_year',
-            exam_year: '2019',
+            paper_category: 'practice_test',
             duration_minutes: 60,
             total_marks: 60,
             status: 'published',
@@ -2250,13 +2288,12 @@ export const mockEngine = {
           },
           {
             id: 1004,
-            title: 'Class 6 IMO Level-1 Previous Year Paper 2019',
-            short_code: 'IMO - 2019',
+            title: 'Class 6 IMO Practice Test',
+            short_code: 'IMO',
             subject_code: 'IMO',
             subject_name: 'IMO (Mathematics Olympiad)',
             class_name: 'Class 6',
-            paper_category: 'previous_year',
-            exam_year: '2019',
+            paper_category: 'practice_test',
             duration_minutes: 60,
             total_marks: 60,
             status: 'published',
@@ -2295,13 +2332,12 @@ export const mockEngine = {
           },
           {
             id: 1005,
-            title: 'Class 6 ISO Level-1 Previous Year Paper 2019',
-            short_code: 'ISO - 2019',
+            title: 'Class 6 ISO Practice Test',
+            short_code: 'ISO',
             subject_code: 'ISO',
             subject_name: 'ISO (Science Olympiad)',
             class_name: 'Class 6',
-            paper_category: 'previous_year',
-            exam_year: '2019',
+            paper_category: 'practice_test',
             duration_minutes: 60,
             total_marks: 60,
             status: 'published',
@@ -2340,13 +2376,12 @@ export const mockEngine = {
           },
           {
             id: 1006,
-            title: 'Class 6 IHO Hindi Olympiad 2019',
-            short_code: 'IHO - 2019',
+            title: 'Class 6 IHO Hindi Practice Test',
+            short_code: 'IHO',
             subject_code: 'IHO',
             subject_name: 'IHO (Hindi)',
             class_name: 'Class 6',
-            paper_category: 'previous_year',
-            exam_year: '2019',
+            paper_category: 'practice_test',
             duration_minutes: 60,
             total_marks: 60,
             status: 'published',
@@ -2871,13 +2906,67 @@ export const mockEngine = {
           localAdminPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
         } catch (e) {}
 
+        let mockDbPapers = [];
+        try {
+          mockDbPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+        } catch (e) {}
+
+        let examStorePapers = [];
+        try {
+          const rawExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+          if (Array.isArray(rawExams)) {
+            examStorePapers = rawExams.filter(e => (e.exam_type || '').includes('practice') || (e.paper_category || '').includes('practice'));
+          }
+        } catch (e) {}
+
         let allAvailable = [...papers];
-        if (Array.isArray(localAdminPapers)) {
-          localAdminPapers.forEach((lp) => {
-            if (lp && !allAvailable.some(p => String(p.id) === String(lp.id))) {
-              allAvailable.unshift(lp);
-            }
-          });
+        const extraStores = [localAdminPapers, mockDbPapers, examStorePapers];
+        extraStores.forEach((arr) => {
+          if (Array.isArray(arr)) {
+            arr.forEach((lp) => {
+              if (lp && (lp.title || lp.exam_code)) {
+                const existingIdx = allAvailable.findIndex(p => String(p.id) === String(lp.id) || (p.exam_code && lp.exam_code && p.exam_code === lp.exam_code));
+                if (existingIdx === -1) {
+                  allAvailable.unshift(lp);
+                } else {
+                  allAvailable[existingIdx] = { ...allAvailable[existingIdx], ...lp };
+                }
+              }
+            });
+          }
+        });
+
+        // Clean out empty parentheses left from year removal across all papers
+        allAvailable = allAvailable.map(p => ({
+          ...p,
+          title: (p.title || '')
+            .replace(/Previous\s*Year\s*Paper/gi, 'Practice Test')
+            .replace(/Previous\s*Year/gi, 'Practice Test')
+            .replace(/\bPYQs?\b/gi, 'Practice Test')
+            .replace(/\b(201[5-9]|202[0-9])\b/g, '')
+            .replace(/Level-\d+\s*Practice\s*Test/gi, 'Practice Test')
+            .replace(/\(\s*\)/g, '')
+            .replace(/\[\s*\]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim()
+        }));
+
+        // Persist consolidated list back silently if needed, WITHOUT dispatching mutation events on GET
+        try {
+          const currentStored = localStorage.getItem('olympiadhub_db_exam_papers');
+          const newStored = JSON.stringify(allAvailable);
+          if (currentStored !== newStored) {
+            localStorage.setItem('olympiadhub_db_exam_papers', newStored);
+          }
+        } catch (e) {}
+
+        // Check if single paper requested by ID
+        const targetSingleId = (sub && sub !== 'admin-papers') ? sub : subId;
+        if (targetSingleId && !isNaN(Number(targetSingleId))) {
+          const found = allAvailable.find(p => String(p.id) === String(targetSingleId));
+          if (found) {
+            return { success: true, data: found };
+          }
         }
 
         let filtered = [...allAvailable];
@@ -2993,9 +3082,10 @@ export const mockEngine = {
         const rawQs = Array.isArray(body.questions) ? body.questions : [];
         const normQuestions = rawQs.map((q, idx) => {
           const qText = q.question_text || q.q || q.question || q.title || `Question ${idx + 1}`;
-          const opts = Array.isArray(q.options) && q.options.length >= 2
+          const rawOpts = Array.isArray(q.options) && q.options.length >= 2
             ? q.options
-            : [q.option_a || 'Option A', q.option_b || 'Option B', q.option_c || 'Option C', q.option_d || 'Option D'];
+            : [q.option_a, q.option_b, q.option_c, q.option_d];
+          const opts = rawOpts.map((opt, oIdx) => (opt && String(opt).trim()) ? String(opt).trim() : `Option ${['A', 'B', 'C', 'D'][oIdx] || String.fromCharCode(65 + oIdx)}`);
           let corr = 0;
           if (typeof q.correct === 'number') corr = q.correct;
           else if (q.correct_option === 'B' || q.correct === 'B') corr = 1;
@@ -3023,22 +3113,39 @@ export const mockEngine = {
 
         const newPaper = {
           id: body.id || Date.now(),
-          title: body.title || 'New Model Test Paper',
-          short_code: body.short_code || `${body.subject_code || 'EXAM'} - ${body.exam_year || '2026'}`,
+          exam_code: body.exam_code || `PPR-${body.id || Date.now()}`,
+          title: (body.title || 'New Practice Test Paper')
+            .replace(/Previous\s*Year\s*Paper/gi, 'Practice Test')
+            .replace(/Previous\s*Year/gi, 'Practice Test')
+            .replace(/\bPYQs?\b/gi, 'Practice Test')
+            .replace(/\b(201[5-9]|202[0-9])\b/g, '')
+            .replace(/\(\s*\)/g, '')
+            .replace(/\[\s*\]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim(),
+          short_code: body.short_code || body.exam_code || `${body.subject_code || 'EXAM'} - ${body.class_name || 'Class 6'}`,
           series_title: body.series_title || `${body.class_name || 'Class 6'} - All India ${body.subject_code || 'IMO'} Mock Test Series`,
           subject_code: (body.subject_code || 'IMO').toUpperCase(),
+          subject: body.subject || body.subject_code || 'math',
           subject_name: body.subject_name || `${body.subject_code || 'IMO'} Olympiad`,
-          class_name: body.class_name || body.class || 'Class 6',
-          paper_category: body.paper_category || 'mock_test',
-          exam_year: body.exam_year || '2026',
+          class_name: body.class_name || body.class || body.grade || 'Class 6',
+          class: body.class_name || body.class || body.grade || 'Class 6',
+          grade: body.class_name || body.class || body.grade || 'Class 6',
+          paper_category: body.paper_category || body.category || 'practice_test',
+          category: body.category || body.paper_category || 'practice_test',
+          exam_type: body.exam_type || (body.paper_category === 'generator' ? 'generated' : 'practice'),
+          exam_year: '',
           duration_minutes: Number(body.duration_minutes) || 60,
+          total_questions: normQuestions.length,
           total_marks: Number(body.total_marks) || (normQuestions.length > 0 ? normQuestions.reduce((a, b) => a + (b.marks || 1), 0) : 60),
           cutoff_marks: Number(body.cutoff_marks) || 42,
-          status: 'published',
+          status: body.status || 'published',
+          is_published: true,
           header_color: body.header_color || '#809926',
           accent_color: body.accent_color || '#809926',
           sections: Array.isArray(body.sections) && body.sections.length > 0 ? body.sections : ['General Awareness', 'Subject Knowledge', 'Achievers Section'],
-          questions: normQuestions
+          questions: normQuestions,
+          created_at: body.created_at || new Date().toISOString()
         };
         papers = [newPaper, ...papers.filter(p => String(p.id) !== String(newPaper.id))];
         saveDb('exam_papers', papers);
@@ -3050,22 +3157,25 @@ export const mockEngine = {
           localStorage.setItem('admin_generator_papers', JSON.stringify([newPaper, ...genPapers.filter(p => String(p.id) !== String(newPaper.id))]));
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: newPaper }));
+            window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exam_papers', data: papers } }));
           }
         } catch (e) {}
 
-        return { success: true, message: 'Model Test Paper created successfully', data: newPaper };
+        return { success: true, message: 'Practice Test Paper created successfully', data: newPaper };
       }
 
-      if (method === 'PUT' && sub) {
+      if (method === 'PUT' && (sub || subId)) {
+        const targetPutId = (sub && sub !== 'admin-papers') ? sub : subId;
         let updatedPaper = null;
         papers = papers.map((p) => {
-          if (String(p.id) === String(sub)) {
+          if (String(p.id) === String(targetPutId) || (p.exam_code && p.exam_code === targetPutId)) {
             const rawQs = Array.isArray(body.questions) ? body.questions : (p.questions || []);
             const normQuestions = rawQs.map((q, idx) => {
               const qText = q.question_text || q.q || q.question || q.title || `Question ${idx + 1}`;
-              const opts = Array.isArray(q.options) && q.options.length >= 2
+              const rawOpts = Array.isArray(q.options) && q.options.length >= 2
                 ? q.options
-                : [q.option_a || 'Option A', q.option_b || 'Option B', q.option_c || 'Option C', q.option_d || 'Option D'];
+                : [q.option_a, q.option_b, q.option_c, q.option_d];
+              const opts = rawOpts.map((opt, oIdx) => (opt && String(opt).trim()) ? String(opt).trim() : `Option ${['A', 'B', 'C', 'D'][oIdx] || String.fromCharCode(65 + oIdx)}`);
               let corr = 0;
               if (typeof q.correct === 'number') corr = q.correct;
               else if (q.correct_option === 'B' || q.correct === 'B') corr = 1;
@@ -3093,6 +3203,7 @@ export const mockEngine = {
             updatedPaper = {
               ...p,
               ...body,
+              title: body.title ? body.title.replace(/\(\s*\)/g, '').replace(/\[\s*\]/g, '').replace(/\s+/g, ' ').trim() : p.title,
               subject_code: (body.subject_code || p.subject_code || 'IMO').toUpperCase(),
               cutoff_marks: body.cutoff_marks !== undefined ? Number(body.cutoff_marks) : (p.cutoff_marks || 42),
               questions: normQuestions
@@ -3106,20 +3217,21 @@ export const mockEngine = {
         if (updatedPaper) {
           try {
             const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
-            localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockDb.map(p => String(p.id) === String(sub) ? updatedPaper : p)));
+            localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockDb.map(p => String(p.id) === String(targetPutId) ? updatedPaper : p)));
             const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-            localStorage.setItem('admin_generator_papers', JSON.stringify(genPapers.map(p => String(p.id) === String(sub) ? updatedPaper : p)));
+            localStorage.setItem('admin_generator_papers', JSON.stringify(genPapers.map(p => String(p.id) === String(targetPutId) ? updatedPaper : p)));
             if (typeof window !== 'undefined') {
               window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedPaper }));
             }
           } catch (e) {}
         }
 
-        return { success: true, message: 'Model Test Paper updated successfully', data: updatedPaper };
+        return { success: true, message: 'Practice Test Paper updated successfully', data: updatedPaper };
       }
 
       if (method === 'DELETE' && (sub || subId)) {
         const targetDelId = (sub && sub !== 'admin-papers') ? sub : subId;
+        registerDeletedId(targetDelId);
         papers = papers.filter((p) => String(p.id) !== String(targetDelId));
         saveDb('exam_papers', papers);
         try {
@@ -3131,7 +3243,7 @@ export const mockEngine = {
             window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedId: targetDelId } }));
           }
         } catch (e) {}
-        return { success: true, message: 'Model Test Paper deleted successfully' };
+        return { success: true, message: 'Practice Test Paper deleted successfully' };
       }
     }
 
@@ -3337,22 +3449,83 @@ export const mockEngine = {
 
       // DELETE SINGLE
       if (method === 'DELETE' && sub) {
+        registerDeletedId(sub);
         questions = questions.filter(q => String(q.id) !== String(sub));
         saveDb('questions', questions);
         return { success: true, message: 'Question deleted successfully' };
       }
     }
 
-    // EXAMS
+    // EXAMS (Super Admin & Student synchronized with 100% persistent local & cloud fallback)
     if (root === 'exams') {
-      let exams = getDb('exams');
+      let exams = getDb('exams') || [];
+
+      // Gather from all local stores to ensure no exam or generated paper is ever omitted on refresh
+      const extraStores = [];
+      try {
+        const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+        if (Array.isArray(genPapers)) extraStores.push(...genPapers);
+      } catch (e) {}
+      try {
+        const mockPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+        if (Array.isArray(mockPapers)) extraStores.push(...mockPapers);
+      } catch (e) {}
+      try {
+        const examPapers = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+        if (Array.isArray(examPapers)) extraStores.push(...examPapers);
+      } catch (e) {}
+
+      extraStores.forEach((item) => {
+        if (!item || (!item.id && !item.exam_code)) return;
+        const idStr = item.id ? String(item.id) : '';
+        const codeStr = item.exam_code ? String(item.exam_code) : '';
+        const existsIdx = exams.findIndex(e => 
+          (idStr && String(e.id) === idStr) || 
+          (codeStr && e.exam_code && String(e.exam_code) === codeStr)
+        );
+        const normalized = {
+          ...item,
+          exam_type: item.exam_type || (item.paper_category === 'generator' ? 'practice' : (item.paper_category?.includes('mock') ? 'mock' : 'practice')),
+          paper_category: item.paper_category || (item.exam_type === 'mock' ? 'mock_test' : 'practice_test'),
+          class_name: item.class_name || item.class || 'Class 6',
+          subject_name: item.subject_name || item.subject || 'Mathematics',
+          subject_code: item.subject_code || 'IMO',
+          status: item.status || 'published',
+          total_questions: Array.isArray(item.questions) ? item.questions.length : (item.total_questions || 10)
+        };
+        if (existsIdx === -1) {
+          exams.unshift(normalized);
+        } else {
+          exams[existsIdx] = { ...exams[existsIdx], ...normalized };
+        }
+      });
+
       if (method === 'GET' && sub && sub !== 'all') {
-        const found = exams.find((e) => String(e.id) === String(sub));
+        const found = exams.find((e) => String(e.id) === String(sub) || (e.exam_code && e.exam_code === sub));
         return { success: true, data: found || exams[0] };
       }
+
       if (method === 'GET') {
-        return { success: true, data: exams };
+        let filteredExams = [...exams];
+        const examType = (queryParams?.exam_type || params?.exam_type || '').toLowerCase();
+        const search = (queryParams?.search || params?.search || '').toLowerCase();
+        const classFilter = (queryParams?.class || queryParams?.class_id || params?.class || '').toLowerCase();
+
+        if (examType && examType !== 'all') {
+          filteredExams = filteredExams.filter((e) => {
+            const t = (e.exam_type || e.paper_category || 'mock').toLowerCase();
+            return t === examType || (examType === 'practice' && (t.includes('practice') || t.includes('generator'))) || (examType === 'mock' && t.includes('mock'));
+          });
+        }
+        if (search) {
+          filteredExams = filteredExams.filter((e) => (e.title || '').toLowerCase().includes(search) || (e.exam_code || '').toLowerCase().includes(search));
+        }
+        if (classFilter && classFilter !== 'all') {
+          filteredExams = filteredExams.filter((e) => (e.class_name || e.class || '').toLowerCase().includes(classFilter));
+        }
+        return { success: true, data: filteredExams };
       }
+
       if (method === 'POST' && (subId === 'toggle-status' || sub === 'toggle-status')) {
         const targetId = subId === 'toggle-status' ? sub : body.id;
         let updatedExam = null;
@@ -3367,6 +3540,7 @@ export const mockEngine = {
         saveDb('exams', exams);
         return { success: true, message: 'Exam status updated', data: updatedExam };
       }
+
       if (method === 'POST' && (subId === 'duplicate' || sub === 'duplicate')) {
         const targetId = subId === 'duplicate' ? sub : body.id;
         const orig = exams.find(e => String(e.id) === String(targetId));
@@ -3374,6 +3548,7 @@ export const mockEngine = {
           const dup = {
             ...orig,
             id: Date.now(),
+            exam_code: `OLY-${Date.now().toString().slice(-4)}`,
             title: `${orig.title} (Copy)`,
             created_at: new Date().toISOString()
           };
@@ -3382,6 +3557,7 @@ export const mockEngine = {
           return { success: true, message: 'Exam duplicated successfully', data: dup };
         }
       }
+
       if (method === 'PUT' && sub) {
         let updatedExam = null;
         exams = exams.map(e => {
@@ -3392,17 +3568,72 @@ export const mockEngine = {
           return e;
         });
         saveDb('exams', exams);
+        try {
+          const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+          localStorage.setItem('admin_generator_papers', JSON.stringify(genPapers.map(p => String(p.id) === String(sub) ? updatedExam : p)));
+          const mockPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+          localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockPapers.map(p => String(p.id) === String(sub) ? updatedExam : p)));
+          const epList = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+          localStorage.setItem('olympiadhub_db_exam_papers', JSON.stringify(epList.map(p => String(p.id) === String(sub) ? updatedExam : p)));
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: updatedExam }));
+            window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams', data: exams } }));
+          }
+        } catch (e) {}
         return { success: true, message: 'Exam updated successfully', data: updatedExam };
       }
+
       if (method === 'POST') {
-        const newExam = { id: Date.now(), ...body, created_at: new Date().toISOString() };
-        exams.unshift(newExam);
+        const newExam = { 
+          id: body.id || Date.now(), 
+          status: body.status || 'published',
+          exam_code: body.exam_code || `OLY-${Date.now().toString().slice(-4)}`,
+          ...body, 
+          created_at: body.created_at || new Date().toISOString() 
+        };
+        exams = [newExam, ...exams.filter(e => String(e.id) !== String(newExam.id))];
         saveDb('exams', exams);
+
+        // Sync to all storage layers
+        try {
+          const isPractice = (newExam.exam_type === 'practice' || newExam.paper_category === 'practice_test' || newExam.paper_category === 'generator');
+          if (isPractice) {
+            const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+            localStorage.setItem('admin_generator_papers', JSON.stringify([newExam, ...genPapers.filter(p => String(p.id) !== String(newExam.id))]));
+          } else {
+            const mockPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+            localStorage.setItem('mock_db_exam_papers', JSON.stringify([newExam, ...mockPapers.filter(p => String(p.id) !== String(newExam.id))]));
+          }
+          const epList = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+          localStorage.setItem('olympiadhub_db_exam_papers', JSON.stringify([newExam, ...epList.filter(p => String(p.id) !== String(newExam.id))]));
+
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: newExam }));
+            window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: newExam }));
+            window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams', data: exams } }));
+            window.dispatchEvent(new Event('storage'));
+          }
+        } catch (e) {}
+
         return { success: true, message: 'Exam created successfully', data: newExam };
       }
+
       if (method === 'DELETE' && sub) {
+        registerDeletedId(sub);
         exams = exams.filter((e) => String(e.id) !== String(sub));
         saveDb('exams', exams);
+        try {
+          const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+          localStorage.setItem('admin_generator_papers', JSON.stringify(genPapers.filter(p => String(p.id) !== String(sub))));
+          const mockPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+          localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockPapers.filter(p => String(p.id) !== String(sub))));
+          const epList = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+          localStorage.setItem('olympiadhub_db_exam_papers', JSON.stringify(epList.filter(p => String(p.id) !== String(sub))));
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: { deletedId: sub } }));
+            window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams', data: exams } }));
+          }
+        } catch (e) {}
         return { success: true, message: 'Exam deleted successfully' };
       }
     }

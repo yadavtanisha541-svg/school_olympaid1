@@ -53,8 +53,8 @@ export const apiClient = {
       headers
     };
 
-    // 100% Vercel Mode: All operations (CRUD, Auth, Exams, Packages) run via Client Mock & Persistence Engine
-    return mockEngine.handleRequest(method, endpoint, body);
+    // 100% Vercel & Resilient Mode: All operations run via Client Mock & Persistence Engine
+    return mockEngine.handleRequest(method, endpoint, body, options.params || {});
   },
 
   get(endpoint, params = {}) {
@@ -65,7 +65,7 @@ export const apiClient = {
       }
     });
     const queryString = query.toString() ? `?${query.toString()}` : '';
-    return this.request(`${endpoint}${queryString}`, { method: 'GET' });
+    return this.request(`${endpoint}${queryString}`, { method: 'GET', params });
   },
 
   post(endpoint, body = {}) {

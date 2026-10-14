@@ -41,6 +41,13 @@ import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfM
 import { DetailedSolutionsPage } from './DetailedSolutionsPage';
 import { getTestPricing } from '../../utils/purchaseUtils';
 import { CHAPTERS_BY_SUBJECT, getTopicsForSubject } from '../../data/subjectTopics';
+import {
+  getQuestionImage,
+  getCleanQuestionText,
+  isImageString,
+  getOptionImageSrc,
+  QuestionDiagram
+} from '../../utils/questionMediaHelper';
 
 const subjectsMap = {
   math: { name: 'IMO (Maths)', code: 'IMO', color: '#eab308', letter: 'M' },
@@ -51,6 +58,21 @@ const subjectsMap = {
   hindi: { name: 'IHO (Hindi)', code: 'IHO', color: '#dc2626', letter: 'H' }
 };
 
+const cleanPaperTitle = (title = '', fallbackSub = '', fallbackClass = '') => {
+  if (!title) return [fallbackClass, fallbackSub, 'Practice Test'].filter(Boolean).join(' ');
+  return title
+    .replace(/Previous\s*Year\s*Paper/gi, 'Practice Test')
+    .replace(/Previous\s*Year/gi, 'Practice Test')
+    .replace(/\bPYQs?\b/gi, 'Practice Test')
+    .replace(/\b(201[5-9]|202[0-9])\b/g, '')
+    .replace(/Level-\d+\s*Practice\s*Test/gi, 'Practice Test')
+    .replace(/\(\s*\)/g, '')
+    .replace(/\[\s*\]/g, '')
+    .replace(/\s*-\s*-\s*/g, ' - ')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
 export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('tests'); // 'tests' | 'generator' | 'list'
@@ -59,10 +81,11 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   const [adminPapers, setAdminPapers] = useState([]);
   const [loadingAdminPapers, setLoadingAdminPapers] = useState(false);
 
-  // Practice Tests Hub Filters
+  // Practice Tests Hub Filters & Preview
   const [listGradeFilter, setListGradeFilter] = useState('All');
   const [listSubFilter, setListSubFilter] = useState('All');
   const [listSearchFilter, setListSearchFilter] = useState('');
+  const [quickPreviewPaper, setQuickPreviewPaper] = useState(null);
 
   // Generator Configuration State
   const [selectedGrade, setSelectedGrade] = useState(user?.class || 'Class 6');
@@ -209,75 +232,102 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     }
   };
 
-  // Fetch Super Admin papers directly from API & all localStorage stores
+  const isFetchingAdminPapersRef = useRef(false);
+
   // Fetch Super Admin papers directly from API & all localStorage stores
   const fetchAdminPapers = async () => {
+    if (isFetchingAdminPapersRef.current) return;
+    isFetchingAdminPapersRef.current = true;
     setLoadingAdminPapers(true);
     try {
       let combined = [];
 
-      // 1. Direct admin_generator_papers check
+      const addUniquePaper = (p) => {
+        if (!p) return;
+        const cat = (p.paper_category || p.category || p.exam_type || 'practice_test').toLowerCase();
+        const pTitle = (p.title || '').toLowerCase();
+        // Exclude pure mock tests only
+        if (cat.includes('mock') && !cat.includes('practice') && !pTitle.includes('practice') && !cat.includes('generator')) return;
+        const pIdStr = String(p.id || '');
+        const pCodeStr = String(p.exam_code || '');
+        const exists = combined.some((cp) => 
+          (pIdStr && String(cp.id) === pIdStr) || 
+          (pCodeStr && cp.exam_code && cp.exam_code === pCodeStr) ||
+          (cp.title && p.title && cp.title === p.title && (cp.class_name || cp.class) === (p.class_name || p.class))
+        );
+        if (!exists) {
+          combined.push({ ...p, paper_category: p.paper_category || 'practice_test', status: p.status || 'published' });
+        }
+      };
+
+      // 1. Direct admin_generator_papers check (authored in Practice Tests & Papers)
       try {
         const local = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-        if (Array.isArray(local)) {
-          local.forEach((lp) => {
-            if (lp && (lp.title || lp.exam_code)) {
-              combined.push(lp);
-            }
-          });
-        }
+        if (Array.isArray(local)) local.forEach(addUniquePaper);
       } catch (e) {}
 
-      // 2. Direct mock_db_exam_papers check
+      // 2. Direct olympiadhub_db_exam_papers check (mockEngine DB)
+      try {
+        const dbPapers = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+        if (Array.isArray(dbPapers)) dbPapers.forEach(addUniquePaper);
+      } catch (e) {}
+
+      // 3. Direct mock_db_exam_papers check
       try {
         const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
-        if (Array.isArray(mockDb)) {
-          mockDb.forEach((mp) => {
-            if (mp && !combined.some((cp) => String(cp.id) === String(mp.id) || (cp.title && mp.title && cp.title === mp.title))) {
-              combined.push(mp);
-            }
-          });
-        }
+        if (Array.isArray(mockDb)) mockDb.forEach(addUniquePaper);
       } catch (e) {}
 
-      // 3. Direct olympiadhub_db_exam_papers check
+      // 4. Direct olympiadhub_db_exams check
       try {
-        const oDb = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
-        if (Array.isArray(oDb)) {
-          oDb.forEach((op) => {
-            if (op && !combined.some((cp) => String(cp.id) === String(op.id) || (cp.title && op.title && cp.title === op.title))) {
-              combined.push(op);
-            }
-          });
+        const oExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+        if (Array.isArray(oExams)) oExams.forEach(addUniquePaper);
+      } catch (e) {}
+
+      // 5. API endpoint check: /test-generator/admin-papers
+      try {
+        const resAdmin = await apiClient.get('/test-generator/admin-papers').catch(() => null);
+        if (resAdmin && resAdmin.success && Array.isArray(resAdmin.data)) {
+          resAdmin.data.forEach(addUniquePaper);
         }
       } catch (e) {}
 
-      // 4. API endpoint check
+      // 6. API endpoint check: /exam-papers
       try {
         const res = await apiClient.get('/exam-papers').catch(() => null);
         if (res && res.success && Array.isArray(res.data)) {
-          res.data.forEach((p) => {
-            if (p && !combined.some((cp) => String(cp.id) === String(p.id) || (cp.title && p.title && cp.title === p.title))) {
-              combined.push(p);
-            }
-          });
+          res.data.forEach(addUniquePaper);
         }
       } catch (e) {}
 
-      setAdminPapers(combined);
+      const sanitized = combined.map((p) => ({
+        ...p,
+        title: cleanPaperTitle(p.title, p.subject_code, p.class_name),
+        exam_year: '',
+        short_code: (p.short_code || '').replace(/\s*-\s*(201[5-9]|202[0-9]|PYQ)/gi, '').trim()
+      }));
+      setAdminPapers(sanitized);
     } catch (e) {
       console.warn('Error syncing admin papers:', e);
     } finally {
       setLoadingAdminPapers(false);
+      isFetchingAdminPapersRef.current = false;
     }
   };
 
   useEffect(() => {
     fetchAdminPapers();
-    const handleSync = () => fetchAdminPapers();
+    let syncTimer = null;
+    const handleSync = () => {
+      if (syncTimer) clearTimeout(syncTimer);
+      syncTimer = setTimeout(() => {
+        fetchAdminPapers();
+      }, 400);
+    };
     window.addEventListener('storage', handleSync);
     window.addEventListener('olympiadhub-admin-papers-updated', handleSync);
     return () => {
+      if (syncTimer) clearTimeout(syncTimer);
       window.removeEventListener('storage', handleSync);
       window.removeEventListener('olympiadhub-admin-papers-updated', handleSync);
     };
@@ -310,25 +360,46 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     }
   };
 
+  // Helper to check if a paper has valid questions or is published
+  const paperHasQuestions = (p) => {
+    if (!p) return false;
+    if (Array.isArray(p.questions) && p.questions.length > 0) return true;
+    if (Array.isArray(p.question_ids) && p.question_ids.length > 0) return true;
+    if (Number(p.total_questions || p.questions_count) > 0) return true;
+    if (p.status === 'published' || p.status === 'active') return true;
+    return false;
+  };
+
   // Helper to find matching Super Admin Paper for Class & Subject
   const getMatchingPaper = (grade = selectedGrade, subject = selectedSubject) => {
     return adminPapers.find((p) => {
-      const pClass = (p.class_name || p.class || p.title || '').toLowerCase().trim();
+      // 0. Strict exclusion: NEVER match pure Mock Tests in Practice Tests Hub!
+      const cat = (p.paper_category || p.category || p.exam_type || '').toLowerCase();
+      const pTitle = (p.title || '').toLowerCase().trim();
+      const isPureMock = (cat === 'mock_test' || cat === 'mock' || p.exam_type === 'mock') && !cat.includes('practice') && !pTitle.includes('practice');
+      if (isPureMock) return false;
+
+      // 1. Grade match
+      const pClassRaw = p.class_name || p.class || p.grade || '';
+      const pClass = (pClassRaw || p.title || '').toLowerCase().trim();
       const selGrade = (grade || '').toLowerCase().trim();
 
-      const pMatch = pClass.match(/\d+/);
+      const pMatch = (pClassRaw || '').match(/\d+/) || pClass.match(/class\s*(\d+)/i) || pClass.match(/grade\s*(\d+)/i) || pClass.match(/\d+/);
       const selMatch = selGrade.match(/\d+/);
 
       if (pMatch && selMatch) {
-        if (pMatch[0] !== selMatch[0]) return false;
+        const pNum = pMatch[1] || pMatch[0];
+        const selNum = selMatch[0];
+        if (pNum !== selNum) return false;
       } else if (pClass && selGrade) {
         if (!pClass.includes(selGrade) && !selGrade.includes(pClass)) return false;
       }
 
+      // 2. Subject match
       const subCode = (p.subject_code || p.subject || p.subject_name || '').toLowerCase().trim();
       const currentSub = (subject || '').toLowerCase().trim();
       const subMap = {
-        math: ['imo', 'math', 'mathematics', 'mathematic'],
+        math: ['imo', 'math', 'mathematics', 'mathematic', 'maths', 'nmo', 'ieom'],
         science: ['iso', 'science', 'nso'],
         cyber: ['ico', 'icso', 'cyber', 'computer', 'computers', 'ai', 'digital', 'idlo', 'it'],
         digital: ['ico', 'icso', 'cyber', 'computer', 'computers', 'ai', 'digital', 'idlo', 'it'],
@@ -339,35 +410,41 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       };
       const validCodes = subMap[currentSub] || [currentSub];
       return validCodes.some(
-        (code) => subCode.includes(code) || (p.title || '').toLowerCase().includes(code)
+        (code) => subCode.includes(code) || pTitle.includes(code)
       );
     });
   };
 
   const matchingPaper = getMatchingPaper(selectedGrade, selectedSubject);
-  const hasMatchingPaper = !!(matchingPaper && Array.isArray(matchingPaper.questions) && matchingPaper.questions.length > 0);
+  const hasMatchingPaper = !!(matchingPaper && paperHasQuestions(matchingPaper));
 
   // Helper to check if a specific Olympiad subject has published questions for the selected grade
   const isSubjectPublished = (subKey) => {
     const p = getMatchingPaper(selectedGrade, subKey);
-    return !!(p && Array.isArray(p.questions) && p.questions.length > 0);
+    return !!(p && paperHasQuestions(p));
   };
 
   // Helper to check if a specific Grade has any published questions
   const isGradePublished = (grade) => {
     return adminPapers.some((p) => {
-      const pClass = (p.class_name || p.class || p.title || '').toLowerCase();
+      const cat = (p.paper_category || p.category || p.exam_type || '').toLowerCase();
+      const pTitle = (p.title || '').toLowerCase().trim();
+      const isPureMock = (cat === 'mock_test' || cat === 'mock' || p.exam_type === 'mock') && !cat.includes('practice') && !pTitle.includes('practice');
+      if (isPureMock) return false;
+
+      const pClassRaw = p.class_name || p.class || p.grade || '';
+      const pClass = (pClassRaw || p.title || '').toLowerCase();
       const selGrade = (grade || '').toLowerCase();
-      const pMatch = pClass.match(/\d+/);
+      const pMatch = (pClassRaw || '').match(/\d+/) || pClass.match(/class\s*(\d+)/i) || pClass.match(/\d+/);
       const selMatch = selGrade.match(/\d+/);
-      const isClassMatch = pMatch && selMatch ? pMatch[0] === selMatch[0] : pClass.includes(selGrade);
-      return isClassMatch && Array.isArray(p.questions) && p.questions.length > 0;
+      const isClassMatch = pMatch && selMatch ? (pMatch[1] || pMatch[0]) === selMatch[0] : pClass.includes(selGrade);
+      return isClassMatch && paperHasQuestions(p);
     });
   };
 
   // Start exam with Super Admin created Paper
   const handleStartAdminPaper = (paper) => {
-    if (!paper || !Array.isArray(paper.questions) || paper.questions.length === 0) {
+    if (!paper) {
       alert(`⚠️ No questions found in this exam paper. Please add questions from Super Admin panel.`);
       return;
     }
@@ -381,18 +458,48 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    const questionsToUse = paper.questions.map((q, idx) => ({
-      id: q.id || idx + 1,
-      q: q.q || q.question_text || `Question ${idx + 1}`,
-      options: Array.isArray(q.options) && q.options.length >= 2 
-        ? q.options 
-        : [q.option_a || 'Option A', q.option_b || 'Option B', q.option_c || 'Option C', q.option_d || 'Option D'],
-      correct: typeof q.correct === 'number' 
-        ? q.correct 
-        : (q.correct_option === 'B' ? 1 : q.correct_option === 'C' ? 2 : q.correct_option === 'D' ? 3 : 0),
-      explanation: q.explanation || '',
-      marks: q.marks || 1
-    }));
+
+    // Resolve questions (from questions array, question_ids, or dynamic generator)
+    let rawQuestions = Array.isArray(paper.questions) && paper.questions.length > 0 ? paper.questions : [];
+    if (rawQuestions.length === 0 && Array.isArray(paper.question_ids) && paper.question_ids.length > 0) {
+      try {
+        const qBank = JSON.parse(localStorage.getItem('olympiadhub_db_questions') || '[]');
+        rawQuestions = qBank.filter(q => paper.question_ids.includes(q.id));
+      } catch (e) {}
+    }
+    if (rawQuestions.length === 0) {
+      rawQuestions = generateIntelligentOlympiadTest({
+        subject: selectedSubject,
+        grade: selectedGrade,
+        level: selectedLevel,
+        difficulty: selectedDifficulty,
+        count: Number(paper.total_questions) || questionCount,
+        chapters: selectedChapters
+      });
+    }
+
+    const questionsToUse = rawQuestions.map((q, idx) => {
+      const rawImg = q.question_image || q.image_url || q.diagram || q.image || q.figure || '';
+      const qImg = getQuestionImage(q) || rawImg;
+      return {
+        ...q,
+        id: q.id || idx + 1,
+        q: q.q || q.question_text || `Question ${idx + 1}`,
+        question_image: qImg,
+        image_url: qImg,
+        diagram: qImg,
+        image: qImg,
+        figure: qImg,
+        options: Array.isArray(q.options) && q.options.length >= 2 
+          ? q.options 
+          : [q.option_a || 'Option A', q.option_b || 'Option B', q.option_c || 'Option C', q.option_d || 'Option D'],
+        correct: typeof q.correct === 'number' 
+          ? q.correct 
+          : (q.correct_option === 'B' ? 1 : q.correct_option === 'C' ? 2 : q.correct_option === 'D' ? 3 : 0),
+        explanation: q.explanation || '',
+        marks: q.marks || 1
+      };
+    });
     const dur = parseInt(paper.duration_minutes) || testDurationMinutes || 15;
     setTestQuestions(questionsToUse);
     setQuestionCount(questionsToUse.length);
@@ -482,18 +589,28 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       return;
     }
 
-    const questionsToUse = targetPaper.questions.map((q, idx) => ({
-      id: q.id || idx + 1,
-      q: q.q || q.question_text || `Question ${idx + 1}`,
-      options: Array.isArray(q.options) && q.options.length >= 2 
-        ? q.options 
-        : [q.option_a || 'Option A', q.option_b || 'Option B', q.option_c || 'Option C', q.option_d || 'Option D'],
-      correct: typeof q.correct === 'number' 
-        ? q.correct 
-        : (q.correct_option === 'B' ? 1 : q.correct_option === 'C' ? 2 : q.correct_option === 'D' ? 3 : 0),
-      explanation: q.explanation || '',
-      marks: q.marks || 1
-    }));
+    const questionsToUse = targetPaper.questions.map((q, idx) => {
+      const rawImg = q.question_image || q.image_url || q.diagram || q.image || q.figure || '';
+      const qImg = getQuestionImage(q) || rawImg;
+      return {
+        ...q,
+        id: q.id || idx + 1,
+        q: q.q || q.question_text || `Question ${idx + 1}`,
+        question_image: qImg,
+        image_url: qImg,
+        diagram: qImg,
+        image: qImg,
+        figure: qImg,
+        options: Array.isArray(q.options) && q.options.length >= 2 
+          ? q.options 
+          : [q.option_a || 'Option A', q.option_b || 'Option B', q.option_c || 'Option C', q.option_d || 'Option D'],
+        correct: typeof q.correct === 'number' 
+          ? q.correct 
+          : (q.correct_option === 'B' ? 1 : q.correct_option === 'C' ? 2 : q.correct_option === 'D' ? 3 : 0),
+        explanation: q.explanation || '',
+        marks: q.marks || 1
+      };
+    });
     const dur = parseInt(targetPaper.duration_minutes) || testDurationMinutes || 15;
 
     setTestQuestions(questionsToUse);
@@ -566,10 +683,18 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       const optLetter = uAns !== undefined ? String.fromCharCode(65 + uAns) : null;
       const correctLetter = String.fromCharCode(65 + (typeof q.correct === 'number' ? q.correct : 0));
 
+      const rawImg = q.question_image || q.image_url || q.diagram || q.image || q.figure || '';
+      const qImg = getQuestionImage(q) || rawImg;
       return {
+        ...q,
         id: q.id || qIdx + 1,
         question_text: q.q || q.question_text || `Question ${qIdx + 1}`,
         q: q.q || q.question_text,
+        question_image: qImg,
+        image_url: qImg,
+        diagram: qImg,
+        image: qImg,
+        figure: qImg,
         options: q.options,
         option_a: q.options?.[0] || q.option_a || 'Option A',
         option_b: q.options?.[1] || q.option_b || 'Option B',
@@ -1144,15 +1269,23 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
               {/* Question Statement */}
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-[#321630] leading-relaxed">
-                  {currentQ.q}
+                  {getCleanQuestionText(currentQ.q || currentQ.question_text)}
                 </h3>
               </div>
+
+              {/* Question Diagram - Matches Super Admin Exactly with Zoom modal */}
+              <QuestionDiagram
+                question={currentQ}
+                title="Question Diagram / Figure"
+                maxHeight="max-h-80 sm:max-h-96"
+              />
 
               {/* 4 Selectable Options (A, B, C, D) */}
               <div className="space-y-3 pt-2">
                 {currentQ.options?.map((optionText, optIdx) => {
                   const isSelected = userAnswers[currentIndex] === optIdx;
                   const optionLabel = String.fromCharCode(65 + optIdx);
+                  const isOptImg = isImageString(optionText);
 
                   return (
                     <button
@@ -1165,7 +1298,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                           : 'bg-white border-[#edd6ed] text-slate-700 hover:bg-[#faf5fa] hover:border-[#6d3a68]/40'
                       }`}
                     >
-                      <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="flex items-center gap-3.5 min-w-0 flex-1">
                         <span className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs transition-all shrink-0 ${
                           optionLabel === 'A'
                             ? isSelected
@@ -1189,11 +1322,21 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                         }`}>
                           {optionLabel}
                         </span>
-                        <span className="leading-snug">{optionText}</span>
+                        {isOptImg ? (
+                          <div className="p-1 rounded-xl bg-white border border-slate-200 shadow-2xs inline-block">
+                            <img
+                              src={getOptionImageSrc(optionText)}
+                              alt={`Option ${optionLabel}`}
+                              className="max-h-20 max-w-full object-contain rounded-lg"
+                            />
+                          </div>
+                        ) : (
+                          <span className="leading-snug">{optionText}</span>
+                        )}
                       </div>
 
                       {isSelected && (
-                        <div className="w-5 h-5 rounded-full bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white flex items-center justify-center shrink-0">
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#3b82f6] text-white flex items-center justify-center shrink-0 ml-2">
                           <Check className="w-3.5 h-3.5" />
                         </div>
                       )}
@@ -1345,27 +1488,37 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
 
   const studentClass = user?.class || user?.class_name || user?.grade || 'Class 6';
 
-  // Filtered admin papers for Practice Tests Hub (Strictly isolated by student's enrolled grade)
+  // Filtered admin papers for Practice Tests Hub
   const filteredAdminPapers = adminPapers.filter((p) => {
     const pClass = (p.class_name || p.class || p.title || '').toLowerCase();
     const pSub = (p.subject_code || p.subject || p.subject_name || p.title || '').toLowerCase();
     const pTitle = (p.title || '').toLowerCase();
     const pCode = (p.exam_code || '').toLowerCase();
 
-    // 1. Strict Class Isolation: ONLY show tests created for this student's grade
-    const sCls = studentClass.toLowerCase();
-    const matchP = pClass.match(/\d+/);
-    const matchS = sCls.match(/\d+/);
-    if (matchP && matchS) {
-      if (matchP[0] !== matchS[0]) return false;
-    } else if (pClass && !pClass.includes(sCls) && !sCls.includes(pClass)) {
-      return false;
+    // 1. Grade filter (defaults to 'All' to show all published papers, or filters by selected grade)
+    if (listGradeFilter !== 'All') {
+      const matchP = pClass.match(/\d+/);
+      const matchS = listGradeFilter.toLowerCase().match(/\d+/);
+      if (matchP && matchS) {
+        if (matchP[0] !== matchS[0]) return false;
+      } else if (!pClass.includes(listGradeFilter.toLowerCase())) {
+        return false;
+      }
     }
 
     // 2. Subject filter
     if (listSubFilter !== 'All') {
       const s = listSubFilter.toLowerCase();
-      if (!pSub.includes(s) && !pTitle.includes(s)) {
+      const subFilterMap = {
+        math: ['imo', 'math', 'mathematics', 'mathematic'],
+        science: ['iso', 'science', 'nso'],
+        digital: ['idlo', 'digital', 'computer', 'icso', 'cyber', 'ai'],
+        english: ['ieo', 'english', 'eng'],
+        gk: ['igko', 'gk', 'general knowledge', 'general'],
+        hindi: ['iho', 'hindi']
+      };
+      const validCodes = subFilterMap[s] || [s];
+      if (!validCodes.some((code) => pSub.includes(code) || pTitle.includes(code))) {
         return false;
       }
     }
@@ -1822,7 +1975,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                     ✓ Official Super Admin Exam Paper Found
                   </h4>
                   <p className="text-xs text-emerald-800 font-bold mt-0.5">
-                    &quot;{matchingPaper.title}&quot; • {matchingPaper.questions.length} Questions published by Super Admin
+                    &quot;{cleanPaperTitle(matchingPaper.title)}&quot; • {matchingPaper.questions.length} Questions published by Super Admin
                   </p>
                 </div>
               </div>
@@ -2136,149 +2289,45 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                     <span className="text-xs font-black text-slate-700">Select Olympiad:</span>
                   </div>
                   <div className="flex flex-wrap items-center gap-2.5 flex-1">
-                    {/* IEO */}
-                    <button
-                      type="button"
-                      onClick={() => setSelectedSubject('english')}
-                      className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
-                        selectedSubject === 'english'
-                          ? 'bg-[#df7950] text-white border-[#df7950] shadow-sm ring-2 ring-[#df7950]/30'
-                          : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
-                      }`}
-                    >
-                      <input type="radio" checked={selectedSubject === 'english'} readOnly className="accent-white" />
-                      <span className="font-black font-mono tracking-wider">I E O</span>
-                      <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
-                      {isSubjectPublished('english') ? (
-                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
-                          Published
-                        </span>
-                      ) : (
-                        <span className="text-[9px] font-bold text-slate-400">
-                          Pending
-                        </span>
-                      )}
-                    </button>
-
-                    {/* IMO */}
-                    <button
-                      type="button"
-                      onClick={() => setSelectedSubject('math')}
-                      className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
-                        selectedSubject === 'math'
-                          ? 'bg-[#e8ac2c] text-white border-[#e8ac2c] shadow-sm ring-2 ring-[#e8ac2c]/30'
-                          : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
-                      }`}
-                    >
-                      <input type="radio" checked={selectedSubject === 'math'} readOnly className="accent-white" />
-                      <span className="font-black font-mono tracking-wider">I M O</span>
-                      <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
-                      {isSubjectPublished('math') ? (
-                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
-                          Published
-                        </span>
-                      ) : (
-                        <span className="text-[9px] font-bold text-slate-400">
-                          Pending
-                        </span>
-                      )}
-                    </button>
-
-                    {/* ISO */}
-                    <button
-                      type="button"
-                      onClick={() => setSelectedSubject('science')}
-                      className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
-                        selectedSubject === 'science'
-                          ? 'bg-[#9db83b] text-white border-[#9db83b] shadow-sm ring-2 ring-[#9db83b]/30'
-                          : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
-                      }`}
-                    >
-                      <input type="radio" checked={selectedSubject === 'science'} readOnly className="accent-white" />
-                      <span className="font-black font-mono tracking-wider">I S O</span>
-                      <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
-                      {isSubjectPublished('science') ? (
-                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
-                          Published
-                        </span>
-                      ) : (
-                        <span className="text-[9px] font-bold text-slate-400">
-                          Pending
-                        </span>
-                      )}
-                    </button>
-
-                    {/* ICSO */}
-                    <button
-                      type="button"
-                      onClick={() => setSelectedSubject('cyber')}
-                      className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
-                        selectedSubject === 'cyber'
-                          ? 'bg-[#0284c7] text-white border-[#0284c7] shadow-sm ring-2 ring-[#0284c7]/30'
-                          : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
-                      }`}
-                    >
-                      <input type="radio" checked={selectedSubject === 'cyber'} readOnly className="accent-white" />
-                      <span className="font-black font-mono tracking-wider">I C S O</span>
-                      <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
-                      {isSubjectPublished('cyber') ? (
-                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
-                          Published
-                        </span>
-                      ) : (
-                        <span className="text-[9px] font-bold text-slate-400">
-                          Pending
-                        </span>
-                      )}
-                    </button>
-
-                    {/* IGKO */}
-                    <button
-                      type="button"
-                      onClick={() => setSelectedSubject('gk')}
-                      className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
-                        selectedSubject === 'gk'
-                          ? 'bg-[#eab308] text-white border-[#eab308] shadow-sm ring-2 ring-[#eab308]/30'
-                          : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
-                      }`}
-                    >
-                      <input type="radio" checked={selectedSubject === 'gk'} readOnly className="accent-white" />
-                      <span className="font-black font-mono tracking-wider">I G K O</span>
-                      <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
-                      {isSubjectPublished('gk') ? (
-                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
-                          Published
-                        </span>
-                      ) : (
-                        <span className="text-[9px] font-bold text-slate-400">
-                          Pending
-                        </span>
-                      )}
-                    </button>
-
-                    {/* ISSO / REASONING */}
-                    <button
-                      type="button"
-                      onClick={() => setSelectedSubject('reasoning')}
-                      className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
-                        selectedSubject === 'reasoning'
-                          ? 'bg-[#b97fa8] text-white border-[#b97fa8] shadow-sm ring-2 ring-[#b97fa8]/30'
-                          : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
-                      }`}
-                    >
-                      <input type="radio" checked={selectedSubject === 'reasoning'} readOnly className="accent-white" />
-                      <span className="font-black text-xs uppercase tracking-wider">ISSO (Reasoning)</span>
-                      <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
-                      {isSubjectPublished('reasoning') ? (
-                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
-                          Published
-                        </span>
-                      ) : (
-                        <span className="text-[9px] font-bold text-slate-400">
-                          Pending
-                        </span>
-                      )}
-                    </button>
+                    {[
+                      { id: 'english', code: 'I E O', name: 'IEO (English)', activeBg: 'bg-[#df7950] text-white border-[#df7950] shadow-sm ring-2 ring-[#df7950]/30' },
+                      { id: 'math', code: 'I M O', name: 'IMO (Maths)', activeBg: 'bg-[#e8ac2c] text-white border-[#e8ac2c] shadow-sm ring-2 ring-[#e8ac2c]/30' },
+                      { id: 'science', code: 'I S O', name: 'ISO (Science)', activeBg: 'bg-[#9db83b] text-white border-[#9db83b] shadow-sm ring-2 ring-[#9db83b]/30' },
+                      { id: 'digital', code: 'I D L O', name: 'IDLO (Digital Literacy)', activeBg: 'bg-[#0284c7] text-white border-[#0284c7] shadow-sm ring-2 ring-[#0284c7]/30' },
+                      { id: 'gk', code: 'I G K O', name: 'IGKO (GK)', activeBg: 'bg-[#eab308] text-white border-[#eab308] shadow-sm ring-2 ring-[#eab308]/30' },
+                      { id: 'hindi', code: 'I H O', name: 'IHO (Hindi)', activeBg: 'bg-[#dc2626] text-white border-[#dc2626] shadow-sm ring-2 ring-[#dc2626]/30' }
+                    ].map((sub) => {
+                      const isSelected = selectedSubject === sub.id;
+                      const isPub = isSubjectPublished(sub.id);
+                      return (
+                        <button
+                          key={sub.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedSubject(sub.id);
+                            setSelectedChapters(getTopicsForSubject(sub.id) || []);
+                          }}
+                          className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all cursor-pointer ${
+                            isSelected
+                              ? sub.activeBg
+                              : 'bg-[#faf5fa] text-slate-700 border-slate-200 hover:bg-[#f4ebf4]'
+                          }`}
+                        >
+                          <input type="radio" checked={isSelected} readOnly className="accent-white" />
+                          <span className="font-black font-mono tracking-wider">{sub.code}</span>
+                          <Lightbulb className="w-3.5 h-3.5 text-yellow-300 fill-yellow-400" />
+                          {isPub ? (
+                            <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-600 text-white shadow-2xs">
+                              Published
+                            </span>
+                          ) : (
+                            <span className="text-[9px] font-bold text-slate-400">
+                              Pending
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -2557,6 +2606,192 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
               </div>
             </div>
           </div>
+
+          {/* SECTION 2: PUBLISHED PRACTICE TEST PAPERS (Synced directly with Super Admin) */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#edd6ed] shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#f4ebf4]">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-black uppercase tracking-wider">
+                    ⚡ Live Published Papers
+                  </span>
+                  <span className="text-[11px] font-bold text-slate-500">
+                    Showing {filteredAdminPapers.length} {filteredAdminPapers.length === 1 ? 'Paper' : 'Papers'}
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-[#4e2a4a] tracking-tight mt-1">
+                  Practice Test Question Papers
+                </h2>
+                <p className="text-xs text-slate-500 font-medium">
+                  Author-verified practice papers published by Super Admin. Click &apos;Start Test&apos; to begin practicing immediately.
+                </p>
+              </div>
+
+              {/* Filter Controls */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Grade Filter */}
+                <select
+                  value={listGradeFilter}
+                  onChange={(e) => setListGradeFilter(e.target.value)}
+                  className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#6d3a68] cursor-pointer"
+                >
+                  <option value="All">All Grades (1-12)</option>
+                  {['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+
+                {/* Subject Filter */}
+                <select
+                  value={listSubFilter}
+                  onChange={(e) => setListSubFilter(e.target.value)}
+                  className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#6d3a68] cursor-pointer"
+                >
+                  <option value="All">All Subjects</option>
+                  <option value="math">IMO (Mathematics)</option>
+                  <option value="science">ISO (Science)</option>
+                  <option value="digital">IDLO (Digital Literacy)</option>
+                  <option value="english">IEO (English)</option>
+                  <option value="gk">IGKO (General Knowledge)</option>
+                  <option value="hindi">IHO (Hindi)</option>
+                </select>
+
+                {/* Search Input */}
+                <input
+                  type="text"
+                  placeholder="Search exam code, title..."
+                  value={listSearchFilter}
+                  onChange={(e) => setListSearchFilter(e.target.value)}
+                  className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#6d3a68] w-40 sm:w-48"
+                />
+
+                {(listGradeFilter !== 'All' || listSubFilter !== 'All' || listSearchFilter) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setListGradeFilter('All');
+                      setListSubFilter('All');
+                      setListSearchFilter('');
+                    }}
+                    className="px-2.5 py-1.5 text-xs font-bold text-[#6d3a68] hover:bg-[#f4ebf4] rounded-lg transition-colors cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Papers Grid */}
+            {filteredAdminPapers.length === 0 ? (
+              <div className="bg-[#faf5fa] rounded-2xl p-10 text-center border border-[#edd6ed] space-y-3">
+                <div className="w-12 h-12 rounded-full bg-purple-100 text-[#6d3a68] flex items-center justify-center mx-auto text-xl font-black">
+                  📝
+                </div>
+                <h3 className="text-base font-black text-slate-800">
+                  No Practice Test Papers Available for this Selection
+                </h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  Try changing the grade or subject filters above to explore all available Olympiad practice tests.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setListGradeFilter('All');
+                    setListSubFilter('All');
+                    setListSearchFilter('');
+                  }}
+                  className="px-4 py-2 bg-[#6d3a68] text-white rounded-xl text-xs font-bold shadow-xs hover:bg-[#582d54] cursor-pointer"
+                >
+                  Show All Grades &amp; Subjects
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {filteredAdminPapers.map((paper) => {
+                  const subCode = paper.subject_code || paper.subject || 'IMO';
+                  const qCount = Array.isArray(paper.questions) ? paper.questions.length : (paper.total_questions || 10);
+                  const isGen = paper.paper_category === 'generator' || paper.exam_type === 'generated';
+                  const pBadge = isGen
+                    ? { label: 'Test Generator Pro', color: 'bg-emerald-50 text-emerald-800 border-emerald-200' }
+                    : { label: 'Practice Mock Test', color: 'bg-purple-50 text-purple-800 border-purple-200' };
+
+                  return (
+                    <div
+                      key={paper.id}
+                      className="bg-white rounded-2xl border border-slate-200 hover:border-[#6d3a68] shadow-2xs hover:shadow-md transition-all p-5 flex flex-col justify-between group"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${pBadge.color}`}>
+                            {pBadge.label}
+                          </span>
+                          <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                            Published ✓
+                          </span>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-black text-slate-900 group-hover:text-[#6d3a68] transition-colors leading-snug">
+                            {cleanPaperTitle(paper.title, paper.subject_code, paper.class_name)}
+                          </h3>
+                          <p className="text-[11px] text-slate-400 font-mono mt-0.5">
+                            Code: {paper.exam_code || `PPR-${paper.id}`}
+                          </p>
+                        </div>
+
+                        {/* Badges Row */}
+                        <div className="flex items-center gap-1.5 flex-wrap text-xs">
+                          <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg font-bold text-[11px]">
+                            {paper.class_name || paper.class || 'Class 6'}
+                          </span>
+                          <span className="px-2.5 py-1 bg-amber-50 text-amber-800 rounded-lg font-bold text-[11px]">
+                            {subCode}
+                          </span>
+                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded-lg font-bold text-[11px]">
+                            {qCount} Questions
+                          </span>
+                          <span className="px-2.5 py-1 bg-blue-50 text-blue-800 rounded-lg font-bold text-[11px]">
+                            {paper.duration_minutes || 60}m
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Card Action Buttons */}
+                      <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setQuickPreviewPaper(paper)}
+                            className="px-2.5 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1 border border-slate-200 transition-colors cursor-pointer"
+                          >
+                            <Eye className="w-3.5 h-3.5 text-slate-600" />
+                            <span>View MCQs</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPdfModalPaper(paper)}
+                            className="px-2.5 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1 border border-slate-200 transition-colors cursor-pointer"
+                          >
+                            <Download className="w-3.5 h-3.5 text-slate-600" />
+                            <span>PDF &amp; Key</span>
+                          </button>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleStartAdminPaper(paper)}
+                          className="px-3.5 py-1.5 rounded-xl bg-[#6d3a68] hover:bg-[#582d54] text-white text-xs font-black flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer ml-auto"
+                        >
+                          <Play className="w-3.5 h-3.5 fill-current" />
+                          <span>Start Test</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -2567,6 +2802,113 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
         paper={pdfModalPaper}
         onStartExamAfterDownload={() => handleStartTest()}
       />
+
+      {/* Quick MCQ Preview Modal for Students */}
+      {quickPreviewPaper && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95">
+            <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#6d3a68] block">
+                  Question Paper Preview • {quickPreviewPaper.class_name || quickPreviewPaper.class}
+                </span>
+                <h3 className="text-base font-black text-slate-900">
+                  {cleanPaperTitle(quickPreviewPaper.title, quickPreviewPaper.subject_code, quickPreviewPaper.class_name)}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setQuickPreviewPaper(null)}
+                className="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-sm cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-5 divide-y divide-slate-100 flex-1">
+              {Array.isArray(quickPreviewPaper.questions) && quickPreviewPaper.questions.length > 0 ? (
+                quickPreviewPaper.questions.map((q, idx) => (
+                  <div key={q.id || idx} className="pt-4 first:pt-0 space-y-2.5">
+                    <div className="flex items-start gap-2">
+                      <span className="w-6 h-6 rounded-lg bg-[#f4ebf4] text-[#6d3a68] font-black text-xs flex items-center justify-center shrink-0">
+                        {idx + 1}
+                      </span>
+                      <div className="flex-1 space-y-2">
+                        <p className="text-sm font-bold text-slate-800 leading-snug">
+                          {getCleanQuestionText(q.q || q.question_text || q.title)}
+                        </p>
+                        <QuestionDiagram question={q} title="Question Diagram" maxHeight="max-h-56" />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-8">
+                      {(q.options || ['Option A', 'Option B', 'Option C', 'Option D']).map((opt, oIdx) => {
+                        const isCorrect = (typeof q.correct === 'number' && q.correct === oIdx) ||
+                                          (q.correct_option === ['A', 'B', 'C', 'D'][oIdx]);
+                        const isOptImg = isImageString(opt);
+                        return (
+                          <div
+                            key={oIdx}
+                            className={`p-2.5 rounded-xl text-xs font-medium border flex items-center gap-2 ${
+                              isCorrect
+                                ? 'bg-emerald-50 border-emerald-300 text-emerald-900 font-bold'
+                                : 'bg-slate-50 border-slate-200 text-slate-700'
+                            }`}
+                          >
+                            <span className="w-5 h-5 rounded-md bg-white border border-slate-200 text-slate-700 font-black text-[10px] flex items-center justify-center shrink-0">
+                              {['A', 'B', 'C', 'D'][oIdx]}
+                            </span>
+                            {isOptImg ? (
+                              <img
+                                src={getOptionImageSrc(opt)}
+                                alt={`Option ${['A', 'B', 'C', 'D'][oIdx]}`}
+                                className="max-h-14 max-w-full object-contain rounded"
+                              />
+                            ) : (
+                              <span className="truncate">{opt}</span>
+                            )}
+                            {isCorrect && (
+                              <span className="ml-auto text-[10px] text-emerald-700 font-black">✓ Correct</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {q.explanation && (
+                      <div className="pl-8 pt-1 text-[11px] text-slate-500 italic">
+                        <strong>Explanation:</strong> {q.explanation}
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-slate-400 text-xs font-bold">
+                  No questions found in this paper.
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-500">
+                Total: {(quickPreviewPaper.questions || []).length} MCQs
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  const p = quickPreviewPaper;
+                  setQuickPreviewPaper(null);
+                  handleStartAdminPaper(p);
+                }}
+                className="px-5 py-2 bg-[#6d3a68] hover:bg-[#582d54] text-white font-black text-xs rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5"
+              >
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Start Practice Test Now</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

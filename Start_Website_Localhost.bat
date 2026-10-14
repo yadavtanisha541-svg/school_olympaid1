@@ -1,0 +1,6 @@
+@echo off
+title OlympiadHub Localhost Launcher
+echo Starting OlympiadHub Localhost (Port 3000 & 8000)...
+powershell -ExecutionPolicy Bypass -File "C:\Users\HP\.gemini\antigravity\scratch\olympiadhub\start_servers.ps1"
+echo Server is running! Opening browser...
+start http://localhost:3000

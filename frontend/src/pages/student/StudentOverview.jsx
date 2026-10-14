@@ -516,9 +516,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
 
     const basePapers = [
       {
-        id: `mock_${subCode.toLowerCase()}_prev`,
-        title: `${studentClass} ${subCode} Previous Year Paper 2019`,
-        short_code: `${subCode} - 2019`,
+        id: `mock_${subCode.toLowerCase()}_1`,
+        title: `${studentClass} ${subCode} Mock Test 1`,
+        short_code: `${subCode} - Mock 1`,
         subject_code: subCode,
         class_name: studentClass,
         duration_minutes: 60,
@@ -527,9 +527,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
         status: 'published'
       },
       {
-        id: `mock_${subCode.toLowerCase()}_sample`,
-        title: `${studentClass} ${subCode} Official Sample Paper 2026`,
-        short_code: `${subCode} - Sample 2026`,
+        id: `mock_${subCode.toLowerCase()}_2`,
+        title: `${studentClass} ${subCode} Mock Test 2`,
+        short_code: `${subCode} - Mock 2`,
         subject_code: subCode,
         class_name: studentClass,
         duration_minutes: 60,

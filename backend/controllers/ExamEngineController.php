@@ -727,14 +727,20 @@ class ExamEngineController {
 
             if ($existingQId) {
                 $qId = (int)$existingQId;
+                $qImg = trim($qData['question_image'] ?? $qData['image_url'] ?? $qData['diagram'] ?? $qData['image'] ?? '');
+                if (!empty($qImg)) {
+                    $upQ = $db->prepare("UPDATE questions SET question_image = ?, image_url = ?, diagram = ? WHERE id = ? AND (question_image IS NULL OR question_image = '')");
+                    $upQ->execute([$qImg, $qImg, $qImg, $qId]);
+                }
             } else {
+                $qImg = trim($qData['question_image'] ?? $qData['image_url'] ?? $qData['diagram'] ?? $qData['image'] ?? '');
                 $insQ = $db->prepare("
                     INSERT INTO questions (
                         subject_id, class_id, question_text, option_a, option_b, option_c, option_d,
-                        correct_option, explanation, difficulty, marks, negative_marks, status, created_by, created_at
+                        correct_option, explanation, difficulty, marks, negative_marks, question_image, image_url, diagram, status, created_by, created_at
                     ) VALUES (
                         ?, ?, ?, ?, ?, ?, ?,
-                        ?, ?, ?, 1.00, 0.00, 'active', 1, NOW()
+                        ?, ?, ?, 1.00, 0.00, ?, ?, ?, 'active', 1, NOW()
                     )
                 ");
                 $insQ->execute([
@@ -747,7 +753,10 @@ class ExamEngineController {
                     $optD,
                     $correctLetter,
                     $explanation,
-                    strtolower($difficulty)
+                    strtolower($difficulty),
+                    !empty($qImg) ? $qImg : null,
+                    !empty($qImg) ? $qImg : null,
+                    !empty($qImg) ? $qImg : null
                 ]);
                 $qId = (int)$db->lastInsertId();
             }
@@ -959,15 +968,26 @@ class ExamEngineController {
                 $formattedQs[] = [
                     'id' => (int)$rq['id'],
                     'q' => $rq['question_text'],
+                    'question_text' => $rq['question_text'],
                     'options' => [
                         $rq['option_a'],
                         $rq['option_b'],
                         $rq['option_c'],
                         $rq['option_d']
                     ],
+                    'option_a' => $rq['option_a'],
+                    'option_b' => $rq['option_b'],
+                    'option_c' => $rq['option_c'],
+                    'option_d' => $rq['option_d'],
                     'correct' => $correctIdx,
+                    'correct_option' => $correctLetter,
                     'explanation' => $rq['explanation'] ?? '',
-                    'marks' => (float)($rq['marks'] ?? 1.0)
+                    'marks' => (float)($rq['marks'] ?? 1.0),
+                    'question_image' => $rq['question_image'] ?? $rq['image_url'] ?? $rq['diagram'] ?? '',
+                    'image_url' => $rq['image_url'] ?? $rq['question_image'] ?? $rq['diagram'] ?? '',
+                    'diagram' => $rq['diagram'] ?? $rq['question_image'] ?? $rq['image_url'] ?? '',
+                    'image' => $rq['question_image'] ?? '',
+                    'figure' => $rq['question_image'] ?? ''
                 ];
             }
             $p['questions'] = $formattedQs;
@@ -1080,14 +1100,15 @@ class ExamEngineController {
             $corrLetter = $letters[$corrIdx] ?? 'A';
             $explanation = trim($q['explanation'] ?? '');
             $qMarks = (float)($q['marks'] ?? 1.0);
+            $qImg = trim($q['question_image'] ?? $q['image_url'] ?? $q['diagram'] ?? $q['image'] ?? $q['figure'] ?? '');
 
             $insQ = $db->prepare("
                 INSERT INTO questions (
                     subject_id, class_id, question_text, option_a, option_b, option_c, option_d,
-                    correct_option, explanation, difficulty, marks, negative_marks, status, created_by, created_at
+                    correct_option, explanation, difficulty, marks, negative_marks, question_image, image_url, diagram, status, created_by, created_at
                 ) VALUES (
                     ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, 0.00, 'active', 1, NOW()
+                    ?, ?, ?, ?, 0.00, ?, ?, ?, 'active', 1, NOW()
                 )
             ");
             $insQ->execute([
@@ -1101,7 +1122,10 @@ class ExamEngineController {
                 $corrLetter,
                 $explanation,
                 strtolower($difficulty),
-                $qMarks
+                $qMarks,
+                !empty($qImg) ? $qImg : null,
+                !empty($qImg) ? $qImg : null,
+                !empty($qImg) ? $qImg : null
             ]);
             $qId = (int)$db->lastInsertId();
 

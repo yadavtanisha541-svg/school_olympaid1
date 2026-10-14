@@ -41,6 +41,8 @@ export async function getMammoth() {
   return mammothPromise;
 }
 
+import { saveMultipleImages, saveImageToStore } from './imageStore';
+
 // ─── Global image store ───────────────────────────────────────────────────────
 let _images = {};
 export function getExtractedImages() { return _images; }
@@ -83,6 +85,7 @@ export async function extractFromFile(file) {
 
         if (htmlResult && htmlResult.value && htmlResult.value.trim().length > 0) {
           const text = htmlToStructuredText(htmlResult.value);
+          saveMultipleImages(_images);
           return { text, images: { ..._images } };
         }
 
@@ -526,21 +529,37 @@ function parseBlock(blockText, idx, images = {}) {
     .replace(/^(?:Exp(?:lanation)?|Reason|Hint|Sol(?:ution)?)\s*[:=\-–]\s*/i, '')
     .trim();
 
+  const qId = Date.now() + idx * 1000 + Math.floor(Math.random() * 999);
+  const qTextFinal = cleanedQuestionText || questionText;
+
+  if (primaryImgSrc) {
+    try {
+      saveImageToStore(String(qId), primaryImgSrc);
+      const norm = (qTextFinal || '').replace(/^(\d+[\.\)\s]+)/, '').replace(/\s+/g, ' ').trim().toLowerCase();
+      if (norm) saveImageToStore(norm, primaryImgSrc);
+    } catch (_) {}
+  }
+
   return {
-    id: Date.now() + idx * 1000 + Math.floor(Math.random() * 999),
-    question_text: cleanedQuestionText || questionText,
+    id: qId,
+    q: qTextFinal,
+    question_text: qTextFinal,
     option_a: optionMap['A'] || '',
     option_b: optionMap['B'] || '',
     option_c: optionMap['C'] || '',
     option_d: optionMap['D'] || '',
     correct_option: correctOption,
     explanation,
-    difficulty: detectDifficulty(cleanedQuestionText || questionText),
+    difficulty: detectDifficulty(qTextFinal),
     marks: 1.0,
     negative_marks: 0.25,
     status: 'active',
     question_image: primaryImgSrc,
     image_url: primaryImgSrc,
+    diagram: primaryImgSrc,
+    diagrams: imageKeys.map(k => (images && images[k]) || getExtractedImages()[k]).filter(Boolean),
+    image: primaryImgSrc,
+    figure: primaryImgSrc,
     question_image_keys: imageKeys,
     _imgStore: images || {}
   };

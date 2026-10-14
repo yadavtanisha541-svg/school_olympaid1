@@ -34,7 +34,45 @@ export const AvailableExamsPage = ({ onStartExam }) => {
     try {
       setLoading(true);
       const res = await apiClient.get('/exams', { exam_type: activeTab });
-      if (res.success) setExams(res.data || []);
+      let list = (res && res.success && Array.isArray(res.data)) ? [...res.data] : [];
+
+      // Multi-store local fallback
+      const addUniqueExam = (item) => {
+        if (!item || (!item.id && !item.exam_code)) return;
+        const idStr = item.id ? String(item.id) : '';
+        const codeStr = item.exam_code ? String(item.exam_code) : '';
+        const exists = list.some(e => 
+          (idStr && String(e.id) === idStr) ||
+          (codeStr && e.exam_code && String(e.exam_code) === codeStr)
+        );
+        if (!exists) {
+          list.unshift(item);
+        }
+      };
+
+      try {
+        const storedExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+        if (Array.isArray(storedExams)) storedExams.forEach(addUniqueExam);
+      } catch (e) {}
+
+      try {
+        const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+        if (Array.isArray(genPapers)) genPapers.forEach(addUniqueExam);
+      } catch (e) {}
+
+      try {
+        const mockPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+        if (Array.isArray(mockPapers)) mockPapers.forEach(addUniqueExam);
+      } catch (e) {}
+
+      if (activeTab && activeTab !== 'all') {
+        list = list.filter(e => {
+          const t = (e.exam_type || e.paper_category || 'mock').toLowerCase();
+          return t === activeTab.toLowerCase() || (activeTab === 'practice' && (t.includes('practice') || t.includes('generator'))) || (activeTab === 'mock' && t.includes('mock'));
+        });
+      }
+
+      setExams(list);
     } catch (err) {
       console.error(err);
     } finally {
@@ -44,6 +82,22 @@ export const AvailableExamsPage = ({ onStartExam }) => {
 
   useEffect(() => {
     fetchExams();
+  }, [activeTab]);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      fetchExams();
+    };
+    window.addEventListener('olympiadhub-exams-updated', handleUpdate);
+    window.addEventListener('olympiadhub-data-updated', handleUpdate);
+    window.addEventListener('olympiadhub-admin-papers-updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('olympiadhub-exams-updated', handleUpdate);
+      window.removeEventListener('olympiadhub-data-updated', handleUpdate);
+      window.removeEventListener('olympiadhub-admin-papers-updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
   }, [activeTab]);
 
   const handleLaunchClick = (exam) => {

@@ -21,6 +21,12 @@ import {
 } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
+import {
+  getCleanQuestionText,
+  isImageString,
+  getOptionImageSrc,
+  QuestionDiagram
+} from '../../utils/questionMediaHelper';
 
 export const DetailedSolutionsPage = ({
   attemptId,
@@ -495,10 +501,13 @@ export const DetailedSolutionsPage = ({
                   </div>
                 </div>
 
-                {/* Question Text */}
-                <h3 className="text-base sm:text-lg font-black text-[#2e1065] leading-snug">
-                  {item.question_text}
-                </h3>
+                {/* Question Text & Diagram */}
+                <div className="space-y-3">
+                  <h3 className="text-base sm:text-lg font-black text-[#2e1065] leading-snug">
+                    {getCleanQuestionText(item.question_text || item.q)}
+                  </h3>
+                  <QuestionDiagram question={item} title="Question Diagram / Figure" />
+                </div>
 
                 {/* 4 MCQ Options */}
                 <div className="space-y-2.5">
@@ -506,6 +515,7 @@ export const DetailedSolutionsPage = ({
                     const text = item.options?.[optIdx] || item[`option_${opt.toLowerCase()}`] || `Option ${opt}`;
                     const isUserPick = userSelected === opt;
                     const isThisCorrect = correctOpt === opt;
+                    const isOptImg = isImageString(text);
 
                     let cardStyle = 'border-slate-200 bg-slate-50/70 text-slate-700 hover:bg-slate-100/80';
                     if (isThisCorrect) {
@@ -519,7 +529,7 @@ export const DetailedSolutionsPage = ({
                         key={opt}
                         className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 text-xs sm:text-sm transition-all ${cardStyle}`}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
                           <span
                             className={`w-7 h-7 rounded-xl font-black flex items-center justify-center text-xs shrink-0 transition-all ${
                               isThisCorrect
@@ -539,7 +549,17 @@ export const DetailedSolutionsPage = ({
                           >
                             {opt}
                           </span>
-                          <span className="font-semibold">{text}</span>
+                          {isOptImg ? (
+                            <div className="p-1 rounded-xl bg-white border border-slate-200 shadow-2xs inline-block">
+                              <img
+                                src={getOptionImageSrc(text)}
+                                alt={`Option ${opt}`}
+                                className="max-h-20 max-w-full object-contain rounded-lg"
+                              />
+                            </div>
+                          ) : (
+                            <span className="font-semibold leading-snug">{text}</span>
+                          )}
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0">

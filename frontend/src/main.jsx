@@ -8,6 +8,9 @@ import { syncManager } from './utils/syncManager';
 import './index.css';
 
 // Automatically establish real-time cross-origin data sync between Localhost and Vercel
+if (typeof window !== 'undefined') {
+  window.syncManager = syncManager;
+}
 syncManager.init();
 
 class ErrorBoundary extends React.Component {
