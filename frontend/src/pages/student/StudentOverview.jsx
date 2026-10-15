@@ -110,9 +110,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
     return () => clearInterval(timer);
   }, []);
 
-  const fetchDashboard = async () => {
+  const fetchDashboard = async (showLoading = false) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const [dashRes, examsRes, certRes, papersRes] = await Promise.all([
         apiClient.get('/analytics/student').catch(() => ({ success: false })),
         apiClient.get('/exams/available').catch(() => ({ success: false })),
@@ -188,7 +188,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
     } catch (err) {
       console.error('Error fetching student dashboard:', err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -228,6 +228,12 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       const combined = [...localList, ...apiList];
       const seen = new Set();
       const unique = [];
+
+      let allUsers = [];
+      try {
+        allUsers = JSON.parse(localStorage.getItem('olympiadhub_db_users') || '[]');
+      } catch (e) {}
+
       combined.forEach((rawR) => {
         if (!rawR) return;
         const totalQ = Number(rawR.total_marks || rawR.total_questions || rawR.totalQuestions || 60);
@@ -236,29 +242,27 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           ? Number(rawR.percentage)
           : null;
 
-        if (rawPctVal !== null) {
-          while (rawPctVal > 100) {
-            rawPctVal = rawPctVal / 100;
-          }
-        } else {
-          rawPctVal = totalQ > 0 ? (scoreVal / totalQ) * 100 : 0;
+        let cleanPct = 0;
+        if (rawPctVal !== null && Number.isFinite(rawPctVal)) {
+          cleanPct = rawPctVal;
+          if (cleanPct > 100) cleanPct = cleanPct / 100;
+        } else if (totalQ > 0 && Number.isFinite(scoreVal)) {
+          cleanPct = (scoreVal / totalQ) * 100;
         }
-        const calcPct = Math.min(100, Math.max(0, rawPctVal)).toFixed(1);
+        if (!Number.isFinite(cleanPct) || isNaN(cleanPct)) cleanPct = 0;
+        const calcPct = Math.min(100, Math.max(0, cleanPct)).toFixed(1);
 
         // Dynamically resolve student name in proper Title Case
         let cleanStudentName = (rawR.student_name || rawR.name || rawR.full_name || rawR.studentName || '').trim();
         if (!cleanStudentName || cleanStudentName.toLowerCase() === 'student candidate' || cleanStudentName.toLowerCase() === 'candidate' || cleanStudentName.toLowerCase() === (rawR.student_login_id || '').toLowerCase()) {
-          try {
-            const allUsers = JSON.parse(localStorage.getItem('olympiadhub_db_users') || '[]');
-            const match = allUsers.find(u =>
-              String(u.id) === String(rawR.student_id) ||
-              String(u.login_id || '').toLowerCase() === String(rawR.student_login_id || '').toLowerCase() ||
-              (u.email && rawR.student_email && u.email.toLowerCase() === rawR.student_email.toLowerCase())
-            );
-            if (match && (match.full_name || match.name)) {
-              cleanStudentName = match.full_name || match.name;
-            }
-          } catch (e) {}
+          const match = allUsers.find(u =>
+            String(u.id) === String(rawR.student_id) ||
+            String(u.login_id || '').toLowerCase() === String(rawR.student_login_id || '').toLowerCase() ||
+            (u.email && rawR.student_email && u.email.toLowerCase() === rawR.student_email.toLowerCase())
+          );
+          if (match && (match.full_name || match.name)) {
+            cleanStudentName = match.full_name || match.name;
+          }
         }
         if (!cleanStudentName || cleanStudentName.toLowerCase() === 'student candidate' || cleanStudentName.toLowerCase() === 'candidate') {
           const base = rawR.student_login_id || rawR.student_name || 'Student Candidate';
@@ -376,50 +380,44 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
     };
 
     window.addEventListener('students-updated', handleStudentsUpdated);
-    window.addEventListener('olympiadhub-data-updated', handleStudentsUpdated);
-    window.addEventListener('storage', handleStudentsUpdated);
     return () => {
       window.removeEventListener('students-updated', handleStudentsUpdated);
-      window.removeEventListener('olympiadhub-data-updated', handleStudentsUpdated);
-      window.removeEventListener('storage', handleStudentsUpdated);
     };
   }, []);
 
   useEffect(() => {
-    fetchDashboard();
+    fetchDashboard(true);
     fetchResultsStream(true);
+    fetchWeeklyLeaderboard(leaderboardClass, leaderboardSubject);
 
-    const handleExamSubmitted = () => {
-      fetchDashboard();
-      fetchResultsStream(false);
-      fetchWeeklyLeaderboard(leaderboardClass, leaderboardSubject);
+    let refreshTimer = null;
+    const debouncedRefresh = () => {
+      if (refreshTimer) clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(() => {
+        fetchDashboard(false);
+        fetchResultsStream(false);
+        fetchWeeklyLeaderboard(leaderboardClass, leaderboardSubject);
+      }, 600);
     };
 
-    window.addEventListener('exam-submitted', handleExamSubmitted);
-    window.addEventListener('olympiad-exam-submitted', handleExamSubmitted);
-    window.addEventListener('olympiadhub-exams-updated', handleExamSubmitted);
-    window.addEventListener('olympiadhub-data-updated', handleExamSubmitted);
-    window.addEventListener('olympiadhub-admin-papers-updated', handleExamSubmitted);
-    window.addEventListener('storage', handleExamSubmitted);
+    window.addEventListener('exam-submitted', debouncedRefresh);
+    window.addEventListener('olympiad-exam-submitted', debouncedRefresh);
+    window.addEventListener('olympiadhub-exams-updated', debouncedRefresh);
+    window.addEventListener('olympiadhub-admin-papers-updated', debouncedRefresh);
 
     // Silent background refresh without table flicker/collapse
     const pollInterval = setInterval(() => {
       fetchResultsStream(false);
-    }, 10000);
+    }, 15000);
 
     return () => {
+      if (refreshTimer) clearTimeout(refreshTimer);
       clearInterval(pollInterval);
-      window.removeEventListener('exam-submitted', handleExamSubmitted);
-      window.removeEventListener('olympiad-exam-submitted', handleExamSubmitted);
-      window.removeEventListener('olympiadhub-exams-updated', handleExamSubmitted);
-      window.removeEventListener('olympiadhub-data-updated', handleExamSubmitted);
-      window.removeEventListener('olympiadhub-admin-papers-updated', handleExamSubmitted);
-      window.removeEventListener('storage', handleExamSubmitted);
+      window.removeEventListener('exam-submitted', debouncedRefresh);
+      window.removeEventListener('olympiad-exam-submitted', debouncedRefresh);
+      window.removeEventListener('olympiadhub-exams-updated', debouncedRefresh);
+      window.removeEventListener('olympiadhub-admin-papers-updated', debouncedRefresh);
     };
-  }, [leaderboardClass, leaderboardSubject]);
-
-  useEffect(() => {
-    fetchWeeklyLeaderboard(leaderboardClass, leaderboardSubject);
   }, [leaderboardClass, leaderboardSubject]);
 
   const handleSort = (field) => {

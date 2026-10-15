@@ -324,16 +324,12 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
         fetchAdminPapers();
       }, 400);
     };
-    window.addEventListener('storage', handleSync);
     window.addEventListener('olympiadhub-admin-papers-updated', handleSync);
     window.addEventListener('olympiadhub-exams-updated', handleSync);
-    window.addEventListener('olympiadhub-data-updated', handleSync);
     return () => {
       if (syncTimer) clearTimeout(syncTimer);
-      window.removeEventListener('storage', handleSync);
       window.removeEventListener('olympiadhub-admin-papers-updated', handleSync);
       window.removeEventListener('olympiadhub-exams-updated', handleSync);
-      window.removeEventListener('olympiadhub-data-updated', handleSync);
     };
   }, []);
 

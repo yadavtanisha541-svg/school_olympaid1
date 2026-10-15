@@ -209,20 +209,21 @@ export const StudentMyContentPage = ({
 
   useEffect(() => {
     fetchMyContentData();
+    let timer = null;
     const handleSync = () => {
-      fetchMyContentData();
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        fetchMyContentData();
+      }, 500);
     };
     window.addEventListener('olympiadhub-admin-papers-updated', handleSync);
     window.addEventListener('olympiadhub-exams-updated', handleSync);
-    window.addEventListener('olympiadhub-data-updated', handleSync);
     window.addEventListener('olympiadhub-package-updated', handleSync);
-    window.addEventListener('storage', handleSync);
     return () => {
+      if (timer) clearTimeout(timer);
       window.removeEventListener('olympiadhub-admin-papers-updated', handleSync);
       window.removeEventListener('olympiadhub-exams-updated', handleSync);
-      window.removeEventListener('olympiadhub-data-updated', handleSync);
       window.removeEventListener('olympiadhub-package-updated', handleSync);
-      window.removeEventListener('storage', handleSync);
     };
   }, [user]);
 

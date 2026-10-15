@@ -3018,10 +3018,12 @@ export const mockEngine = {
         const unansweredCount = Number(body.unansweredCount !== undefined ? body.unansweredCount : (body.unanswered_count || 0));
         
         let calculatedPercentage = Number(body.percentage !== undefined ? body.percentage : (totalMarks > 0 ? (score / totalMarks) * 100 : 80));
-        while (calculatedPercentage > 100) {
-          calculatedPercentage = calculatedPercentage / 100;
+        if (!Number.isFinite(calculatedPercentage) || isNaN(calculatedPercentage)) {
+          calculatedPercentage = 0;
+        } else if (calculatedPercentage > 100) {
+          calculatedPercentage = calculatedPercentage > 100 ? (calculatedPercentage / 100) : calculatedPercentage;
         }
-        calculatedPercentage = Math.min(100, Math.max(0, calculatedPercentage));
+        calculatedPercentage = Math.min(100, Math.max(0, Number.isFinite(calculatedPercentage) ? calculatedPercentage : 0));
 
         const rawStudentName = body.student_name || activeUser?.full_name || activeUser?.name || body.student_login_id || activeUser?.login_id || 'Student Candidate';
         const formattedStudentName = rawStudentName
@@ -3161,7 +3163,6 @@ export const mockEngine = {
             window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: newPaper }));
             window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: newPaper }));
             window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exam_papers', data: papers } }));
-            window.dispatchEvent(new Event('storage'));
           }
         } catch (e) {}
 
@@ -3229,7 +3230,6 @@ export const mockEngine = {
             if (typeof window !== 'undefined') {
               window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedPaper }));
               window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: updatedPaper }));
-              window.dispatchEvent(new Event('storage'));
             }
           } catch (e) {}
         }
@@ -3619,7 +3619,6 @@ export const mockEngine = {
             window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: newExam }));
             window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: newExam }));
             window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams', data: exams } }));
-            window.dispatchEvent(new Event('storage'));
           }
         } catch (e) {}
 
@@ -3759,10 +3758,12 @@ export const mockEngine = {
         const unansweredCount = Number(body.unanswered_count || body.unansweredCount || 0);
 
         let calculatedPercentage = Number(body.percentage !== undefined ? body.percentage : (totalMarks > 0 ? (score / totalMarks) * 100 : 80));
-        while (calculatedPercentage > 100) {
-          calculatedPercentage = calculatedPercentage / 100;
+        if (!Number.isFinite(calculatedPercentage) || isNaN(calculatedPercentage)) {
+          calculatedPercentage = 0;
+        } else if (calculatedPercentage > 100) {
+          calculatedPercentage = calculatedPercentage > 100 ? (calculatedPercentage / 100) : calculatedPercentage;
         }
-        calculatedPercentage = Math.min(100, Math.max(0, calculatedPercentage));
+        calculatedPercentage = Math.min(100, Math.max(0, Number.isFinite(calculatedPercentage) ? calculatedPercentage : 0));
 
         const rawStudentName = body.student_name || activeUser?.full_name || activeUser?.name || body.student_login_id || activeUser?.login_id || 'Student Candidate';
         const formattedStudentName = rawStudentName

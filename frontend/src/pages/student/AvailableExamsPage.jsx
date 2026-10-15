@@ -93,18 +93,19 @@ export const AvailableExamsPage = ({ onStartExam }) => {
   }, [activeTab]);
 
   useEffect(() => {
+    let timer = null;
     const handleUpdate = () => {
-      fetchExams();
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        fetchExams();
+      }, 500);
     };
     window.addEventListener('olympiadhub-exams-updated', handleUpdate);
-    window.addEventListener('olympiadhub-data-updated', handleUpdate);
     window.addEventListener('olympiadhub-admin-papers-updated', handleUpdate);
-    window.addEventListener('storage', handleUpdate);
     return () => {
+      if (timer) clearTimeout(timer);
       window.removeEventListener('olympiadhub-exams-updated', handleUpdate);
-      window.removeEventListener('olympiadhub-data-updated', handleUpdate);
       window.removeEventListener('olympiadhub-admin-papers-updated', handleUpdate);
-      window.removeEventListener('storage', handleUpdate);
     };
   }, [activeTab]);
 
