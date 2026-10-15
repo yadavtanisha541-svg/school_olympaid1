@@ -56,6 +56,11 @@ export const AvailableExamsPage = ({ onStartExam }) => {
       } catch (e) {}
 
       try {
+        const examPapers = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+        if (Array.isArray(examPapers)) examPapers.forEach(addUniqueExam);
+      } catch (e) {}
+
+      try {
         const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
         if (Array.isArray(genPapers)) genPapers.forEach(addUniqueExam);
       } catch (e) {}
@@ -67,8 +72,11 @@ export const AvailableExamsPage = ({ onStartExam }) => {
 
       if (activeTab && activeTab !== 'all') {
         list = list.filter(e => {
-          const t = (e.exam_type || e.paper_category || 'mock').toLowerCase();
-          return t === activeTab.toLowerCase() || (activeTab === 'practice' && (t.includes('practice') || t.includes('generator'))) || (activeTab === 'mock' && t.includes('mock'));
+          const t = (e.exam_type || e.paper_category || e.category || 'mock').toLowerCase();
+          const title = (e.title || e.name || '').toLowerCase();
+          return t === activeTab.toLowerCase() ||
+                 (activeTab === 'practice' && (t.includes('practice') || t.includes('generator') || title.includes('practice'))) ||
+                 (activeTab === 'mock' && (t.includes('mock') || title.includes('mock') || !t.includes('practice')));
         });
       }
 

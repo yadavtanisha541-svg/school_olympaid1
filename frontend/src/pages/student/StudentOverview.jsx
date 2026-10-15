@@ -123,15 +123,68 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       if (dashRes.success && dashRes.data) {
         setData(dashRes.data);
       }
-      if (examsRes.success && examsRes.data) {
-        setAvailableExams(examsRes.data);
-      }
+
+      // Merge local stores for exams
+      let examsList = (examsRes && examsRes.success && Array.isArray(examsRes.data)) ? [...examsRes.data] : [];
+      const addUniqueItem = (list, item) => {
+        if (!item || (!item.id && !item.exam_code)) return;
+        const idStr = item.id ? String(item.id) : '';
+        const codeStr = item.exam_code ? String(item.exam_code) : '';
+        const exists = list.some(e => 
+          (idStr && String(e.id) === idStr) ||
+          (codeStr && e.exam_code && String(e.exam_code) === codeStr)
+        );
+        if (!exists) {
+          list.unshift(item);
+        }
+      };
+
+      try {
+        const storedExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+        if (Array.isArray(storedExams)) storedExams.forEach(e => addUniqueItem(examsList, e));
+      } catch (e) {}
+
+      try {
+        const examPapersLocal = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+        if (Array.isArray(examPapersLocal)) examPapersLocal.forEach(e => addUniqueItem(examsList, e));
+      } catch (e) {}
+
+      try {
+        const genPapersLocal = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+        if (Array.isArray(genPapersLocal)) genPapersLocal.forEach(e => addUniqueItem(examsList, e));
+      } catch (e) {}
+
+      try {
+        const mockPapersLocal = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+        if (Array.isArray(mockPapersLocal)) mockPapersLocal.forEach(e => addUniqueItem(examsList, e));
+      } catch (e) {}
+
+      setAvailableExams(examsList);
+
       if (certRes.success && certRes.data) {
         setCertificates(certRes.data);
       }
-      if (papersRes && papersRes.success && Array.isArray(papersRes.data)) {
-        setExamPapers(papersRes.data);
-      }
+
+      // Merge local stores for exam papers
+      let papersList = (papersRes && papersRes.success && Array.isArray(papersRes.data)) ? [...papersRes.data] : [];
+      try {
+        const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+        if (Array.isArray(genPapers)) genPapers.forEach(p => addUniqueItem(papersList, p));
+      } catch (e) {}
+      try {
+        const dbPapers = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+        if (Array.isArray(dbPapers)) dbPapers.forEach(p => addUniqueItem(papersList, p));
+      } catch (e) {}
+      try {
+        const mockPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+        if (Array.isArray(mockPapers)) mockPapers.forEach(p => addUniqueItem(papersList, p));
+      } catch (e) {}
+      try {
+        const dbExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+        if (Array.isArray(dbExams)) dbExams.forEach(p => addUniqueItem(papersList, p));
+      } catch (e) {}
+
+      setExamPapers(papersList);
     } catch (err) {
       console.error('Error fetching student dashboard:', err);
     } finally {
@@ -344,6 +397,10 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
 
     window.addEventListener('exam-submitted', handleExamSubmitted);
     window.addEventListener('olympiad-exam-submitted', handleExamSubmitted);
+    window.addEventListener('olympiadhub-exams-updated', handleExamSubmitted);
+    window.addEventListener('olympiadhub-data-updated', handleExamSubmitted);
+    window.addEventListener('olympiadhub-admin-papers-updated', handleExamSubmitted);
+    window.addEventListener('storage', handleExamSubmitted);
 
     // Silent background refresh without table flicker/collapse
     const pollInterval = setInterval(() => {
@@ -354,6 +411,10 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       clearInterval(pollInterval);
       window.removeEventListener('exam-submitted', handleExamSubmitted);
       window.removeEventListener('olympiad-exam-submitted', handleExamSubmitted);
+      window.removeEventListener('olympiadhub-exams-updated', handleExamSubmitted);
+      window.removeEventListener('olympiadhub-data-updated', handleExamSubmitted);
+      window.removeEventListener('olympiadhub-admin-papers-updated', handleExamSubmitted);
+      window.removeEventListener('storage', handleExamSubmitted);
     };
   }, [leaderboardClass, leaderboardSubject]);
 
@@ -505,14 +566,36 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
   ], [studentClass]);
 
   const getSubjectPapers = (subCode, altCode) => {
+    const sCode = (subCode || '').toUpperCase();
+    const aCode = (altCode || '').toUpperCase();
+
+    const subMap = {
+      IMO: ['IMO', 'IEOM', 'MATH', 'MATHEMATICS'],
+      ISO: ['ISO', 'IEOS', 'SCIENCE', 'NSO'],
+      IDLO: ['IDLO', 'IEOD', 'DIGITAL', 'COMPUTER', 'ICSO', 'CYBER', 'AI', 'TECH'],
+      IEO: ['IEO', 'IEOE', 'ENGLISH', 'ENG'],
+      IGKO: ['IGKO', 'IEOG', 'GK', 'GENERAL KNOWLEDGE', 'GENERAL'],
+      IHO: ['IHO', 'IEOH', 'HINDI']
+    };
+    const aliases = [...(subMap[sCode] || [sCode]), aCode].filter(Boolean).map(x => x.toUpperCase());
+
     const matching = examPapers.filter((p) => {
-      const pSub = (p.subject_code || '').toUpperCase();
-      const codeMatches = pSub === subCode || (altCode && pSub === altCode);
-      const classMatches = !p.class_name || p.class_name === studentClass || p.class_name === 'All';
+      const pSub = (p.subject_code || p.subject || '').toUpperCase();
+      const pTitle = (p.title || p.name || '').toUpperCase();
+      const pCode = (p.exam_code || p.short_code || '').toUpperCase();
+
+      const codeMatches = aliases.some(alias => 
+        pSub.includes(alias) || pTitle.includes(alias) || pCode.includes(alias)
+      );
+
+      const pClass = String(p.class_name || p.class || p.grade || '').toLowerCase();
+      const sClass = String(studentClass || '').toLowerCase();
+      const pClassNum = (pClass.match(/\d+/) || [])[0];
+      const sClassNum = (sClass.match(/\d+/) || [])[0];
+
+      const classMatches = !pClass || pClass === 'all' || (pClassNum && sClassNum && pClassNum === sClassNum) || pClass.includes(sClass);
       return codeMatches && classMatches;
     });
-
-    if (matching.length > 0) return matching;
 
     const basePapers = [
       {
@@ -538,31 +621,6 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
         status: 'published'
       },
       {
-        id: `mock_${subCode.toLowerCase()}_1`,
-        title: `${subCode} Level-1 Mock Test 1 ${studentClass}`,
-        short_code: `${subCode} - Mock 1`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 42,
-        status: 'published'
-      },
-      {
-        id: `mock_${subCode.toLowerCase()}_2`,
-        title: `${subCode} Level-1 Mock Test 2 ${studentClass}`,
-        short_code: `${subCode} - Mock 2`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 45,
-        status: 'published'
-      }
-    ];
-
-    if (subCode === 'IMO') {
-      basePapers.push({
         id: `mock_${subCode.toLowerCase()}_3`,
         title: `${subCode} Level-1 Mock Test 3 ${studentClass}`,
         short_code: `${subCode} - Mock 3`,
@@ -570,12 +628,44 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
         class_name: studentClass,
         duration_minutes: 60,
         total_marks: 60,
+        cutoff_marks: 45,
+        status: 'published'
+      },
+      {
+        id: `mock_${subCode.toLowerCase()}_4`,
+        title: `${subCode} Level-1 Mock Test 4 ${studentClass}`,
+        short_code: `${subCode} - Mock 4`,
+        subject_code: subCode,
+        class_name: studentClass,
+        duration_minutes: 60,
+        total_marks: 60,
+        cutoff_marks: 45,
+        status: 'published'
+      },
+      {
+        id: `mock_${subCode.toLowerCase()}_5`,
+        title: `${subCode} Level-1 Mock Test 5 ${studentClass}`,
+        short_code: `${subCode} - Mock 5`,
+        subject_code: subCode,
+        class_name: studentClass,
+        duration_minutes: 60,
+        total_marks: 60,
         cutoff_marks: 46,
         status: 'published'
-      });
-    }
+      }
+    ];
 
-    return basePapers;
+    const seenIds = new Set();
+    const result = [];
+    [...matching, ...basePapers].forEach(p => {
+      const key = String(p.id || p.exam_code || p.title);
+      if (!seenIds.has(key)) {
+        seenIds.add(key);
+        result.push(p);
+      }
+    });
+
+    return result;
   };
 
   // Time of day greeting

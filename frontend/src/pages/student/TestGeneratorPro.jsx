@@ -244,10 +244,6 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
 
       const addUniquePaper = (p) => {
         if (!p) return;
-        const cat = (p.paper_category || p.category || p.exam_type || 'practice_test').toLowerCase();
-        const pTitle = (p.title || '').toLowerCase();
-        // Exclude pure mock tests only
-        if (cat.includes('mock') && !cat.includes('practice') && !pTitle.includes('practice') && !cat.includes('generator')) return;
         const pIdStr = String(p.id || '');
         const pCodeStr = String(p.exam_code || '');
         const exists = combined.some((cp) => 
@@ -256,7 +252,11 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
           (cp.title && p.title && cp.title === p.title && (cp.class_name || cp.class) === (p.class_name || p.class))
         );
         if (!exists) {
-          combined.push({ ...p, paper_category: p.paper_category || 'practice_test', status: p.status || 'published' });
+          combined.push({ 
+            ...p, 
+            paper_category: p.paper_category || (p.exam_type === 'mock' ? 'mock_test' : 'practice_test'), 
+            status: p.status || 'published' 
+          });
         }
       };
 
@@ -326,10 +326,14 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     };
     window.addEventListener('storage', handleSync);
     window.addEventListener('olympiadhub-admin-papers-updated', handleSync);
+    window.addEventListener('olympiadhub-exams-updated', handleSync);
+    window.addEventListener('olympiadhub-data-updated', handleSync);
     return () => {
       if (syncTimer) clearTimeout(syncTimer);
       window.removeEventListener('storage', handleSync);
       window.removeEventListener('olympiadhub-admin-papers-updated', handleSync);
+      window.removeEventListener('olympiadhub-exams-updated', handleSync);
+      window.removeEventListener('olympiadhub-data-updated', handleSync);
     };
   }, []);
 
@@ -1510,15 +1514,15 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     if (listSubFilter !== 'All') {
       const s = listSubFilter.toLowerCase();
       const subFilterMap = {
-        math: ['imo', 'math', 'mathematics', 'mathematic'],
-        science: ['iso', 'science', 'nso'],
-        digital: ['idlo', 'digital', 'computer', 'icso', 'cyber', 'ai'],
-        english: ['ieo', 'english', 'eng'],
-        gk: ['igko', 'gk', 'general knowledge', 'general'],
-        hindi: ['iho', 'hindi']
+        math: ['imo', 'ieom', 'math', 'mathematics', 'mathematic'],
+        science: ['iso', 'ieos', 'science', 'nso'],
+        digital: ['idlo', 'ieod', 'digital', 'computer', 'icso', 'cyber', 'ai', 'tech'],
+        english: ['ieo', 'ieoe', 'english', 'eng'],
+        gk: ['igko', 'ieog', 'gk', 'general knowledge', 'general'],
+        hindi: ['iho', 'ieoh', 'hindi']
       };
       const validCodes = subFilterMap[s] || [s];
-      if (!validCodes.some((code) => pSub.includes(code) || pTitle.includes(code))) {
+      if (!validCodes.some((code) => pSub.includes(code) || pTitle.includes(code) || pCode.includes(code))) {
         return false;
       }
     }

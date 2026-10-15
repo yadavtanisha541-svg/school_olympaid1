@@ -146,28 +146,27 @@ export const StudentMyContentPage = ({
         allPapers = [...papersRes.data];
       }
 
-      // Only include pure Mock Tests from database and local storage (EXCLUDE Practice Tests)
+      // Include all Mock Tests & Admin-published papers from database and local storage
+      const adminPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
       const mockDbPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
       const olympiadDbPapers = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
       const olympiadExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
-      const combinedLocal = [...mockDbPapers, ...olympiadDbPapers, ...olympiadExams];
+      const combinedLocal = [...adminPapers, ...mockDbPapers, ...olympiadDbPapers, ...olympiadExams];
 
       if (Array.isArray(combinedLocal)) {
         combinedLocal.forEach((lp) => {
-          if (!lp) return;
-          const cat = (lp.paper_category || lp.category || lp.exam_type || 'mock_test').toLowerCase();
-          // STRICT SEPARATION: Never load Practice Tests or AI Generators into Mock Tests
-          if (cat.includes('practice') || cat.includes('generator') || (lp.exam_type === 'practice')) {
-            return;
-          }
-          if (!allPapers.some(p => String(p.id) === String(lp.id) || (p.title === lp.title && p.class_name === (lp.class_name || lp.class)))) {
+          if (!lp || (!lp.id && !lp.exam_code)) return;
+          const pId = String(lp.id || lp.exam_code);
+          if (!allPapers.some(p => String(p.id) === pId || (p.title === lp.title && (p.class_name || p.class) === (lp.class_name || lp.class)))) {
             allPapers.push({
-              id: lp.id,
+              ...lp,
+              id: lp.id || pId,
               title: lp.title,
               short_code: lp.shortCode || lp.short_code || `${lp.subject_code || 'OLY'} - Mock`,
               subject_code: (lp.subject_code || lp.subject || '').toUpperCase(),
-              class_name: lp.class_name || lp.class,
-              category: 'mock_test',
+              class_name: lp.class_name || lp.class || 'Class 6',
+              category: lp.paper_category || lp.category || (lp.exam_type === 'mock' ? 'mock_test' : 'practice_test'),
+              paper_category: lp.paper_category || lp.category || 'mock_test',
               duration_minutes: lp.duration_minutes || 60,
               total_marks: lp.total_marks || 60,
               cutoff_marks: lp.cutoff_marks || 42,
@@ -214,10 +213,14 @@ export const StudentMyContentPage = ({
       fetchMyContentData();
     };
     window.addEventListener('olympiadhub-admin-papers-updated', handleSync);
+    window.addEventListener('olympiadhub-exams-updated', handleSync);
+    window.addEventListener('olympiadhub-data-updated', handleSync);
     window.addEventListener('olympiadhub-package-updated', handleSync);
     window.addEventListener('storage', handleSync);
     return () => {
       window.removeEventListener('olympiadhub-admin-papers-updated', handleSync);
+      window.removeEventListener('olympiadhub-exams-updated', handleSync);
+      window.removeEventListener('olympiadhub-data-updated', handleSync);
       window.removeEventListener('olympiadhub-package-updated', handleSync);
       window.removeEventListener('storage', handleSync);
     };
@@ -433,30 +436,24 @@ export const StudentMyContentPage = ({
   const getSubjectPapers = (subCode, altCode) => {
     const matching = examPapers.filter((p) => {
       const pSub = (p.subject_code || p.subject || '').toUpperCase();
-      const codeMatches = pSub === subCode || (altCode && pSub === altCode) || (subCode === 'IDLO' && (pSub === 'ICSO' || pSub === 'CYBER' || pSub === 'IEOD')) || (subCode === 'IHO' && (pSub === 'IEOH' || pSub === 'HINDI'));
+      const sCode = (subCode || '').toUpperCase();
+      const aCode = (altCode || '').toUpperCase();
+      const isMath = (sCode === 'IMO' || sCode === 'IEOM') && ['IMO', 'IEOM', 'MATH', 'MATHEMATICS'].includes(pSub);
+      const isScience = (sCode === 'ISO' || sCode === 'IEOS') && ['ISO', 'IEOS', 'NSO', 'SCIENCE'].includes(pSub);
+      const isDigital = (sCode === 'IDLO' || sCode === 'IEOD') && ['IDLO', 'IEOD', 'ICSO', 'CYBER', 'COMPUTER'].includes(pSub);
+      const isEnglish = (sCode === 'IEO' || sCode === 'IEOE') && ['IEO', 'IEOE', 'ENGLISH'].includes(pSub);
+      const isGk = (sCode === 'IGKO' || sCode === 'IEOG') && ['IGKO', 'IEOG', 'GK', 'GENERAL KNOWLEDGE'].includes(pSub);
+      const isHindi = (sCode === 'IHO' || sCode === 'IEOH') && ['IHO', 'IEOH', 'HINDI'].includes(pSub);
+      const codeMatches = pSub === sCode || pSub === aCode || isMath || isScience || isDigital || isEnglish || isGk || isHindi;
       
       const pCls = (p.class_name || p.class || '').toLowerCase();
       const sCls = (studentClass || '').toLowerCase();
       const matchP = pCls.match(/\d+/);
       const matchS = sCls.match(/\d+/);
       const classMatches = (matchP && matchS) ? matchP[0] === matchS[0] : (pCls === sCls || !pCls || pCls === 'all');
-      
-      // Strict exclusion: NEVER show Practice Tests, Generators, Previous Year Papers or Sample Papers in Mock Tests
-      const titleLower = (p.title || '').toLowerCase();
-      const catLower = (p.category || p.paper_category || p.paper_type || p.exam_type || '').toLowerCase();
-      
-      const isPractice = catLower.includes('practice') || catLower.includes('generator') || (p.exam_type === 'practice') || titleLower.includes('practice');
-      const isPreviousYear = catLower.includes('previous') || catLower.includes('pyq') || catLower.includes('past') || titleLower.includes('previous year') || titleLower.includes('pyq');
-      const isSamplePaper = catLower.includes('sample') || titleLower.includes('sample paper');
-      
-      if (isPractice || isPreviousYear || isSamplePaper) {
-        return false;
-      }
 
       return codeMatches && classMatches;
     });
-
-    if (matching.length > 0) return matching;
 
     // Pure mock tests fallback (4 mocks per subject, 5 for IMO)
     const basePapers = [
@@ -518,6 +515,11 @@ export const StudentMyContentPage = ({
         cutoff_marks: 46,
         status: 'published'
       });
+    }
+
+    if (matching.length > 0) {
+      const uniqueAdmin = matching.filter(m => !basePapers.some(b => String(b.id) === String(m.id)));
+      return [...uniqueAdmin, ...basePapers];
     }
 
     return basePapers;

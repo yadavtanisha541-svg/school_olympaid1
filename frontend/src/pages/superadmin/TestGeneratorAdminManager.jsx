@@ -649,6 +649,8 @@ export const TestGeneratorAdminManager = () => {
     const subCode = subObj ? subObj.code : (subKey || 'IMO').toUpperCase();
     if (cat === 'generator') {
       return `${grade} ${subCode} Intelligent Generator Practice Paper`;
+    } else if (cat === 'mock_test' || cat === 'mock') {
+      return `${grade} ${subCode} Official Mock Test`;
     } else {
       return `${grade} ${subCode} Practice Mock Test`;
     }
@@ -830,13 +832,14 @@ export const TestGeneratorAdminManager = () => {
         };
       });
 
+      const isMockPaper = paperCategory === 'mock_test' || (finalTitle || '').toLowerCase().includes('mock');
       const completePaper = {
         id: paperId,
         exam_code: examCode,
         title: cleanPaperTitle(finalTitle, subObj?.code, paperClass),
-        paper_category: paperCategory || 'practice_test',
-        category: paperCategory || 'practice_test',
-        exam_type: paperCategory === 'generator' ? 'generated' : 'practice',
+        paper_category: isMockPaper ? 'mock_test' : (paperCategory || 'practice_test'),
+        category: isMockPaper ? 'mock_test' : (paperCategory || 'practice_test'),
+        exam_type: isMockPaper ? 'mock' : (paperCategory === 'generator' ? 'generated' : 'practice'),
         exam_year: '',
         subject: paperSubject,
         subject_name: subObj?.name || 'Mathematics',
@@ -1785,8 +1788,22 @@ export const TestGeneratorAdminManager = () => {
                 />
               </div>
 
-              {/* Row: Grade, Subject, Duration (Class & Subject only) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Row: Category, Grade, Subject, Duration */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Category / Exam Type */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-600">Exam Category / Type:</label>
+                  <select
+                    value={paperCategory}
+                    onChange={(e) => handleCategoryChangeInModal(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-purple-300 text-xs font-bold text-purple-950 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer bg-purple-50/40"
+                  >
+                    <option value="practice_test">Practice Test (Practice Hub)</option>
+                    <option value="mock_test">Mock Test (Student Mock Series)</option>
+                    <option value="generator">Intelligent Generator Paper</option>
+                  </select>
+                </div>
+
                 {/* Class */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-600">Class / Grade:</label>

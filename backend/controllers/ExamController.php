@@ -37,7 +37,8 @@ class ExamController {
             if (!empty($user['class_id'])) {
                 $sql .= " AND (
                     e.class_id = ?
-                    OR (e.class_id IS NULL AND e.id IN (SELECT exam_id FROM exam_assignments WHERE target_type = 'all' OR (target_type = 'class' AND target_id = ?)))
+                    OR e.class_id IS NULL
+                    OR (e.id IN (SELECT exam_id FROM exam_assignments WHERE target_type = 'all' OR (target_type = 'class' AND target_id = ?)))
                     OR e.id IN (SELECT exam_id FROM exam_assignments WHERE target_type = 'individual' AND target_id = ?)
                 )";
                 $params[] = $user['class_id'];

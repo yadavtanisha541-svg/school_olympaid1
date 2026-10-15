@@ -3155,9 +3155,13 @@ export const mockEngine = {
           localStorage.setItem('mock_db_exam_papers', JSON.stringify([newPaper, ...mockDb.filter(p => String(p.id) !== String(newPaper.id))]));
           const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
           localStorage.setItem('admin_generator_papers', JSON.stringify([newPaper, ...genPapers.filter(p => String(p.id) !== String(newPaper.id))]));
+          const examsDb = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+          localStorage.setItem('olympiadhub_db_exams', JSON.stringify([newPaper, ...examsDb.filter(p => String(p.id) !== String(newPaper.id))]));
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: newPaper }));
+            window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: newPaper }));
             window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exam_papers', data: papers } }));
+            window.dispatchEvent(new Event('storage'));
           }
         } catch (e) {}
 
@@ -3220,8 +3224,12 @@ export const mockEngine = {
             localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockDb.map(p => String(p.id) === String(targetPutId) ? updatedPaper : p)));
             const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
             localStorage.setItem('admin_generator_papers', JSON.stringify(genPapers.map(p => String(p.id) === String(targetPutId) ? updatedPaper : p)));
+            const examsDb = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+            localStorage.setItem('olympiadhub_db_exams', JSON.stringify(examsDb.map(p => String(p.id) === String(targetPutId) ? updatedPaper : p)));
             if (typeof window !== 'undefined') {
               window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedPaper }));
+              window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: updatedPaper }));
+              window.dispatchEvent(new Event('storage'));
             }
           } catch (e) {}
         }
@@ -3500,7 +3508,7 @@ export const mockEngine = {
         }
       });
 
-      if (method === 'GET' && sub && sub !== 'all') {
+      if (method === 'GET' && sub && sub !== 'all' && sub !== 'available') {
         const found = exams.find((e) => String(e.id) === String(sub) || (e.exam_code && e.exam_code === sub));
         return { success: true, data: found || exams[0] };
       }
