@@ -2717,42 +2717,24 @@ export const TestGeneratorAdminManager = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-3 w-full md:w-auto shrink-0 pt-1 md:pt-0">
-          <button
-            type="button"
-            onClick={() => setShowPricingModal(true)}
-            className="w-full sm:w-auto px-2.5 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-800 hover:from-purple-800 hover:to-indigo-800 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 shrink-0 border border-purple-400/30 text-center min-w-0"
-            title="Set Practice Test & Generator Pro Price"
-          >
-            <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300 shrink-0" />
-            <span className="truncate">
-              <span className="sm:hidden">Price: ₹{testPricing.practice_test_price || 99}</span>
-              <span className="hidden sm:inline">Practice Test Price: ₹{testPricing.practice_test_price || 99}</span>
-            </span>
-          </button>
-
+        <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto shrink-0 pt-1 md:pt-0">
           <button
             type="button"
             onClick={() => setShowUniversalImportModal(true)}
-            className="w-full sm:w-auto px-2.5 sm:px-4 py-2 sm:py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-black rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 shrink-0 text-center min-w-0"
+            className="flex-1 sm:flex-none px-3.5 sm:px-4 py-2 sm:py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-black rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 shrink-0 text-center"
             title="Import Word / PDF Questions directly to create a new paper"
           >
-            <Upload className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 shrink-0" />
-            <span className="truncate">
-              <span>Import Word / PDF</span>
-            </span>
+            <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span>Import Word / PDF</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleOpenCreateModal(activeCategoryTab)}
-            className="w-full sm:w-auto px-2.5 sm:px-5 py-2 sm:py-2.5 bg-[#00b074] hover:bg-[#009260] text-white font-black rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 shrink-0 text-center min-w-0"
+            className="flex-1 sm:flex-none px-4 sm:px-5 py-2 sm:py-2.5 bg-[#00b074] hover:bg-[#009260] text-white font-black rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 shrink-0 text-center"
           >
-            <Plus className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 shrink-0" />
-            <span className="truncate">
-              <span className="sm:hidden">Create Test</span>
-              <span className="hidden sm:inline">Create New Practice Test</span>
-            </span>
+            <Plus className="w-4 h-4 shrink-0" />
+            <span>Create New Practice Test</span>
           </button>
         </div>
       </div>
@@ -2803,27 +2785,27 @@ export const TestGeneratorAdminManager = () => {
       )}
 
       {/* Dedicated Practice Test Pricing Banner Card */}
-      <div className="bg-gradient-to-r from-[#2d124d] via-[#1e1b4b] to-[#3b0764] rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-white shadow-md flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-5 border border-purple-800/50">
-        <div className="flex items-start sm:items-center gap-3.5 sm:gap-4">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-900 flex items-center justify-center font-black shadow-md shrink-0">
+      <div className="bg-gradient-to-r from-[#2d124d] via-[#1e1b4b] to-[#3b0764] rounded-2xl p-4 sm:p-5 text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-purple-800/40">
+        <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-900 flex items-center justify-center font-black shadow-sm shrink-0">
             <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-slate-950" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] sm:text-xs uppercase font-black text-purple-300 tracking-wider bg-purple-950/70 px-2 sm:px-2.5 py-0.5 rounded-full border border-purple-700/50">
+              <span className="text-[10px] sm:text-xs uppercase font-black text-purple-300 tracking-wider bg-purple-950/70 px-2.5 py-0.5 rounded-full border border-purple-700/50">
                 Live Student Generator Pricing
               </span>
-              <span className="text-[10px] sm:text-xs font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded-full flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+              <span className="text-[10px] sm:text-xs font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Auto-Syncs to All Students</span>
               </span>
             </div>
 
-            <div className="flex items-baseline gap-2 sm:gap-2.5 mt-1.5 flex-wrap">
-              <span className="text-sm sm:text-lg lg:text-xl font-black text-white">
+            <div className="flex items-baseline gap-2.5 mt-1.5 flex-wrap">
+              <span className="text-sm sm:text-base font-bold text-slate-200">
                 Practice Tests Price:
               </span>
-              <span className="text-xl sm:text-2xl lg:text-3xl font-black text-amber-300">
+              <span className="text-xl sm:text-2xl font-black text-amber-300">
                 ₹{testPricing.practice_test_price || 99}
               </span>
               {testPricing.original_price && Number(testPricing.original_price) > Number(testPricing.practice_test_price) && (
@@ -2831,29 +2813,27 @@ export const TestGeneratorAdminManager = () => {
                   <span className="text-xs sm:text-sm text-purple-300 line-through font-bold">
                     ₹{testPricing.original_price}
                   </span>
-                  <span className="text-[10px] sm:text-[11px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500 text-white shadow-2xs">
+                  <span className="text-[10px] sm:text-xs font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500 text-white shadow-2xs">
                     {Math.round(((Number(testPricing.original_price) - Number(testPricing.practice_test_price)) / Number(testPricing.original_price)) * 100)}% OFF
                   </span>
                 </>
               )}
             </div>
 
-            <p className="text-[11px] sm:text-xs text-purple-200/90 font-medium mt-1">
+            <p className="text-[11px] sm:text-xs text-purple-200/80 font-medium mt-1">
               Amount charged to students when unlocking Practice Tests and generating custom papers in Test Generator Pro.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
-          <button
-            type="button"
-            onClick={() => setShowPricingModal(true)}
-            className="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-purple-950 font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 text-center"
-          >
-            <DollarSign className="w-4 h-4 text-purple-950" />
-            <span>Edit Practice Price</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setShowPricingModal(true)}
+          className="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-purple-950 font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-2 shrink-0 self-stretch sm:self-auto"
+        >
+          <DollarSign className="w-4 h-4 text-purple-950" />
+          <span>Edit Practice Price</span>
+        </button>
       </div>
 
 
