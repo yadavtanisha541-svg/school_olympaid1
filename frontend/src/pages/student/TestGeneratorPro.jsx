@@ -369,7 +369,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
 
   // Helper to find matching Super Admin Paper for Class & Subject
   const getMatchingPaper = (grade = selectedGrade, subject = selectedSubject) => {
-    return adminPapers.find((p) => {
+    const candidates = adminPapers.filter((p) => {
       // 0. Strict exclusion: NEVER match pure Mock Tests in Practice Tests Hub!
       const cat = (p.paper_category || p.category || p.exam_type || '').toLowerCase();
       const pTitle = (p.title || '').toLowerCase().trim();
@@ -410,48 +410,56 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
         (code) => subCode.includes(code) || pTitle.includes(code)
       );
     });
+
+    return candidates.find((p) => Array.isArray(p.questions) && p.questions.length > 0) || candidates[0] || null;
   };
 
   // Filtered papers specifically for currently chosen Class & Subject
   const selectedClassSubjectPapers = useMemo(() => {
-    return adminPapers.filter((p) => {
-      // 0. Strict exclusion: NEVER match pure Mock Tests in Practice Tests Hub!
-      const cat = (p.paper_category || p.category || p.exam_type || '').toLowerCase();
-      const pTitle = (p.title || '').toLowerCase().trim();
-      const isPureMock = (cat === 'mock_test' || cat === 'mock' || p.exam_type === 'mock') && !cat.includes('practice') && !pTitle.includes('practice');
-      if (isPureMock) return false;
+    return adminPapers
+      .filter((p) => {
+        // 0. Strict exclusion: NEVER match pure Mock Tests in Practice Tests Hub!
+        const cat = (p.paper_category || p.category || p.exam_type || '').toLowerCase();
+        const pTitle = (p.title || '').toLowerCase().trim();
+        const isPureMock = (cat === 'mock_test' || cat === 'mock' || p.exam_type === 'mock') && !cat.includes('practice') && !pTitle.includes('practice');
+        if (isPureMock) return false;
 
-      // 1. Grade match
-      const pClassRaw = p.class_name || p.class || p.grade || '';
-      const pClass = (pClassRaw || p.title || '').toLowerCase().trim();
-      const selGrade = (selectedGrade || '').toLowerCase().trim();
+        // 1. Grade match
+        const pClassRaw = p.class_name || p.class || p.grade || '';
+        const pClass = (pClassRaw || p.title || '').toLowerCase().trim();
+        const selGrade = (selectedGrade || '').toLowerCase().trim();
 
-      const pMatch = (pClassRaw || '').match(/\d+/) || pClass.match(/class\s*(\d+)/i) || pClass.match(/grade\s*(\d+)/i) || pClass.match(/\d+/);
-      const selMatch = selGrade.match(/\d+/);
+        const pMatch = (pClassRaw || '').match(/\d+/) || pClass.match(/class\s*(\d+)/i) || pClass.match(/grade\s*(\d+)/i) || pClass.match(/\d+/);
+        const selMatch = selGrade.match(/\d+/);
 
-      if (pMatch && selMatch) {
-        const pNum = pMatch[1] || pMatch[0];
-        const selNum = selMatch[0];
-        if (pNum !== selNum) return false;
-      } else if (pClass && selGrade) {
-        if (!pClass.includes(selGrade) && !selGrade.includes(pClass)) return false;
-      }
+        if (pMatch && selMatch) {
+          const pNum = pMatch[1] || pMatch[0];
+          const selNum = selMatch[0];
+          if (pNum !== selNum) return false;
+        } else if (pClass && selGrade) {
+          if (!pClass.includes(selGrade) && !selGrade.includes(pClass)) return false;
+        }
 
-      // 2. Subject match
-      const subCode = (p.subject_code || p.subject || p.subject_name || '').toLowerCase().trim();
-      const currentSub = (selectedSubject || '').toLowerCase().trim();
-      const subMap = {
-        math: ['imo', 'ieom', 'math', 'mathematics', 'mathematic', 'maths', 'nmo'],
-        science: ['iso', 'ieos', 'science', 'nso'],
-        digital: ['idlo', 'ieod', 'digital', 'computer', 'icso', 'cyber', 'ai', 'tech', 'ico', 'it'],
-        english: ['ieo', 'ieoe', 'english', 'eng'],
-        gk: ['igko', 'ieog', 'gk', 'general knowledge', 'general'],
-        hindi: ['iho', 'ieoh', 'hindi'],
-        reasoning: ['lro', 'iro', 'isso', 'reasoning', 'social studies', 'aptitude', 'logical']
-      };
-      const validCodes = subMap[currentSub] || [currentSub];
-      return validCodes.some((code) => subCode.includes(code) || pTitle.includes(code));
-    });
+        // 2. Subject match
+        const subCode = (p.subject_code || p.subject || p.subject_name || '').toLowerCase().trim();
+        const currentSub = (selectedSubject || '').toLowerCase().trim();
+        const subMap = {
+          math: ['imo', 'ieom', 'math', 'mathematics', 'mathematic', 'maths', 'nmo'],
+          science: ['iso', 'ieos', 'science', 'nso'],
+          digital: ['idlo', 'ieod', 'digital', 'computer', 'icso', 'cyber', 'ai', 'tech', 'ico', 'it'],
+          english: ['ieo', 'ieoe', 'english', 'eng'],
+          gk: ['igko', 'ieog', 'gk', 'general knowledge', 'general'],
+          hindi: ['iho', 'ieoh', 'hindi'],
+          reasoning: ['lro', 'iro', 'isso', 'reasoning', 'social studies', 'aptitude', 'logical']
+        };
+        const validCodes = subMap[currentSub] || [currentSub];
+        return validCodes.some((code) => subCode.includes(code) || pTitle.includes(code));
+      })
+      .sort((a, b) => {
+        const qA = Array.isArray(a.questions) ? a.questions.length : 0;
+        const qB = Array.isArray(b.questions) ? b.questions.length : 0;
+        return qB - qA;
+      });
   }, [adminPapers, selectedGrade, selectedSubject]);
 
   const matchingPaper = getMatchingPaper(selectedGrade, selectedSubject) || (selectedClassSubjectPapers.length > 0 ? selectedClassSubjectPapers[0] : null);
@@ -621,14 +629,35 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
 
   // Handle Start Test - Strictly uses Super Admin authored published questions only
   const handleStartTest = (paperToStart = null) => {
-    const targetPaper = paperToStart || getMatchingPaper(selectedGrade, selectedSubject) || (selectedClassSubjectPapers.length > 0 ? selectedClassSubjectPapers[0] : null);
+    const validPapers = selectedClassSubjectPapers.filter((p) => Array.isArray(p.questions) && p.questions.length > 0);
+    const targetPaper = paperToStart || (validPapers.length > 0 ? validPapers[0] : null) || getMatchingPaper(selectedGrade, selectedSubject);
 
     if (!targetPaper || !Array.isArray(targetPaper.questions) || targetPaper.questions.length === 0) {
       alert(`⚠️ Super Admin se ${selectedGrade} (${subjectsMap[selectedSubject]?.name || selectedSubject}) ke liye questions publish nahi huye hain.`);
       return;
     }
 
-    const questionsToUse = targetPaper.questions.map((q, idx) => {
+    let sourceQuestions = [];
+    if (paperToStart) {
+      sourceQuestions = paperToStart.questions;
+    } else if (validPapers.length > 1) {
+      const seen = new Set();
+      validPapers.forEach((vp) => {
+        (vp.questions || []).forEach((q) => {
+          const key = (q.q || q.question_text || '').trim();
+          if (key && !seen.has(key)) {
+            seen.add(key);
+            sourceQuestions.push(q);
+          } else if (!key) {
+            sourceQuestions.push(q);
+          }
+        });
+      });
+    } else {
+      sourceQuestions = targetPaper.questions;
+    }
+
+    const questionsToUse = sourceQuestions.map((q, idx) => {
       const rawImg = q.question_image || q.image_url || q.diagram || q.image || q.figure || '';
       const qImg = getQuestionImage(q) || rawImg;
       return {
@@ -1956,108 +1985,25 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
             </div>
           </div>
 
-          {/* Test Engine Status & Published Paper(s) */}
-          {selectedClassSubjectPapers.length > 0 ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-[#6d3a68] text-white text-xs font-black flex items-center justify-center">
-                    ★
-                  </span>
-                  <h3 className="text-sm font-black text-slate-800">
-                    Published Practice Test Papers for {selectedGrade} ({subjectsMap[selectedSubject]?.name || selectedSubject.toUpperCase()}):
-                  </h3>
-                  <span className="text-[11px] font-black text-[#6d3a68] bg-[#f4ebf4] border border-[#edd6ed] px-2.5 py-0.5 rounded-full">
-                    {selectedClassSubjectPapers.length} Available
-                  </span>
+          {/* Test Engine Status Banner */}
+          {hasMatchingPaper ? (
+            <div className="p-4 bg-emerald-50 rounded-2xl border-2 border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-600" />
                 </div>
-                <span className="text-xs text-slate-500 font-medium hidden sm:inline">
-                  Click &apos;Start Test&apos; to begin practicing immediately
-                </span>
+                <div>
+                  <h4 className="text-xs font-black text-emerald-950 uppercase tracking-wide">
+                    ✓ Official Exam Paper Ready
+                  </h4>
+                  <p className="text-xs text-emerald-800 font-bold mt-0.5">
+                    {selectedGrade} ({subjectsMap[selectedSubject]?.name || selectedSubject.toUpperCase()}) practice test is ready. Click &apos;Start Test Now&apos; to begin.
+                  </p>
+                </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {selectedClassSubjectPapers.map((paper) => {
-                  const subCode = paper.subject_code || paper.subject || 'IMO';
-                  const qCount = Array.isArray(paper.questions) ? paper.questions.length : (paper.total_questions || 10);
-                  const isGen = paper.paper_category === 'generator' || paper.exam_type === 'generated';
-                  const pBadge = isGen
-                    ? { label: 'Test Generator Pro', color: 'bg-emerald-50 text-emerald-800 border-emerald-200' }
-                    : { label: 'Practice Mock Test', color: 'bg-purple-50 text-purple-800 border-purple-200' };
-
-                  return (
-                    <div
-                      key={paper.id}
-                      className="bg-[#faf5fa]/70 rounded-2xl border-2 border-[#edd6ed] hover:border-[#6d3a68] shadow-2xs hover:shadow-md transition-all p-4.5 flex flex-col justify-between group space-y-3"
-                    >
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${pBadge.color}`}>
-                            {pBadge.label}
-                          </span>
-                          <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                            Published ✓
-                          </span>
-                        </div>
-
-                        <div>
-                          <h4 className="text-sm sm:text-base font-black text-slate-900 group-hover:text-[#6d3a68] transition-colors leading-snug">
-                            {cleanPaperTitle(paper.title, paper.subject_code, paper.class_name)}
-                          </h4>
-                          <p className="text-[11px] text-slate-400 font-mono mt-0.5">
-                            Code: {paper.exam_code || `PPR-${paper.id}`}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-1.5 flex-wrap text-xs">
-                          <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg font-bold text-[11px]">
-                            {paper.class_name || paper.class || selectedGrade}
-                          </span>
-                          <span className="px-2.5 py-1 bg-amber-50 text-amber-800 rounded-lg font-bold text-[11px]">
-                            {subCode}
-                          </span>
-                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded-lg font-bold text-[11px]">
-                            {qCount} Questions
-                          </span>
-                          <span className="px-2.5 py-1 bg-blue-50 text-blue-800 rounded-lg font-bold text-[11px]">
-                            {paper.duration_minutes || 60}m
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="pt-3 border-t border-slate-200 flex items-center justify-between gap-2 flex-wrap">
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => setQuickPreviewPaper(paper)}
-                            className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1 border border-slate-200 transition-colors cursor-pointer"
-                          >
-                            <Eye className="w-3.5 h-3.5 text-slate-600" />
-                            <span>View MCQs</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setPdfModalPaper(paper)}
-                            className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1 border border-slate-200 transition-colors cursor-pointer"
-                          >
-                            <Download className="w-3.5 h-3.5 text-slate-600" />
-                            <span>PDF &amp; Key</span>
-                          </button>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => handleStartAdminPaper(paper)}
-                          className="px-3.5 py-1.5 rounded-xl bg-[#6d3a68] hover:bg-[#582d54] text-white text-xs font-black flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer ml-auto"
-                        >
-                          <Play className="w-3.5 h-3.5 fill-current" />
-                          <span>Start Test</span>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <span className="px-3 py-1 rounded-xl bg-emerald-200 text-emerald-900 text-[11px] font-black uppercase shrink-0 text-center">
+                Ready to Start
+              </span>
             </div>
           ) : (
             <div className="p-4 bg-rose-50/70 rounded-2xl border-2 border-rose-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
