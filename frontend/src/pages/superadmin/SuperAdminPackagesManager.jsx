@@ -2278,8 +2278,7 @@ export const SuperAdminPackagesManager = () => {
       <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {[
           { id: 'exam_papers', label: 'Subject Mock Test Series Covers & Tests', icon: Sparkles, count: examPapers.length },
-          { id: 'packages', label: 'All-in-One Study Packages', icon: Package, count: packages.length },
-          { id: 'orders', label: 'Student Purchases & Orders', icon: ShoppingBag, count: orders.length }
+          { id: 'packages', label: 'All-in-One Study Packages', icon: Package, count: packages.length }
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -2719,38 +2718,6 @@ export const SuperAdminPackagesManager = () => {
       )}
 
 
-      {/* ========================================================================= */}
-      {/* TAB 4: STUDENT PURCHASES & ORDERS                                         */}
-      {/* ========================================================================= */}
-      {activeTab === 'orders' && (
-        <div className="space-y-4 animate-in fade-in bg-white rounded-3xl p-5 border border-[#edd6ed] shadow-sm">
-          <h3 className="text-sm font-black text-slate-800">Student Purchases ({orders.length})</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="bg-[#faf5fa] text-[#6d3a68] border-b border-[#edd6ed] uppercase text-[10px] font-black">
-                  <th className="py-3 px-4">Order ID</th>
-                  <th className="py-3 px-4">Student</th>
-                  <th className="py-3 px-4">Class</th>
-                  <th className="py-3 px-4">Package</th>
-                  <th className="py-3 px-4">Amount</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {orders.map((o) => (
-                  <tr key={o.id}>
-                    <td className="py-3 px-4 font-mono font-bold text-[#6d3a68]">{o.order_id}</td>
-                    <td className="py-3 px-4 font-bold">{o.student_name}</td>
-                    <td className="py-3 px-4">{o.student_class}</td>
-                    <td className="py-3 px-4">{o.package_title}</td>
-                    <td className="py-3 px-4 font-black text-emerald-700">₹{o.price}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
