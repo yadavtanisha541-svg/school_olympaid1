@@ -1337,48 +1337,46 @@ export const SuperAdminPackagesManager = () => {
                       </div>
                     </div>
 
-                    {/* Quick Subject Syllabus Topics (Identical to Student Panel) */}
+                    {/* Quick Subject Syllabus Topics as Dropdown */}
                     <div className="pt-2.5 border-t border-slate-200">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[11px] font-black text-purple-900 flex items-center gap-1.5">
-                          <BookOpen className="w-3.5 h-3.5 text-purple-700" />
-                          <span>Curriculum Subject Topics (Click to add):</span>
-                        </span>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                        <div className="flex items-center gap-2 flex-1">
+                          <span className="text-[11px] font-black text-purple-900 flex items-center gap-1.5 shrink-0">
+                            <BookOpen className="w-3.5 h-3.5 text-purple-700" />
+                            <span>Curriculum Subject Topics:</span>
+                          </span>
+                          <select
+                            defaultValue=""
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val && !paperSections.includes(val)) {
+                                setPaperSections([...paperSections, val]);
+                              }
+                              e.target.value = '';
+                            }}
+                            className="w-full sm:max-w-md px-3 py-1.5 rounded-xl border border-purple-300 bg-white text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer shadow-2xs"
+                          >
+                            <option value="" disabled>-- Select Topic from Dropdown to Add --</option>
+                            {getTopicsForSubject(paperSubjectCode).map((t) => {
+                              const isAlreadyAdded = paperSections.includes(t);
+                              return (
+                                <option key={t} value={t} disabled={isAlreadyAdded}>
+                                  {isAlreadyAdded ? `✓ ${t} (Already Added)` : `+ ${t}`}
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
                         <button
                           type="button"
                           onClick={() => {
                             const topics = getTopicsForSubject(paperSubjectCode);
                             setPaperSections(Array.from(new Set([...paperSections, ...topics])));
                           }}
-                          className="text-[10px] font-black text-purple-700 hover:underline cursor-pointer"
+                          className="text-[11px] font-black text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-3 py-1.5 rounded-xl cursor-pointer transition-colors shrink-0 flex items-center gap-1"
                         >
                           + Add All ({getTopicsForSubject(paperSubjectCode).length} Topics)
                         </button>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {getTopicsForSubject(paperSubjectCode).map((t) => {
-                          const isAlreadyAdded = paperSections.includes(t);
-                          return (
-                            <button
-                              key={t}
-                              type="button"
-                              onClick={() => {
-                                if (!isAlreadyAdded) {
-                                  setPaperSections([...paperSections, t]);
-                                }
-                              }}
-                              disabled={isAlreadyAdded}
-                              className={`px-2.5 py-1 rounded-xl text-xs font-bold border transition-all flex items-center gap-1 cursor-pointer ${
-                                isAlreadyAdded
-                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300 opacity-80 cursor-default'
-                                  : 'bg-white hover:bg-purple-100 text-slate-700 border-slate-300 shadow-2xs hover:border-purple-400'
-                              }`}
-                            >
-                              <span>{isAlreadyAdded ? '✓' : '+'}</span>
-                              <span>{t}</span>
-                            </button>
-                          );
-                        })}
                       </div>
                     </div>
                   </div>
