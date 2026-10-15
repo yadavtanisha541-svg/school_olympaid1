@@ -585,7 +585,22 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     if (targetPaper && Array.isArray(targetPaper.questions) && targetPaper.questions.length > 0) {
       setPdfModalPaper(targetPaper);
     } else {
-      alert(`⚠️ No published test paper available for download for ${selectedGrade} ${subjectsMap[selectedSubject]?.name || selectedSubject}.`);
+      const genQuestions = generateIntelligentOlympiadTest({
+        subject: selectedSubject,
+        grade: selectedGrade,
+        level: selectedLevel,
+        difficulty: selectedDifficulty,
+        count: Number(questionCount) || 10,
+        chapters: selectedChapters.length > 0 ? selectedChapters : (CHAPTERS_BY_SUBJECT[selectedSubject] || [])
+      });
+      setPdfModalPaper({
+        id: `GEN-${Date.now()}`,
+        title: `${selectedGrade} ${subjectsMap[selectedSubject]?.name || selectedSubject.toUpperCase()} Practice Paper`,
+        class_name: selectedGrade,
+        subject_code: selectedSubject.toUpperCase(),
+        duration_minutes: testDurationMinutes || 15,
+        questions: genQuestions
+      });
     }
   };
 
@@ -627,19 +642,17 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     };
   }, [isTestRunning, isSubmitted, remainingSeconds]);
 
-  // Handle Start Test - Strictly uses Super Admin authored published questions only
+  // Handle Start Test - Uses Super Admin authored questions or generates intelligent practice questions
   const handleStartTest = (paperToStart = null) => {
     const validPapers = selectedClassSubjectPapers.filter((p) => Array.isArray(p.questions) && p.questions.length > 0);
     const targetPaper = paperToStart || (validPapers.length > 0 ? validPapers[0] : null) || getMatchingPaper(selectedGrade, selectedSubject);
 
-    if (!targetPaper || !Array.isArray(targetPaper.questions) || targetPaper.questions.length === 0) {
-      alert(`⚠️ Super Admin se ${selectedGrade} (${subjectsMap[selectedSubject]?.name || selectedSubject}) ke liye questions publish nahi huye hain.`);
-      return;
-    }
-
     let sourceQuestions = [];
-    if (paperToStart) {
+    let dur = testDurationMinutes || 15;
+
+    if (paperToStart && Array.isArray(paperToStart.questions) && paperToStart.questions.length > 0) {
       sourceQuestions = paperToStart.questions;
+      dur = parseInt(paperToStart.duration_minutes) || dur;
     } else if (validPapers.length > 1) {
       const seen = new Set();
       validPapers.forEach((vp) => {
@@ -653,8 +666,20 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
           }
         });
       });
-    } else {
+      dur = parseInt(validPapers[0].duration_minutes) || dur;
+    } else if (targetPaper && Array.isArray(targetPaper.questions) && targetPaper.questions.length > 0) {
       sourceQuestions = targetPaper.questions;
+      dur = parseInt(targetPaper.duration_minutes) || dur;
+    } else {
+      // Intelligently generate Olympiad questions for this Class & Subject
+      sourceQuestions = generateIntelligentOlympiadTest({
+        subject: selectedSubject,
+        grade: selectedGrade,
+        level: selectedLevel,
+        difficulty: selectedDifficulty,
+        count: Number(questionCount) || 10,
+        chapters: selectedChapters.length > 0 ? selectedChapters : (CHAPTERS_BY_SUBJECT[selectedSubject] || [])
+      });
     }
 
     const questionsToUse = sourceQuestions.map((q, idx) => {
@@ -679,7 +704,6 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
         marks: q.marks || 1
       };
     });
-    const dur = parseInt(targetPaper.duration_minutes) || testDurationMinutes || 15;
 
     setTestQuestions(questionsToUse);
     setQuestionCount(questionsToUse.length);
@@ -1986,45 +2010,24 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
           </div>
 
           {/* Test Engine Status Banner */}
-          {hasMatchingPaper ? (
-            <div className="p-4 bg-emerald-50 rounded-2xl border-2 border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-600" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-black text-emerald-950 uppercase tracking-wide">
-                    ✓ Official Exam Paper Ready
-                  </h4>
-                  <p className="text-xs text-emerald-800 font-bold mt-0.5">
-                    {selectedGrade} ({subjectsMap[selectedSubject]?.name || selectedSubject.toUpperCase()}) practice test is ready. Click &apos;Start Test Now&apos; to begin.
-                  </p>
-                </div>
+          <div className="p-4 bg-emerald-50 rounded-2xl border-2 border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600" />
               </div>
-              <span className="px-3 py-1 rounded-xl bg-emerald-200 text-emerald-900 text-[11px] font-black uppercase shrink-0 text-center">
-                Ready to Start
-              </span>
-            </div>
-          ) : (
-            <div className="p-4 bg-rose-50/70 rounded-2xl border-2 border-rose-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center shrink-0">
-                  <AlertCircle className="w-6 h-6 text-rose-600" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-black text-rose-950 uppercase tracking-wide">
-                    No Questions Published Yet
-                  </h4>
-                  <p className="text-xs text-rose-800 font-medium mt-0.5">
-                    Super Admin has not published any questions for <strong>{selectedGrade} ({subjectsMap[selectedSubject]?.name || selectedSubject})</strong> yet.
-                  </p>
-                </div>
+              <div>
+                <h4 className="text-xs font-black text-emerald-950 uppercase tracking-wide">
+                  ✓ {hasMatchingPaper ? 'Official Exam Paper Ready' : 'Intelligent Practice Test Ready'}
+                </h4>
+                <p className="text-xs text-emerald-800 font-bold mt-0.5">
+                  {selectedGrade} ({subjectsMap[selectedSubject]?.name || selectedSubject.toUpperCase()}) practice test is ready. Click &apos;Start Test Now&apos; to begin practicing.
+                </p>
               </div>
-              <span className="px-3 py-1 rounded-xl bg-rose-200 text-rose-900 text-[11px] font-black uppercase shrink-0 text-center">
-                Not Published
-              </span>
             </div>
-          )}
+            <span className="px-3 py-1 rounded-xl bg-emerald-200 text-emerald-900 text-[11px] font-black uppercase shrink-0 text-center">
+              Ready to Start
+            </span>
+          </div>
 
           {/* Selected Test Configuration Banner */}
           <div className="bg-[#faf5fa] rounded-2xl p-5 border border-[#edd6ed] space-y-3">
@@ -2162,15 +2165,15 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
 
               <button
                 type="button"
-                disabled={!hasAgreedInstructions || !hasMatchingPaper}
+                disabled={!hasAgreedInstructions}
                 onClick={handleStartTest}
                 className={`w-full sm:w-auto px-8 py-3 rounded-2xl text-sm font-black uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
-                  hasAgreedInstructions && hasMatchingPaper
+                  hasAgreedInstructions
                     ? 'bg-[#00b074] hover:bg-[#009260] text-white hover:shadow-xl active:scale-95'
                     : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                 }`}
               >
-                <span>{hasMatchingPaper ? 'Start Test Now (Official Paper)' : 'No Questions Published Yet'}</span>
+                <span>Start Test Now</span>
                 <Play className="w-4 h-4 fill-current" />
               </button>
             </div>
@@ -2533,24 +2536,16 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
                     </div>
 
                     {/* Paper Status */}
-                    <div className={`flex items-center gap-2 p-2 rounded-xl col-span-2 border ${
-                      hasMatchingPaper ? 'bg-emerald-50/90 border-emerald-300' : 'bg-rose-50/70 border-rose-200'
-                    }`}>
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
-                        hasMatchingPaper ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700'
-                      }`}>
-                        {hasMatchingPaper ? '✓' : '✕'}
+                    <div className="flex items-center gap-2 p-2 rounded-xl col-span-2 border bg-emerald-50/90 border-emerald-300">
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 bg-emerald-100 text-emerald-800">
+                        ✓
                       </div>
                       <div className="flex-1 min-w-0 text-left">
-                        <p className={`text-[10px] font-bold uppercase ${
-                          hasMatchingPaper ? 'text-emerald-800' : 'text-rose-700'
-                        }`}>
-                          {hasMatchingPaper ? 'Official Super Admin Paper' : 'Super Admin Exam Paper'}
+                        <p className="text-[10px] font-bold uppercase text-emerald-800">
+                          {hasMatchingPaper ? 'Official Super Admin Paper' : 'AI Intelligent Practice Test'}
                         </p>
-                        <p className={`text-xs font-black truncate ${
-                          hasMatchingPaper ? 'text-emerald-950' : 'text-rose-900'
-                        }`}>
-                          {hasMatchingPaper ? `Published (${matchingPaper.questions.length} Questions)` : 'Not Published Yet (0 Questions)'}
+                        <p className="text-xs font-black truncate text-emerald-950">
+                          {hasMatchingPaper ? `Published (${matchingPaper.questions.length} Questions)` : `Auto-Generated Practice Test (${questionCount} MCQs)`}
                         </p>
                       </div>
                     </div>
