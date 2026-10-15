@@ -529,6 +529,9 @@ export const TestGeneratorAdminManager = () => {
   const [paperDuration, setPaperDuration] = useState(60);
   const [paperDifficulty, setPaperDifficulty] = useState('Standard');
   const [selectedPaperChapters, setSelectedPaperChapters] = useState(() => getTopicsForSubject('math'));
+  const [isTopicsDropdownOpen, setIsTopicsDropdownOpen] = useState(false);
+  const [topicsSearchQuery, setTopicsSearchQuery] = useState('');
+  const topicsDropdownRef = useRef(null);
   const [bulkTargetTopic, setBulkTargetTopic] = useState('');
   const [questionsList, setQuestionsList] = useState([]);
 
@@ -625,6 +628,21 @@ export const TestGeneratorAdminManager = () => {
     fetchPapers();
   }, []);
 
+  // Close topics dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (topicsDropdownRef.current && !topicsDropdownRef.current.contains(event.target)) {
+        setIsTopicsDropdownOpen(false);
+      }
+    };
+    if (isTopicsDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isTopicsDropdownOpen]);
+
   // Helper to generate dynamic title (Class & Subject only)
   const generateTitle = (cat, grade, subKey) => {
     const subObj = SUBJECT_OPTIONS.find((s) => s.id === subKey);
@@ -644,6 +662,8 @@ export const TestGeneratorAdminManager = () => {
     setPaperClass('Class 6');
     setPaperSubject('math');
     setSelectedPaperChapters(getTopicsForSubject('math'));
+    setIsTopicsDropdownOpen(false);
+    setTopicsSearchQuery('');
     setPaperDuration(cat === 'generator' ? 15 : 60);
     setPaperDifficulty('Standard');
     setPaperTitle(generateTitle(cat, 'Class 6', 'math'));
@@ -1814,11 +1834,11 @@ export const TestGeneratorAdminManager = () => {
               </div>
             </div>
 
-            {/* Section 2.5: Subject Topics & Syllabus Chapters (Exact Match to Student Panel) */}
-            <div className="bg-gradient-to-r from-purple-50/80 via-pink-50/50 to-amber-50/50 rounded-xl border-2 border-purple-200/80 p-5 space-y-3.5 shadow-2xs">
+            {/* Section 2.5: Subject Topics & Syllabus Chapters Dropdown */}
+            <div className="bg-gradient-to-r from-purple-50/80 via-pink-50/50 to-amber-50/50 rounded-xl border-2 border-purple-200/80 p-4 sm:p-5 space-y-3.5 shadow-2xs">
               <div className="flex items-center justify-between flex-wrap gap-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-[#4e2a4a] text-white flex items-center justify-center font-black text-xs shadow-2xs">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#4e2a4a] text-white flex items-center justify-center font-black text-xs shadow-2xs shrink-0">
                     <BookOpen className="w-4 h-4 text-amber-300" />
                   </div>
                   <div>
@@ -1852,34 +1872,189 @@ export const TestGeneratorAdminManager = () => {
                 </div>
               </div>
 
-              {/* Topics Pills Bar - Identical to Student Dashboard */}
-              <div className="flex flex-wrap gap-2 pt-1">
-                {getTopicsForSubject(paperSubject).map((topic) => {
-                  const isSelected = selectedPaperChapters.includes(topic);
-                  return (
-                    <button
-                      key={topic}
-                      type="button"
-                      onClick={() => {
-                        if (isSelected) {
-                          setSelectedPaperChapters(selectedPaperChapters.filter(t => t !== topic));
-                        } else {
-                          setSelectedPaperChapters([...selectedPaperChapters, topic]);
-                        }
-                      }}
-                      className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
-                        isSelected
-                          ? 'bg-white text-purple-950 border-purple-400 ring-2 ring-purple-400/30 font-black scale-102'
-                          : 'bg-white/80 text-slate-600 border-slate-200 hover:bg-white hover:text-slate-900'
+              {/* Topics Multi-Select Dropdown Container */}
+              <div className="relative" ref={topicsDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsTopicsDropdownOpen(!isTopicsDropdownOpen)}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 bg-white rounded-xl border border-purple-200 hover:border-purple-400 text-left shadow-2xs transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/30"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-purple-600 shrink-0" />
+                    <span className="text-xs sm:text-sm font-bold text-slate-800 truncate">
+                      {selectedPaperChapters.length === 0
+                        ? 'No topics selected (Click to choose curriculum chapters)'
+                        : selectedPaperChapters.length === getTopicsForSubject(paperSubject).length
+                        ? `All ${getTopicsForSubject(paperSubject).length} Topics Selected (Complete Syllabus)`
+                        : `${selectedPaperChapters.length} of ${getTopicsForSubject(paperSubject).length} Topics Selected: ${selectedPaperChapters.join(', ')}`}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-[10px] sm:text-[11px] font-black text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200">
+                      {isTopicsDropdownOpen ? 'Close Menu' : 'Select Topics'}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-purple-700 transition-transform duration-200 ${
+                        isTopicsDropdownOpen ? 'rotate-180' : ''
                       }`}
-                    >
-                      <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-purple-600' : 'bg-slate-300'}`} />
-                      <span>{topic}</span>
-                      {isSelected && <span className="text-[10px] text-purple-600 font-black">✓</span>}
-                    </button>
-                  );
-                })}
+                    />
+                  </div>
+                </button>
+
+                {/* Dropdown Menu */}
+                {isTopicsDropdownOpen && (
+                  <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl border border-purple-200 shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    {/* Search and Quick Actions Bar */}
+                    <div className="p-3 bg-purple-50/60 border-b border-purple-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+                      <div className="relative flex-1">
+                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          value={topicsSearchQuery}
+                          onChange={(e) => setTopicsSearchQuery(e.target.value)}
+                          placeholder="Search topics / chapters..."
+                          className="w-full pl-8 pr-7 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400/40"
+                        />
+                        {topicsSearchQuery && (
+                          <button
+                            type="button"
+                            onClick={() => setTopicsSearchQuery('')}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPaperChapters(getTopicsForSubject(paperSubject))}
+                          className="flex-1 sm:flex-none px-2.5 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-black text-[11px] shadow-2xs cursor-pointer transition-all text-center"
+                        >
+                          ✓ Select All ({getTopicsForSubject(paperSubject).length})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPaperChapters([])}
+                          className="flex-1 sm:flex-none px-2.5 py-1 rounded-lg bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-700 font-bold text-[11px] border border-slate-200 cursor-pointer transition-all text-center"
+                        >
+                          ✕ Clear
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Topics Checklist */}
+                    <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 p-2">
+                      {getTopicsForSubject(paperSubject)
+                        .filter((topic) => topic.toLowerCase().includes(topicsSearchQuery.toLowerCase()))
+                        .map((topic) => {
+                          const isSelected = selectedPaperChapters.includes(topic);
+                          return (
+                            <div
+                              key={topic}
+                              onClick={() => {
+                                if (isSelected) {
+                                  setSelectedPaperChapters(selectedPaperChapters.filter((t) => t !== topic));
+                                } else {
+                                  setSelectedPaperChapters([...selectedPaperChapters, topic]);
+                                }
+                              }}
+                              className={`flex items-center justify-between p-2.5 rounded-lg cursor-pointer transition-colors ${
+                                isSelected ? 'bg-purple-50/70 hover:bg-purple-100/60' : 'hover:bg-slate-50'
+                              }`}
+                            >
+                              <div className="flex items-center gap-3 min-w-0 pr-2">
+                                <div
+                                  className={`w-4 h-4 rounded flex items-center justify-center transition-colors shrink-0 ${
+                                    isSelected
+                                      ? 'bg-purple-600 text-white'
+                                      : 'border-2 border-slate-300 bg-white'
+                                  }`}
+                                >
+                                  {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                                </div>
+                                <span
+                                  className={`text-xs sm:text-sm font-bold ${
+                                    isSelected ? 'text-purple-950 font-black' : 'text-slate-700'
+                                  }`}
+                                >
+                                  {topic}
+                                </span>
+                              </div>
+                              {isSelected && (
+                                <span className="text-[10px] font-black text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full shrink-0">
+                                  Selected
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+
+                      {getTopicsForSubject(paperSubject).filter((topic) =>
+                        topic.toLowerCase().includes(topicsSearchQuery.toLowerCase())
+                      ).length === 0 && (
+                        <div className="p-4 text-center text-xs font-bold text-slate-400">
+                          No topics found matching "{topicsSearchQuery}"
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Footer bar */}
+                    <div className="p-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-slate-500">
+                        {selectedPaperChapters.length} of {getTopicsForSubject(paperSubject).length} topics selected
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsTopicsDropdownOpen(false)}
+                        className="px-3.5 py-1 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shadow-2xs"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {/* Selected Topics Compact Preview */}
+              {selectedPaperChapters.length === getTopicsForSubject(paperSubject).length ? (
+                <div className="flex items-center gap-2 text-xs font-bold text-purple-800 bg-purple-100/60 border border-purple-200/80 px-3 py-2 rounded-lg">
+                  <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                  <span>All {getTopicsForSubject(paperSubject).length} curriculum topics are selected and active for this question paper.</span>
+                </div>
+              ) : selectedPaperChapters.length > 0 ? (
+                <div className="space-y-1.5 pt-0.5">
+                  <div className="flex items-center justify-between text-[11px] font-bold text-slate-600">
+                    <span>Active Selected Topics ({selectedPaperChapters.length}):</span>
+                    <span className="text-slate-400 font-normal">Click '×' on any chip to remove</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto pr-1">
+                    {selectedPaperChapters.map((topic) => (
+                      <span
+                        key={topic}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-purple-300 text-purple-950 font-bold text-xs shadow-2xs"
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-600" />
+                        <span>{topic}</span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPaperChapters(selectedPaperChapters.filter((t) => t !== topic))}
+                          className="p-0.5 rounded-full hover:bg-purple-100 text-purple-600 hover:text-rose-600 cursor-pointer transition-colors"
+                          title={`Remove ${topic}`}
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3 py-2 rounded-lg">
+                  <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                  <span>No topics selected. Please open the dropdown above and select at least one topic.</span>
+                </div>
+              )}
             </div>
 
             {/* Section 3: Question Builder with Bulk Tool */}
