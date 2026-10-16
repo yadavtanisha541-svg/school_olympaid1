@@ -3671,11 +3671,43 @@ export const mockEngine = {
           }
         }
 
-        const rawQuestions = (foundPaper && Array.isArray(foundPaper.questions) && foundPaper.questions.length > 0)
+        let rawQuestions = (foundPaper && Array.isArray(foundPaper.questions) && foundPaper.questions.length > 0)
           ? foundPaper.questions
           : (foundExam && Array.isArray(foundExam.questions) && foundExam.questions.length > 0)
           ? foundExam.questions
-          : (allExams[0]?.questions || initialStore.exams[0]?.questions || []);
+          : [];
+
+        // 1. Resolve question_ids if paper/exam stored IDs instead of objects
+        if (rawQuestions.length === 0) {
+          const qIds = (foundPaper && Array.isArray(foundPaper.question_ids))
+            ? foundPaper.question_ids
+            : ((foundExam && Array.isArray(foundExam.question_ids)) ? foundExam.question_ids : []);
+          if (qIds.length > 0) {
+            const allDbQs = getDb('questions') || [];
+            rawQuestions = allDbQs.filter(q => qIds.includes(q.id) || qIds.includes(String(q.id)));
+          }
+        }
+
+        // 2. Auto-pull Super Admin's questions from Question Bank matching Class & Subject
+        if (rawQuestions.length === 0) {
+          const allDbQs = getDb('questions') || [];
+          const classTarget = (foundPaper?.class_name || foundPaper?.class || foundExam?.class_name || foundExam?.class || 'Class 6').toLowerCase();
+          const subTarget = (targetSubCode || foundPaper?.subject_code || foundExam?.subject_code || foundPaper?.subject || foundExam?.subject || '').toLowerCase();
+          const matchedQs = allDbQs.filter(q => {
+            const qc = (q.class_name || q.class || '').toLowerCase();
+            const qs = (q.subject_code || q.subject_name || q.subject || '').toLowerCase();
+            const classMatch = !classTarget || qc.includes(classTarget) || classTarget.includes(qc) || (classTarget.match(/\d+/) && qc.includes(classTarget.match(/\d+/)[0]));
+            const subMatch = !subTarget || qs.includes(subTarget) || subTarget.includes(qs);
+            return classMatch && subMatch;
+          });
+          if (matchedQs.length > 0) {
+            rawQuestions = matchedQs;
+          }
+        }
+
+        if (rawQuestions.length === 0) {
+          rawQuestions = (allExams[0]?.questions || initialStore.exams[0]?.questions || []);
+        }
 
         const normalizedQuestions = rawQuestions.map((q, idx) => {
           const qText = q.question_text || q.q || q.question || q.title || `Question ${idx + 1}`;

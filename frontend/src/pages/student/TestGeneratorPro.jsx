@@ -515,6 +515,24 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       } catch (e) {}
     }
     if (rawQuestions.length === 0) {
+      try {
+        const qBank = JSON.parse(localStorage.getItem('olympiadhub_db_questions') || '[]');
+        if (Array.isArray(qBank) && qBank.length > 0) {
+          const pClass = (paper.class_name || paper.class || selectedGrade || '').toLowerCase();
+          const pSub = (paper.subject_code || paper.subject || selectedSubject || '').toLowerCase();
+          const pNum = pClass.match(/\d+/)?.[0] || '';
+          const bankMatches = qBank.filter(q => {
+            const qc = (q.class_name || q.class || '').toLowerCase();
+            const qs = (q.subject || q.subject_name || q.subject_code || '').toLowerCase();
+            const cMatch = !pNum || qc.includes(pNum);
+            const sMatch = !pSub || qs.includes(pSub) || pSub.includes(qs);
+            return cMatch && sMatch;
+          });
+          if (bankMatches.length > 0) rawQuestions = bankMatches;
+        }
+      } catch (e) {}
+    }
+    if (rawQuestions.length === 0) {
       rawQuestions = generateIntelligentOlympiadTest({
         subject: selectedSubject,
         grade: selectedGrade,
@@ -671,15 +689,39 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       sourceQuestions = targetPaper.questions;
       dur = parseInt(targetPaper.duration_minutes) || dur;
     } else {
-      // Intelligently generate Olympiad questions for this Class & Subject
-      sourceQuestions = generateIntelligentOlympiadTest({
-        subject: selectedSubject,
-        grade: selectedGrade,
-        level: selectedLevel,
-        difficulty: selectedDifficulty,
-        count: Number(questionCount) || 10,
-        chapters: selectedChapters.length > 0 ? selectedChapters : (CHAPTERS_BY_SUBJECT[selectedSubject] || [])
-      });
+      // 1. First check if Super Admin added questions in Question Bank for this Class & Subject
+      let bankQuestions = [];
+      try {
+        const qBank = JSON.parse(localStorage.getItem('olympiadhub_db_questions') || '[]');
+        if (Array.isArray(qBank) && qBank.length > 0) {
+          const selNum = (selectedGrade || '').match(/\d+/)?.[0] || '';
+          const subKey = (selectedSubject || '').toLowerCase();
+          const subObj = subjectsMap[selectedSubject] || {};
+          const subCodes = [subKey, (subObj.code || '').toLowerCase(), (subObj.title || '').toLowerCase()];
+
+          bankQuestions = qBank.filter(q => {
+            const qClass = (q.class_name || q.class || '').toLowerCase();
+            const qSub = (q.subject || q.subject_name || q.subject_code || '').toLowerCase();
+            const classMatch = !selNum || qClass.includes(selNum);
+            const subMatch = subCodes.some(c => c && (qSub.includes(c) || c.includes(qSub)));
+            return classMatch && subMatch;
+          });
+        }
+      } catch (e) {}
+
+      if (bankQuestions.length > 0) {
+        sourceQuestions = bankQuestions;
+      } else {
+        // Intelligently generate Olympiad questions for this Class & Subject
+        sourceQuestions = generateIntelligentOlympiadTest({
+          subject: selectedSubject,
+          grade: selectedGrade,
+          level: selectedLevel,
+          difficulty: selectedDifficulty,
+          count: Number(questionCount) || 10,
+          chapters: selectedChapters.length > 0 ? selectedChapters : (CHAPTERS_BY_SUBJECT[selectedSubject] || [])
+        });
+      }
     }
 
     const questionsToUse = sourceQuestions.map((q, idx) => {

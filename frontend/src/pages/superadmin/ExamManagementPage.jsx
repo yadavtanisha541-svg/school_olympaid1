@@ -368,6 +368,10 @@ export const ExamManagementPage = () => {
       const subjectName = matchedSubject ? matchedSubject.name : (examForm.subject_name || 'Mathematics');
       const subjectCode = matchedSubject ? (matchedSubject.code || 'IMO') : (examForm.subject_code || 'IMO');
 
+      const selectedQuestionObjs = Array.isArray(examForm.question_ids) && examForm.question_ids.length > 0
+        ? allQuestions.filter(q => examForm.question_ids.includes(q.id) || examForm.question_ids.includes(String(q.id)))
+        : (editingExam?.questions || []);
+
       const payload = {
         ...examForm,
         class_name: className,
@@ -375,7 +379,8 @@ export const ExamManagementPage = () => {
         subject_name: subjectName,
         subject_code: subjectCode,
         subject: subjectName,
-        total_questions: Array.isArray(examForm.question_ids) ? examForm.question_ids.length : (allQuestions.length || 10),
+        total_questions: selectedQuestionObjs.length > 0 ? selectedQuestionObjs.length : (Array.isArray(examForm.question_ids) ? examForm.question_ids.length : 10),
+        questions: selectedQuestionObjs,
         paper_category: isPractice ? 'practice_test' : 'mock_test',
         category: isPractice ? 'practice_test' : 'mock_test',
         status: examForm.status || 'published'
