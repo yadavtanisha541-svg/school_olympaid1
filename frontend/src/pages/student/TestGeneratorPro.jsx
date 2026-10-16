@@ -394,6 +394,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   // Helper to find matching Super Admin Paper for Class & Subject
   const getMatchingPaper = (grade = selectedGrade, subject = selectedSubject) => {
     const candidates = adminPapers.filter((p) => {
+      const pTitle = (p.title || '').toLowerCase().trim();
 
       // 1. Grade match
       const pClassRaw = p.class_name || p.class || p.grade || '';
@@ -437,6 +438,8 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   const selectedClassSubjectPapers = useMemo(() => {
     return adminPapers
       .filter((p) => {
+        const pTitle = (p.title || '').toLowerCase().trim();
+
         // 1. Grade match
         const pClassRaw = p.class_name || p.class || p.grade || '';
         const pClass = (pClassRaw || p.title || '').toLowerCase().trim();
@@ -487,11 +490,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   // Helper to check if a specific Grade has any published questions
   const isGradePublished = (grade) => {
     return adminPapers.some((p) => {
-      const cat = (p.paper_category || p.category || p.exam_type || '').toLowerCase();
       const pTitle = (p.title || '').toLowerCase().trim();
-      const isPureMock = (cat === 'mock_test' || cat === 'mock' || p.exam_type === 'mock') && !cat.includes('practice') && !pTitle.includes('practice');
-      if (isPureMock) return false;
-
       const pClassRaw = p.class_name || p.class || p.grade || '';
       const pClass = (pClassRaw || p.title || '').toLowerCase();
       const selGrade = (grade || '').toLowerCase();
