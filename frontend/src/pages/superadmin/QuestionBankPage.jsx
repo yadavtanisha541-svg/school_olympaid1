@@ -179,13 +179,38 @@ export const QuestionBankPage = () => {
 
     setActionLoading(true);
     try {
+      const cls = classes.find(c => String(c.id) === String(qForm.class_id));
+      const sub = subjects.find(s => String(s.id) === String(qForm.subject_id));
+      const rawOpts = [qForm.option_a, qForm.option_b, qForm.option_c, qForm.option_d].filter(Boolean);
+      const enrichedQ = {
+        ...qForm,
+        class_name: cls ? cls.name : `Class ${qForm.class_id || 6}`,
+        class: cls ? cls.name : `Class ${qForm.class_id || 6}`,
+        subject_name: sub ? sub.name : 'General',
+        subject_code: sub ? (sub.code || 'OLY') : 'OLY',
+        subject: sub ? sub.name : 'General',
+        options: rawOpts.length >= 2 ? rawOpts : ['Option A', 'Option B', 'Option C', 'Option D']
+      };
+
       if (editingQuestion) {
-        await apiClient.put(`/questions/${editingQuestion.id}`, qForm);
+        await apiClient.put(`/questions/${editingQuestion.id}`, enrichedQ);
         setFeedback({ type: 'success', message: 'Question updated successfully!' });
       } else {
-        await apiClient.post('/questions', qForm);
+        await apiClient.post('/questions', enrichedQ);
         setFeedback({ type: 'success', message: 'Question created successfully in Question Bank!' });
       }
+
+      // Proactively sync into localStorage & dispatch global events
+      try {
+        const allDbQs = JSON.parse(localStorage.getItem('olympiadhub_db_questions') || '[]');
+        const qId = editingQuestion ? editingQuestion.id : Date.now();
+        const fullQ = { ...enrichedQ, id: qId, created_at: new Date().toISOString() };
+        const updated = [fullQ, ...allDbQs.filter(q => String(q.id) !== String(qId))];
+        localStorage.setItem('olympiadhub_db_questions', JSON.stringify(updated));
+        window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'questions', data: updated } }));
+        window.dispatchEvent(new Event('storage'));
+      } catch (err) {}
+
       setViewMode('list');
       fetchQuestions(pagination.page);
     } catch (err) {

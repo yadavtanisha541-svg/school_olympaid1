@@ -314,6 +314,26 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
 
   useEffect(() => {
     fetchAdminPapers();
+
+    // Also proactively sync Question Bank questions from API to local storage
+    apiClient.get('/questions', { limit: 300 }).then(res => {
+      if (res && res.data) {
+        const qList = Array.isArray(res.data) ? res.data : (res.data.questions || []);
+        if (qList.length > 0) {
+          try {
+            const existing = JSON.parse(localStorage.getItem('olympiadhub_db_questions') || '[]');
+            const merged = [...existing];
+            qList.forEach(q => {
+              if (!merged.some(m => String(m.id) === String(q.id))) {
+                merged.push(q);
+              }
+            });
+            localStorage.setItem('olympiadhub_db_questions', JSON.stringify(merged));
+          } catch (e) {}
+        }
+      }
+    }).catch(() => {});
+
     let syncTimer = null;
     const handleSync = () => {
       if (syncTimer) clearTimeout(syncTimer);
@@ -323,10 +343,14 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     };
     window.addEventListener('olympiadhub-admin-papers-updated', handleSync);
     window.addEventListener('olympiadhub-exams-updated', handleSync);
+    window.addEventListener('olympiadhub-data-updated', handleSync);
+    window.addEventListener('storage', handleSync);
     return () => {
       if (syncTimer) clearTimeout(syncTimer);
       window.removeEventListener('olympiadhub-admin-papers-updated', handleSync);
       window.removeEventListener('olympiadhub-exams-updated', handleSync);
+      window.removeEventListener('olympiadhub-data-updated', handleSync);
+      window.removeEventListener('storage', handleSync);
     };
   }, []);
 
@@ -370,11 +394,6 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   // Helper to find matching Super Admin Paper for Class & Subject
   const getMatchingPaper = (grade = selectedGrade, subject = selectedSubject) => {
     const candidates = adminPapers.filter((p) => {
-      // 0. Strict exclusion: NEVER match pure Mock Tests in Practice Tests Hub!
-      const cat = (p.paper_category || p.category || p.exam_type || '').toLowerCase();
-      const pTitle = (p.title || '').toLowerCase().trim();
-      const isPureMock = (cat === 'mock_test' || cat === 'mock' || p.exam_type === 'mock') && !cat.includes('practice') && !pTitle.includes('practice');
-      if (isPureMock) return false;
 
       // 1. Grade match
       const pClassRaw = p.class_name || p.class || p.grade || '';
@@ -418,12 +437,6 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
   const selectedClassSubjectPapers = useMemo(() => {
     return adminPapers
       .filter((p) => {
-        // 0. Strict exclusion: NEVER match pure Mock Tests in Practice Tests Hub!
-        const cat = (p.paper_category || p.category || p.exam_type || '').toLowerCase();
-        const pTitle = (p.title || '').toLowerCase().trim();
-        const isPureMock = (cat === 'mock_test' || cat === 'mock' || p.exam_type === 'mock') && !cat.includes('practice') && !pTitle.includes('practice');
-        if (isPureMock) return false;
-
         // 1. Grade match
         const pClassRaw = p.class_name || p.class || p.grade || '';
         const pClass = (pClassRaw || p.title || '').toLowerCase().trim();
@@ -518,15 +531,39 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
       try {
         const qBank = JSON.parse(localStorage.getItem('olympiadhub_db_questions') || '[]');
         if (Array.isArray(qBank) && qBank.length > 0) {
-          const pClass = (paper.class_name || paper.class || selectedGrade || '').toLowerCase();
-          const pSub = (paper.subject_code || paper.subject || selectedSubject || '').toLowerCase();
-          const pNum = pClass.match(/\d+/)?.[0] || '';
+          const selNum = (paper.class_name || paper.class || selectedGrade || '').match(/\d+/)?.[0] || '';
+          const subKey = (paper.subject_code || paper.subject || selectedSubject || '').toLowerCase();
+          const subObj = subjectsMap[selectedSubject] || {};
+          const subCodes = [subKey, (subObj.code || '').toLowerCase(), (subObj.name || '').toLowerCase()];
+
+          const subIdMap = { math: '1', science: '2', digital: '3', cyber: '3', english: '4', gk: '5', hindi: '6' };
+          const expectedSubId = subIdMap[subKey] || '';
+          const classIdMap = { '1': '4', '2': '5', '3': '6', '4': '7', '5': '8', '6': '9', '7': '10', '8': '11', '9': '12', '10': '13', '11': '14', '12': '15' };
+          const expectedClassId = classIdMap[selNum] || selNum;
+
           const bankMatches = qBank.filter(q => {
-            const qc = (q.class_name || q.class || '').toLowerCase();
-            const qs = (q.subject || q.subject_name || q.subject_code || '').toLowerCase();
-            const cMatch = !pNum || qc.includes(pNum);
-            const sMatch = !pSub || qs.includes(pSub) || pSub.includes(qs);
-            return cMatch && sMatch;
+            const qClass = String(q.class_name || q.class || '').toLowerCase();
+            const qClassId = String(q.class_id || '');
+            const qSub = String(q.subject || q.subject_name || q.subject_code || '').toLowerCase();
+            const qSubId = String(q.subject_id || '');
+
+            const classMatch = !selNum || 
+              qClass.includes(selNum) || 
+              qClass.includes('all') || 
+              qClassId === selNum || 
+              qClassId === expectedClassId;
+
+            const subMatch = 
+              (expectedSubId && qSubId === expectedSubId) ||
+              subCodes.some(c => c && (qSub.includes(c) || c.includes(qSub))) ||
+              (subKey === 'gk' && (qSub.includes('gk') || qSub.includes('general') || qSub.includes('igko') || qSubId === '5')) ||
+              (subKey === 'science' && (qSub.includes('science') || qSub.includes('iso') || qSub.includes('nso') || qSubId === '2')) ||
+              (subKey === 'math' && (qSub.includes('math') || qSub.includes('imo') || qSubId === '1')) ||
+              (subKey === 'english' && (qSub.includes('english') || qSub.includes('ieo') || qSubId === '4')) ||
+              (subKey === 'digital' && (qSub.includes('cyber') || qSub.includes('digital') || qSub.includes('computer') || qSub.includes('idlo') || qSubId === '3')) ||
+              (subKey === 'hindi' && (qSub.includes('hindi') || qSub.includes('iho') || qSubId === '6'));
+
+            return classMatch && subMatch;
           });
           if (bankMatches.length > 0) rawQuestions = bankMatches;
         }
@@ -662,8 +699,27 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
 
   // Handle Start Test - Uses Super Admin authored questions or generates intelligent practice questions
   const handleStartTest = (paperToStart = null) => {
-    const validPapers = selectedClassSubjectPapers.filter((p) => Array.isArray(p.questions) && p.questions.length > 0);
-    const targetPaper = paperToStart || (validPapers.length > 0 ? validPapers[0] : null) || getMatchingPaper(selectedGrade, selectedSubject);
+    // 0. Ensure papers with question_ids have their questions resolved from Question Bank
+    let qBankAll = [];
+    try {
+      qBankAll = JSON.parse(localStorage.getItem('olympiadhub_db_questions') || '[]');
+    } catch (e) {}
+
+    const resolvePaperQuestions = (p) => {
+      if (!p) return p;
+      if ((!p.questions || p.questions.length === 0) && Array.isArray(p.question_ids) && p.question_ids.length > 0) {
+        return {
+          ...p,
+          questions: qBankAll.filter(q => p.question_ids.includes(q.id) || p.question_ids.includes(String(q.id)))
+        };
+      }
+      return p;
+    };
+
+    const validPapers = selectedClassSubjectPapers
+      .map(resolvePaperQuestions)
+      .filter((p) => Array.isArray(p.questions) && p.questions.length > 0);
+    const targetPaper = resolvePaperQuestions(paperToStart) || (validPapers.length > 0 ? validPapers[0] : null) || resolvePaperQuestions(getMatchingPaper(selectedGrade, selectedSubject));
 
     let sourceQuestions = [];
     let dur = testDurationMinutes || 15;
@@ -691,23 +747,42 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
     } else {
       // 1. First check if Super Admin added questions in Question Bank for this Class & Subject
       let bankQuestions = [];
-      try {
-        const qBank = JSON.parse(localStorage.getItem('olympiadhub_db_questions') || '[]');
-        if (Array.isArray(qBank) && qBank.length > 0) {
-          const selNum = (selectedGrade || '').match(/\d+/)?.[0] || '';
-          const subKey = (selectedSubject || '').toLowerCase();
-          const subObj = subjectsMap[selectedSubject] || {};
-          const subCodes = [subKey, (subObj.code || '').toLowerCase(), (subObj.title || '').toLowerCase()];
+      if (Array.isArray(qBankAll) && qBankAll.length > 0) {
+        const selNum = (selectedGrade || '').match(/\d+/)?.[0] || '';
+        const subKey = (selectedSubject || '').toLowerCase();
+        const subObj = subjectsMap[selectedSubject] || {};
+        const subCodes = [subKey, (subObj.code || '').toLowerCase(), (subObj.name || '').toLowerCase()];
 
-          bankQuestions = qBank.filter(q => {
-            const qClass = (q.class_name || q.class || '').toLowerCase();
-            const qSub = (q.subject || q.subject_name || q.subject_code || '').toLowerCase();
-            const classMatch = !selNum || qClass.includes(selNum);
-            const subMatch = subCodes.some(c => c && (qSub.includes(c) || c.includes(qSub)));
-            return classMatch && subMatch;
-          });
-        }
-      } catch (e) {}
+        const subIdMap = { math: '1', science: '2', digital: '3', cyber: '3', english: '4', gk: '5', hindi: '6' };
+        const expectedSubId = subIdMap[subKey] || '';
+        const classIdMap = { '1': '4', '2': '5', '3': '6', '4': '7', '5': '8', '6': '9', '7': '10', '8': '11', '9': '12', '10': '13', '11': '14', '12': '15' };
+        const expectedClassId = classIdMap[selNum] || selNum;
+
+        bankQuestions = qBankAll.filter(q => {
+          const qClass = String(q.class_name || q.class || '').toLowerCase();
+          const qClassId = String(q.class_id || '');
+          const qSub = String(q.subject || q.subject_name || q.subject_code || '').toLowerCase();
+          const qSubId = String(q.subject_id || '');
+
+          const classMatch = !selNum || 
+            qClass.includes(selNum) || 
+            qClass.includes('all') || 
+            qClassId === selNum || 
+            qClassId === expectedClassId;
+
+          const subMatch = 
+            (expectedSubId && qSubId === expectedSubId) ||
+            subCodes.some(c => c && (qSub.includes(c) || c.includes(qSub))) ||
+            (subKey === 'gk' && (qSub.includes('gk') || qSub.includes('general') || qSub.includes('igko') || qSubId === '5')) ||
+            (subKey === 'science' && (qSub.includes('science') || qSub.includes('iso') || qSub.includes('nso') || qSubId === '2')) ||
+            (subKey === 'math' && (qSub.includes('math') || qSub.includes('imo') || qSubId === '1')) ||
+            (subKey === 'english' && (qSub.includes('english') || qSub.includes('ieo') || qSubId === '4')) ||
+            (subKey === 'digital' && (qSub.includes('cyber') || qSub.includes('digital') || qSub.includes('computer') || qSub.includes('idlo') || qSubId === '3')) ||
+            (subKey === 'hindi' && (qSub.includes('hindi') || qSub.includes('iho') || qSubId === '6'));
+
+          return classMatch && subMatch;
+        });
+      }
 
       if (bankQuestions.length > 0) {
         sourceQuestions = bankQuestions;

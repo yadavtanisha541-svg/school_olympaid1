@@ -3431,9 +3431,24 @@ export const mockEngine = {
 
       // POST SINGLE
       if (method === 'POST') {
+        const cls = (initialStore.academic_classes || []).find(c => String(c.id) === String(body.class_id));
+        const subObj = (initialStore.academic_subjects || []).find(s => String(s.id) === String(body.subject_id));
+        const className = body.class_name || (cls ? cls.name : `Class ${body.class_id || 6}`);
+        const subName = body.subject_name || (subObj ? subObj.name : 'General');
+        const subCode = body.subject_code || (subObj ? subObj.code : 'OLY');
+        const rawOpts = (Array.isArray(body.options) && body.options.length >= 2)
+          ? body.options
+          : [body.option_a, body.option_b, body.option_c, body.option_d].filter(Boolean);
+
         const newQ = {
           id: Date.now(),
           ...body,
+          class_name: className,
+          class: className,
+          subject_name: subName,
+          subject_code: subCode,
+          subject: subName,
+          options: rawOpts.length >= 2 ? rawOpts : ['Option A', 'Option B', 'Option C', 'Option D'],
           created_at: new Date().toISOString()
         };
         questions.unshift(newQ);
@@ -3444,9 +3459,21 @@ export const mockEngine = {
       // PUT SINGLE
       if (method === 'PUT' && sub) {
         let updatedQ = null;
+        const cls = (initialStore.academic_classes || []).find(c => String(c.id) === String(body.class_id));
+        const subObj = (initialStore.academic_subjects || []).find(s => String(s.id) === String(body.subject_id));
+        const className = body.class_name || (cls ? cls.name : undefined);
+        const subName = body.subject_name || (subObj ? subObj.name : undefined);
+        const subCode = body.subject_code || (subObj ? subObj.code : undefined);
+
         questions = questions.map(q => {
           if (String(q.id) === String(sub)) {
-            updatedQ = { ...q, ...body };
+            updatedQ = {
+              ...q,
+              ...body,
+              ...(className ? { class_name: className, class: className } : {}),
+              ...(subName ? { subject_name: subName, subject: subName } : {}),
+              ...(subCode ? { subject_code: subCode } : {})
+            };
             return updatedQ;
           }
           return q;
