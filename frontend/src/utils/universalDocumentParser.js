@@ -99,7 +99,20 @@ export async function extractFromFile(file) {
       console.warn('Mammoth error:', e);
     }
 
-    // XML stream fallback
+    // 2. High-reliability DecompressionStream ZIP / DOCX extractor fallback (Works 100% offline & without CDN)
+    try {
+      const nativeDocx = await extractDocxViaDecompressionStream(buf);
+      if (nativeDocx && nativeDocx.text && nativeDocx.text.trim().length > 10) {
+        if (nativeDocx.images && Object.keys(nativeDocx.images).length > 0) {
+          saveMultipleImages(nativeDocx.images);
+        }
+        return { text: nativeDocx.text, images: nativeDocx.images || {} };
+      }
+    } catch (e) {
+      console.warn('DecompressionStream docx fallback error:', e);
+    }
+
+    // 3. XML stream fallback
     try {
       const u8 = new Uint8Array(buf);
       const str = new TextDecoder('utf-8').decode(u8);
@@ -188,6 +201,115 @@ export async function extractFromFile(file) {
 export async function extractTextFromFile(file) {
   const { text } = await extractFromFile(file);
   return text;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NATIVE ZERO-DEPENDENCY DOCX EXTRACTOR (Uses browser DecompressionStream)
+// ─────────────────────────────────────────────────────────────────────────────
+async function extractDocxViaDecompressionStream(arrayBuffer) {
+  try {
+    const bytes = new Uint8Array(arrayBuffer);
+    let pos = 0;
+    let xmlContent = '';
+    const images = {};
+    let imgCount = 0;
+
+    while (pos < bytes.length - 30) {
+      if (bytes[pos] === 0x50 && bytes[pos + 1] === 0x4B && bytes[pos + 2] === 0x03 && bytes[pos + 3] === 0x04) {
+        const compMethod = bytes[pos + 8] | (bytes[pos + 9] << 8);
+        const compSize = (bytes[pos + 18]) | (bytes[pos + 19] << 8) | (bytes[pos + 20] << 16) | (bytes[pos + 21] << 24);
+        const nameLen = bytes[pos + 26] | (bytes[pos + 27] << 8);
+        const extraLen = bytes[pos + 28] | (bytes[pos + 29] << 8);
+
+        const nameBytes = bytes.slice(pos + 30, pos + 30 + nameLen);
+        const filename = new TextDecoder('utf-8').decode(nameBytes);
+        const dataStart = pos + 30 + nameLen + extraLen;
+        const compData = bytes.slice(dataStart, dataStart + compSize);
+
+        if (filename === 'word/document.xml') {
+          if (compMethod === 0) {
+            xmlContent = new TextDecoder('utf-8').decode(compData);
+          } else if (compMethod === 8 && typeof DecompressionStream !== 'undefined') {
+            const ds = new DecompressionStream('deflate-raw');
+            const writer = ds.writable.getWriter();
+            writer.write(compData);
+            writer.close();
+            const reader = ds.readable.getReader();
+            const chunks = [];
+            let total = 0;
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              chunks.push(value);
+              total += value.length;
+            }
+            const full = new Uint8Array(total);
+            let off = 0;
+            for (const c of chunks) { full.set(c, off); off += c.length; }
+            xmlContent = new TextDecoder('utf-8').decode(full);
+          }
+        } else if (filename.startsWith('word/media/') && (filename.endsWith('.png') || filename.endsWith('.jpg') || filename.endsWith('.jpeg') || filename.endsWith('.gif'))) {
+          try {
+            let imgBytes = compData;
+            if (compMethod === 8 && typeof DecompressionStream !== 'undefined') {
+              const ds = new DecompressionStream('deflate-raw');
+              const writer = ds.writable.getWriter();
+              writer.write(compData);
+              writer.close();
+              const reader = ds.readable.getReader();
+              const chunks = [];
+              let total = 0;
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                chunks.push(value);
+                total += value.length;
+              }
+              const full = new Uint8Array(total);
+              let off = 0;
+              for (const c of chunks) { full.set(c, off); off += c.length; }
+              imgBytes = full;
+            }
+            const mime = filename.endsWith('.png') ? 'image/png' : (filename.endsWith('.gif') ? 'image/gif' : 'image/jpeg');
+            let binary = '';
+            for (let i = 0; i < imgBytes.length; i++) binary += String.fromCharCode(imgBytes[i]);
+            const b64 = btoa(binary);
+            const key = `docx_img_${++imgCount}`;
+            images[key] = `data:${mime};base64,${b64}`;
+          } catch (ie) {}
+        }
+
+        pos = dataStart + compSize;
+      } else {
+        pos++;
+      }
+    }
+
+    if (xmlContent) {
+      const text = xmlToStructuredText(xmlContent);
+      return { text, images };
+    }
+  } catch (e) {
+    console.warn('DecompressionStream docx error:', e);
+  }
+  return null;
+}
+
+function xmlToStructuredText(xmlStr) {
+  if (!xmlStr) return '';
+  let clean = xmlStr.replace(/<w:br[^>]*\/?>/gi, '\n').replace(/<w:tab[^>]*\/?>/gi, '    ');
+  const pMatches = clean.match(/<w:p[\s\S]*?<\/w:p>/gi);
+  if (!pMatches || pMatches.length === 0) {
+    const tMatches = clean.match(/<w:t[^>]*>([\s\S]*?)<\/w:t>/gi);
+    return tMatches ? tMatches.map(m => m.replace(/<[^>]+>/g, '')).join(' ') : '';
+  }
+  const lines = pMatches.map(p => {
+    const tMatches = p.match(/<w:t[^>]*>([\s\S]*?)<\/w:t>/gi);
+    if (!tMatches) return '';
+    return tMatches.map(m => m.replace(/<[^>]+>/g, '')).join('');
+  }).filter(l => l.trim().length > 0);
+
+  return lines.join('\n');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

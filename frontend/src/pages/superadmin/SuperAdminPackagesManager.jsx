@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 import { getTestPricing } from '../../utils/purchaseUtils';
 import { getTopicsForSubject } from '../../data/subjectTopics';
+import { extractFromFile } from '../../utils/universalDocumentParser';
 import {
   ShoppingBag,
   Package,
@@ -710,6 +711,13 @@ export const SuperAdminPackagesManager = () => {
       showToast('Please paste or type your questions first.', 'info');
       return;
     }
+
+    // Check if raw binary data from docx was accidentally pasted or loaded
+    if (bulkQuestionsInput.includes('word/document.xml') || bulkQuestionsInput.includes('PK\x03\x04') || (bulkQuestionsInput.includes('PK') && bulkQuestionsInput.includes(''))) {
+      showToast('⚠️ This appears to be raw binary Word file data. Please click "Import File (.docx / .pdf / .txt)" above to load the file, or copy and paste questions directly from Word.', 'error');
+      return;
+    }
+
     const defaultSec = paperSections[0] || 'General Awareness';
     const parsed = parseAnyQuestionsInput(bulkQuestionsInput, defaultSec);
 
@@ -726,26 +734,59 @@ export const SuperAdminPackagesManager = () => {
       setActiveQuestionIndex(startId); // Focus newly added question
       showToast(`✓ Successfully imported ${mapped.length} questions!`);
     } else {
-      showToast('Could not parse questions. Click "Load Sample Format Template" to see the format.', 'error');
+      showToast('Could not parse questions. Click "Load Sample Format Template" to see the expected format.', 'error');
     }
   };
 
-  // Bulk File Upload Helper (.txt, .csv, .json)
-  const handleBulkFileUpload = (e) => {
+  // State for file extraction loading
+  const [isExtractingFile, setIsExtractingFile] = useState(false);
+
+  // Bulk File Upload Helper (.docx, .doc, .pdf, .txt, .csv, .json)
+  const handleBulkFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const content = ev.target?.result || '';
-      setBulkQuestionsInput(content);
-      const detected = parseAnyQuestionsInput(content, paperSections[0] || 'General Awareness');
-      if (detected.length > 0) {
-        showToast(`✓ Loaded "${file.name}" (${detected.length} questions detected). Click "Parse & Add" to import.`);
-      } else {
-        showToast(`Loaded "${file.name}". Click "Parse & Add All Questions" below.`);
+
+    try {
+      setIsExtractingFile(true);
+      showToast(`Reading and extracting questions from "${file.name}"...`);
+
+      const { text, images } = await extractFromFile(file);
+      if (!text || !text.trim()) {
+        showToast(`Could not extract text from "${file.name}". Please ensure it contains readable text.`, 'error');
+        return;
       }
-    };
-    reader.readAsText(file);
+
+      setBulkQuestionsInput(text);
+      const defaultSec = paperSections[0] || 'General Awareness';
+      const detected = parseAnyQuestionsInput(text, defaultSec);
+
+      if (detected.length > 0) {
+        showToast(`✓ Extracted "${file.name}" (~${detected.length} MCQs detected). Click "Parse & Add All Questions to Test" below.`);
+      } else {
+        showToast(`Extracted text from "${file.name}". Review text below and click "Parse & Add All Questions".`);
+      }
+    } catch (err) {
+      console.warn('extractFromFile failed, attempting fallback text read:', err);
+      try {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const content = ev.target?.result || '';
+          if (content && !content.includes('word/document.xml') && !content.includes('PK\x03\x04')) {
+            setBulkQuestionsInput(content);
+            const detected = parseAnyQuestionsInput(content, paperSections[0] || 'General Awareness');
+            showToast(`Loaded "${file.name}" (${detected.length} questions detected). Click "Parse & Add" below.`);
+          } else {
+            showToast(`Could not extract questions from "${file.name}". Please save as standard .docx or copy & paste text directly from Word.`, 'error');
+          }
+        };
+        reader.readAsText(file);
+      } catch (e2) {
+        showToast(`Failed to read file: ${err.message || 'Unknown error'}`, 'error');
+      }
+    } finally {
+      setIsExtractingFile(false);
+      e.target.value = '';
+    }
   };
 
   // Add a blank question
@@ -1706,14 +1747,19 @@ export const SuperAdminPackagesManager = () => {
                     <span className="sm:hidden">📋 Sample Template</span>
                   </button>
 
-                  <label className="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-900 font-bold text-[11px] sm:text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all whitespace-nowrap">
-                    <Upload className="w-3.5 h-3.5 text-sky-700 shrink-0" />
-                    <span className="hidden sm:inline">📁 Import File (.txt / .csv / .json)</span>
-                    <span className="sm:hidden">📁 Import File</span>
+                  <label className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl ${isExtractingFile ? 'bg-amber-100 text-amber-900 animate-pulse' : 'bg-sky-100 hover:bg-sky-200 text-sky-900'} font-bold text-[11px] sm:text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all whitespace-nowrap`}>
+                    <Upload className={`w-3.5 h-3.5 ${isExtractingFile ? 'text-amber-700 animate-spin' : 'text-sky-700'} shrink-0`} />
+                    <span className="hidden sm:inline">
+                      {isExtractingFile ? '⏳ Extracting Document...' : '📁 Import File (.docx / .pdf / .txt / .csv / .json)'}
+                    </span>
+                    <span className="sm:hidden">
+                      {isExtractingFile ? '⏳ Extracting...' : '📁 Import File'}
+                    </span>
                     <input
                       type="file"
-                      accept=".txt,.csv,.json"
+                      accept=".docx,.doc,.pdf,.txt,.csv,.json"
                       onChange={handleBulkFileUpload}
+                      disabled={isExtractingFile}
                       className="hidden"
                     />
                   </label>
