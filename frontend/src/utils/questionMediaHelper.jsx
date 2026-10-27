@@ -46,13 +46,19 @@ export const getQuestionImage = (q) => {
     }
     if (typeof c === 'string' && c.trim().length > 0) {
       const clean = c.trim();
-      // If it has __IMG__ placeholder, resolve key
-      if (clean.includes('__IMG__')) {
+      // If it has __IMG__ placeholder or is an extracted key like docx_img_1
+      if (clean.includes('__IMG__') || clean.startsWith('docx_img_') || clean.startsWith('img_')) {
         const keyMatch = clean.match(/__IMG__(\S+?)__/);
         const key = keyMatch ? keyMatch[1] : clean.replace(/__IMG__/g, '').trim();
         const store = q._imgStore || (typeof window !== 'undefined' && window._olympiadhub_img_cache) || {};
         const extracted = getExtractedImages() || {};
-        const resolved = store[key] || extracted[key] || getCachedImageSync(key);
+        let resolved = store[key] || extracted[key] || getCachedImageSync(key);
+        if (!resolved && typeof window !== 'undefined') {
+          try {
+            const sess = JSON.parse(sessionStorage.getItem('olympiadhub_bulk_extracted_images') || '{}');
+            if (sess[key]) resolved = sess[key];
+          } catch (_) {}
+        }
         if (resolved) {
           try {
             if (q.id) saveImageToStore(String(q.id), resolved);

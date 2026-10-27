@@ -521,6 +521,7 @@ export const SuperAdminPackagesManager = () => {
   });
   const [newSectionInput, setNewSectionInput] = useState('');
   const [previewModalImage, setPreviewModalImage] = useState(null);
+  const [bulkInputViewMode, setBulkInputViewMode] = useState('visual');
 
   // Persist extracted images to sessionStorage and memory store
   useEffect(() => {
@@ -940,8 +941,10 @@ export const SuperAdminPackagesManager = () => {
         });
         setPaperQuestions(mapped);
         setActiveQuestionIndex(0);
+        setBulkInputViewMode('visual');
+        setPaperModalTab('questions');
         const diagCount = mapped.filter(q => q.question_image).length;
-        showToast(`✓ Extracted "${file.name}": ${detected.length} MCQs loaded automatically${diagCount > 0 ? ` (${diagCount} diagram${diagCount > 1 ? 's' : ''} attached)` : ''}!`);
+        showToast(`✓ Extracted "${file.name}": ${detected.length} questions loaded with ${diagCount} diagrams!`);
       } else {
         showToast(`Extracted text from "${file.name}". Review text below and click "Parse & Add All Questions".`);
       }
@@ -962,6 +965,8 @@ export const SuperAdminPackagesManager = () => {
               }));
               setPaperQuestions(mapped);
               setActiveQuestionIndex(0);
+              setBulkInputViewMode('visual');
+              setPaperModalTab('questions');
               showToast(`✓ Loaded "${file.name}" (${detected.length} questions loaded automatically).`);
             } else {
               showToast(`Loaded "${file.name}". Click "Parse & Add" below.`);
@@ -1863,11 +1868,43 @@ export const SuperAdminPackagesManager = () => {
                     </label>
                     <textarea
                       rows={3}
-                      value={activeQ.q}
+                      value={getCleanQuestionText(activeQ.q)}
                       onChange={(e) => handleUpdateQuestion(activeQuestionIndex, 'q', e.target.value)}
                       placeholder="Type the full question statement here..."
                       className="w-full px-4 py-3 rounded-2xl border border-slate-300 text-xs font-semibold text-slate-900 focus:border-[#4e2a4a] outline-none shadow-2xs leading-relaxed"
                     />
+
+                    {/* Inline Diagram Indicator if this question has an attached diagram */}
+                    {getQuestionImage(activeQ) && (
+                      <div className="mt-2.5 p-2.5 bg-indigo-50/70 border border-indigo-200 rounded-xl flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={getQuestionImage(activeQ)}
+                            alt="Question diagram thumbnail"
+                            className="w-14 h-14 object-contain rounded-lg bg-white border border-indigo-200 p-1 cursor-pointer hover:scale-105 transition-transform shadow-2xs"
+                            onClick={() => setPreviewModalImage(getQuestionImage(activeQ))}
+                            title="Click to zoom diagram"
+                          />
+                          <div>
+                            <span className="text-xs font-black text-indigo-950 flex items-center gap-1.5">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                              <span>Diagram Attached to Question #{activeQuestionIndex + 1}</span>
+                            </span>
+                            <span className="text-[11px] text-slate-500 block font-medium">
+                              This image is shown to students with this question. Click thumbnail to zoom full size.
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setPreviewModalImage(getQuestionImage(activeQ))}
+                          className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg cursor-pointer shrink-0 shadow-2xs flex items-center gap-1"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Zoom</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {/* Question Diagram / Image Box */}
@@ -2021,46 +2058,82 @@ export const SuperAdminPackagesManager = () => {
                 </div>
 
                 {/* Quick Action Toolbar */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  <button
-                    type="button"
-                    onClick={() => setBulkQuestionsInput(SAMPLE_MOCK_TEST_QUESTIONS)}
-                    className="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-[11px] sm:text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all whitespace-nowrap"
-                    title="Load 4 Sample Formatted Questions"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-                    <span className="hidden sm:inline">📋 Load Sample Format Template</span>
-                    <span className="sm:hidden">📋 Sample Template</span>
-                  </button>
-
-                  <label className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl ${isExtractingFile ? 'bg-amber-100 text-amber-900 animate-pulse' : 'bg-sky-100 hover:bg-sky-200 text-sky-900'} font-bold text-[11px] sm:text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all whitespace-nowrap`}>
-                    <Upload className={`w-3.5 h-3.5 ${isExtractingFile ? 'text-amber-700 animate-spin' : 'text-sky-700'} shrink-0`} />
-                    <span className="hidden sm:inline">
-                      {isExtractingFile ? '⏳ Extracting Document...' : '📁 Import File (.docx / .pdf / .txt / .csv / .json)'}
-                    </span>
-                    <span className="sm:hidden">
-                      {isExtractingFile ? '⏳ Extracting...' : '📁 Import File'}
-                    </span>
-                    <input
-                      type="file"
-                      accept=".docx,.doc,.pdf,.txt,.csv,.json"
-                      onChange={handleBulkFileUpload}
-                      disabled={isExtractingFile}
-                      className="hidden"
-                    />
-                  </label>
-
-                  {bulkQuestionsInput && (
+                <div className="flex items-center gap-2 flex-wrap justify-between">
+                  {/* View Mode Switcher */}
+                  <div className="flex items-center rounded-xl bg-slate-100 p-0.5 border border-slate-200 shadow-2xs">
                     <button
                       type="button"
-                      onClick={() => setBulkQuestionsInput('')}
-                      className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 font-bold text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer transition-all"
-                      title="Clear text area"
+                      onClick={() => setBulkInputViewMode('visual')}
+                      className={`px-3 py-1.5 rounded-lg font-bold text-[11px] sm:text-xs flex items-center gap-1.5 cursor-pointer transition-all ${
+                        bulkInputViewMode === 'visual'
+                          ? 'bg-white text-indigo-700 shadow-xs ring-1 ring-slate-200'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
                     >
-                      <Trash2 className="w-3.5 h-3.5 shrink-0" />
-                      <span>Clear</span>
+                      <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>🎨 Visual Cards View</span>
                     </button>
-                  )}
+                    <button
+                      type="button"
+                      onClick={() => setBulkInputViewMode('raw')}
+                      className={`px-3 py-1.5 rounded-lg font-bold text-[11px] sm:text-xs flex items-center gap-1.5 cursor-pointer transition-all ${
+                        bulkInputViewMode === 'raw'
+                          ? 'bg-white text-indigo-700 shadow-xs ring-1 ring-slate-200'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>📝 Raw Text / Code</span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBulkQuestionsInput(SAMPLE_MOCK_TEST_QUESTIONS);
+                        setBulkInputViewMode('visual');
+                      }}
+                      className="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-[11px] sm:text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all whitespace-nowrap"
+                      title="Load Sample Formatted Questions"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                      <span className="hidden sm:inline">📋 Sample Template</span>
+                      <span className="sm:hidden">📋 Sample</span>
+                    </button>
+
+                    <label className={`px-3 sm:px-4 py-1.5 rounded-xl ${isExtractingFile ? 'bg-amber-100 text-amber-900 animate-pulse' : 'bg-[#1e1b4b] hover:bg-[#2e2b6b] text-white'} font-black text-[11px] sm:text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all whitespace-nowrap`}>
+                      <Upload className={`w-3.5 h-3.5 ${isExtractingFile ? 'text-amber-700 animate-spin' : 'text-amber-300'} shrink-0`} />
+                      <span className="hidden sm:inline">
+                        {isExtractingFile ? '⏳ Extracting Document...' : '📁 Import Word (.docx) / PDF'}
+                      </span>
+                      <span className="sm:hidden">
+                        {isExtractingFile ? '⏳ Extracting...' : '📁 Import File'}
+                      </span>
+                      <input
+                        type="file"
+                        accept=".docx,.doc,.pdf,.txt,.csv,.json"
+                        onChange={handleBulkFileUpload}
+                        disabled={isExtractingFile}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {bulkQuestionsInput && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setBulkQuestionsInput('');
+                          setBulkExtractedImages({});
+                        }}
+                        className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 font-bold text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer transition-all"
+                        title="Clear all"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                        <span>Clear</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -2078,7 +2151,7 @@ export const SuperAdminPackagesManager = () => {
                       </span>
                     </div>
                     <span className="text-[11px] text-slate-500 font-medium">
-                      Click any image to view enlarged full size
+                      Click any thumbnail to view enlarged full size
                     </span>
                   </div>
 
@@ -2114,161 +2187,239 @@ export const SuperAdminPackagesManager = () => {
                 </div>
               )}
 
-              {/* Textarea */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-black text-slate-700">Paste Questions Text Here:</label>
-                  {bulkQuestionsInput.trim() && (() => {
-                    const detected = parseAnyQuestionsInput(bulkQuestionsInput, paperSections[0] || 'General Awareness', bulkExtractedImages);
-                    const diagCount = detected.filter(q => q.question_image || q.image_url || q.diagram || (q.question_image_keys?.[0] && bulkExtractedImages[q.question_image_keys[0]])).length;
-                    return (
-                      <span className="text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                        ⚡ ~{detected.length} questions detected {diagCount > 0 ? `(${diagCount} diagram${diagCount > 1 ? 's' : ''})` : ''}
-                      </span>
-                    );
-                  })()}
-                </div>
-                <textarea
-                  rows={10}
-                  value={bulkQuestionsInput}
-                  onChange={(e) => setBulkQuestionsInput(e.target.value)}
-                  placeholder="Paste your questions here...&#10;&#10;Example:&#10;Q1. If 3x + 15 = 45, what is the value of 2x - 5?&#10;A) 15&#10;B) 20&#10;C) 25&#10;D) 30&#10;Correct: A&#10;&#10;Tip: Even if you paste single plain questions without options, the system will automatically parse them and create editable options for you!"
-                  className="w-full px-3.5 sm:px-4 py-3 rounded-2xl border border-slate-300 text-xs font-mono text-slate-800 outline-none focus:border-[#859900] leading-relaxed shadow-2xs bg-slate-50/50"
-                />
-              </div>
+              {/* RAW TEXT INPUT VIEW */}
+              {bulkInputViewMode === 'raw' && (
+                <div className="space-y-4">
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 font-medium flex items-center justify-between gap-2">
+                    <span>
+                      ℹ️ <strong>Raw Text View:</strong> Diagrams from Word documents are represented here as internal tokens like <code className="font-mono bg-white px-1.5 py-0.5 rounded border border-amber-300 font-bold">__IMG__docx_img_1__</code>. To view and inspect actual diagram pictures, switch to <strong>"🎨 Visual Cards View"</strong> above or click <strong>"2. Question Studio"</strong>.
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setBulkInputViewMode('visual')}
+                      className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-xs shrink-0 cursor-pointer shadow-2xs"
+                    >
+                      Show Visual Cards
+                    </button>
+                  </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pt-2 border-t border-slate-100">
-                <span className="text-xs font-bold text-slate-500">
-                  Currently in test: <span className="font-black text-slate-900">{paperQuestions.length}</span> question{paperQuestions.length !== 1 ? 's' : ''}
-                </span>
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <button
-                    type="button"
-                    onClick={() => setPaperModalTab('questions')}
-                    className="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-all text-center whitespace-nowrap"
-                  >
-                    View Questions ({paperQuestions.length})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleParseBulkQuestions}
-                    className="flex-1 sm:flex-initial px-3.5 sm:px-5 py-2 bg-[#859900] hover:bg-[#728400] text-white rounded-xl text-xs font-black shadow-md cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 transition-all whitespace-nowrap"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                    <span className="hidden sm:inline">Parse &amp; Add All Questions to Test</span>
-                    <span className="sm:hidden">Parse &amp; Add All</span>
-                  </button>
-                </div>
-              </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-black text-slate-700">Paste Questions Text Here:</label>
+                      {bulkQuestionsInput.trim() && (() => {
+                        const detected = parseAnyQuestionsInput(bulkQuestionsInput, paperSections[0] || 'General Awareness', bulkExtractedImages);
+                        const diagCount = detected.filter(q => q.question_image || q.image_url || q.diagram || (q.question_image_keys?.[0] && bulkExtractedImages[q.question_image_keys[0]])).length;
+                        return (
+                          <span className="text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                            ⚡ ~{detected.length} questions detected {diagCount > 0 ? `(${diagCount} diagram${diagCount > 1 ? 's' : ''})` : ''}
+                          </span>
+                        );
+                      })()}
+                    </div>
+                    <textarea
+                      rows={10}
+                      value={bulkQuestionsInput}
+                      onChange={(e) => setBulkQuestionsInput(e.target.value)}
+                      placeholder="Paste your questions here...&#10;&#10;Example:&#10;Q1. If 3x + 15 = 45, what is the value of 2x - 5?&#10;A) 15&#10;B) 20&#10;C) 25&#10;D) 30&#10;Correct: A&#10;&#10;Tip: Even if you paste single plain questions without options, the system will automatically parse them and create editable options for you!"
+                      className="w-full px-3.5 sm:px-4 py-3 rounded-2xl border border-slate-300 text-xs font-mono text-slate-800 outline-none focus:border-[#859900] leading-relaxed shadow-2xs bg-slate-50/50"
+                    />
+                  </div>
 
-              {/* LIVE QUESTIONS & ATTACHED DIAGRAMS PREVIEW LIST */}
-              {(() => {
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pt-2 border-t border-slate-100">
+                    <span className="text-xs font-bold text-slate-500">
+                      Currently in test: <span className="font-black text-slate-900">{paperQuestions.length}</span> question{paperQuestions.length !== 1 ? 's' : ''}
+                    </span>
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                      <button
+                        type="button"
+                        onClick={() => setPaperModalTab('questions')}
+                        className="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-all text-center whitespace-nowrap"
+                      >
+                        View Questions ({paperQuestions.length})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleParseBulkQuestions}
+                        className="flex-1 sm:flex-initial px-3.5 sm:px-5 py-2 bg-[#859900] hover:bg-[#728400] text-white rounded-xl text-xs font-black shadow-md cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 transition-all whitespace-nowrap"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                        <span className="hidden sm:inline">Parse &amp; Add All Questions to Test</span>
+                        <span className="sm:hidden">Parse &amp; Add All</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* VISUAL CARDS VIEW (DEFAULT - NO RAW CODES SHOWN!) */}
+              {bulkInputViewMode === 'visual' && (() => {
                 const detectedList = bulkQuestionsInput.trim()
                   ? parseAnyQuestionsInput(bulkQuestionsInput, paperSections[0] || 'General Awareness', bulkExtractedImages)
                   : paperQuestions;
 
-                if (!detectedList || detectedList.length === 0) return null;
+                if (!detectedList || detectedList.length === 0) {
+                  return (
+                    <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-10 text-center space-y-4">
+                      <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 mx-auto flex items-center justify-center shadow-xs">
+                        <Upload className="w-7 h-7" />
+                      </div>
+                      <div>
+                        <h4 className="text-base font-black text-slate-800">No Questions Loaded Yet</h4>
+                        <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+                          Click "Import Word (.docx) / PDF" above to automatically extract all questions and diagrams, or switch to "Raw Text / Code" to paste directly.
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-center gap-3 pt-2">
+                        <label className="px-5 py-2.5 rounded-xl bg-[#1e1b4b] hover:bg-[#2e2b6b] text-white font-black text-xs cursor-pointer shadow-md inline-flex items-center gap-2 transition-all">
+                          <Upload className="w-4 h-4 text-amber-300" />
+                          <span>📁 Select Word Document (.docx)</span>
+                          <input
+                            type="file"
+                            accept=".docx,.doc,.pdf,.txt,.csv,.json"
+                            onChange={handleBulkFileUpload}
+                            disabled={isExtractingFile}
+                            className="hidden"
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setBulkInputViewMode('raw')}
+                          className="px-4 py-2.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs cursor-pointer shadow-2xs"
+                        >
+                          Paste Raw Text Instead
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }
+
                 const diagCount = detectedList.filter(q => q.question_image || q.image_url || q.diagram || q.image || (q.question_image_keys?.[0] && bulkExtractedImages[q.question_image_keys[0]])).length;
 
                 return (
-                  <div className="space-y-4 pt-4 border-t border-slate-200">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-gradient-to-r from-emerald-50 via-teal-50 to-indigo-50 p-3 rounded-2xl border border-emerald-200">
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <h4 className="text-xs font-black text-slate-900 uppercase tracking-wide">
-                          Live Visual Preview: Questions &amp; Diagrams ({detectedList.length})
-                        </h4>
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-emerald-50 via-teal-50 to-indigo-50 p-4 rounded-2xl border border-emerald-200">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <h4 className="text-sm font-black text-slate-900 uppercase tracking-wide">
+                            {detectedList.length} Questions Ready with Diagrams
+                          </h4>
+                        </div>
+                        <p className="text-xs text-slate-600 font-medium mt-0.5">
+                          All questions and diagrams are mapped. Review below or proceed to Question Studio to edit individual questions.
+                        </p>
                       </div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[10px] font-bold text-emerald-800 bg-white border border-emerald-300 px-2.5 py-0.5 rounded-full shadow-2xs">
-                          {diagCount > 0 ? `✓ ${diagCount} Diagram${diagCount > 1 ? 's' : ''} Attached` : 'Text Only'}
+                      <div className="flex items-center gap-2 flex-wrap shrink-0">
+                        <span className="text-[11px] font-bold text-emerald-800 bg-white border border-emerald-300 px-3 py-1 rounded-full shadow-2xs">
+                          {diagCount > 0 ? `✓ ${diagCount} Diagram${diagCount > 1 ? 's' : ''} Attached` : 'Text Questions'}
                         </span>
                         <button
                           type="button"
-                          onClick={() => setPaperModalTab('questions')}
-                          className="text-[11px] font-black text-purple-700 hover:text-purple-900 bg-white border border-purple-200 px-3 py-1 rounded-xl cursor-pointer hover:bg-purple-50 transition-colors shadow-2xs"
+                          onClick={() => {
+                            if (paperQuestions.length === 0 && detectedList.length > 0) {
+                              setPaperQuestions(detectedList);
+                            }
+                            setPaperModalTab('questions');
+                            setActiveQuestionIndex(0);
+                          }}
+                          className="px-4 py-2 bg-gradient-to-r from-[#1e1b4b] to-[#3b0764] text-white rounded-xl text-xs font-black shadow-md hover:shadow-lg cursor-pointer transition-all flex items-center gap-1.5"
                         >
-                          Open in Question Studio &rarr;
+                          <span>Open in Studio &rarr;</span>
                         </button>
                       </div>
                     </div>
 
-                    <div className="space-y-3.5 max-h-[600px] overflow-y-auto pr-1">
+                    {/* Question Cards Stream */}
+                    <div className="space-y-4 max-h-[650px] overflow-y-auto pr-1">
                       {detectedList.map((q, idx) => {
                         const diagSrc = q.question_image || q.image_url || q.diagram || q.image || (q.question_image_keys?.[0] ? bulkExtractedImages[q.question_image_keys[0]] : '') || '';
                         const cleanText = getCleanQuestionText(q.q || q.question_text || '');
                         return (
                           <div
                             key={q.id || idx}
-                            className="p-4 sm:p-5 rounded-2xl bg-white border-2 border-slate-200 hover:border-indigo-300 transition-all space-y-3.5 shadow-2xs"
+                            className="p-5 rounded-3xl bg-white border-2 border-slate-200 hover:border-indigo-300 transition-all space-y-4 shadow-2xs"
                           >
                             <div className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-2">
-                                <span className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#1e1b4b] to-[#3b0764] text-white font-black text-xs flex items-center justify-center shadow-xs">
-                                  {idx + 1}
+                                <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#1e1b4b] to-[#3b0764] text-white font-black text-xs flex items-center justify-center shadow-xs">
+                                  Q{idx + 1}
                                 </span>
-                                <span className="text-[10px] font-bold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200">
-                                  {q.section || paperSections[0] || 'General'}
+                                <span className="text-[11px] font-bold bg-slate-100 text-slate-700 px-3 py-1 rounded-lg border border-slate-200">
+                                  {q.section || paperSections[0] || 'General Awareness'}
                                 </span>
                               </div>
-                              {diagSrc ? (
-                                <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5 shadow-2xs">
-                                  <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
-                                  <span>Diagram Attached</span>
-                                </span>
-                              ) : (
-                                <span className="text-[10px] font-semibold text-slate-400">
-                                  No diagram
-                                </span>
-                              )}
+                              <div className="flex items-center gap-2">
+                                {diagSrc ? (
+                                  <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-lg flex items-center gap-1.5 shadow-2xs">
+                                    <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
+                                    <span>Diagram Attached</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] font-semibold text-slate-400">
+                                    Text only
+                                  </span>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (paperQuestions.length === 0) setPaperQuestions(detectedList);
+                                    setActiveQuestionIndex(idx);
+                                    setPaperModalTab('questions');
+                                  }}
+                                  className="text-xs font-bold text-slate-600 hover:text-indigo-700 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg cursor-pointer transition-colors"
+                                  title="Edit in Studio"
+                                >
+                                  Edit &rarr;
+                                </button>
+                              </div>
                             </div>
 
-                            {/* Question Statement Text */}
-                            <p className="text-xs sm:text-sm font-bold text-slate-900 leading-relaxed">
+                            {/* Clean Question Text (NO __IMG__ tokens!) */}
+                            <p className="text-sm font-bold text-slate-900 leading-relaxed">
                               {cleanText}
                             </p>
 
-                            {/* Render Diagram Visually in Full Color! */}
+                            {/* THE REAL VISUAL DIAGRAM IMAGE */}
                             {diagSrc && (
-                              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center gap-2">
+                              <div className="p-3.5 rounded-2xl bg-indigo-50/40 border border-indigo-100 flex flex-col items-center justify-center gap-2">
                                 <div
-                                  className="relative group rounded-xl overflow-hidden cursor-zoom-in border border-slate-200 bg-white shadow-2xs"
+                                  className="relative group rounded-xl overflow-hidden cursor-zoom-in border border-slate-200 bg-white shadow-xs max-w-md w-full flex items-center justify-center p-2"
                                   onClick={() => setPreviewModalImage(diagSrc)}
-                                  title="Click to view full size"
+                                  title="Click to view enlarged full size"
                                 >
                                   <img
                                     src={diagSrc}
                                     alt={`Question ${idx + 1} diagram`}
-                                    className="max-h-60 max-w-full object-contain p-2 group-hover:scale-102 transition-transform"
+                                    className="max-h-64 max-w-full object-contain group-hover:scale-102 transition-transform"
                                   />
-                                  <div className="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1.5">
+                                  <div className="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1.5 rounded-xl">
                                     <Eye className="w-4 h-4" />
-                                    <span>Click to Zoom</span>
+                                    <span>Click to Zoom Full Size</span>
                                   </div>
                                 </div>
                                 <span className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
-                                  <Eye className="w-3 h-3 text-slate-400" />
-                                  <span>Diagram attached to Question #{idx + 1} • Click image to zoom</span>
+                                  <Eye className="w-3.5 h-3.5 text-indigo-600" />
+                                  <span>Visual diagram for Question #{idx + 1} • Click to enlarge</span>
                                 </span>
                               </div>
                             )}
 
                             {/* Options Grid */}
                             {Array.isArray(q.options) && q.options.length > 0 && (
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                                 {q.options.map((opt, oIdx) => {
                                   const isCorrect = Number(q.correct) === oIdx;
                                   return (
                                     <div
                                       key={oIdx}
-                                      className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 border ${
+                                      className={`px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 border ${
                                         isCorrect
-                                          ? 'bg-emerald-50 border-emerald-300 text-emerald-900 font-bold shadow-2xs'
+                                          ? 'bg-emerald-50 border-emerald-300 text-emerald-900 font-bold shadow-2xs ring-1 ring-emerald-300'
                                           : 'bg-slate-50/80 border-slate-200 text-slate-700'
                                       }`}
                                     >
                                       <span
-                                        className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
+                                        className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black shrink-0 ${
                                           isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'
                                         }`}
                                       >
@@ -2276,8 +2427,9 @@ export const SuperAdminPackagesManager = () => {
                                       </span>
                                       <span className="truncate">{opt}</span>
                                       {isCorrect && (
-                                        <span className="ml-auto text-[10px] font-black text-emerald-700">
-                                          ✓ Correct
+                                        <span className="ml-auto text-[10px] font-black text-emerald-700 flex items-center gap-0.5">
+                                          <Check className="w-3 h-3" />
+                                          <span>Correct</span>
                                         </span>
                                       )}
                                     </div>
@@ -2288,6 +2440,28 @@ export const SuperAdminPackagesManager = () => {
                           </div>
                         );
                       })}
+                    </div>
+
+                    {/* Bottom Save & Proceed Bar */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                      <span className="text-xs font-bold text-slate-500">
+                        Total: <span className="font-black text-slate-900">{detectedList.length}</span> questions loaded
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (paperQuestions.length === 0 && detectedList.length > 0) {
+                              setPaperQuestions(detectedList);
+                            }
+                            setPaperModalTab('questions');
+                            setActiveQuestionIndex(0);
+                          }}
+                          className="px-5 py-2.5 bg-[#4e2a4a] hover:bg-[#3d203a] text-white rounded-xl text-xs font-black shadow-md cursor-pointer flex items-center gap-2"
+                        >
+                          <span>Proceed to Question Studio &rarr;</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );

@@ -111,10 +111,20 @@ export async function saveMultipleImages(imgMap = {}) {
  */
 export function getCachedImageSync(key) {
   if (!key) return null;
-  if (typeof window !== 'undefined' && window._olympiadhub_img_cache) {
-    if (window._olympiadhub_img_cache[key]) return window._olympiadhub_img_cache[key];
-    const norm = normalizeTextKey(key);
-    if (norm && window._olympiadhub_img_cache[norm]) return window._olympiadhub_img_cache[norm];
+  if (typeof window !== 'undefined') {
+    if (window._olympiadhub_img_cache) {
+      if (window._olympiadhub_img_cache[key]) return window._olympiadhub_img_cache[key];
+      const norm = normalizeTextKey(key);
+      if (norm && window._olympiadhub_img_cache[norm]) return window._olympiadhub_img_cache[norm];
+    }
+    try {
+      const sess = JSON.parse(sessionStorage.getItem('olympiadhub_bulk_extracted_images') || '{}');
+      if (sess && sess[key]) {
+        if (!window._olympiadhub_img_cache) window._olympiadhub_img_cache = {};
+        window._olympiadhub_img_cache[key] = sess[key];
+        return sess[key];
+      }
+    } catch (_) {}
   }
   return null;
 }
