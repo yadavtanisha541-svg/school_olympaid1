@@ -2137,55 +2137,6 @@ export const SuperAdminPackagesManager = () => {
                 </div>
               </div>
 
-              {/* Extracted Diagram Gallery */}
-              {Object.keys(bulkExtractedImages).length > 0 && (
-                <div className="bg-indigo-50/60 border-2 border-indigo-200 rounded-2xl p-4 space-y-3">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div className="flex items-center gap-2">
-                      <ImageIcon className="w-4 h-4 text-indigo-700" />
-                      <span className="text-xs font-black text-slate-900">
-                        Extracted Diagrams &amp; Figures ({Object.keys(bulkExtractedImages).length})
-                      </span>
-                      <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-300">
-                        ✓ Auto-Mapped to Questions
-                      </span>
-                    </div>
-                    <span className="text-[11px] text-slate-500 font-medium">
-                      Click any thumbnail to view enlarged full size
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 max-h-56 overflow-y-auto p-1">
-                    {Object.entries(bulkExtractedImages).map(([imgKey, imgSrc], imgIdx) => (
-                      <div
-                        key={imgKey}
-                        className="group relative bg-white border border-indigo-200 hover:border-indigo-500 rounded-xl p-2 flex flex-col items-center gap-1.5 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
-                        onClick={() => setPreviewModalImage(imgSrc)}
-                      >
-                        <div className="w-full h-20 bg-slate-50 rounded-lg overflow-hidden flex items-center justify-center relative border border-slate-100">
-                          <img
-                            src={imgSrc}
-                            alt={imgKey}
-                            className="w-full h-full object-contain p-1 group-hover:scale-105 transition-transform"
-                          />
-                          <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[10px] font-bold gap-1 rounded-lg">
-                            <Eye className="w-3.5 h-3.5" />
-                            <span>Zoom</span>
-                          </div>
-                        </div>
-                        <div className="w-full text-center">
-                          <p className="text-[10px] font-mono font-bold text-slate-700 truncate" title={imgKey}>
-                            Fig #{imgIdx + 1}
-                          </p>
-                          <p className="text-[9px] font-mono text-slate-400 truncate" title={imgKey}>
-                            {imgKey}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* RAW TEXT INPUT VIEW */}
               {bulkInputViewMode === 'raw' && (
@@ -2332,7 +2283,7 @@ export const SuperAdminPackagesManager = () => {
                     {/* Question Cards Stream */}
                     <div className="space-y-4 max-h-[650px] overflow-y-auto pr-1">
                       {detectedList.map((q, idx) => {
-                        const diagSrc = q.question_image || q.image_url || q.diagram || q.image || (q.question_image_keys?.[0] ? bulkExtractedImages[q.question_image_keys[0]] : '') || '';
+                        const diagSrc = getQuestionImage(q) || q.question_image || q.image_url || q.diagram || q.image || (q.question_image_keys?.[0] ? bulkExtractedImages[q.question_image_keys[0]] : '') || '';
                         const cleanText = getCleanQuestionText(q.q || q.question_text || '');
                         return (
                           <div
