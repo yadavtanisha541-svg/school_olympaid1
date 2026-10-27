@@ -118,6 +118,8 @@ export const getQuestionImage = (q) => {
       const extracted = getExtractedImages() || {};
       if (store[key]) return store[key];
       if (extracted[key]) return extracted[key];
+      const byCached = getCachedImageSync(key);
+      if (byCached) return byCached;
       if (key.startsWith('data:image') || key.startsWith('http')) return key;
     }
 

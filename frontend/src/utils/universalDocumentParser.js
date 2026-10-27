@@ -41,7 +41,7 @@ export async function getMammoth() {
   return mammothPromise;
 }
 
-import { saveMultipleImages, saveImageToStore } from './imageStore';
+import { saveMultipleImages, saveImageToStore, getCachedImageSync } from './imageStore';
 
 // ─── Global image store ───────────────────────────────────────────────────────
 let _images = {};
@@ -652,7 +652,12 @@ function parseBlock(blockText, idx, images = {}) {
 
   // Primary image
   const primaryImgKey = imageKeys[0] || '';
-  const primaryImgSrc = (images && primaryImgKey && images[primaryImgKey]) || (getExtractedImages()[primaryImgKey]) || '';
+  const primaryImgSrc =
+    (images && primaryImgKey && images[primaryImgKey]) ||
+    (getExtractedImages()[primaryImgKey]) ||
+    (typeof window !== 'undefined' && window._olympiadhub_img_cache && window._olympiadhub_img_cache[primaryImgKey]) ||
+    getCachedImageSync(primaryImgKey) ||
+    '';
 
   if (!cleanedQuestionText && primaryImgSrc) {
     cleanedQuestionText = `Look at the given diagram and choose the correct option:`;

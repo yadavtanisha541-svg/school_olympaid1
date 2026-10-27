@@ -512,8 +512,25 @@ export const SuperAdminPackagesManager = () => {
   const [paperSections, setPaperSections] = useState(['General Awareness', 'Current Affairs', 'Life Skills', 'Achievers Section']);
   const [paperQuestions, setPaperQuestions] = useState([]);
   const [bulkQuestionsInput, setBulkQuestionsInput] = useState('');
-  const [bulkExtractedImages, setBulkExtractedImages] = useState({});
+  const [bulkExtractedImages, setBulkExtractedImages] = useState(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem('olympiadhub_bulk_extracted_images') || '{}');
+    } catch (e) {
+      return {};
+    }
+  });
   const [newSectionInput, setNewSectionInput] = useState('');
+  const [previewModalImage, setPreviewModalImage] = useState(null);
+
+  // Persist extracted images to sessionStorage and memory store
+  useEffect(() => {
+    if (bulkExtractedImages && Object.keys(bulkExtractedImages).length > 0) {
+      try {
+        sessionStorage.setItem('olympiadhub_bulk_extracted_images', JSON.stringify(bulkExtractedImages));
+        saveMultipleImages(bulkExtractedImages);
+      } catch (e) {}
+    }
+  }, [bulkExtractedImages]);
 
   // Helper functions for robust subject & class matching
   const matchSubjectCodes = (testSubCode, targetCode) => {
@@ -891,6 +908,9 @@ export const SuperAdminPackagesManager = () => {
       setBulkExtractedImages(imgMap);
       if (typeof window !== 'undefined' && Object.keys(imgMap).length > 0) {
         saveMultipleImages(imgMap);
+        try {
+          sessionStorage.setItem('olympiadhub_bulk_extracted_images', JSON.stringify(imgMap));
+        } catch (_) {}
       }
 
       setBulkQuestionsInput(text);
@@ -899,7 +919,29 @@ export const SuperAdminPackagesManager = () => {
       const imgCount = Object.keys(imgMap).length;
 
       if (detected.length > 0) {
-        showToast(`✓ Extracted "${file.name}" (~${detected.length} MCQs detected${imgCount > 0 ? `, ${imgCount} diagram${imgCount > 1 ? 's' : ''} found` : ''}). Click "Parse & Add All Questions to Test" below.`);
+        const mapped = detected.map((p, i) => {
+          const qId = Date.now() + i;
+          const qImg = p.question_image || p.image_url || p.diagram || p.image || (p.question_image_keys?.[0] ? imgMap[p.question_image_keys[0]] : '') || '';
+          if (qImg) {
+            saveImageToStore(String(qId), qImg);
+            const norm = normalizeTextKey(p.q || p.question_text || '');
+            if (norm) saveImageToStore(norm, qImg);
+          }
+          return {
+            ...p,
+            id: qId,
+            section: p.section || defaultSec,
+            question_image: qImg,
+            image_url: qImg,
+            diagram: qImg,
+            image: qImg,
+            figure: qImg
+          };
+        });
+        setPaperQuestions(mapped);
+        setActiveQuestionIndex(0);
+        const diagCount = mapped.filter(q => q.question_image).length;
+        showToast(`✓ Extracted "${file.name}": ${detected.length} MCQs loaded automatically${diagCount > 0 ? ` (${diagCount} diagram${diagCount > 1 ? 's' : ''} attached)` : ''}!`);
       } else {
         showToast(`Extracted text from "${file.name}". Review text below and click "Parse & Add All Questions".`);
       }
@@ -912,7 +954,18 @@ export const SuperAdminPackagesManager = () => {
           if (content && !content.includes('word/document.xml') && !content.includes('PK\x03\x04')) {
             setBulkQuestionsInput(content);
             const detected = parseAnyQuestionsInput(content, paperSections[0] || 'General Awareness');
-            showToast(`Loaded "${file.name}" (${detected.length} questions detected). Click "Parse & Add" below.`);
+            if (detected.length > 0) {
+              const mapped = detected.map((p, i) => ({
+                ...p,
+                id: Date.now() + i,
+                section: p.section || paperSections[0] || 'General Awareness'
+              }));
+              setPaperQuestions(mapped);
+              setActiveQuestionIndex(0);
+              showToast(`✓ Loaded "${file.name}" (${detected.length} questions loaded automatically).`);
+            } else {
+              showToast(`Loaded "${file.name}". Click "Parse & Add" below.`);
+            }
           } else {
             showToast(`Could not extract questions from "${file.name}". Please save as standard .docx or copy & paste text directly from Word.`, 'error');
           }
@@ -2011,13 +2064,63 @@ export const SuperAdminPackagesManager = () => {
                 </div>
               </div>
 
+              {/* Extracted Diagram Gallery */}
+              {Object.keys(bulkExtractedImages).length > 0 && (
+                <div className="bg-indigo-50/60 border-2 border-indigo-200 rounded-2xl p-4 space-y-3">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <ImageIcon className="w-4 h-4 text-indigo-700" />
+                      <span className="text-xs font-black text-slate-900">
+                        Extracted Diagrams &amp; Figures ({Object.keys(bulkExtractedImages).length})
+                      </span>
+                      <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-300">
+                        ✓ Auto-Mapped to Questions
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-slate-500 font-medium">
+                      Click any image to view enlarged full size
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 max-h-56 overflow-y-auto p-1">
+                    {Object.entries(bulkExtractedImages).map(([imgKey, imgSrc], imgIdx) => (
+                      <div
+                        key={imgKey}
+                        className="group relative bg-white border border-indigo-200 hover:border-indigo-500 rounded-xl p-2 flex flex-col items-center gap-1.5 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                        onClick={() => setPreviewModalImage(imgSrc)}
+                      >
+                        <div className="w-full h-20 bg-slate-50 rounded-lg overflow-hidden flex items-center justify-center relative border border-slate-100">
+                          <img
+                            src={imgSrc}
+                            alt={imgKey}
+                            className="w-full h-full object-contain p-1 group-hover:scale-105 transition-transform"
+                          />
+                          <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[10px] font-bold gap-1 rounded-lg">
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>Zoom</span>
+                          </div>
+                        </div>
+                        <div className="w-full text-center">
+                          <p className="text-[10px] font-mono font-bold text-slate-700 truncate" title={imgKey}>
+                            Fig #{imgIdx + 1}
+                          </p>
+                          <p className="text-[9px] font-mono text-slate-400 truncate" title={imgKey}>
+                            {imgKey}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Textarea */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-black text-slate-700">Paste Questions Text Here:</label>
                   {bulkQuestionsInput.trim() && (() => {
                     const detected = parseAnyQuestionsInput(bulkQuestionsInput, paperSections[0] || 'General Awareness', bulkExtractedImages);
-                    const diagCount = detected.filter(q => q.question_image).length;
+                    const diagCount = detected.filter(q => q.question_image || q.image_url || q.diagram || (q.question_image_keys?.[0] && bulkExtractedImages[q.question_image_keys[0]])).length;
                     return (
                       <span className="text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
                         ⚡ ~{detected.length} questions detected {diagCount > 0 ? `(${diagCount} diagram${diagCount > 1 ? 's' : ''})` : ''}
@@ -2057,9 +2160,184 @@ export const SuperAdminPackagesManager = () => {
                   </button>
                 </div>
               </div>
+
+              {/* LIVE QUESTIONS & ATTACHED DIAGRAMS PREVIEW LIST */}
+              {(() => {
+                const detectedList = bulkQuestionsInput.trim()
+                  ? parseAnyQuestionsInput(bulkQuestionsInput, paperSections[0] || 'General Awareness', bulkExtractedImages)
+                  : paperQuestions;
+
+                if (!detectedList || detectedList.length === 0) return null;
+                const diagCount = detectedList.filter(q => q.question_image || q.image_url || q.diagram || q.image || (q.question_image_keys?.[0] && bulkExtractedImages[q.question_image_keys[0]])).length;
+
+                return (
+                  <div className="space-y-4 pt-4 border-t border-slate-200">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-gradient-to-r from-emerald-50 via-teal-50 to-indigo-50 p-3 rounded-2xl border border-emerald-200">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <h4 className="text-xs font-black text-slate-900 uppercase tracking-wide">
+                          Live Visual Preview: Questions &amp; Diagrams ({detectedList.length})
+                        </h4>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[10px] font-bold text-emerald-800 bg-white border border-emerald-300 px-2.5 py-0.5 rounded-full shadow-2xs">
+                          {diagCount > 0 ? `✓ ${diagCount} Diagram${diagCount > 1 ? 's' : ''} Attached` : 'Text Only'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setPaperModalTab('questions')}
+                          className="text-[11px] font-black text-purple-700 hover:text-purple-900 bg-white border border-purple-200 px-3 py-1 rounded-xl cursor-pointer hover:bg-purple-50 transition-colors shadow-2xs"
+                        >
+                          Open in Question Studio &rarr;
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3.5 max-h-[600px] overflow-y-auto pr-1">
+                      {detectedList.map((q, idx) => {
+                        const diagSrc = q.question_image || q.image_url || q.diagram || q.image || (q.question_image_keys?.[0] ? bulkExtractedImages[q.question_image_keys[0]] : '') || '';
+                        const cleanText = getCleanQuestionText(q.q || q.question_text || '');
+                        return (
+                          <div
+                            key={q.id || idx}
+                            className="p-4 sm:p-5 rounded-2xl bg-white border-2 border-slate-200 hover:border-indigo-300 transition-all space-y-3.5 shadow-2xs"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <span className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#1e1b4b] to-[#3b0764] text-white font-black text-xs flex items-center justify-center shadow-xs">
+                                  {idx + 1}
+                                </span>
+                                <span className="text-[10px] font-bold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200">
+                                  {q.section || paperSections[0] || 'General'}
+                                </span>
+                              </div>
+                              {diagSrc ? (
+                                <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5 shadow-2xs">
+                                  <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
+                                  <span>Diagram Attached</span>
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-semibold text-slate-400">
+                                  No diagram
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Question Statement Text */}
+                            <p className="text-xs sm:text-sm font-bold text-slate-900 leading-relaxed">
+                              {cleanText}
+                            </p>
+
+                            {/* Render Diagram Visually in Full Color! */}
+                            {diagSrc && (
+                              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center gap-2">
+                                <div
+                                  className="relative group rounded-xl overflow-hidden cursor-zoom-in border border-slate-200 bg-white shadow-2xs"
+                                  onClick={() => setPreviewModalImage(diagSrc)}
+                                  title="Click to view full size"
+                                >
+                                  <img
+                                    src={diagSrc}
+                                    alt={`Question ${idx + 1} diagram`}
+                                    className="max-h-60 max-w-full object-contain p-2 group-hover:scale-102 transition-transform"
+                                  />
+                                  <div className="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1.5">
+                                    <Eye className="w-4 h-4" />
+                                    <span>Click to Zoom</span>
+                                  </div>
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
+                                  <Eye className="w-3 h-3 text-slate-400" />
+                                  <span>Diagram attached to Question #{idx + 1} • Click image to zoom</span>
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Options Grid */}
+                            {Array.isArray(q.options) && q.options.length > 0 && (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                                {q.options.map((opt, oIdx) => {
+                                  const isCorrect = Number(q.correct) === oIdx;
+                                  return (
+                                    <div
+                                      key={oIdx}
+                                      className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 border ${
+                                        isCorrect
+                                          ? 'bg-emerald-50 border-emerald-300 text-emerald-900 font-bold shadow-2xs'
+                                          : 'bg-slate-50/80 border-slate-200 text-slate-700'
+                                      }`}
+                                    >
+                                      <span
+                                        className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
+                                          isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'
+                                        }`}
+                                      >
+                                        {String.fromCharCode(65 + oIdx)}
+                                      </span>
+                                      <span className="truncate">{opt}</span>
+                                      {isCorrect && (
+                                        <span className="ml-auto text-[10px] font-black text-emerald-700">
+                                          ✓ Correct
+                                        </span>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>
+
+        {/* Full Image Zoom Modal */}
+        {previewModalImage && (
+          <div
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 cursor-pointer animate-in fade-in duration-150"
+            onClick={() => setPreviewModalImage(null)}
+          >
+            <div
+              className="relative max-w-4xl max-h-[90vh] bg-white rounded-3xl p-4 shadow-2xl flex flex-col items-center gap-3 cursor-default"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-full flex items-center justify-between pb-2 border-b border-slate-100">
+                <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                  <ImageIcon className="w-4 h-4 text-indigo-600" />
+                  <span>Diagram Full Zoom View</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPreviewModalImage(null)}
+                  className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center cursor-pointer text-xs"
+                >
+                  &times;
+                </button>
+              </div>
+              <div className="overflow-auto max-h-[75vh] flex items-center justify-center p-2 bg-slate-50 rounded-2xl w-full">
+                <img
+                  src={previewModalImage}
+                  alt="Zoomed diagram"
+                  className="max-w-full max-h-[70vh] object-contain rounded-xl shadow-xs"
+                />
+              </div>
+              <div className="w-full flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setPreviewModalImage(null)}
+                  className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl cursor-pointer"
+                >
+                  Close Preview
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
