@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { apiClient } from '../../api/client';
+import { QuestionDiagram, getQuestionImage, getCleanQuestionText, isImageString, getOptionImageSrc } from '../../utils/questionMediaHelper';
 import {
   Laptop,
   Rocket,
@@ -710,12 +711,15 @@ export const SubjectContentPackagesPage = ({
                       {/* Question Title & Marks */}
                       <div className="flex items-center justify-between pb-2 border-b border-slate-100 text-xs font-black text-slate-800">
                         <span>
-                          Q{originalIdx + 1}. [{q.section || 'General Awareness'}] {q.q}
+                          Q{originalIdx + 1}. [{q.section || 'General Awareness'}] {getCleanQuestionText(q.q || q.question_text || '')}
                         </span>
                         <span className="text-slate-500 font-bold shrink-0 ml-2">
                           [Marks: {q.marks || 1}]
                         </span>
                       </div>
+
+                      {/* Question Diagram / Image in Review */}
+                      <QuestionDiagram question={q} className="my-2" maxHeight="max-h-60" />
 
                       {/* Options with correctness highlights */}
                       <div className="space-y-2 pt-1">
@@ -860,8 +864,11 @@ export const SubjectContentPackagesPage = ({
 
                 {/* Question Text */}
                 <div className="py-4 text-sm sm:text-base font-medium text-slate-900 leading-relaxed">
-                  {currentQ.q}
+                  {getCleanQuestionText(currentQ.q || currentQ.question_text || '')}
                 </div>
+
+                {/* Question Diagram / Image */}
+                <QuestionDiagram question={currentQ} className="mb-4" />
 
                 {/* Options List with Colored Letter Boxes (Image 1 style) */}
                 <div className="space-y-3 pt-2">
@@ -876,6 +883,8 @@ export const SubjectContentPackagesPage = ({
                       'bg-[#9b59b6] text-white'  // D: Purple
                     ];
 
+                    const isOptImg = isImageString(opt);
+
                     return (
                       <div
                         key={optIdx}
@@ -889,9 +898,17 @@ export const SubjectContentPackagesPage = ({
                         <span className={`w-7 h-7 rounded-md flex items-center justify-center font-black text-xs shrink-0 shadow-2xs ${colorStyles[optIdx % 4]}`}>
                           {optLabel}
                         </span>
-                        <span className="text-xs sm:text-sm font-semibold text-slate-800">
-                          {opt}
-                        </span>
+                        <div className="text-xs sm:text-sm font-semibold text-slate-800 flex-1">
+                          {isOptImg ? (
+                            <img
+                              src={getOptionImageSrc(opt, currentQ._imgStore)}
+                              alt={`Option ${optLabel}`}
+                              className="max-h-24 sm:max-h-28 rounded-lg object-contain bg-white border border-slate-200 p-1"
+                            />
+                          ) : (
+                            <span>{opt}</span>
+                          )}
+                        </div>
                       </div>
                     );
                   })}

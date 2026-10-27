@@ -20,6 +20,7 @@ import {
 import { Button } from '../../components/Button';
 import { Modal } from '../../components/Modal';
 import { Badge } from '../../components/Badge';
+import { QuestionDiagram, getQuestionImage, getCleanQuestionText, isImageString, getOptionImageSrc } from '../../utils/questionMediaHelper';
 
 export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
   const { user } = useAuth();
@@ -580,23 +581,10 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
             {currentQuestion ? (
               <div className="space-y-6">
                 <div className="text-base sm:text-lg font-medium text-slate-900 leading-relaxed">
-                  {currentQuestion.question_text || currentQuestion.q || currentQuestion.question || currentQuestion.title || 'Question Statement'}
+                  {getCleanQuestionText(currentQuestion.question_text || currentQuestion.q || currentQuestion.question || currentQuestion.title || 'Question Statement')}
                 </div>
 
-                {(currentQuestion.question_image || currentQuestion.image_url || currentQuestion.diagram || currentQuestion.image || currentQuestion.figure) && (
-                  <div className="my-4 text-left">
-                    <div className="inline-block border-2 border-indigo-200 rounded-2xl p-3 bg-white shadow-xs max-w-full">
-                      <div className="text-xs font-bold text-indigo-700 mb-2 border-b border-indigo-100 pb-1 flex items-center gap-1.5">
-                        <span>📸 Question Diagram / Figure:</span>
-                      </div>
-                      <img
-                        src={currentQuestion.question_image || currentQuestion.image_url || currentQuestion.diagram || currentQuestion.image || currentQuestion.figure}
-                        alt="Question Diagram"
-                        className="max-h-72 sm:max-h-80 rounded-xl border border-slate-100 shadow-sm object-contain bg-white"
-                      />
-                    </div>
-                  </div>
-                )}
+                <QuestionDiagram question={currentQuestion} className="my-4" />
 
                 {/* 4 MCQ OPTIONS */}
                 <div className="space-y-3 pt-2">
@@ -610,6 +598,7 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
                         `Option ${optKey}`
                       : `Option ${optKey}`;
                     const active = isSelected(optKey);
+                    const isOptImg = isImageString(optText);
 
                     return (
                       <button
@@ -647,9 +636,17 @@ export const ExamPortal = ({ examId, onExamCompleted, onExit }) => {
                         >
                           {optKey}
                         </span>
-                        <span className="text-sm font-medium pt-0.5 flex-1">
-                          {optText}
-                        </span>
+                        <div className="text-sm font-medium pt-0.5 flex-1">
+                          {isOptImg ? (
+                            <img
+                              src={getOptionImageSrc(optText, currentQuestion._imgStore)}
+                              alt={`Option ${optKey}`}
+                              className="max-h-28 rounded-lg object-contain bg-white border border-slate-200 p-1"
+                            />
+                          ) : (
+                            <span>{optText}</span>
+                          )}
+                        </div>
                         {active && (
                           <Check className="w-5 h-5 text-brand-600 shrink-0 mt-0.5" />
                         )}

@@ -3,7 +3,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 import { getTestPricing } from '../../utils/purchaseUtils';
 import { getTopicsForSubject } from '../../data/subjectTopics';
-import { extractFromFile } from '../../utils/universalDocumentParser';
+import { extractFromFile, parseQuestionsFromText, getExtractedImages } from '../../utils/universalDocumentParser';
+import { saveMultipleImages, saveImageToStore, normalizeTextKey } from '../../utils/imageStore';
+import { QuestionDiagram, getQuestionImage, getCleanQuestionText, isImageString, getOptionImageSrc } from '../../utils/questionMediaHelper';
 import {
   ShoppingBag,
   Package,
@@ -27,6 +29,7 @@ import {
   Sparkles,
   Download,
   Upload,
+  Image as ImageIcon,
   FileSpreadsheet,
   Printer,
   Flame,
@@ -135,10 +138,65 @@ Marks: 1
 Section: General Awareness
 Explanation: Mars appears reddish because of pervasive iron oxide minerals on its terrain.`;
 
-// Universal multi-format intelligent question parser (Handles Plain text, Q1..Qn, JSON, and CSV)
-export const parseAnyQuestionsInput = (rawInput, defaultSection = 'General Awareness') => {
+// Universal multi-format intelligent question parser (Handles Plain text, Q1..Qn, Word/PDF extracted, JSON, and CSV)
+export const parseAnyQuestionsInput = (rawInput, defaultSection = 'General Awareness', imageMap = {}) => {
   if (!rawInput || !rawInput.trim()) return [];
   const text = rawInput.trim();
+  const effectiveImages = { ...getExtractedImages(), ...(imageMap || {}) };
+
+  // 0. Primary Universal Parser (Intelligently detects numbered questions, sections, options, answers, and diagram images)
+  try {
+    const docParsed = parseQuestionsFromText(text, effectiveImages);
+    if (Array.isArray(docParsed) && docParsed.length > 0) {
+      return docParsed.map((q, idx) => {
+        const qId = q.id || (Date.now() + idx);
+        const cleanQ = getCleanQuestionText(q.q || q.question_text || `Question ${idx + 1}`);
+        const primaryImg = q.question_image || q.image_url || q.diagram || q.image || q.figure || (q.question_image_keys?.[0] ? effectiveImages[q.question_image_keys[0]] : '') || '';
+
+        if (primaryImg) {
+          saveImageToStore(String(qId), primaryImg);
+          const norm = normalizeTextKey(cleanQ);
+          if (norm) saveImageToStore(norm, primaryImg);
+        }
+
+        let corr = 0;
+        if (typeof q.correct === 'number') {
+          corr = Math.max(0, Math.min(3, q.correct));
+        } else {
+          const cStr = String(q.correct_option || q.correct || q.answer || 'A').toUpperCase().trim();
+          const matchIdx = ['A', 'B', 'C', 'D'].indexOf(cStr);
+          if (matchIdx >= 0) corr = matchIdx;
+          else if (!isNaN(parseInt(cStr))) corr = Math.max(0, Math.min(3, parseInt(cStr) - 1));
+        }
+
+        const opts = [
+          q.option_a || q.options?.[0] || 'Option A',
+          q.option_b || q.options?.[1] || 'Option B',
+          q.option_c || q.options?.[2] || 'Option C',
+          q.option_d || q.options?.[3] || 'Option D'
+        ];
+
+        return {
+          id: qId,
+          section: q.section || defaultSection,
+          q: cleanQ,
+          options: opts,
+          correct: corr,
+          marks: Number(q.marks) || 1,
+          explanation: String(q.explanation || '').trim(),
+          question_image: primaryImg,
+          image_url: primaryImg,
+          diagram: primaryImg,
+          image: primaryImg,
+          figure: primaryImg,
+          question_image_keys: q.question_image_keys || [],
+          _imgStore: effectiveImages
+        };
+      });
+    }
+  } catch (err) {
+    console.warn('parseQuestionsFromText error, trying fallback parser:', err);
+  }
 
   // 1. JSON Array or Object
   if ((text.startsWith('[') && text.endsWith(']')) || (text.startsWith('{') && text.endsWith('}'))) {
@@ -170,14 +228,30 @@ export const parseAnyQuestionsInput = (rawInput, defaultSection = 'General Aware
             else if (!isNaN(parseInt(cStr))) correct = Math.max(0, Math.min(3, parseInt(cStr) - 1));
           }
 
+          const qId = item.id || (Date.now() + idx);
+          const cleanQ = getCleanQuestionText(item.q || item.question || item.question_text || item.title || `Question ${idx + 1}`);
+          const primaryImg = item.question_image || item.image_url || item.diagram || item.image || item.figure || '';
+
+          if (primaryImg) {
+            saveImageToStore(String(qId), primaryImg);
+            const norm = normalizeTextKey(cleanQ);
+            if (norm) saveImageToStore(norm, primaryImg);
+          }
+
           return {
-            id: Date.now() + idx,
+            id: qId,
             section: item.section || defaultSection,
-            q: String(item.q || item.question || item.question_text || item.title || `Question ${idx + 1}`).trim(),
+            q: cleanQ,
             options: opts,
             correct,
             marks: Number(item.marks || item.points || 1) || 1,
-            explanation: String(item.explanation || item.solution || item.hint || '').trim()
+            explanation: String(item.explanation || item.solution || item.hint || '').trim(),
+            question_image: primaryImg,
+            image_url: primaryImg,
+            diagram: primaryImg,
+            image: primaryImg,
+            figure: primaryImg,
+            _imgStore: effectiveImages
           };
         }).filter(q => q.q.length > 0);
       }
@@ -216,7 +290,7 @@ export const parseAnyQuestionsInput = (rawInput, defaultSection = 'General Aware
       for (let i = 1; i < rawLines.length; i++) {
         const parts = parseCSVLine(rawLines[i]);
         if (parts.length >= 2) {
-          const qText = parts[0] || parts[3] || parts[4] || '';
+          const qText = getCleanQuestionText(parts[0] || parts[3] || parts[4] || '');
           const optA = parts[1] || parts[5] || 'Option A';
           const optB = parts[2] || parts[6] || 'Option B';
           const optC = parts[3] || parts[7] || 'Option C';
@@ -234,7 +308,13 @@ export const parseAnyQuestionsInput = (rawInput, defaultSection = 'General Aware
               options: [optA, optB, optC, optD],
               correct: corr,
               marks: Number(parts[11]) || 1,
-              explanation: parts[12] || ''
+              explanation: parts[12] || '',
+              question_image: '',
+              image_url: '',
+              diagram: '',
+              image: '',
+              figure: '',
+              _imgStore: effectiveImages
             });
           }
         }
@@ -245,10 +325,13 @@ export const parseAnyQuestionsInput = (rawInput, defaultSection = 'General Aware
     }
   }
 
-  // 3. Robust Text Parser (Supports Q1., 1., double-newlines, inline options, and plain single/multi-line questions)
-  let rawBlocks = text.split(/(?:\r?\n\s*\r?\n)|(?=(?:^|\n)\s*(?:Q\d*[\.:\)]|Question\s*\d*[\.:\)]|\d+[\.\)]\s+[A-Z]))/im);
+  // 3. Robust Text Parser (Supports Q1., 1., option groups, and extracted diagrams)
+  let rawBlocks = text.split(/(?=(?:^|\n)\s*(?:Q\d*[\.:\)]|Question\s*\d*[\.:\)]|\d+[\.\)]\s+\S))/im);
   rawBlocks = rawBlocks.map(b => b.trim()).filter(Boolean);
 
+  if (rawBlocks.length <= 1) {
+    rawBlocks = text.split(/(?:\r?\n\s*\r?\n)/).map(b => b.trim()).filter(Boolean);
+  }
   if (rawBlocks.length === 0) {
     rawBlocks = [text];
   }
@@ -265,10 +348,23 @@ export const parseAnyQuestionsInput = (rawInput, defaultSection = 'General Aware
     let explanation = '';
     let marks = 1;
     let section = defaultSection;
+    const blockImgKeys = [];
 
     const remainingLines = [];
 
     bLines.forEach((l) => {
+      // Extract __IMG__ placeholders
+      const imgMatches = l.match(/['"]?__IMG__(\S+?)__['"]?/g);
+      if (imgMatches) {
+        imgMatches.forEach(m => {
+          const k = m.replace(/['"]?__IMG__/, '').replace(/__['"]?/, '');
+          if (k && !blockImgKeys.includes(k)) blockImgKeys.push(k);
+        });
+        if (/^['"]?__IMG__\S+?__['"]?$/.test(l)) {
+          return; // skip standalone image placeholder line from statement
+        }
+      }
+
       const optMatch = l.match(/^(?:[\(\[]?([A-Da-d1-4])[\.\)\]\:\-]|Option\s+([A-Da-d1-4])[\:\.\-]?)\s*(.+)$/i);
       const ansMatch = l.match(/^(?:Answer|Ans|Correct(?:\s*Option)?|Key|Right\s*Answer)[\:\s\-]+([A-Da-d1-4]|.+)/i);
       const expMatch = l.match(/^(?:Explanation|Solution|Hint|Reason|Note)[\:\s\-]+(.+)$/i);
@@ -342,18 +438,37 @@ export const parseAnyQuestionsInput = (rawInput, defaultSection = 'General Aware
       }
     }
 
+    // Clean statement & resolve primary image
+    const cleanStmt = getCleanQuestionText(questionStatement);
+    const primaryImgKey = blockImgKeys[0] || '';
+    const primaryImg = (effectiveImages && effectiveImages[primaryImgKey]) || (primaryImgKey.startsWith('data:') ? primaryImgKey : '') || '';
+
+    const qId = Date.now() + idx;
+    if (primaryImg) {
+      saveImageToStore(String(qId), primaryImg);
+      const norm = normalizeTextKey(cleanStmt);
+      if (norm) saveImageToStore(norm, primaryImg);
+    }
+
     // Assign fallback labels for missing options
     const finalOptions = options.map((opt, oIdx) => opt ? opt.trim() : `Option ${String.fromCharCode(65 + oIdx)}`);
 
-    if (questionStatement.trim().length > 0) {
+    if (cleanStmt.trim().length > 0 || primaryImg) {
       results.push({
-        id: Date.now() + idx,
+        id: qId,
         section: section || defaultSection,
-        q: questionStatement.trim(),
+        q: cleanStmt.trim() || 'Look at the given diagram and choose the correct option:',
         options: finalOptions,
         correct,
         marks,
-        explanation: explanation.trim()
+        explanation: explanation.trim(),
+        question_image: primaryImg,
+        image_url: primaryImg,
+        diagram: primaryImg,
+        image: primaryImg,
+        figure: primaryImg,
+        question_image_keys: blockImgKeys,
+        _imgStore: effectiveImages
       });
     }
   });
@@ -397,6 +512,7 @@ export const SuperAdminPackagesManager = () => {
   const [paperSections, setPaperSections] = useState(['General Awareness', 'Current Affairs', 'Life Skills', 'Achievers Section']);
   const [paperQuestions, setPaperQuestions] = useState([]);
   const [bulkQuestionsInput, setBulkQuestionsInput] = useState('');
+  const [bulkExtractedImages, setBulkExtractedImages] = useState({});
   const [newSectionInput, setNewSectionInput] = useState('');
 
   // Helper functions for robust subject & class matching
@@ -719,20 +835,35 @@ export const SuperAdminPackagesManager = () => {
     }
 
     const defaultSec = paperSections[0] || 'General Awareness';
-    const parsed = parseAnyQuestionsInput(bulkQuestionsInput, defaultSec);
+    const parsed = parseAnyQuestionsInput(bulkQuestionsInput, defaultSec, bulkExtractedImages);
 
     if (parsed.length > 0) {
       const startId = paperQuestions.length;
-      const mapped = parsed.map((p, i) => ({
-        ...p,
-        id: Date.now() + i,
-        section: p.section || defaultSec
-      }));
+      const mapped = parsed.map((p, i) => {
+        const qId = Date.now() + i;
+        const qImg = p.question_image || p.image_url || p.diagram || p.image || (p.question_image_keys?.[0] ? bulkExtractedImages[p.question_image_keys[0]] : '') || '';
+        if (qImg) {
+          saveImageToStore(String(qId), qImg);
+          const norm = normalizeTextKey(p.q || p.question_text || '');
+          if (norm) saveImageToStore(norm, qImg);
+        }
+        return {
+          ...p,
+          id: qId,
+          section: p.section || defaultSec,
+          question_image: qImg,
+          image_url: qImg,
+          diagram: qImg,
+          image: qImg,
+          figure: qImg
+        };
+      });
       setPaperQuestions([...paperQuestions, ...mapped]);
       setBulkQuestionsInput('');
       setPaperModalTab('questions');
       setActiveQuestionIndex(startId); // Focus newly added question
-      showToast(`✓ Successfully imported ${mapped.length} questions!`);
+      const diagCount = mapped.filter(q => q.question_image).length;
+      showToast(`✓ Successfully imported ${mapped.length} questions${diagCount > 0 ? ` (${diagCount} diagram${diagCount > 1 ? 's' : ''} attached)` : ''}!`);
     } else {
       showToast('Could not parse questions. Click "Load Sample Format Template" to see the expected format.', 'error');
     }
@@ -748,7 +879,7 @@ export const SuperAdminPackagesManager = () => {
 
     try {
       setIsExtractingFile(true);
-      showToast(`Reading and extracting questions from "${file.name}"...`);
+      showToast(`Reading and extracting questions and diagrams from "${file.name}"...`);
 
       const { text, images } = await extractFromFile(file);
       if (!text || !text.trim()) {
@@ -756,12 +887,19 @@ export const SuperAdminPackagesManager = () => {
         return;
       }
 
+      const imgMap = images || {};
+      setBulkExtractedImages(imgMap);
+      if (typeof window !== 'undefined' && Object.keys(imgMap).length > 0) {
+        saveMultipleImages(imgMap);
+      }
+
       setBulkQuestionsInput(text);
       const defaultSec = paperSections[0] || 'General Awareness';
-      const detected = parseAnyQuestionsInput(text, defaultSec);
+      const detected = parseAnyQuestionsInput(text, defaultSec, imgMap);
+      const imgCount = Object.keys(imgMap).length;
 
       if (detected.length > 0) {
-        showToast(`✓ Extracted "${file.name}" (~${detected.length} MCQs detected). Click "Parse & Add All Questions to Test" below.`);
+        showToast(`✓ Extracted "${file.name}" (~${detected.length} MCQs detected${imgCount > 0 ? `, ${imgCount} diagram${imgCount > 1 ? 's' : ''} found` : ''}). Click "Parse & Add All Questions to Test" below.`);
       } else {
         showToast(`Extracted text from "${file.name}". Review text below and click "Parse & Add All Questions".`);
       }
@@ -787,6 +925,52 @@ export const SuperAdminPackagesManager = () => {
       setIsExtractingFile(false);
       e.target.value = '';
     }
+  };
+
+  // Upload/Change diagram for an individual question
+  const handleUploadQuestionDiagram = (qIdx, file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result;
+      if (!dataUrl) return;
+      const updated = [...paperQuestions];
+      const curQ = updated[qIdx];
+      if (!curQ) return;
+      const qId = curQ.id || Date.now();
+      updated[qIdx] = {
+        ...curQ,
+        question_image: dataUrl,
+        image_url: dataUrl,
+        diagram: dataUrl,
+        image: dataUrl,
+        figure: dataUrl
+      };
+      setPaperQuestions(updated);
+      saveImageToStore(String(qId), dataUrl);
+      const norm = normalizeTextKey(curQ.q || curQ.question_text || '');
+      if (norm) saveImageToStore(norm, dataUrl);
+      showToast('✓ Diagram attached to question');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Remove diagram from an individual question
+  const handleRemoveQuestionDiagram = (qIdx) => {
+    const updated = [...paperQuestions];
+    const curQ = updated[qIdx];
+    if (!curQ) return;
+    updated[qIdx] = {
+      ...curQ,
+      question_image: '',
+      image_url: '',
+      diagram: '',
+      image: '',
+      figure: '',
+      question_image_keys: []
+    };
+    setPaperQuestions(updated);
+    showToast('Diagram removed');
   };
 
   // Add a blank question
@@ -1443,20 +1627,28 @@ export const SuperAdminPackagesManager = () => {
               <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3">
                 <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto py-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden min-w-0 flex-1">
                   <span className="text-xs font-black text-slate-700 mr-1 shrink-0">Questions:</span>
-                  {paperQuestions.map((_, qIdx) => (
-                    <button
-                      key={qIdx}
-                      type="button"
-                      onClick={() => setActiveQuestionIndex(qIdx)}
-                      className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl font-black text-xs flex items-center justify-center shrink-0 transition-all cursor-pointer ${
-                        activeQuestionIndex === qIdx
-                          ? 'bg-[#859900] text-white shadow-xs ring-2 ring-[#859900]/40 scale-105'
-                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
-                      }`}
-                    >
-                      {qIdx + 1}
-                    </button>
-                  ))}
+                  {paperQuestions.map((qItem, qIdx) => {
+                    const hasDiag = !!getQuestionImage(qItem);
+                    return (
+                      <button
+                        key={qItem.id || qIdx}
+                        type="button"
+                        onClick={() => setActiveQuestionIndex(qIdx)}
+                        className={`relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl font-black text-xs flex items-center justify-center shrink-0 transition-all cursor-pointer ${
+                          activeQuestionIndex === qIdx
+                            ? 'bg-[#859900] text-white shadow-xs ring-2 ring-[#859900]/40 scale-105'
+                            : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+                        }`}
+                      >
+                        {qIdx + 1}
+                        {hasDiag && (
+                          <span className="absolute -top-1 -right-1 text-[9px] bg-indigo-600 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center shadow-2xs leading-none">
+                            📷
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                   <button
                     type="button"
                     onClick={handleAddBlankQuestion}
@@ -1625,6 +1817,47 @@ export const SuperAdminPackagesManager = () => {
                     />
                   </div>
 
+                  {/* Question Diagram / Image Box */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                        <ImageIcon className="w-4 h-4 text-indigo-600" />
+                        <span>Question Diagram / Illustration Image</span>
+                      </label>
+                      <span className="text-[11px] font-bold text-slate-500">
+                        {getQuestionImage(activeQ) ? '✓ Diagram Attached' : 'Optional figure / photo'}
+                      </span>
+                    </div>
+
+                    {getQuestionImage(activeQ) ? (
+                      <QuestionDiagram
+                        question={activeQ}
+                        editable={true}
+                        onChange={(file) => handleUploadQuestionDiagram(activeQuestionIndex, file)}
+                        onRemove={() => handleRemoveQuestionDiagram(activeQuestionIndex)}
+                      />
+                    ) : (
+                      <div className="flex items-center gap-2 pt-1">
+                        <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl cursor-pointer transition-colors border border-indigo-200 shadow-2xs">
+                          <Upload className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>+ Upload Diagram Image</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleUploadQuestionDiagram(activeQuestionIndex, file);
+                            }}
+                          />
+                        </label>
+                        <span className="text-[11px] text-slate-400 font-medium">
+                          JPG, PNG, GIF, SVG or extracted from Word/PDF
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
                   {/* 4 Options */}
                   <div>
                     <label className="block text-xs font-black text-slate-700 mb-2">
@@ -1782,11 +2015,15 @@ export const SuperAdminPackagesManager = () => {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-black text-slate-700">Paste Questions Text Here:</label>
-                  {bulkQuestionsInput.trim() && (
-                    <span className="text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                      ⚡ ~{parseAnyQuestionsInput(bulkQuestionsInput, paperSections[0] || 'General Awareness').length} detected
-                    </span>
-                  )}
+                  {bulkQuestionsInput.trim() && (() => {
+                    const detected = parseAnyQuestionsInput(bulkQuestionsInput, paperSections[0] || 'General Awareness', bulkExtractedImages);
+                    const diagCount = detected.filter(q => q.question_image).length;
+                    return (
+                      <span className="text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                        ⚡ ~{detected.length} questions detected {diagCount > 0 ? `(${diagCount} diagram${diagCount > 1 ? 's' : ''})` : ''}
+                      </span>
+                    );
+                  })()}
                 </div>
                 <textarea
                   rows={10}

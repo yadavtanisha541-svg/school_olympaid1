@@ -286,7 +286,7 @@ async function extractDocxViaDecompressionStream(arrayBuffer) {
     }
 
     if (xmlContent) {
-      const text = xmlToStructuredText(xmlContent);
+      const text = xmlToStructuredText(xmlContent, images);
       return { text, images };
     }
   } catch (e) {
@@ -295,18 +295,46 @@ async function extractDocxViaDecompressionStream(arrayBuffer) {
   return null;
 }
 
-function xmlToStructuredText(xmlStr) {
+function xmlToStructuredText(xmlStr, images = {}) {
   if (!xmlStr) return '';
-  let clean = xmlStr.replace(/<w:br[^>]*\/?>/gi, '\n').replace(/<w:tab[^>]*\/?>/gi, '    ');
+  let imgCounter = 0;
+  const imgKeys = Object.keys(images);
+
+  // Replace drawing and picture elements with placeholder before paragraph splitting
+  let clean = xmlStr
+    .replace(/<w:br[^>]*\/?>/gi, '\n')
+    .replace(/<w:tab[^>]*\/?>/gi, '    ')
+    .replace(/<(?:w:drawing|w:pict)[\s\S]*?<\/(?:w:drawing|w:pict)>/gi, () => {
+      const key = imgKeys[imgCounter++] || `docx_img_${imgCounter}`;
+      return `\n__IMG__${key}__\n`;
+    });
+
   const pMatches = clean.match(/<w:p[\s\S]*?<\/w:p>/gi);
   if (!pMatches || pMatches.length === 0) {
-    const tMatches = clean.match(/<w:t[^>]*>([\s\S]*?)<\/w:t>/gi);
+    const tMatches = clean.match(/(?:<w:t[^>]*>([\s\S]*?)<\/w:t>|__IMG__\S+?__)/gi);
     return tMatches ? tMatches.map(m => m.replace(/<[^>]+>/g, '')).join(' ') : '';
   }
   const lines = pMatches.map(p => {
-    const tMatches = p.match(/<w:t[^>]*>([\s\S]*?)<\/w:t>/gi);
-    if (!tMatches) return '';
-    return tMatches.map(m => m.replace(/<[^>]+>/g, '')).join('');
+    let pWithPlaceholders = p;
+    const tokens = [];
+    pWithPlaceholders = pWithPlaceholders.replace(/__IMG__\S+?__/g, (tok) => {
+      tokens.push(tok);
+      return `###IMG_TOKEN_${tokens.length - 1}###`;
+    });
+
+    const tMatches = pWithPlaceholders.match(/<w:t[^>]*>([\s\S]*?)<\/w:t>/gi);
+    let lineText = '';
+    if (tMatches) {
+      lineText = tMatches.map(m => m.replace(/<[^>]+>/g, '')).join('');
+    }
+    tokens.forEach((tok, idx) => {
+      if (lineText.includes(`###IMG_TOKEN_${idx}###`)) {
+        lineText = lineText.replace(`###IMG_TOKEN_${idx}###`, `\n${tok}\n`);
+      } else {
+        lineText += (lineText ? '\n' : '') + tok;
+      }
+    });
+    return lineText;
   }).filter(l => l.trim().length > 0);
 
   return lines.join('\n');
