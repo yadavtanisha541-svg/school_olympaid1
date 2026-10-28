@@ -769,18 +769,6 @@ export const LoginPage = ({ onNavigateVerify, onNavigateHome, onBackToPublic }) 
                 </button>
               </p>
             )}
-
-            {authMode === 'login' && (
-              <div className="mt-1.5 sm:mt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowCoordinatorModal(true)}
-                  className="text-[10px] sm:text-[11px] text-pink-200 hover:text-white font-bold underline transition-colors cursor-pointer"
-                >
-                  Don't have login credentials? Contact School Coordinator
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>
