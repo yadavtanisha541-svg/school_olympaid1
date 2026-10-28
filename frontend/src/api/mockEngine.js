@@ -2275,6 +2275,12 @@ export const mockEngine = {
         if (!user || !user.role) {
           return { success: false, message: 'Unauthenticated' };
         }
+        // Super Admin sessions MUST be in sessionStorage. If tab was closed, admin is logged out!
+        if (user.role === 'superadmin' && !sessionStorage.getItem('olympiadhub_user')) {
+          localStorage.removeItem('olympiadhub_user');
+          localStorage.removeItem('olympiadhub_token');
+          return { success: false, message: 'Admin session closed' };
+        }
         if (user.role !== 'superadmin') {
           // If the user's name is mismatched or missing, normalize it
           if (!user.full_name || !user.name) {

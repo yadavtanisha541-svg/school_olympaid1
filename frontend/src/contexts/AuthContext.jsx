@@ -20,23 +20,86 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const token = apiClient.getToken();
-      const saved = sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user');
-      // Strictly require BOTH valid token and saved user; otherwise default to logged out!
-      if (!token || !saved) return null;
-      return JSON.parse(saved);
+      if (!token) return null;
+
+      // Super Admin sessions MUST come strictly from sessionStorage (tab session)
+      // When website or tab is closed, sessionStorage is destroyed automatically.
+      const sessionStr = sessionStorage.getItem('olympiadhub_user');
+      if (sessionStr) {
+        return JSON.parse(sessionStr);
+      }
+
+      const localStr = localStorage.getItem('olympiadhub_user');
+      if (localStr) {
+        const u = JSON.parse(localStr);
+        if (u?.role === 'superadmin') {
+          // Superadmin must NEVER persist in localStorage!
+          localStorage.removeItem('olympiadhub_user');
+          localStorage.removeItem('olympiadhub_token');
+          localStorage.removeItem('token');
+          return null;
+        }
+        return u;
+      }
+      return null;
     } catch {
       return null;
     }
   });
   const [loading, setLoading] = useState(false);
 
+  // Automatically ensure admin is logged out as soon as the tab / window / website is closed
+  useEffect(() => {
+    const handleTabClose = () => {
+      try {
+        const sessionStr = sessionStorage.getItem('olympiadhub_user');
+        const localStr = localStorage.getItem('olympiadhub_user');
+        let role = '';
+        if (sessionStr) role = JSON.parse(sessionStr)?.role;
+        else if (localStr) role = JSON.parse(localStr)?.role;
+
+        if (role === 'superadmin') {
+          sessionStorage.removeItem('olympiadhub_user');
+          sessionStorage.removeItem('olympiadhub_token');
+          localStorage.removeItem('olympiadhub_user');
+          localStorage.removeItem('olympiadhub_token');
+          localStorage.removeItem('token');
+          localStorage.removeItem('olympiadhub_route_state');
+          localStorage.removeItem('olympiadhub_current_tab');
+        }
+      } catch (e) {}
+    };
+
+    window.addEventListener('beforeunload', handleTabClose);
+    window.addEventListener('pagehide', handleTabClose);
+    return () => {
+      window.removeEventListener('beforeunload', handleTabClose);
+      window.removeEventListener('pagehide', handleTabClose);
+    };
+  }, []);
+
   useEffect(() => {
     const checkAuth = async () => {
       const token = apiClient.getToken();
-      const savedUserStr = sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user');
+      const sessionUserStr = sessionStorage.getItem('olympiadhub_user');
+      const localUserStr = localStorage.getItem('olympiadhub_user');
       let savedUser = null;
       try {
-        if (savedUserStr) savedUser = JSON.parse(savedUserStr);
+        if (sessionUserStr) {
+          savedUser = JSON.parse(sessionUserStr);
+        } else if (localUserStr) {
+          const u = JSON.parse(localUserStr);
+          if (u?.role === 'superadmin') {
+            // Super Admin session expired when browser/tab was closed!
+            localStorage.removeItem('olympiadhub_user');
+            localStorage.removeItem('olympiadhub_token');
+            localStorage.removeItem('token');
+            setUser(null);
+            setLoading(false);
+            return;
+          }
+          savedUser = u;
+        }
       } catch {}
 
       if (!token || !savedUser) {
@@ -51,9 +114,16 @@ export const AuthProvider = ({ children }) => {
       try {
         const res = await apiClient.get('/auth/me');
         if (res.success && res.data) {
+          const isSuperAdmin = res.data.role === 'superadmin';
           setUser(res.data);
           sessionStorage.setItem('olympiadhub_user', JSON.stringify(res.data));
-          localStorage.setItem('olympiadhub_user', JSON.stringify(res.data));
+          if (!isSuperAdmin) {
+            localStorage.setItem('olympiadhub_user', JSON.stringify(res.data));
+          } else {
+            localStorage.removeItem('olympiadhub_user');
+            localStorage.removeItem('olympiadhub_token');
+            localStorage.removeItem('token');
+          }
         } else {
           // If unauthenticated or token expired, clear session
           setUser(null);
@@ -82,10 +152,21 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (res.success && res.data) {
-      apiClient.setToken(res.data.token);
+      const isSuperAdmin = res.data.user?.role === 'superadmin';
+      // Super Admin is STRICTLY session-only!
+      apiClient.setToken(res.data.token, isSuperAdmin);
       setUser(res.data.user);
       sessionStorage.setItem('olympiadhub_user', JSON.stringify(res.data.user));
-      localStorage.setItem('olympiadhub_user', JSON.stringify(res.data.user));
+
+      if (!isSuperAdmin) {
+        localStorage.setItem('olympiadhub_user', JSON.stringify(res.data.user));
+      } else {
+        localStorage.removeItem('olympiadhub_user');
+        localStorage.removeItem('olympiadhub_token');
+        localStorage.removeItem('token');
+        localStorage.removeItem('olympiadhub_route_state');
+        localStorage.removeItem('olympiadhub_current_tab');
+      }
       return res.data.user;
     }
     throw new Error(res.message || 'Login failed');

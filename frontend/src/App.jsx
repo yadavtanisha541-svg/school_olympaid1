@@ -198,9 +198,15 @@ const updateUrlAndStorage = (state) => {
       window.history.replaceState(null, '', `#/${hash}`);
     }
     sessionStorage.setItem('olympiadhub_route_state', JSON.stringify(state));
-    localStorage.setItem('olympiadhub_route_state', JSON.stringify(state));
-    if (state.currentTab) {
-      localStorage.setItem('olympiadhub_current_tab', state.currentTab);
+    if (state.viewMode !== 'dashboard') {
+      localStorage.setItem('olympiadhub_route_state', JSON.stringify(state));
+      if (state.currentTab) {
+        localStorage.setItem('olympiadhub_current_tab', state.currentTab);
+      }
+    } else {
+      // Never persist dashboard state in permanent localStorage
+      localStorage.removeItem('olympiadhub_route_state');
+      localStorage.removeItem('olympiadhub_current_tab');
     }
   } catch (e) {
     // ignore storage errors

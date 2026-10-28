@@ -6,16 +6,21 @@ const API_BASE = '/api';
 export const apiClient = {
   getToken() {
     return sessionStorage.getItem('olympiadhub_token') || 
+           sessionStorage.getItem('token') || 
            localStorage.getItem('olympiadhub_token') || 
-           localStorage.getItem('token') || 
-           sessionStorage.getItem('token');
+           localStorage.getItem('token');
   },
 
-  setToken(token) {
+  setToken(token, isSessionOnly = false) {
     if (token) {
       sessionStorage.setItem('olympiadhub_token', token);
-      localStorage.setItem('olympiadhub_token', token);
-      localStorage.setItem('token', token);
+      if (!isSessionOnly) {
+        localStorage.setItem('olympiadhub_token', token);
+        localStorage.setItem('token', token);
+      } else {
+        localStorage.removeItem('olympiadhub_token');
+        localStorage.removeItem('token');
+      }
     } else {
       sessionStorage.removeItem('olympiadhub_token');
       localStorage.removeItem('olympiadhub_token');
