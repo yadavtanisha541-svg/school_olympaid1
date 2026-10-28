@@ -126,8 +126,18 @@ export const syncManager = {
       const localData = this.getAllLocalData();
 
       // Merge Cloud Data into Local Storage safely without wiping newer local records
+      const authKeys = [
+        'token',
+        'olympiadhub_token',
+        'olympiadhub_user',
+        'user',
+        'olympiadhub_route_state',
+        'olympiadhub_current_tab',
+        'olympiadhub_auth_cleaned_v2'
+      ];
       Object.keys(cloudData).forEach((key) => {
         if (key === 'name') return;
+        if (authKeys.includes(key)) return;
         const cloudVal = cloudData[key];
         if (cloudVal !== null && cloudVal !== undefined) {
           const currentLocalVal = localStorage.getItem(key);
@@ -276,11 +286,20 @@ export const syncManager = {
   getAllLocalData() {
     const data = {};
     if (typeof localStorage === 'undefined') return data;
+    const authKeys = [
+      'token',
+      'olympiadhub_token',
+      'olympiadhub_user',
+      'user',
+      'olympiadhub_route_state',
+      'olympiadhub_current_tab',
+      'olympiadhub_auth_cleaned_v2'
+    ];
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
       if (!k) continue;
       if (k.startsWith('ally-') || k.startsWith('__')) continue;
-      if (k === 'token' || k === 'olympiadhub_token') continue;
+      if (authKeys.includes(k)) continue;
       data[k] = localStorage.getItem(k);
     }
     return data;

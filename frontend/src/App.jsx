@@ -90,14 +90,15 @@ const parseRouteFromUrl = () => {
       if (saved) savedState = JSON.parse(saved);
     } catch {}
 
+    // When opening the website link directly with no hash (e.g. root link),
+    // ALWAYS open the clean Public Home Page. Admin panel must never open automatically.
     if (!rawHash) {
-      if (savedState && typeof savedState === 'object') return savedState;
       return {
         viewMode: 'public',
         activePublicPage: 'home',
         activeOlympiadId: 'english',
         activeClassLevel: 'Class 1',
-        currentTab: savedTab || 'overview',
+        currentTab: 'overview',
         activeResultAttemptId: null,
         activeSolutionAttemptId: null
       };
@@ -106,17 +107,31 @@ const parseRouteFromUrl = () => {
     const [routePath, queryString] = rawHash.split('?');
     const params = new URLSearchParams(queryString || '');
 
-    if (routePath.startsWith('dashboard')) {
+    if (routePath.startsWith('dashboard') || routePath.startsWith('superadmin')) {
+      const savedUser = localStorage.getItem('olympiadhub_user') || sessionStorage.getItem('olympiadhub_user');
+      const token = localStorage.getItem('olympiadhub_token') || sessionStorage.getItem('olympiadhub_token') || localStorage.getItem('token') || sessionStorage.getItem('token');
+      // If NOT logged in, require login! Never auto-open admin panel!
+      if (!savedUser || !token) {
+        return {
+          viewMode: 'login',
+          activePublicPage: 'home',
+          currentTab: 'overview',
+          activeOlympiadId: 'english',
+          activeClassLevel: 'Class 1',
+          activeResultAttemptId: null,
+          activeSolutionAttemptId: null
+        };
+      }
       const parts = routePath.split('/');
-      const tab = parts[1] || savedTab || savedState?.currentTab || 'overview';
+      const tab = parts[1] || 'overview';
       return {
         viewMode: 'dashboard',
         currentTab: tab,
         activePublicPage: 'home',
-        activeOlympiadId: params.get('id') || params.get('olympiad') || savedState?.activeOlympiadId || 'english',
-        activeClassLevel: params.get('class') || savedState?.activeClassLevel || 'Class 1',
-        activeResultAttemptId: params.get('resultAttempt') || savedState?.activeResultAttemptId || null,
-        activeSolutionAttemptId: params.get('solutionAttempt') || savedState?.activeSolutionAttemptId || null
+        activeOlympiadId: params.get('id') || params.get('olympiad') || 'english',
+        activeClassLevel: params.get('class') || 'Class 1',
+        activeResultAttemptId: params.get('resultAttempt') || null,
+        activeSolutionAttemptId: params.get('solutionAttempt') || null
       };
     } else if (routePath === 'login') {
       return {
@@ -222,22 +237,21 @@ export const App = () => {
   // Standalone Certificate View Modal
   const [viewingCertificate, setViewingCertificate] = useState(null);
 
-  // Synchronize viewMode with authentication state (without resetting active tab on refresh!)
+  // Synchronize viewMode with authentication state
   useEffect(() => {
     if (user) {
-      if (viewMode === 'login' || viewMode === 'dashboard') {
+      if (viewMode === 'login') {
         setViewMode('dashboard');
       }
     } else if (!loading) {
-      const cached = localStorage.getItem('olympiadhub_user') || sessionStorage.getItem('olympiadhub_user');
-      if (!cached && viewMode === 'dashboard') {
+      if (viewMode === 'dashboard') {
         setViewMode('login');
         setActiveExamId(null);
         setActiveResultAttemptId(null);
         setActiveSolutionAttemptId(null);
       }
     }
-  }, [user, loading]);
+  }, [user, loading, viewMode]);
 
   // Keep URL hash and LocalStorage updated whenever state changes
   useEffect(() => {

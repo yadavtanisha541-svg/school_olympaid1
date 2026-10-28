@@ -2261,9 +2261,21 @@ export const mockEngine = {
       }
 
       if (sub === 'me') {
+        const token = sessionStorage.getItem('olympiadhub_token') || localStorage.getItem('olympiadhub_token') || sessionStorage.getItem('token') || localStorage.getItem('token');
         const savedUserRaw = sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user');
-        let user = savedUserRaw ? JSON.parse(savedUserRaw) : null;
-        if (user && user.role !== 'superadmin') {
+        if (!token || !savedUserRaw) {
+          return { success: false, message: 'Unauthenticated' };
+        }
+        let user = null;
+        try {
+          user = JSON.parse(savedUserRaw);
+        } catch {
+          return { success: false, message: 'Invalid session' };
+        }
+        if (!user || !user.role) {
+          return { success: false, message: 'Unauthenticated' };
+        }
+        if (user.role !== 'superadmin') {
           // If the user's name is mismatched or missing, normalize it
           if (!user.full_name || !user.name) {
             const cleanName = (user.login_id || user.email || 'Student')
@@ -2279,7 +2291,7 @@ export const mockEngine = {
             user.school_name = 'Delhi Public School';
           }
         }
-        return { success: true, data: user || initialStore.users[0] };
+        return { success: true, data: user };
       }
 
       if (sub === 'logout') {

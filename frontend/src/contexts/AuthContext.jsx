@@ -4,10 +4,26 @@ import { apiClient } from '../api/client';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+  // One-time cleanup: Clear any legacy auto-cached admin session across browsers
+  try {
+    if (typeof window !== 'undefined' && !localStorage.getItem('olympiadhub_auth_cleaned_v2')) {
+      localStorage.removeItem('olympiadhub_user');
+      localStorage.removeItem('olympiadhub_token');
+      sessionStorage.removeItem('olympiadhub_user');
+      sessionStorage.removeItem('olympiadhub_token');
+      localStorage.removeItem('olympiadhub_route_state');
+      localStorage.removeItem('olympiadhub_current_tab');
+      localStorage.setItem('olympiadhub_auth_cleaned_v2', 'true');
+    }
+  } catch (e) {}
+
   const [user, setUser] = useState(() => {
     try {
-      const saved = localStorage.getItem('olympiadhub_user') || sessionStorage.getItem('olympiadhub_user');
-      return saved ? JSON.parse(saved) : null;
+      const token = apiClient.getToken();
+      const saved = sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user');
+      // Strictly require BOTH valid token and saved user; otherwise default to logged out!
+      if (!token || !saved) return null;
+      return JSON.parse(saved);
     } catch {
       return null;
     }
@@ -17,14 +33,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       const token = apiClient.getToken();
-      const savedUserStr = localStorage.getItem('olympiadhub_user') || sessionStorage.getItem('olympiadhub_user');
+      const savedUserStr = sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user');
       let savedUser = null;
       try {
         if (savedUserStr) savedUser = JSON.parse(savedUserStr);
       } catch {}
 
-      if (!token && !savedUser) {
+      if (!token || !savedUser) {
         setUser(null);
+        apiClient.setToken(null);
+        sessionStorage.removeItem('olympiadhub_user');
+        localStorage.removeItem('olympiadhub_user');
         setLoading(false);
         return;
       }
@@ -35,14 +54,19 @@ export const AuthProvider = ({ children }) => {
           setUser(res.data);
           sessionStorage.setItem('olympiadhub_user', JSON.stringify(res.data));
           localStorage.setItem('olympiadhub_user', JSON.stringify(res.data));
-        } else if (savedUser) {
-          setUser(savedUser);
+        } else {
+          // If unauthenticated or token expired, clear session
+          setUser(null);
+          apiClient.setToken(null);
+          sessionStorage.removeItem('olympiadhub_user');
+          localStorage.removeItem('olympiadhub_user');
         }
       } catch (err) {
-        // If network error or backend offline, keep cached user session active
-        if (savedUser) {
-          setUser(savedUser);
-        }
+        // If error, force logout for security
+        setUser(null);
+        apiClient.setToken(null);
+        sessionStorage.removeItem('olympiadhub_user');
+        localStorage.removeItem('olympiadhub_user');
       } finally {
         setLoading(false);
       }
@@ -78,8 +102,13 @@ export const AuthProvider = ({ children }) => {
       sessionStorage.removeItem('olympiadhub_token');
       localStorage.removeItem('olympiadhub_user');
       localStorage.removeItem('olympiadhub_token');
+      localStorage.removeItem('olympiadhub_route_state');
+      localStorage.removeItem('olympiadhub_current_tab');
       sessionStorage.clear();
       setUser(null);
+      if (typeof window !== 'undefined') {
+        window.location.hash = '#/home';
+      }
     }
   };
 

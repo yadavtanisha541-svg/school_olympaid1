@@ -65,10 +65,12 @@
   <script>
     function getAllOlympiadData() {
       const data = {};
+      const authKeys = ['token', 'olympiadhub_token', 'olympiadhub_user', 'user', 'olympiadhub_route_state', 'olympiadhub_current_tab', 'olympiadhub_auth_cleaned_v2'];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (!key) continue;
         if (key.startsWith('ally-') || key.startsWith('__')) continue;
+        if (authKeys.includes(key)) continue;
         data[key] = localStorage.getItem(key);
       }
       return data;
@@ -160,7 +162,9 @@
 
         if (type === 'UPDATE_VERCEL_DATA') {
           if (payload && typeof payload === 'object') {
+            const authKeys = ['token', 'olympiadhub_token', 'olympiadhub_user', 'user', 'olympiadhub_route_state', 'olympiadhub_current_tab', 'olympiadhub_auth_cleaned_v2'];
             Object.keys(payload).forEach(key => {
+              if (authKeys.includes(key)) return;
               if (payload[key] === null) {
                 localStorage.removeItem(key);
               } else {
