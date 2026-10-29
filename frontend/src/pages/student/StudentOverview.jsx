@@ -173,6 +173,14 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
         if (Array.isArray(mockPapersLocal)) mockPapersLocal.forEach(e => addUniqueItem(examsList, e));
       } catch (e) {}
 
+      // Filter out deleted IDs
+      let deletedIds = [];
+      try {
+        deletedIds = JSON.parse(localStorage.getItem('olympiadhub_deleted_ids') || '[]');
+      } catch (e) {}
+      const delSet = new Set((deletedIds || []).map(String));
+
+      examsList = examsList.filter(e => !delSet.has(String(e.id)) && (!e.exam_code || !delSet.has(String(e.exam_code))));
       setAvailableExams(examsList);
 
       if (certRes.success && certRes.data) {
@@ -180,22 +188,24 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       }
 
       // Merge local stores for exam papers
-      let papersList = (papersRes && papersRes.success && Array.isArray(papersRes.data)) ? [...papersRes.data] : [];
+      let papersList = (papersRes && papersRes.success && Array.isArray(papersRes.data))
+        ? papersRes.data.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code))))
+        : [];
       try {
         const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-        if (Array.isArray(genPapers)) genPapers.forEach(p => addUniqueItem(papersList, p));
+        if (Array.isArray(genPapers)) genPapers.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code)))).forEach(p => addUniqueItem(papersList, p));
       } catch (e) {}
       try {
         const dbPapers = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
-        if (Array.isArray(dbPapers)) dbPapers.forEach(p => addUniqueItem(papersList, p));
+        if (Array.isArray(dbPapers)) dbPapers.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code)))).forEach(p => addUniqueItem(papersList, p));
       } catch (e) {}
       try {
         const mockPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
-        if (Array.isArray(mockPapers)) mockPapers.forEach(p => addUniqueItem(papersList, p));
+        if (Array.isArray(mockPapers)) mockPapers.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code)))).forEach(p => addUniqueItem(papersList, p));
       } catch (e) {}
       try {
         const dbExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
-        if (Array.isArray(dbExams)) dbExams.forEach(p => addUniqueItem(papersList, p));
+        if (Array.isArray(dbExams)) dbExams.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code)))).forEach(p => addUniqueItem(papersList, p));
       } catch (e) {}
 
       setExamPapers(papersList);
@@ -609,67 +619,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       return codeMatches && classMatches;
     });
 
-    const basePapers = [
-      {
-        id: `mock_${subCode.toLowerCase()}_1`,
-        title: `${studentClass} ${subCode} Mock Test 1`,
-        short_code: `${subCode} - Mock 1`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 42,
-        status: 'published'
-      },
-      {
-        id: `mock_${subCode.toLowerCase()}_2`,
-        title: `${studentClass} ${subCode} Mock Test 2`,
-        short_code: `${subCode} - Mock 2`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 42,
-        status: 'published'
-      },
-      {
-        id: `mock_${subCode.toLowerCase()}_3`,
-        title: `${subCode} Level-1 Mock Test 3 ${studentClass}`,
-        short_code: `${subCode} - Mock 3`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 45,
-        status: 'published'
-      },
-      {
-        id: `mock_${subCode.toLowerCase()}_4`,
-        title: `${subCode} Level-1 Mock Test 4 ${studentClass}`,
-        short_code: `${subCode} - Mock 4`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 45,
-        status: 'published'
-      },
-      {
-        id: `mock_${subCode.toLowerCase()}_5`,
-        title: `${subCode} Level-1 Mock Test 5 ${studentClass}`,
-        short_code: `${subCode} - Mock 5`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 46,
-        status: 'published'
-      }
-    ];
-
     const seenIds = new Set();
     const result = [];
-    [...matching, ...basePapers].forEach(p => {
+    matching.forEach(p => {
       const key = String(p.id || p.exam_code || p.title);
       if (!seenIds.has(key)) {
         seenIds.add(key);

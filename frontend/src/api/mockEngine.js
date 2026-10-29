@@ -3973,6 +3973,16 @@ export const mockEngine = {
           }
         });
 
+        // Filter out registered deleted IDs so deleted tests never resurrect
+        let deletedIds = [];
+        try {
+          deletedIds = JSON.parse(localStorage.getItem('olympiadhub_deleted_ids') || '[]');
+        } catch (e) {}
+        if (Array.isArray(deletedIds) && deletedIds.length > 0) {
+          const delSet = new Set(deletedIds.map(String));
+          allAvailable = allAvailable.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code))));
+        }
+
         // Clean out empty parentheses left from year removal across all papers
         allAvailable = allAvailable.map(p => ({
           ...p,
@@ -4290,18 +4300,21 @@ export const mockEngine = {
       if (method === 'DELETE' && (sub || subId)) {
         const targetDelId = (sub && sub !== 'admin-papers') ? sub : subId;
         registerDeletedId(targetDelId);
-        papers = papers.filter((p) => String(p.id) !== String(targetDelId));
+        papers = papers.filter((p) => String(p.id) !== String(targetDelId) && String(p.exam_code) !== String(targetDelId));
         saveDb('exam_papers', papers);
         try {
           const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
-          localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockDb.filter(p => String(p.id) !== String(targetDelId))));
+          localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockDb.filter(p => String(p.id) !== String(targetDelId) && String(p.exam_code) !== String(targetDelId))));
           const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-          localStorage.setItem('admin_generator_papers', JSON.stringify(genPapers.filter(p => String(p.id) !== String(targetDelId))));
+          localStorage.setItem('admin_generator_papers', JSON.stringify(genPapers.filter(p => String(p.id) !== String(targetDelId) && String(p.exam_code) !== String(targetDelId))));
           const examsDb = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
-          localStorage.setItem('olympiadhub_db_exams', JSON.stringify(examsDb.filter(p => String(p.id) !== String(targetDelId))));
+          localStorage.setItem('olympiadhub_db_exams', JSON.stringify(examsDb.filter(p => String(p.id) !== String(targetDelId) && String(p.exam_code) !== String(targetDelId))));
+          const examPapersDb = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+          localStorage.setItem('olympiadhub_db_exam_papers', JSON.stringify(examPapersDb.filter(p => String(p.id) !== String(targetDelId) && String(p.exam_code) !== String(targetDelId))));
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedId: targetDelId } }));
             window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: { deletedId: targetDelId } }));
+            window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exam_papers', data: papers } }));
             window.dispatchEvent(new Event('storage'));
           }
         } catch (e) {}

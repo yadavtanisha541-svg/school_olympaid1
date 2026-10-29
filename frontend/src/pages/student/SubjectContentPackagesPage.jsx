@@ -318,18 +318,27 @@ export const SubjectContentPackagesPage = ({
   const fetchExamPapers = async () => {
     setLoadingPapers(true);
     try {
+      let deletedIds = [];
+      try {
+        deletedIds = JSON.parse(localStorage.getItem('olympiadhub_deleted_ids') || '[]');
+      } catch (e) {}
+      const delSet = new Set((deletedIds || []).map(String));
+
       const curSubCode = subject?.code || 'IMO';
       const res = await apiClient.get('/exam-papers', {
         class: selectedClass,
         subject: curSubCode,
         category: activeTab === 'all_papers' ? 'all' : activeTab
       });
-      let list = (res && res.success && Array.isArray(res.data)) ? [...res.data] : [];
+      let list = (res && res.success && Array.isArray(res.data))
+        ? res.data.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code))))
+        : [];
 
       // Multi-store local fallback & consolidation
       const addUniquePaper = (p) => {
         if (!p || (!p.id && !p.exam_code && !p.short_code)) return;
         if (p.status === 'draft') return; // Hide unpublished drafts from student view
+        if (delSet.has(String(p.id)) || (p.exam_code && delSet.has(String(p.exam_code)))) return;
 
         const pClass = String(p.class_name || p.class || p.grade || '').toLowerCase();
         const selClass = String(selectedClass || '').toLowerCase();

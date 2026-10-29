@@ -141,9 +141,16 @@ export const StudentMyContentPage = ({
         apiClient.get('/packages').catch(() => ({ success: false }))
       ]);
 
+      // Filter out deleted test papers
+      let deletedIds = [];
+      try {
+        deletedIds = JSON.parse(localStorage.getItem('olympiadhub_deleted_ids') || '[]');
+      } catch (e) {}
+      const delSet = new Set((deletedIds || []).map(String));
+
       let allPapers = [];
       if (papersRes && papersRes.success && Array.isArray(papersRes.data)) {
-        allPapers = [...papersRes.data];
+        allPapers = papersRes.data.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code))));
       }
 
       // Include all Mock Tests & Admin-published papers from database and local storage
@@ -157,6 +164,7 @@ export const StudentMyContentPage = ({
         combinedLocal.forEach((lp) => {
           if (!lp || (!lp.id && !lp.exam_code)) return;
           const pId = String(lp.id || lp.exam_code);
+          if (delSet.has(String(lp.id)) || (lp.exam_code && delSet.has(String(lp.exam_code))) || delSet.has(pId)) return;
           if (!allPapers.some(p => String(p.id) === pId || (p.title === lp.title && (p.class_name || p.class) === (lp.class_name || lp.class)))) {
             allPapers.push({
               ...lp,
@@ -220,6 +228,7 @@ export const StudentMyContentPage = ({
     window.addEventListener('olympiadhub-exams-updated', handleSync);
     window.addEventListener('olympiadhub-package-updated', handleSync);
     window.addEventListener('olympiadhub-data-updated', handleSync);
+    window.addEventListener('olympiadhub-covers-updated', handleSync);
     window.addEventListener('storage', handleSync);
     return () => {
       if (timer) clearTimeout(timer);
@@ -227,6 +236,7 @@ export const StudentMyContentPage = ({
       window.removeEventListener('olympiadhub-exams-updated', handleSync);
       window.removeEventListener('olympiadhub-package-updated', handleSync);
       window.removeEventListener('olympiadhub-data-updated', handleSync);
+      window.removeEventListener('olympiadhub-covers-updated', handleSync);
       window.removeEventListener('storage', handleSync);
     };
   }, [user]);
@@ -439,10 +449,27 @@ export const StudentMyContentPage = ({
   ], [studentClass]);
 
   const getSubjectPapers = (subCode, altCode) => {
+    let deletedIds = [];
+    try {
+      deletedIds = JSON.parse(localStorage.getItem('olympiadhub_deleted_ids') || '[]');
+    } catch (e) {}
+    const delSet = new Set((deletedIds || []).map(String));
+
+    let deletedCovers = [];
+    try {
+      deletedCovers = JSON.parse(localStorage.getItem('olympiadhub_deleted_covers') || '[]');
+    } catch (e) {}
+    const sCode = (subCode || '').toUpperCase();
+    const aCode = (altCode || '').toUpperCase();
+    const coverKey1 = `${sCode}_${studentClass}`;
+    const coverKey2 = `${aCode}_${studentClass}`;
+    if (deletedCovers.includes(sCode) || deletedCovers.includes(aCode) || deletedCovers.includes(coverKey1) || deletedCovers.includes(coverKey2)) {
+      return [];
+    }
+
     const matching = examPapers.filter((p) => {
+      if (delSet.has(String(p.id)) || (p.exam_code && delSet.has(String(p.exam_code)))) return false;
       const pSub = (p.subject_code || p.subject || '').toUpperCase();
-      const sCode = (subCode || '').toUpperCase();
-      const aCode = (altCode || '').toUpperCase();
       const isMath = (sCode === 'IMO' || sCode === 'IEOM') && ['IMO', 'IEOM', 'MATH', 'MATHEMATICS'].includes(pSub);
       const isScience = (sCode === 'ISO' || sCode === 'IEOS') && ['ISO', 'IEOS', 'NSO', 'SCIENCE'].includes(pSub);
       const isDigital = (sCode === 'IDLO' || sCode === 'IEOD') && ['IDLO', 'IEOD', 'ICSO', 'CYBER', 'COMPUTER'].includes(pSub);
@@ -460,84 +487,34 @@ export const StudentMyContentPage = ({
       return codeMatches && classMatches;
     });
 
-    // Pure mock tests fallback (4 mocks per subject, 5 for IMO)
-    const basePapers = [
-      {
-        id: `mock_${subCode.toLowerCase()}_1`,
-        title: `${altCode || subCode} Level-1 Mock Test 1 ${studentClass}`,
-        short_code: `${altCode || subCode} - Mock 1`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 42,
-        status: 'published'
-      },
-      {
-        id: `mock_${subCode.toLowerCase()}_2`,
-        title: `${altCode || subCode} Level-1 Mock Test 2 ${studentClass}`,
-        short_code: `${altCode || subCode} - Mock 2`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 45,
-        status: 'published'
-      },
-      {
-        id: `mock_${subCode.toLowerCase()}_3`,
-        title: `${altCode || subCode} Level-1 Mock Test 3 ${studentClass}`,
-        short_code: `${altCode || subCode} - Mock 3`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 45,
-        status: 'published'
-      },
-      {
-        id: `mock_${subCode.toLowerCase()}_4`,
-        title: `${altCode || subCode} Level-1 Mock Test 4 ${studentClass}`,
-        short_code: `${altCode || subCode} - Mock 4`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 45,
-        status: 'published'
-      }
-    ];
-
-    if (subCode === 'IMO') {
-      basePapers.push({
-        id: `mock_${subCode.toLowerCase()}_5`,
-        title: `${altCode || subCode} Level-1 Mock Test 5 ${studentClass}`,
-        short_code: `${altCode || subCode} - Mock 5`,
-        subject_code: subCode,
-        class_name: studentClass,
-        duration_minutes: 60,
-        total_marks: 60,
-        cutoff_marks: 46,
-        status: 'published'
-      });
-    }
-
-    if (matching.length > 0) {
-      const uniqueAdmin = matching.filter(m => !basePapers.some(b => String(b.id) === String(m.id)));
-      return [...uniqueAdmin, ...basePapers];
-    }
-
-    return basePapers;
+    // Return ONLY real test papers configured in Super Admin — no phantom/dummy fallbacks
+    return matching;
   };
 
-  // Filter covers according to selected subject (MUST BE DECLARED BEFORE ANY EARLY RETURN)
+  // Filter covers according to selected subject and only show active non-deleted covers that have mock tests
   const visibleCovers = useMemo(() => {
+    let deletedCovers = [];
+    try {
+      deletedCovers = JSON.parse(localStorage.getItem('olympiadhub_deleted_covers') || '[]');
+    } catch (e) {}
+
+    let list = ALL_SUBJECT_COVERS.filter(s => {
+      const coverKey = `${s.code}_${studentClass}`;
+      const altKey = `${s.altCode}_${studentClass}`;
+      if (deletedCovers.includes(s.code) || deletedCovers.includes(s.altCode) || deletedCovers.includes(coverKey) || deletedCovers.includes(altKey)) {
+        return false;
+      }
+      // If super admin has deleted all papers of this cover, or no tests exist, do not show cover in student panel
+      const papers = getSubjectPapers(s.code, s.altCode);
+      return papers.length > 0;
+    });
+
     if (selectedSubject && selectedSubject !== 'ALL') {
-      const match = ALL_SUBJECT_COVERS.filter(s => s.code === selectedSubject || s.altCode === selectedSubject);
+      const match = list.filter(s => s.code === selectedSubject || s.altCode === selectedSubject);
       if (match.length > 0) return match;
     }
-    return ALL_SUBJECT_COVERS;
-  }, [selectedSubject, ALL_SUBJECT_COVERS]);
+    return list;
+  }, [selectedSubject, ALL_SUBJECT_COVERS, examPapers, studentClass]);
 
   // Default subject study packages (Image 1 style) for all 6 subjects
   const DEFAULT_SUBJECT_PACKAGES = useMemo(() => ({
@@ -1285,6 +1262,30 @@ export const StudentMyContentPage = ({
                     </button>
                   </div>
                 </div>
+              ) : subjectPapers.length === 0 ? (
+                /* Empty state when no mock tests exist in this series */
+                <div className="bg-white rounded-3xl p-10 border border-slate-200 text-center space-y-4 max-w-md mx-auto my-6 shadow-sm">
+                  <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                    <FileText className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-slate-800">
+                      No Mock Tests in {currentSub.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Currently there are no mock tests configured for {studentClass}. Tests published in Super Admin will show up here automatically.
+                    </p>
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setOpenedMockSeries(null)}
+                      className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                    >
+                      &larr; Back to Series Covers
+                    </button>
+                  </div>
+                </div>
               ) : (
                 /* Mock Tests Cards Grid (Colorful 2-3 Mix Pastel Theme) */
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -1416,13 +1417,28 @@ export const StudentMyContentPage = ({
 
 
 
-          {/* Grid of Cards */}
-          <div className={`grid gap-6 w-full ${
-            visibleCovers.length === 1
-              ? 'grid-cols-1 max-w-[480px]'
-              : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-          }`}>
-            {visibleCovers.map((sub) => {
+          {/* Grid of Cards or Empty State */}
+          {visibleCovers.length === 0 ? (
+            <div className="bg-white rounded-3xl p-12 border border-slate-200 text-center space-y-4 max-w-lg mx-auto shadow-sm my-6">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <BookOpen className="w-8 h-8" />
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-slate-800">
+                  No Mock Test Series Available
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed mt-1">
+                  Currently, there are no active mock test series configured for {selectedSubject !== 'ALL' ? selectedSubject : studentClass}. Once published by the administrator, they will appear here automatically.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className={`grid gap-6 w-full ${
+              visibleCovers.length === 1
+                ? 'grid-cols-1 max-w-[480px]'
+                : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+            }`}>
+              {visibleCovers.map((sub) => {
               const isUnlocked = isSubjectPurchased(sub.code, studentClass, purchasedTests);
               const subjectPkgs = getPackagesForSubject(sub.code);
               const effectivePrice = Number(bankSettings.mock_test_price) || 99;
@@ -1651,7 +1667,8 @@ export const StudentMyContentPage = ({
                 </div>
               );
             })}
-          </div>
+            </div>
+          )}
         </div>
       )}
     </div>

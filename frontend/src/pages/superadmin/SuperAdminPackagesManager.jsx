@@ -1116,7 +1116,19 @@ export const SuperAdminPackagesManager = () => {
         localStorage.setItem(examsKey, JSON.stringify(updatedExams));
       } catch (err) {}
 
+      // Un-delete cover if it was deleted previously
+      try {
+        const covRaw = localStorage.getItem('olympiadhub_deleted_covers');
+        if (covRaw) {
+          let covList = JSON.parse(covRaw);
+          const sc = (payload.subject_code || '').toUpperCase();
+          covList = covList.filter(c => c !== sc && !c.startsWith(sc + '_'));
+          localStorage.setItem('olympiadhub_deleted_covers', JSON.stringify(covList));
+        }
+      } catch (e) {}
+
       if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('olympiadhub-covers-updated'));
         window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: payload }));
         window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: payload }));
         window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exam_papers', data: payload } }));
@@ -1146,17 +1158,24 @@ export const SuperAdminPackagesManager = () => {
     try {
       await apiClient.delete(`/exam-papers/${id}`).catch(() => null);
       try {
+        const delRaw = localStorage.getItem('olympiadhub_deleted_ids');
+        const delList = delRaw ? JSON.parse(delRaw) : [];
+        if (!delList.includes(String(id))) {
+          delList.push(String(id));
+          localStorage.setItem('olympiadhub_deleted_ids', JSON.stringify(delList));
+        }
+
         const dbKey = 'olympiadhub_db_exam_papers';
         const existingDb = JSON.parse(localStorage.getItem(dbKey) || '[]');
-        localStorage.setItem(dbKey, JSON.stringify(existingDb.filter(p => String(p.id) !== String(id))));
+        localStorage.setItem(dbKey, JSON.stringify(existingDb.filter(p => String(p.id) !== String(id) && String(p.exam_code) !== String(id))));
 
         const mockKey = 'mock_db_exam_papers';
         const existingMock = JSON.parse(localStorage.getItem(mockKey) || '[]');
-        localStorage.setItem(mockKey, JSON.stringify(existingMock.filter(p => String(p.id) !== String(id))));
+        localStorage.setItem(mockKey, JSON.stringify(existingMock.filter(p => String(p.id) !== String(id) && String(p.exam_code) !== String(id))));
 
         const genKey = 'admin_generator_papers';
         const existingGen = JSON.parse(localStorage.getItem(genKey) || '[]');
-        localStorage.setItem(genKey, JSON.stringify(existingGen.filter(p => String(p.id) !== String(id))));
+        localStorage.setItem(genKey, JSON.stringify(existingGen.filter(p => String(p.id) !== String(id) && String(p.exam_code) !== String(id))));
 
         const dbExamsKey = 'olympiadhub_db_exams';
         const existingDbExams = JSON.parse(localStorage.getItem(dbExamsKey) || '[]');
@@ -1167,6 +1186,7 @@ export const SuperAdminPackagesManager = () => {
         window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedId: id } }));
         window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated'));
         window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+        window.dispatchEvent(new Event('storage'));
       }
 
       setExamPapers(prev => prev.filter(p => String(p.id) !== String(id)));
@@ -1190,6 +1210,13 @@ export const SuperAdminPackagesManager = () => {
     try {
       await Promise.all(paperIds.map(id => apiClient.delete(`/exam-papers/${id}`).catch(() => null)));
       try {
+        const delRaw = localStorage.getItem('olympiadhub_deleted_ids');
+        const delList = delRaw ? JSON.parse(delRaw) : [];
+        paperIds.forEach(pid => {
+          if (!delList.includes(String(pid))) delList.push(String(pid));
+        });
+        localStorage.setItem('olympiadhub_deleted_ids', JSON.stringify(delList));
+
         const dbKey = 'olympiadhub_db_exam_papers';
         const existingDb = JSON.parse(localStorage.getItem(dbKey) || '[]');
         localStorage.setItem(dbKey, JSON.stringify(existingDb.filter(p => !paperIds.includes(String(p.id)))));
@@ -1211,6 +1238,7 @@ export const SuperAdminPackagesManager = () => {
         window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedIds: paperIds } }));
         window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated'));
         window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+        window.dispatchEvent(new Event('storage'));
       }
 
       setExamPapers(prev => prev.filter(p => !paperIds.includes(String(p.id))));
@@ -1219,6 +1247,72 @@ export const SuperAdminPackagesManager = () => {
       console.warn('Delete all error:', err);
       showToast('Failed to delete papers.', 'error');
     }
+  };
+
+  // Delete an entire Exam Cover & its tests (Direct delete without alert popup, synced with Student Panel)
+  const handleDeleteCover = async (cover) => {
+    if (!cover) return;
+    const coverCode = cover.code;
+    const paperIds = (cover.papers || []).map(p => String(p.id));
+
+    try {
+      if (paperIds.length > 0) {
+        await Promise.all(paperIds.map(id => apiClient.delete(`/exam-papers/${id}`).catch(() => null)));
+      }
+      try {
+        const delRaw = localStorage.getItem('olympiadhub_deleted_ids');
+        const delList = delRaw ? JSON.parse(delRaw) : [];
+        paperIds.forEach(pid => {
+          if (!delList.includes(String(pid))) delList.push(String(pid));
+        });
+        localStorage.setItem('olympiadhub_deleted_ids', JSON.stringify(delList));
+
+        const covRaw = localStorage.getItem('olympiadhub_deleted_covers');
+        const covList = covRaw ? JSON.parse(covRaw) : [];
+        const coverKey = `${coverCode}_${packageClassFilter}`;
+        if (!covList.includes(coverCode)) covList.push(coverCode);
+        if (!covList.includes(coverKey)) covList.push(coverKey);
+        localStorage.setItem('olympiadhub_deleted_covers', JSON.stringify(covList));
+
+        const dbKey = 'olympiadhub_db_exam_papers';
+        const existingDb = JSON.parse(localStorage.getItem(dbKey) || '[]');
+        localStorage.setItem(dbKey, JSON.stringify(existingDb.filter(p => !paperIds.includes(String(p.id)) && (!p.subject_code || p.subject_code.toUpperCase() !== coverCode.toUpperCase()))));
+
+        const mockKey = 'mock_db_exam_papers';
+        const existingMock = JSON.parse(localStorage.getItem(mockKey) || '[]');
+        localStorage.setItem(mockKey, JSON.stringify(existingMock.filter(p => !paperIds.includes(String(p.id)) && (!p.subject_code || p.subject_code.toUpperCase() !== coverCode.toUpperCase()))));
+
+        const genKey = 'admin_generator_papers';
+        const existingGen = JSON.parse(localStorage.getItem(genKey) || '[]');
+        localStorage.setItem(genKey, JSON.stringify(existingGen.filter(p => !paperIds.includes(String(p.id)) && (!p.subject_code || p.subject_code.toUpperCase() !== coverCode.toUpperCase()))));
+
+        const dbExamsKey = 'olympiadhub_db_exams';
+        const existingDbExams = JSON.parse(localStorage.getItem(dbExamsKey) || '[]');
+        localStorage.setItem(dbExamsKey, JSON.stringify(existingDbExams.filter(p => !paperIds.includes(String(p.id)) && String(p.exam_code) !== coverCode)));
+      } catch (e) {}
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('olympiadhub-covers-updated', { detail: { deletedCover: coverCode } }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedIds: paperIds } }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated'));
+        window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+        window.dispatchEvent(new Event('storage'));
+      }
+
+      setExamPapers(prev => prev.filter(p => !paperIds.includes(String(p.id)) && (!p.subject_code || p.subject_code.toUpperCase() !== coverCode.toUpperCase())));
+      showToast(`✓ ${coverCode} Exam Cover deleted successfully.`, 'info');
+    } catch (err) {
+      console.warn('Delete cover error:', err);
+      showToast('Failed to delete cover.', 'error');
+    }
+  };
+
+  const handleRestoreCovers = () => {
+    localStorage.removeItem('olympiadhub_deleted_covers');
+    window.dispatchEvent(new CustomEvent('olympiadhub-covers-updated'));
+    window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated'));
+    window.dispatchEvent(new Event('storage'));
+    showToast('✓ All exam covers restored successfully.', 'success');
   };
 
   // Bulk Parse Helper with Universal Intelligent Parsing
@@ -1683,7 +1777,18 @@ export const SuperAdminPackagesManager = () => {
 
   // Subject Covers Directory (Level 1: Summarizes each Subject Cover)
   const subjectCoversDirectory = useMemo(() => {
-    const allKnownSubjects = SUBJECTS_LIST.filter(s => s.code !== 'ALL');
+    let deletedCovers = [];
+    try {
+      deletedCovers = JSON.parse(localStorage.getItem('olympiadhub_deleted_covers') || '[]');
+    } catch (e) {}
+
+    const allKnownSubjects = SUBJECTS_LIST.filter(s => {
+      if (s.code === 'ALL') return false;
+      const coverKey = `${s.code}_${packageClassFilter}`;
+      if (deletedCovers.includes(s.code) || deletedCovers.includes(coverKey)) return false;
+      return true;
+    });
+
     return allKnownSubjects.map(sub => {
       const matchingPapers = examPapers.filter(p => {
         const matchesSub = matchSubjectCodes(p.subject_code, sub.code);
@@ -3323,8 +3428,31 @@ export const SuperAdminPackagesManager = () => {
           {/* ------------------------------------------------------------------- */}
           {!selectedSubjectCover ? (
             <div className="space-y-6">
-              {/* Grid of Subject Series Covers */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {subjectCoversDirectory.length === 0 ? (
+                <div className="bg-white rounded-3xl p-10 border border-slate-200 text-center space-y-4 max-w-md mx-auto my-6 shadow-sm">
+                  <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                    <Award className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-slate-800">
+                      All Exam Covers are Deleted / Hidden
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1">
+                      No active exam covers are visible for {packageClassFilter}.
+                    </p>
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={handleRestoreCovers}
+                      className="px-4 py-2 rounded-xl bg-[#859900] hover:bg-[#728400] text-white font-black text-xs transition-colors cursor-pointer"
+                    >
+                      Restore All Exam Covers
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {subjectCoversDirectory.map((cover) => {
                   const Icon = cover.icon || Award;
                   return (
@@ -3344,19 +3472,18 @@ export const SuperAdminPackagesManager = () => {
                             <span>{cover.code} Olympiad Series</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            {cover.totalPapers > 0 && (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteAllPapersInCover(cover);
-                                }}
-                                className="p-1 rounded-md bg-white/20 hover:bg-rose-600 text-white transition-all"
-                                title={`Delete all ${cover.totalPapers} mock tests in ${cover.code}`}
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteCover(cover);
+                              }}
+                              className="px-2 py-1 rounded-md bg-white/20 hover:bg-rose-600 text-white transition-all flex items-center gap-1 text-[10px] font-black cursor-pointer shadow-2xs"
+                              title={`Delete ${cover.code} Exam Cover & All Tests`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Delete</span>
+                            </button>
                             <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded bg-white/20">
                               {cover.className}
                             </span>
@@ -3482,6 +3609,7 @@ export const SuperAdminPackagesManager = () => {
                   );
                 })}
               </div>
+              )}
             </div>
           ) : (
             /* ------------------------------------------------------------------- */
@@ -3505,6 +3633,23 @@ export const SuperAdminPackagesManager = () => {
                 </div>
 
                 <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDeleteCover({
+                        code: selectedSubjectCover,
+                        seriesTitle: `${packageClassFilter} - All India ${selectedSubjectCover} Mock Test Series`,
+                        papers: activeSubjectPapers
+                      });
+                      setSelectedSubjectCover(null);
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-300 text-slate-600 hover:text-rose-600 font-bold text-xs shadow-2xs active:scale-95 cursor-pointer flex items-center gap-1.5 transition-all"
+                    title={`Delete entire ${selectedSubjectCover} series cover & its mock tests`}
+                  >
+                    <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                    <span>Delete Cover</span>
+                  </button>
+
                   {activeSubjectPapers.length > 0 && (
                     <button
                       type="button"
@@ -3517,7 +3662,7 @@ export const SuperAdminPackagesManager = () => {
                       title={`Delete all ${activeSubjectPapers.length} mock tests in this series`}
                     >
                       <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                      <span>Delete All ({activeSubjectPapers.length})</span>
+                      <span>Delete Tests ({activeSubjectPapers.length})</span>
                     </button>
                   )}
 
