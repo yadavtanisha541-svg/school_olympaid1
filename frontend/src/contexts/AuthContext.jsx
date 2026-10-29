@@ -20,15 +20,15 @@ export const AuthProvider = ({ children }) => {
 
   const [user, setUser] = useState(() => {
     try {
-      // If opening website link (root/home), ALWAYS start logged out for admin!
-      if (typeof window !== 'undefined') {
-        const rawHash = window.location.hash.replace(/^#\/?/, '');
-        if (!rawHash || rawHash === 'home' || rawHash === '/') {
-          const sessionUser = sessionStorage.getItem('olympiadhub_user');
-          if (sessionUser && JSON.parse(sessionUser)?.role === 'superadmin') {
-            sessionStorage.removeItem('olympiadhub_user');
-            sessionStorage.removeItem('olympiadhub_token');
-          }
+      // 1. Check inactivity timeout for admin session
+      const lastActiveStr = sessionStorage.getItem('olympiadhub_admin_last_active');
+      if (lastActiveStr) {
+        const elapsed = Date.now() - Number(lastActiveStr);
+        const ADMIN_INACTIVITY_LIMIT_MS = 15 * 60 * 1000; // 15 minutes
+        if (elapsed > ADMIN_INACTIVITY_LIMIT_MS) {
+          sessionStorage.removeItem('olympiadhub_user');
+          sessionStorage.removeItem('olympiadhub_token');
+          sessionStorage.removeItem('olympiadhub_admin_last_active');
           return null;
         }
       }
@@ -39,7 +39,12 @@ export const AuthProvider = ({ children }) => {
       // Super Admin sessions MUST come strictly from active sessionStorage
       const sessionStr = sessionStorage.getItem('olympiadhub_user');
       if (sessionStr) {
-        return JSON.parse(sessionStr);
+        const u = JSON.parse(sessionStr);
+        if (u?.role === 'superadmin') {
+          sessionStorage.setItem('olympiadhub_admin_last_active', String(Date.now()));
+          return u;
+        }
+        return u;
       }
 
       const localStr = localStorage.getItem('olympiadhub_user');
@@ -60,53 +65,85 @@ export const AuthProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(false);
 
-  // Automatically ensure admin is logged out as soon as the tab / window / website is closed
+  // Inactivity / Idle Timeout for Super Admin (15 minutes of inactivity)
+  // Auto-logs out if the admin leaves the panel unattended ("khula chod diya")
+  // Or if the device/tab was left inactive and reopened after timeout
   useEffect(() => {
-    const handleTabClose = () => {
-      try {
-        const sessionStr = sessionStorage.getItem('olympiadhub_user');
-        const localStr = localStorage.getItem('olympiadhub_user');
-        let isSuperAdmin = false;
-        if (sessionStr && JSON.parse(sessionStr)?.role === 'superadmin') isSuperAdmin = true;
-        if (localStr && JSON.parse(localStr)?.role === 'superadmin') isSuperAdmin = true;
+    if (!user || user.role !== 'superadmin') return;
 
-        if (isSuperAdmin) {
-          sessionStorage.clear();
-          localStorage.removeItem('olympiadhub_user');
-          localStorage.removeItem('olympiadhub_token');
-          localStorage.removeItem('token');
-          localStorage.removeItem('olympiadhub_route_state');
-          localStorage.removeItem('olympiadhub_current_tab');
+    const ADMIN_INACTIVITY_LIMIT_MS = 15 * 60 * 1000; // 15 minutes
+
+    const recordActivity = () => {
+      try {
+        sessionStorage.setItem('olympiadhub_admin_last_active', String(Date.now()));
+      } catch (e) {}
+    };
+
+    if (!sessionStorage.getItem('olympiadhub_admin_last_active')) {
+      recordActivity();
+    }
+
+    let lastThrottledTime = 0;
+    const handleUserInteraction = () => {
+      const now = Date.now();
+      if (now - lastThrottledTime > 3000) {
+        lastThrottledTime = now;
+        recordActivity();
+      }
+    };
+
+    const checkInactivity = () => {
+      try {
+        const lastActiveStr = sessionStorage.getItem('olympiadhub_admin_last_active');
+        if (!lastActiveStr) return;
+        const lastActive = Number(lastActiveStr);
+        const elapsed = Date.now() - lastActive;
+
+        if (elapsed > ADMIN_INACTIVITY_LIMIT_MS) {
+          console.warn('Super Admin session timed out due to inactivity.');
+          logout();
+          if (typeof window !== 'undefined') {
+            alert('Aapka Super Admin session inactivity (idle) ki wajah se logout ho gaya hai. Kripya punah login karein.');
+          }
         }
       } catch (e) {}
     };
 
-    window.addEventListener('beforeunload', handleTabClose);
-    window.addEventListener('pagehide', handleTabClose);
-    return () => {
-      window.removeEventListener('beforeunload', handleTabClose);
-      window.removeEventListener('pagehide', handleTabClose);
+    // Check periodically every 15 seconds
+    const intervalId = setInterval(checkInactivity, 15000);
+
+    // Check when user switches back to tab or unlocks device
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkInactivity();
+      }
     };
-  }, []);
+
+    const interactionEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+    interactionEvents.forEach(evt => window.addEventListener(evt, handleUserInteraction, { passive: true }));
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(intervalId);
+      interactionEvents.forEach(evt => window.removeEventListener(evt, handleUserInteraction));
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [user]);
 
   useEffect(() => {
     const checkAuth = async () => {
-      // If navigating to root/home public page, clear admin session immediately
-      if (typeof window !== 'undefined') {
-        const rawHash = window.location.hash.replace(/^#\/?/, '');
-        if (!rawHash || rawHash === 'home' || rawHash === '/') {
-          const sessionUserStr = sessionStorage.getItem('olympiadhub_user');
-          if (sessionUserStr) {
-            try {
-              if (JSON.parse(sessionUserStr)?.role === 'superadmin') {
-                sessionStorage.removeItem('olympiadhub_user');
-                sessionStorage.removeItem('olympiadhub_token');
-                setUser(null);
-                setLoading(false);
-                return;
-              }
-            } catch {}
-          }
+      // Check inactivity timeout first
+      const lastActiveStr = sessionStorage.getItem('olympiadhub_admin_last_active');
+      if (lastActiveStr) {
+        const elapsed = Date.now() - Number(lastActiveStr);
+        const ADMIN_INACTIVITY_LIMIT_MS = 15 * 60 * 1000; // 15 minutes
+        if (elapsed > ADMIN_INACTIVITY_LIMIT_MS) {
+          sessionStorage.removeItem('olympiadhub_user');
+          sessionStorage.removeItem('olympiadhub_token');
+          sessionStorage.removeItem('olympiadhub_admin_last_active');
+          setUser(null);
+          setLoading(false);
+          return;
         }
       }
 
@@ -191,6 +228,7 @@ export const AuthProvider = ({ children }) => {
       if (!isSuperAdmin) {
         localStorage.setItem('olympiadhub_user', JSON.stringify(res.data.user));
       } else {
+        sessionStorage.setItem('olympiadhub_admin_last_active', String(Date.now()));
         localStorage.removeItem('olympiadhub_user');
         localStorage.removeItem('olympiadhub_token');
         localStorage.removeItem('token');
@@ -211,6 +249,7 @@ export const AuthProvider = ({ children }) => {
       apiClient.setToken(null);
       sessionStorage.removeItem('olympiadhub_user');
       sessionStorage.removeItem('olympiadhub_token');
+      sessionStorage.removeItem('olympiadhub_admin_last_active');
       localStorage.removeItem('olympiadhub_user');
       localStorage.removeItem('olympiadhub_token');
       localStorage.removeItem('olympiadhub_route_state');

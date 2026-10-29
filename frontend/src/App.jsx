@@ -94,11 +94,6 @@ const parseRouteFromUrl = () => {
     // ALWAYS open the clean Public Home Page. Admin panel must never open automatically.
     if (!rawHash || rawHash === 'home' || rawHash === '/') {
       try {
-        const sessionUser = sessionStorage.getItem('olympiadhub_user');
-        if (sessionUser && JSON.parse(sessionUser)?.role === 'superadmin') {
-          sessionStorage.removeItem('olympiadhub_user');
-          sessionStorage.removeItem('olympiadhub_token');
-        }
         const localUser = localStorage.getItem('olympiadhub_user');
         if (localUser && JSON.parse(localUser)?.role === 'superadmin') {
           localStorage.removeItem('olympiadhub_user');
@@ -122,6 +117,26 @@ const parseRouteFromUrl = () => {
     const params = new URLSearchParams(queryString || '');
 
     if (routePath.startsWith('dashboard') || routePath.startsWith('superadmin')) {
+      // Check inactivity timeout first (15 minutes)
+      const lastActiveStr = sessionStorage.getItem('olympiadhub_admin_last_active');
+      if (lastActiveStr) {
+        const elapsed = Date.now() - Number(lastActiveStr);
+        if (elapsed > 15 * 60 * 1000) {
+          sessionStorage.removeItem('olympiadhub_user');
+          sessionStorage.removeItem('olympiadhub_token');
+          sessionStorage.removeItem('olympiadhub_admin_last_active');
+          return {
+            viewMode: 'login',
+            activePublicPage: 'home',
+            currentTab: 'overview',
+            activeOlympiadId: 'english',
+            activeClassLevel: 'Class 1',
+            activeResultAttemptId: null,
+            activeSolutionAttemptId: null
+          };
+        }
+      }
+
       // Admin dashboard access strictly requires ACTIVE session in sessionStorage!
       const sessionUserStr = sessionStorage.getItem('olympiadhub_user');
       const sessionToken = sessionStorage.getItem('olympiadhub_token') || sessionStorage.getItem('token');
