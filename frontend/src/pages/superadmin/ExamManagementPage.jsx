@@ -269,16 +269,73 @@ export const ExamManagementPage = () => {
     };
   }, [search, filterType]);
 
+  const handleExamClassChange = (newClassId) => {
+    const selectedClass = classes.find(c => String(c.id) === String(newClassId));
+    const selectedSub = subjects.find(s => String(s.id) === String(examForm.subject_id));
+    const className = selectedClass ? selectedClass.name : '';
+    const subName = selectedSub ? selectedSub.name : '';
+    const subCode = selectedSub ? (selectedSub.code || selectedSub.name?.slice(0, 4).toUpperCase()) : 'OLY';
+    const classNum = className.match(/\d+/) ? className.match(/\d+/)[0] : '';
+
+    let newTitle = examForm.title;
+    if (!newTitle || newTitle.includes('Olympiad') || newTitle.includes('Competition') || newTitle.includes('National')) {
+      newTitle = `National ${subName || 'Olympiad'} Competition 2026${className ? ` - ${className}` : ''}`;
+    }
+    let newCode = examForm.exam_code;
+    if (!newCode || /^[A-Z]+(-\d+)?(-202\d)?$/i.test(newCode) || newCode.startsWith('OLY-')) {
+      newCode = `${subCode}${classNum ? `-${classNum}` : ''}-2026`;
+    }
+
+    setExamForm(prev => ({
+      ...prev,
+      class_id: newClassId,
+      title: newTitle,
+      exam_code: newCode
+    }));
+  };
+
+  const handleExamSubjectChange = (newSubjectId) => {
+    const selectedClass = classes.find(c => String(c.id) === String(examForm.class_id));
+    const selectedSub = subjects.find(s => String(s.id) === String(newSubjectId));
+    const className = selectedClass ? selectedClass.name : '';
+    const subName = selectedSub ? selectedSub.name : '';
+    const subCode = selectedSub ? (selectedSub.code || selectedSub.name?.slice(0, 4).toUpperCase()) : 'OLY';
+    const classNum = className.match(/\d+/) ? className.match(/\d+/)[0] : '';
+
+    let newTitle = examForm.title;
+    if (!newTitle || newTitle.includes('Olympiad') || newTitle.includes('Competition') || newTitle.includes('National')) {
+      newTitle = `National ${subName || 'Olympiad'} Competition 2026${className ? ` - ${className}` : ''}`;
+    }
+    let newCode = examForm.exam_code;
+    if (!newCode || /^[A-Z]+(-\d+)?(-202\d)?$/i.test(newCode) || newCode.startsWith('OLY-')) {
+      newCode = `${subCode}${classNum ? `-${classNum}` : ''}-2026`;
+    }
+
+    setExamForm(prev => ({
+      ...prev,
+      subject_id: newSubjectId,
+      title: newTitle,
+      exam_code: newCode
+    }));
+  };
+
   const handleOpenCreate = () => {
     setEditingExam(null);
+    const initialClass = classes[0];
+    const initialSub = subjects[0];
+    const initialClassName = initialClass?.name || 'Class 6';
+    const initialSubName = initialSub?.name || 'Mathematics';
+    const initialSubCode = initialSub?.code || 'IMO';
+    const classNum = initialClassName.match(/\d+/) ? initialClassName.match(/\d+/)[0] : '6';
+
     setExamForm({
-      title: '',
-      exam_code: 'OLY-2026-' + Math.floor(1000 + Math.random() * 9000),
+      title: `National ${initialSubName} Competition 2026 - ${initialClassName}`,
+      exam_code: `${initialSubCode}-${classNum}-2026`,
       exam_type: 'mock',
       description: '',
       instructions: '1. Each question has 4 options with exactly one correct answer.\n2. Do not switch browser tabs during the examination.',
-      class_id: classes[0]?.id || '',
-      subject_id: subjects[0]?.id || '',
+      class_id: initialClass?.id || '',
+      subject_id: initialSub?.id || '',
       duration_minutes: 60,
       passing_percentage: 40.0,
       negative_marking: 1,
@@ -615,7 +672,7 @@ export const ExamManagementPage = () => {
                 <select
                   required
                   value={examForm.class_id}
-                  onChange={(e) => setExamForm({ ...examForm, class_id: e.target.value })}
+                  onChange={(e) => handleExamClassChange(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="">Select Class</option>
@@ -632,7 +689,7 @@ export const ExamManagementPage = () => {
                 <select
                   required
                   value={examForm.subject_id}
-                  onChange={(e) => setExamForm({ ...examForm, subject_id: e.target.value })}
+                  onChange={(e) => handleExamSubjectChange(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="">Select Subject</option>

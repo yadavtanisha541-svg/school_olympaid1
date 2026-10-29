@@ -616,6 +616,311 @@ export const SuperAdminPackagesManager = () => {
     }
   };
 
+  // Helper to format category suffix for titles
+  const getCategorySuffix = (cat, year) => {
+    if (cat === 'previous_year') return `Previous Year Paper ${year || '2026'}`.trim();
+    if (cat === 'sample_paper') return 'Official Sample Paper';
+    if (cat === 'test_generator') return 'Test Generator Pro';
+    return 'Mock Test Paper';
+  };
+
+  const KNOWN_SUBJECT_CODES = ['IMO', 'ISO', 'IDLO', 'ICSO', 'IEO', 'IGKO', 'IHO', 'NSO', 'IEOM', 'IEOS', 'IEOD', 'IEOE', 'IEOG', 'IEOH'];
+
+  // Auto update paper title when class, subject, category or year changes
+  const computeUpdatedTitle = ({ currentTitle, prevClass, newClass, prevSub, newSub, prevCategory, newCategory, prevYear, newYear }) => {
+    let title = (currentTitle || '').trim();
+
+    // If title is blank, build standard title
+    if (!title) {
+      return `${newClass || 'Class 6'} ${newSub || 'IMO'} ${getCategorySuffix(newCategory || 'mock_test', newYear || '2026')}`.trim();
+    }
+
+    // 1. Update class in title
+    if (newClass && newClass !== prevClass) {
+      const classRegex = /\b(Class\s*\d+|Nursery|LKG|UKG)\b/i;
+      if (classRegex.test(title)) {
+        title = title.replace(classRegex, newClass);
+      } else if (prevClass && title.includes(prevClass)) {
+        title = title.replace(prevClass, newClass);
+      } else {
+        title = `${newClass} ${title}`;
+      }
+    }
+
+    // 2. Update subject code in title
+    if (newSub && newSub !== prevSub) {
+      const subPattern = new RegExp(`\\b(${[prevSub, ...KNOWN_SUBJECT_CODES].filter(Boolean).join('|')})\\b`, 'i');
+      if (subPattern.test(title)) {
+        title = title.replace(subPattern, newSub);
+      } else if (prevSub && title.includes(prevSub)) {
+        title = title.replace(prevSub, newSub);
+      } else {
+        const classMatch = title.match(/\b(Class\s*\d+|Nursery|LKG|UKG)\b/i);
+        if (classMatch) {
+          title = title.replace(classMatch[0], `${classMatch[0]} ${newSub}`);
+        } else {
+          title = `${newSub} ${title}`;
+        }
+      }
+    }
+
+    // 3. Update category suffix in title if category changed
+    if (newCategory && newCategory !== prevCategory) {
+      const categoryPhrases = [
+        /Previous\s+Year\s+Paper(\s+\d{4})?/i,
+        /Official\s+Sample\s+Paper/i,
+        /Sample\s+Paper/i,
+        /Mock\s+Test\s+Paper/i,
+        /Mock\s+Test\s+\d+/i,
+        /Mock\s+Test/i,
+        /Test\s+Generator\s+Pro/i,
+        /Test\s+Generator/i
+      ];
+      let replaced = false;
+      for (const rx of categoryPhrases) {
+        if (rx.test(title)) {
+          title = title.replace(rx, getCategorySuffix(newCategory, newYear || prevYear));
+          replaced = true;
+          break;
+        }
+      }
+      if (!replaced) {
+        title = `${title} ${getCategorySuffix(newCategory, newYear || prevYear)}`;
+      }
+    }
+
+    // 4. Update year in title if year changed
+    if (newYear && newYear !== prevYear) {
+      if (prevYear && title.includes(prevYear)) {
+        title = title.replace(new RegExp(`\\b${prevYear}\\b`, 'g'), newYear);
+      } else {
+        const yearRx = /\b(19\d\d|20\d\d)\b/;
+        if (yearRx.test(title)) {
+          title = title.replace(yearRx, newYear);
+        }
+      }
+    }
+
+    return title.replace(/\s+/g, ' ').trim();
+  };
+
+  // Auto update short code / badge when subject or year changes
+  const computeUpdatedShortCode = ({ currentCode, prevSub, newSub, prevYear, newYear }) => {
+    let code = (currentCode || '').trim();
+    const targetYear = newYear || prevYear || '2026';
+    const targetSub = newSub || prevSub || 'IMO';
+
+    if (!code) {
+      return `${targetSub} - ${targetYear}`;
+    }
+
+    // Update subject in code
+    if (newSub && newSub !== prevSub) {
+      const subPattern = new RegExp(`\\b(${[prevSub, ...KNOWN_SUBJECT_CODES].filter(Boolean).join('|')})\\b`, 'i');
+      if (subPattern.test(code)) {
+        code = code.replace(subPattern, newSub);
+      } else if (prevSub && code.includes(prevSub)) {
+        code = code.replace(prevSub, newSub);
+      } else {
+        code = `${newSub} - ${code}`;
+      }
+    }
+
+    // Update year in code
+    if (newYear && newYear !== prevYear) {
+      if (prevYear && code.includes(prevYear)) {
+        code = code.replace(new RegExp(`\\b${prevYear}\\b`, 'g'), newYear);
+      } else {
+        const yearRx = /\b(19\d\d|20\d\d)\b/;
+        if (yearRx.test(code)) {
+          code = code.replace(yearRx, newYear);
+        }
+      }
+    }
+
+    return code.trim();
+  };
+
+  const getDefaultSectionsForSubject = (sCode) => {
+    const code = (sCode || '').toUpperCase();
+    if (code === 'IDLO' || code === 'IEOD' || code === 'ICSO' || code === 'COMPUTER') {
+      return ['Computer Fundamentals', 'Cyber Safety & AI', 'Achievers Section'];
+    }
+    if (code === 'IHO' || code === 'IEOH' || code === 'HINDI') {
+      return ['Hindi Vyakaran', 'Bhasha Bodh', 'Achievers Section'];
+    }
+    if (code === 'IMO' || code === 'IEOM' || code === 'MATH') {
+      return ['Logical Reasoning', 'Mathematical Reasoning', 'Achievers Section'];
+    }
+    if (code === 'ISO' || code === 'IEOS' || code === 'NSO' || code === 'SCIENCE') {
+      return ['Science & Experiments', 'Applied Science', 'Achievers Section'];
+    }
+    if (code === 'IEO' || code === 'IEOE' || code === 'ENGLISH') {
+      return ['Word and Structure Knowledge', 'Reading', 'Spoken and Written Expression', 'Achievers Section'];
+    }
+    return ['General Awareness', 'Current Affairs', 'Life Skills', 'Achievers Section'];
+  };
+
+  const getDefaultQuestionForSubject = (sCode) => {
+    const code = (sCode || '').toUpperCase();
+    if (code === 'IDLO' || code === 'IEOD' || code === 'ICSO' || code === 'COMPUTER') {
+      return {
+        section: 'Computer Fundamentals',
+        q: 'Which protocol is used for secure encrypted communication over the World Wide Web?',
+        options: ['HTTP', 'HTTPS', 'FTP', 'SMTP'],
+        correct: 1,
+        marks: 1,
+        explanation: 'HTTPS (Hypertext Transfer Protocol Secure) encrypts communication over the Internet.'
+      };
+    }
+    if (code === 'IHO' || code === 'IEOH' || code === 'HINDI') {
+      return {
+        section: 'Hindi Vyakaran',
+        q: "निम्न में से कौन-सा शब्द 'सूर्य' का पर्यायवाची नहीं है?",
+        options: ['दिनकर', 'रवि', 'शशि', 'भास्कर'],
+        correct: 2,
+        marks: 1,
+        explanation: "'शशि' चन्द्रमा का पर्यायवाची है, सूर्य का नहीं।"
+      };
+    }
+    if (code === 'IMO' || code === 'IEOM' || code === 'MATH') {
+      return {
+        section: 'Mathematical Reasoning',
+        q: 'If 3x + 15 = 45, what is the value of 2x - 5?',
+        options: ['15', '20', '25', '30'],
+        correct: 0,
+        marks: 1,
+        explanation: '3x + 15 = 45 => 3x = 30 => x = 10. Then 2(10) - 5 = 20 - 5 = 15.'
+      };
+    }
+    if (code === 'ISO' || code === 'IEOS' || code === 'NSO' || code === 'SCIENCE') {
+      return {
+        section: 'Science & Experiments',
+        q: 'Which component of blood is primarily responsible for fighting infections?',
+        options: ['Red Blood Cells (RBC)', 'White Blood Cells (WBC)', 'Platelets', 'Plasma'],
+        correct: 1,
+        marks: 1,
+        explanation: 'White Blood Cells (leukocytes) protect the body against infectious diseases and foreign invaders.'
+      };
+    }
+    if (code === 'IEO' || code === 'IEOE' || code === 'ENGLISH') {
+      return {
+        section: 'Word and Structure Knowledge',
+        q: 'Choose the correct synonym for the word: "Eloquent".',
+        options: ['Articulate', 'Hesitant', 'Awkward', 'Silent'],
+        correct: 0,
+        marks: 1,
+        explanation: 'Eloquent means fluent or persuasive in speaking or writing, which is synonymous with articulate.'
+      };
+    }
+    return {
+      section: 'General Awareness',
+      q: 'What is the official national currency of Japan?',
+      options: ['Yuan', 'Yen', 'Won', 'Ringgit'],
+      correct: 1,
+      marks: 1,
+      explanation: 'The Japanese Yen (JPY) is the official currency of Japan.'
+    };
+  };
+
+  const handleClassChange = (newCls) => {
+    const updatedTitle = computeUpdatedTitle({
+      currentTitle: paperTitle,
+      prevClass: paperClass,
+      newClass: newCls,
+      prevSub: paperSubjectCode,
+      newSub: paperSubjectCode,
+      prevCategory: paperCategory,
+      newCategory: paperCategory,
+      prevYear: paperYear,
+      newYear: paperYear
+    });
+    setPaperClass(newCls);
+    setPaperTitle(updatedTitle);
+  };
+
+  const handleSubjectChange = (newSub) => {
+    const updatedTitle = computeUpdatedTitle({
+      currentTitle: paperTitle,
+      prevClass: paperClass,
+      newClass: paperClass,
+      prevSub: paperSubjectCode,
+      newSub: newSub,
+      prevCategory: paperCategory,
+      newCategory: paperCategory,
+      prevYear: paperYear,
+      newYear: paperYear
+    });
+    const updatedCode = computeUpdatedShortCode({
+      currentCode: paperShortCode,
+      prevSub: paperSubjectCode,
+      newSub: newSub,
+      prevYear: paperYear,
+      newYear: paperYear
+    });
+
+    setPaperSubjectCode(newSub);
+    setPaperTitle(updatedTitle);
+    setPaperShortCode(updatedCode);
+
+    if (!editingPaper && (!paperQuestions || paperQuestions.length <= 1)) {
+      const defSecs = getDefaultSectionsForSubject(newSub);
+      const defQ = getDefaultQuestionForSubject(newSub);
+      setPaperSections(defSecs);
+      setPaperQuestions([
+        {
+          id: 1,
+          section: defQ.section,
+          q: defQ.q,
+          options: defQ.options,
+          correct: defQ.correct,
+          marks: 1,
+          explanation: defQ.explanation
+        }
+      ]);
+    }
+  };
+
+  const handleCategoryChange = (newCat) => {
+    const updatedTitle = computeUpdatedTitle({
+      currentTitle: paperTitle,
+      prevClass: paperClass,
+      newClass: paperClass,
+      prevSub: paperSubjectCode,
+      newSub: paperSubjectCode,
+      prevCategory: paperCategory,
+      newCategory: newCat,
+      prevYear: paperYear,
+      newYear: paperYear
+    });
+    setPaperCategory(newCat);
+    setPaperTitle(updatedTitle);
+  };
+
+  const handleYearChange = (newYr) => {
+    const updatedTitle = computeUpdatedTitle({
+      currentTitle: paperTitle,
+      prevClass: paperClass,
+      newClass: paperClass,
+      prevSub: paperSubjectCode,
+      newSub: paperSubjectCode,
+      prevCategory: paperCategory,
+      newCategory: paperCategory,
+      prevYear: paperYear,
+      newYear: newYr
+    });
+    const updatedCode = computeUpdatedShortCode({
+      currentCode: paperShortCode,
+      prevSub: paperSubjectCode,
+      newSub: paperSubjectCode,
+      prevYear: paperYear,
+      newYear: newYr
+    });
+    setPaperYear(newYr);
+    setPaperTitle(updatedTitle);
+    setPaperShortCode(updatedCode);
+  };
+
   // Open Create Exam Paper (Full-Page View)
   const handleOpenCreatePaper = (overrideSubject, overrideClass) => {
     setEditingPaper(null);
@@ -633,16 +938,19 @@ export const SuperAdminPackagesManager = () => {
     setPaperDuration('60');
     setPaperTotalMarks('60');
     setPaperCutoffMarks('42');
-    setPaperSections(['General Awareness', 'Core Subject HOTS', 'Achievers Section']);
+
+    const defSecs = getDefaultSectionsForSubject(defaultSub);
+    const defQ = getDefaultQuestionForSubject(defaultSub);
+    setPaperSections(defSecs);
     setPaperQuestions([
       {
         id: 1,
-        section: 'General Awareness',
-        q: 'Enter your first Olympiad question here...',
-        options: ['Option A (Answer choice 1)', 'Option B (Answer choice 2)', 'Option C (Answer choice 3)', 'Option D (Answer choice 4)'],
-        correct: 0,
+        section: defQ.section,
+        q: defQ.q,
+        options: defQ.options,
+        correct: defQ.correct,
         marks: 1,
-        explanation: 'Step-by-step conceptual explanation for this solution.'
+        explanation: defQ.explanation
       }
     ]);
     setBulkQuestionsInput('');
@@ -1517,7 +1825,7 @@ export const SuperAdminPackagesManager = () => {
                   <label className="block text-xs font-black text-slate-700 mb-1.5">Paper Category</label>
                   <select
                     value={paperCategory}
-                    onChange={(e) => setPaperCategory(e.target.value)}
+                    onChange={(e) => handleCategoryChange(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-800 outline-none bg-white cursor-pointer shadow-2xs"
                   >
                     <option value="previous_year">🏆 Free Previous Year Paper</option>
@@ -1531,7 +1839,7 @@ export const SuperAdminPackagesManager = () => {
                   <label className="block text-xs font-black text-slate-700 mb-1.5">Class / Grade</label>
                   <select
                     value={paperClass}
-                    onChange={(e) => setPaperClass(e.target.value)}
+                    onChange={(e) => handleClassChange(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-800 outline-none bg-white cursor-pointer shadow-2xs"
                   >
                     {CLASSES_LIST.filter(c => c !== 'All').map((cls) => (
@@ -1546,7 +1854,7 @@ export const SuperAdminPackagesManager = () => {
                   <label className="block text-xs font-black text-slate-700 mb-1.5">Subject / Discipline</label>
                   <select
                     value={paperSubjectCode}
-                    onChange={(e) => setPaperSubjectCode(e.target.value)}
+                    onChange={(e) => handleSubjectChange(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-800 outline-none bg-white cursor-pointer shadow-2xs"
                   >
                     {SUBJECTS_LIST.filter(s => s.code !== 'ALL').map((sub) => (
@@ -1562,7 +1870,7 @@ export const SuperAdminPackagesManager = () => {
                   <input
                     type="text"
                     value={paperYear}
-                    onChange={(e) => setPaperYear(e.target.value)}
+                    onChange={(e) => handleYearChange(e.target.value)}
                     placeholder="e.g. 2019 or 2026"
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-800 outline-none shadow-2xs"
                   />
