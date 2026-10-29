@@ -368,22 +368,49 @@ export const ExamManagementPage = () => {
       const subjectName = matchedSubject ? matchedSubject.name : (examForm.subject_name || 'Mathematics');
       const subjectCode = matchedSubject ? (matchedSubject.code || 'IMO') : (examForm.subject_code || 'IMO');
 
-      const selectedQuestionObjs = Array.isArray(examForm.question_ids) && examForm.question_ids.length > 0
+      let selectedQuestionObjs = Array.isArray(examForm.question_ids) && examForm.question_ids.length > 0
         ? allQuestions.filter(q => examForm.question_ids.includes(q.id) || examForm.question_ids.includes(String(q.id)))
         : (editingExam?.questions || []);
 
+      if (selectedQuestionObjs.length === 0 && Array.isArray(allQuestions) && allQuestions.length > 0) {
+        const cNum = (className.match(/\d+/) || [])[0];
+        const sUpper = subjectCode.toUpperCase();
+        selectedQuestionObjs = allQuestions.filter(q => {
+          const qc = String(q.class_name || q.class || '');
+          const qs = String(q.subject_code || q.subject_name || q.subject || '').toUpperCase();
+          const cMatch = !cNum || qc.includes(cNum);
+          const sMatch = !sUpper || qs.includes(sUpper) || sUpper.includes(qs);
+          return cMatch && sMatch;
+        });
+      }
+
+      const totalMarksVal = selectedQuestionObjs.length > 0 
+        ? selectedQuestionObjs.reduce((acc, q) => acc + (Number(q.marks) || 1), 0)
+        : (Number(examForm.total_marks) || 60);
+
+      const generatedCode = examForm.exam_code || `OLY-${Date.now().toString().slice(-4)}`;
+
       const payload = {
         ...examForm,
+        exam_code: generatedCode,
+        short_code: generatedCode,
         class_name: className,
         class: className,
+        grade: className,
         subject_name: subjectName,
         subject_code: subjectCode,
         subject: subjectName,
+        exam_type: isPractice ? 'practice' : 'mock',
+        duration_minutes: Number(examForm.duration_minutes) || 60,
         total_questions: selectedQuestionObjs.length > 0 ? selectedQuestionObjs.length : (Array.isArray(examForm.question_ids) ? examForm.question_ids.length : 10),
+        total_marks: totalMarksVal,
+        passing_percentage: Number(examForm.passing_percentage) || 40,
+        cutoff_marks: Math.round(totalMarksVal * 0.7),
         questions: selectedQuestionObjs,
         paper_category: isPractice ? 'practice_test' : 'mock_test',
         category: isPractice ? 'practice_test' : 'mock_test',
-        status: examForm.status || 'published'
+        status: examForm.status || 'published',
+        is_published: (examForm.status || 'published') === 'published'
       };
 
       let savedExam = null;
@@ -423,6 +450,7 @@ export const ExamManagementPage = () => {
         window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: savedExam }));
         window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: savedExam }));
         window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams', data: updatedExams } }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exam_papers', data: updatedDb } }));
         window.dispatchEvent(new Event('storage'));
 
         // Proactive sync to cloud

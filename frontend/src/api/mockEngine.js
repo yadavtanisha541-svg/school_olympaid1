@@ -3951,7 +3951,8 @@ export const mockEngine = {
         try {
           const rawExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
           if (Array.isArray(rawExams)) {
-            examStorePapers = rawExams.filter(e => (e.exam_type || '').includes('practice') || (e.paper_category || '').includes('practice'));
+            // Include all published exams from the exams store (both mock and practice)
+            examStorePapers = rawExams.filter(e => e.status !== 'draft');
           }
         } catch (e) {}
 
@@ -3960,7 +3961,7 @@ export const mockEngine = {
         extraStores.forEach((arr) => {
           if (Array.isArray(arr)) {
             arr.forEach((lp) => {
-              if (lp && (lp.title || lp.exam_code)) {
+              if (lp && (lp.title || lp.exam_code || lp.short_code)) {
                 const existingIdx = allAvailable.findIndex(p => String(p.id) === String(lp.id) || (p.exam_code && lp.exam_code && p.exam_code === lp.exam_code));
                 if (existingIdx === -1) {
                   allAvailable.unshift(lp);
@@ -4008,34 +4009,41 @@ export const mockEngine = {
         let filtered = [...allAvailable];
         if (classFilter && classFilter !== 'All' && classFilter !== 'ALL') {
           filtered = filtered.filter((p) => {
-            const pCls = p.class_name || p.class || '';
+            const pCls = String(p.class_name || p.class || p.grade || '').toLowerCase();
+            if (!pCls || pCls === 'all') return true;
             const match1 = pCls.match(/\d+/);
-            const match2 = classFilter.match(/\d+/);
-            return match1 && match2 ? match1[0] === match2[0] : pCls.toLowerCase() === classFilter.toLowerCase();
+            const match2 = classFilter.toLowerCase().match(/\d+/);
+            if (match1 && match2) return match1[0] === match2[0];
+            return pCls === classFilter.toLowerCase() || pCls.includes(classFilter.toLowerCase()) || classFilter.toLowerCase().includes(pCls);
           });
         }
         if (subjectFilter && subjectFilter !== 'ALL' && subjectFilter !== 'All') {
           const sUpper = subjectFilter.toUpperCase();
           filtered = filtered.filter((p) => {
-            const sc = (p.subject_code || p.subject || '').toUpperCase();
+            const sc = (p.subject_code || p.subject || p.subject_name || '').toUpperCase();
             if (sc === sUpper) return true;
-            if ((sUpper === 'IDLO' || sUpper === 'IEOD' || sUpper === 'ICSO' || sUpper === 'ICO' || sUpper === 'COMPUTER') &&
-                (sc === 'IDLO' || sc === 'IEOD' || sc === 'ICSO' || sc === 'ICO' || sc === 'COMPUTER')) return true;
+            if ((sUpper === 'IDLO' || sUpper === 'IEOD' || sUpper === 'ICSO' || sUpper === 'ICO' || sUpper === 'COMPUTER' || sUpper.includes('DIGITAL')) &&
+                (sc === 'IDLO' || sc === 'IEOD' || sc === 'ICSO' || sc === 'ICO' || sc === 'COMPUTER' || sc.includes('DIGITAL'))) return true;
             if ((sUpper === 'IHO' || sUpper === 'IEOH' || sUpper === 'HINDI') &&
                 (sc === 'IHO' || sc === 'IEOH' || sc === 'HINDI')) return true;
-            if ((sUpper === 'IMO' || sUpper === 'IEOM' || sUpper === 'MATH') &&
-                (sc === 'IMO' || sc === 'IEOM' || sc === 'MATH')) return true;
+            if ((sUpper === 'IMO' || sUpper === 'IEOM' || sUpper === 'MATH' || sUpper.includes('MATH')) &&
+                (sc === 'IMO' || sc === 'IEOM' || sc === 'MATH' || sc.includes('MATH'))) return true;
             if ((sUpper === 'ISO' || sUpper === 'IEOS' || sUpper === 'NSO' || sUpper === 'SCIENCE') &&
                 (sc === 'ISO' || sc === 'IEOS' || sc === 'NSO' || sc === 'SCIENCE')) return true;
-            if ((sUpper === 'IEO' || sUpper === 'IEOE' || sUpper === 'ENGLISH') &&
-                (sc === 'IEO' || sc === 'IEOE' || sc === 'ENGLISH')) return true;
-            if ((sUpper === 'IGKO' || sUpper === 'IEOG' || sUpper === 'GK') &&
-                (sc === 'IGKO' || sc === 'IEOG' || sc === 'GK')) return true;
+            if ((sUpper === 'IEO' || sUpper === 'IEOE' || sUpper === 'ENGLISH' || sUpper === 'ENG') &&
+                (sc === 'IEO' || sc === 'IEOE' || sc === 'ENGLISH' || sc === 'ENG')) return true;
+            if ((sUpper === 'IGKO' || sUpper === 'IEOG' || sUpper === 'GK' || sUpper.includes('GENERAL')) &&
+                (sc === 'IGKO' || sc === 'IEOG' || sc === 'GK' || sc.includes('GENERAL'))) return true;
             return sc.includes(sUpper) || sUpper.includes(sc);
           });
         }
-        if (categoryFilter && categoryFilter !== 'all' && categoryFilter !== 'All') {
-          filtered = filtered.filter((p) => (p.paper_category || 'previous_year') === categoryFilter || categoryFilter === 'all_papers');
+        if (categoryFilter && categoryFilter !== 'all' && categoryFilter !== 'All' && categoryFilter !== 'all_papers') {
+          filtered = filtered.filter((p) => {
+            const cat = (p.paper_category || p.category || p.exam_type || 'mock_test').toLowerCase();
+            return cat === categoryFilter.toLowerCase() || 
+                   (categoryFilter === 'mock_test' && (cat.includes('mock') || !cat.includes('practice'))) ||
+                   (categoryFilter === 'practice_test' && (cat.includes('practice') || cat.includes('generator')));
+          });
         }
         return { success: true, data: filtered };
       }
@@ -4169,9 +4177,9 @@ export const mockEngine = {
           class_name: body.class_name || body.class || body.grade || 'Class 6',
           class: body.class_name || body.class || body.grade || 'Class 6',
           grade: body.class_name || body.class || body.grade || 'Class 6',
-          paper_category: body.paper_category || body.category || 'practice_test',
-          category: body.category || body.paper_category || 'practice_test',
-          exam_type: body.exam_type || (body.paper_category === 'generator' ? 'generated' : 'practice'),
+          paper_category: body.paper_category || body.category || 'mock_test',
+          category: body.category || body.paper_category || 'mock_test',
+          exam_type: body.exam_type || (body.paper_category?.includes('practice') || body.paper_category === 'generator' ? 'practice' : 'mock'),
           exam_year: '',
           duration_minutes: Number(body.duration_minutes) || 60,
           total_questions: normQuestions.length,
@@ -4199,6 +4207,8 @@ export const mockEngine = {
             window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: newPaper }));
             window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: newPaper }));
             window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exam_papers', data: papers } }));
+            window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams', data: [newPaper] } }));
+            window.dispatchEvent(new Event('storage'));
           }
         } catch (e) {}
 
@@ -4247,6 +4257,7 @@ export const mockEngine = {
               title: body.title ? body.title.replace(/\(\s*\)/g, '').replace(/\[\s*\]/g, '').replace(/\s+/g, ' ').trim() : p.title,
               subject_code: (body.subject_code || p.subject_code || 'IMO').toUpperCase(),
               cutoff_marks: body.cutoff_marks !== undefined ? Number(body.cutoff_marks) : (p.cutoff_marks || 42),
+              total_questions: normQuestions.length,
               questions: normQuestions
             };
             return updatedPaper;
@@ -4266,6 +4277,9 @@ export const mockEngine = {
             if (typeof window !== 'undefined') {
               window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: updatedPaper }));
               window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: updatedPaper }));
+              window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exam_papers', data: papers } }));
+              window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams', data: [updatedPaper] } }));
+              window.dispatchEvent(new Event('storage'));
             }
           } catch (e) {}
         }
@@ -4283,8 +4297,12 @@ export const mockEngine = {
           localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockDb.filter(p => String(p.id) !== String(targetDelId))));
           const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
           localStorage.setItem('admin_generator_papers', JSON.stringify(genPapers.filter(p => String(p.id) !== String(targetDelId))));
+          const examsDb = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+          localStorage.setItem('olympiadhub_db_exams', JSON.stringify(examsDb.filter(p => String(p.id) !== String(targetDelId))));
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedId: targetDelId } }));
+            window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: { deletedId: targetDelId } }));
+            window.dispatchEvent(new Event('storage'));
           }
         } catch (e) {}
         return { success: true, message: 'Practice Test Paper deleted successfully' };
@@ -4556,13 +4574,23 @@ export const mockEngine = {
         );
         const normalized = {
           ...item,
-          exam_type: item.exam_type || (item.paper_category === 'generator' ? 'practice' : (item.paper_category?.includes('mock') ? 'mock' : 'practice')),
+          exam_code: item.exam_code || item.short_code || `OLY-${String(item.id).slice(-4)}`,
+          exam_type: item.exam_type || (item.paper_category?.includes('mock') ? 'mock' : item.paper_category === 'generator' ? 'practice' : 'mock'),
           paper_category: item.paper_category || (item.exam_type === 'mock' ? 'mock_test' : 'practice_test'),
+          category: item.paper_category || (item.exam_type === 'mock' ? 'mock_test' : 'practice_test'),
           class_name: item.class_name || item.class || 'Class 6',
+          class: item.class_name || item.class || 'Class 6',
+          grade: item.class_name || item.class || 'Class 6',
           subject_name: item.subject_name || item.subject || 'Mathematics',
-          subject_code: item.subject_code || 'IMO',
+          subject_code: (item.subject_code || 'IMO').toUpperCase(),
+          subject: item.subject_name || item.subject || 'Mathematics',
           status: item.status || 'published',
-          total_questions: Array.isArray(item.questions) ? item.questions.length : (item.total_questions || 10)
+          is_published: item.status !== 'draft',
+          total_questions: Array.isArray(item.questions) && item.questions.length > 0 ? item.questions.length : (item.total_questions || 10),
+          total_marks: item.total_marks || (Array.isArray(item.questions) && item.questions.length > 0 ? item.questions.reduce((a, b) => a + (Number(b.marks) || 1), 0) : 60),
+          duration_minutes: Number(item.duration_minutes) || 60,
+          passing_percentage: Number(item.passing_percentage) || 40,
+          cutoff_marks: Number(item.cutoff_marks) || Math.round((Number(item.total_marks) || 60) * 0.7)
         };
         if (existsIdx === -1) {
           exams.unshift(normalized);
@@ -4582,6 +4610,12 @@ export const mockEngine = {
         const search = (queryParams?.search || params?.search || '').toLowerCase();
         const classFilter = (queryParams?.class || queryParams?.class_id || params?.class || '').toLowerCase();
 
+        const activeUser = JSON.parse(sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user') || '{}');
+        const isStudent = activeUser?.role === 'student' || (!activeUser?.role && !cleanEndpoint.includes('/superadmin'));
+        if (isStudent && queryParams?.status !== 'all') {
+          filteredExams = filteredExams.filter((e) => e.status !== 'draft');
+        }
+
         if (examType && examType !== 'all') {
           filteredExams = filteredExams.filter((e) => {
             const t = (e.exam_type || e.paper_category || 'mock').toLowerCase();
@@ -4592,7 +4626,14 @@ export const mockEngine = {
           filteredExams = filteredExams.filter((e) => (e.title || '').toLowerCase().includes(search) || (e.exam_code || '').toLowerCase().includes(search));
         }
         if (classFilter && classFilter !== 'all') {
-          filteredExams = filteredExams.filter((e) => (e.class_name || e.class || '').toLowerCase().includes(classFilter));
+          filteredExams = filteredExams.filter((e) => {
+            const eCls = String(e.class_name || e.class || e.grade || '').toLowerCase();
+            if (!eCls || eCls === 'all') return true;
+            const match1 = eCls.match(/\d+/);
+            const match2 = classFilter.toLowerCase().match(/\d+/);
+            if (match1 && match2) return match1[0] === match2[0];
+            return eCls.includes(classFilter.toLowerCase()) || classFilter.toLowerCase().includes(eCls);
+          });
         }
         return { success: true, data: filteredExams };
       }
@@ -4711,26 +4752,36 @@ export const mockEngine = {
     // EXAM ENGINE
     if (root === 'exam-engine') {
       if (sub && cleanEndpoint.includes('/start')) {
-        const allPapers = getDb('exam_papers');
-        const allExams = getDb('exams');
+        const allPapers = getDb('exam_papers') || [];
+        const allExams = getDb('exams') || [];
         let localGenPapers = [];
         try {
           localGenPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
         } catch (e) {}
+        let localMockPapers = [];
+        try {
+          localMockPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+        } catch (e) {}
+        let localDbExams = [];
+        try {
+          localDbExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+        } catch (e) {}
+        let localDbPapers = [];
+        try {
+          localDbPapers = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+        } catch (e) {}
 
-        let foundPaper = allPapers.find((p) => String(p.id) === String(sub) || p.short_code === sub);
-        if (!foundPaper) {
-          foundPaper = localGenPapers.find((lp) => String(lp.id) === String(sub) || lp.short_code === sub);
-        }
-        const foundExam = allExams.find((e) => String(e.id) === String(sub));
+        const allSources = [...allPapers, ...allExams, ...localGenPapers, ...localMockPapers, ...localDbExams, ...localDbPapers];
+        let foundPaper = allSources.find((p) => String(p.id) === String(sub) || p.short_code === sub || p.exam_code === sub);
+        const foundExam = foundPaper;
 
         // If it's a mock test code like 'mock_igko_1'
-        let targetSubCode = 'IMO';
+        let targetSubCode = foundPaper?.subject_code || 'IMO';
         if (typeof sub === 'string' && sub.startsWith('mock_')) {
           const parts = sub.split('_');
           if (parts[1]) targetSubCode = parts[1].toUpperCase();
           if (!foundPaper) {
-            foundPaper = allPapers.find((p) => (p.subject_code || '').toUpperCase() === targetSubCode);
+            foundPaper = allSources.find((p) => (p.subject_code || '').toUpperCase() === targetSubCode);
           }
         }
 

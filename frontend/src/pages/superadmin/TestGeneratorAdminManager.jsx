@@ -885,6 +885,7 @@ export const TestGeneratorAdminManager = () => {
         window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: completePaper }));
         window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: completePaper }));
         window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exam_papers', data: [completePaper] } }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams', data: [completePaper] } }));
         window.dispatchEvent(new Event('storage'));
       } catch (_) {}
 

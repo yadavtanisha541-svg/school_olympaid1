@@ -127,15 +127,29 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       // Merge local stores for exams
       let examsList = (examsRes && examsRes.success && Array.isArray(examsRes.data)) ? [...examsRes.data] : [];
       const addUniqueItem = (list, item) => {
-        if (!item || (!item.id && !item.exam_code)) return;
+        if (!item || (!item.id && !item.exam_code && !item.short_code)) return;
+        if (item.status === 'draft') return; // Never show drafts to students
         const idStr = item.id ? String(item.id) : '';
         const codeStr = item.exam_code ? String(item.exam_code) : '';
-        const exists = list.some(e => 
+        const shortStr = item.short_code ? String(item.short_code) : '';
+        const idx = list.findIndex(e => 
           (idStr && String(e.id) === idStr) ||
-          (codeStr && e.exam_code && String(e.exam_code) === codeStr)
+          (codeStr && e.exam_code && String(e.exam_code) === codeStr) ||
+          (shortStr && e.short_code && String(e.short_code) === shortStr)
         );
-        if (!exists) {
-          list.unshift(item);
+        const normalized = {
+          ...item,
+          exam_code: item.exam_code || item.short_code || `OLY-${String(item.id).slice(-4)}`,
+          short_code: item.short_code || item.exam_code,
+          total_questions: Array.isArray(item.questions) && item.questions.length > 0 ? item.questions.length : (item.total_questions || 10),
+          total_marks: Number(item.total_marks) || (Array.isArray(item.questions) && item.questions.length > 0 ? item.questions.reduce((a, b) => a + (Number(b.marks) || 1), 0) : 60),
+          duration_minutes: Number(item.duration_minutes) || 60,
+          status: 'published'
+        };
+        if (idx === -1) {
+          list.unshift(normalized);
+        } else {
+          list[idx] = { ...list[idx], ...normalized };
         }
       };
 

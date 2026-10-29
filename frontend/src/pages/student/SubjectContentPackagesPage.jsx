@@ -127,6 +127,7 @@ const SUBJECT_CONFIGS = {
     worksheetsSubjects: 'IHO & IMO'
   }
 };
+SUBJECT_CONFIGS.icso = SUBJECT_CONFIGS.idlo;
 
 const ALL_CLASSES = [
   'Class 1',
@@ -144,7 +145,7 @@ const ALL_CLASSES = [
 ];
 
 export const SubjectContentPackagesPage = ({
-  subjectCode = 'icso',
+  subjectCode = 'imo',
   onNavigateTab,
   onStartExam
 }) => {
@@ -152,7 +153,7 @@ export const SubjectContentPackagesPage = ({
   const { addToCart } = useCart();
 
   const normalizedSubjectKey = subjectCode.replace('content_', '').toLowerCase();
-  const subject = SUBJECT_CONFIGS[normalizedSubjectKey] || SUBJECT_CONFIGS.icso;
+  const subject = SUBJECT_CONFIGS[normalizedSubjectKey] || SUBJECT_CONFIGS.idlo || SUBJECT_CONFIGS.imo;
 
   const [selectedClass, setSelectedClass] = useState(user?.class || 'Class 6');
 
@@ -317,16 +318,89 @@ export const SubjectContentPackagesPage = ({
   const fetchExamPapers = async () => {
     setLoadingPapers(true);
     try {
+      const curSubCode = subject?.code || 'IMO';
       const res = await apiClient.get('/exam-papers', {
         class: selectedClass,
-        subject: subject.code,
+        subject: curSubCode,
         category: activeTab === 'all_papers' ? 'all' : activeTab
       });
-      if (res && res.success && Array.isArray(res.data)) {
-        setExamPapers(res.data);
-      } else {
-        setExamPapers([]);
-      }
+      let list = (res && res.success && Array.isArray(res.data)) ? [...res.data] : [];
+
+      // Multi-store local fallback & consolidation
+      const addUniquePaper = (p) => {
+        if (!p || (!p.id && !p.exam_code && !p.short_code)) return;
+        if (p.status === 'draft') return; // Hide unpublished drafts from student view
+
+        const pClass = String(p.class_name || p.class || p.grade || '').toLowerCase();
+        const selClass = String(selectedClass || '').toLowerCase();
+        const pMatch = (pClass.match(/\d+/) || [])[0];
+        const sMatch = (selClass.match(/\d+/) || [])[0];
+        const classMatches = !pClass || pClass === 'all' || (pMatch && sMatch && pMatch === sMatch) || pClass.includes(selClass);
+        if (!classMatches) return;
+
+        const pSub = (p.subject_code || p.subject || p.subject_name || '').toUpperCase();
+        const subUpper = curSubCode.toUpperCase();
+        const subMap = {
+          IMO: ['IMO', 'IEOM', 'MATH', 'MATHEMATICS'],
+          ISO: ['ISO', 'IEOS', 'SCIENCE', 'NSO'],
+          IDLO: ['IDLO', 'IEOD', 'DIGITAL', 'COMPUTER', 'ICSO', 'CYBER', 'AI', 'TECH'],
+          IEO: ['IEO', 'IEOE', 'ENGLISH', 'ENG'],
+          IGKO: ['IGKO', 'IEOG', 'GK', 'GENERAL KNOWLEDGE', 'GENERAL'],
+          IHO: ['IHO', 'IEOH', 'HINDI']
+        };
+        const aliases = subMap[subUpper] || [subUpper];
+        const subMatches = aliases.some(a => pSub.includes(a) || subUpper.includes(pSub));
+        if (!subMatches) return;
+
+        const pIdStr = p.id ? String(p.id) : '';
+        const pCodeStr = p.exam_code || p.short_code || '';
+        const existsIdx = list.findIndex(e => 
+          (pIdStr && String(e.id) === pIdStr) ||
+          (pCodeStr && (e.exam_code === pCodeStr || e.short_code === pCodeStr))
+        );
+
+        const normalizedPaper = {
+          ...p,
+          exam_code: p.exam_code || p.short_code || `PPR-${String(p.id).slice(-4)}`,
+          short_code: p.short_code || p.exam_code || `${curSubCode} - Mock`,
+          title: p.title || `${selectedClass} ${curSubCode} Olympiad Paper`,
+          class_name: p.class_name || selectedClass,
+          subject_code: curSubCode,
+          duration_minutes: Number(p.duration_minutes) || 60,
+          total_questions: Array.isArray(p.questions) && p.questions.length > 0 ? p.questions.length : (p.total_questions || 10),
+          total_marks: Number(p.total_marks) || (Array.isArray(p.questions) && p.questions.length > 0 ? p.questions.reduce((a, b) => a + (Number(b.marks) || 1), 0) : 60),
+          cutoff_marks: Number(p.cutoff_marks) || 42,
+          status: 'published'
+        };
+
+        if (existsIdx === -1) {
+          list.unshift(normalizedPaper);
+        } else {
+          list[existsIdx] = { ...list[existsIdx], ...normalizedPaper };
+        }
+      };
+
+      try {
+        const storedExams = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+        if (Array.isArray(storedExams)) storedExams.forEach(addUniquePaper);
+      } catch (e) {}
+
+      try {
+        const examPapers = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
+        if (Array.isArray(examPapers)) examPapers.forEach(addUniquePaper);
+      } catch (e) {}
+
+      try {
+        const mockPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
+        if (Array.isArray(mockPapers)) mockPapers.forEach(addUniquePaper);
+      } catch (e) {}
+
+      try {
+        const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
+        if (Array.isArray(genPapers)) genPapers.forEach(addUniquePaper);
+      } catch (e) {}
+
+      setExamPapers(list);
     } catch (e) {
       console.warn('Error fetching exam papers:', e);
       setExamPapers([]);
@@ -361,10 +435,60 @@ export const SubjectContentPackagesPage = ({
     fetchPackages();
   }, [selectedClass, subjectCode, activeTab]);
 
+  // Live real-time sync when Super Admin publishes or updates exam papers
+  useEffect(() => {
+    let timer = null;
+    const handleSync = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        fetchExamPapers();
+        fetchPackages();
+      }, 300);
+    };
+
+    window.addEventListener('olympiadhub-exams-updated', handleSync);
+    window.addEventListener('olympiadhub-admin-papers-updated', handleSync);
+    window.addEventListener('olympiadhub-data-updated', handleSync);
+    window.addEventListener('storage', handleSync);
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      window.removeEventListener('olympiadhub-exams-updated', handleSync);
+      window.removeEventListener('olympiadhub-admin-papers-updated', handleSync);
+      window.removeEventListener('olympiadhub-data-updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
+  }, [selectedClass, subjectCode, activeTab]);
+
   // Handle Start Live Exam (Transitions to Screenshot 1 format)
   const handleStartExam = (paper) => {
     setSelectedPaperForInstructions(null);
-    setLiveExamPaper(paper);
+    let questions = Array.isArray(paper.questions) && paper.questions.length > 0 ? [...paper.questions] : [];
+    if (questions.length === 0) {
+      try {
+        const allDbQs = JSON.parse(localStorage.getItem('olympiadhub_db_questions') || '[]');
+        if (Array.isArray(paper.question_ids) && paper.question_ids.length > 0) {
+          questions = allDbQs.filter(q => paper.question_ids.includes(q.id) || paper.question_ids.includes(String(q.id)));
+        }
+        if (questions.length === 0) {
+          const cNum = (String(paper.class_name || selectedClass).match(/\d+/) || [])[0];
+          const sUpper = (paper.subject_code || subject?.code || 'IMO').toUpperCase();
+          questions = allDbQs.filter(q => {
+            const qc = String(q.class_name || q.class || '');
+            const qs = String(q.subject_code || q.subject || '').toUpperCase();
+            const cMatch = !cNum || qc.includes(cNum);
+            const sMatch = !sUpper || qs.includes(sUpper) || sUpper.includes(qs);
+            return cMatch && sMatch;
+          });
+        }
+      } catch (e) {}
+    }
+
+    const readyPaper = {
+      ...paper,
+      questions: questions.length > 0 ? questions : (paper.questions || [])
+    };
+    setLiveExamPaper(readyPaper);
     setActiveQuestionIdx(0);
     setSelectedAnswers({});
     setFlaggedQuestions({});
@@ -542,13 +666,13 @@ export const SubjectContentPackagesPage = ({
   // =========================================================================
   if (liveExamPaper) {
     const questions = liveExamPaper.questions || [];
-    const totalQCount = questions.length || 50;
-    const currentQ = questions[activeQuestionIdx] || {
-      q: "World's first human to human heart transplant operation was conducted by _______.",
-      options: ['Christiaan Barnard', 'Robert Koch', 'Antonie van Leeuwenhoek', 'Hans Christian Gram'],
+    const totalQCount = questions.length > 0 ? questions.length : 1;
+    const currentQ = questions[activeQuestionIdx] || questions[0] || {
+      q: "Question data is loading. Please select an option.",
+      options: ['Option A', 'Option B', 'Option C', 'Option D'],
       marks: 1,
       correct: 0,
-      section: 'General Awareness'
+      section: 'General Section'
     };
 
     const sectionsList = Array.isArray(liveExamPaper.sections) && liveExamPaper.sections.length > 0

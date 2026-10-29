@@ -737,24 +737,38 @@ export const SuperAdminPackagesManager = () => {
     }
     try {
       const paperId = editingPaper ? editingPaper.id : Date.now();
+      const generatedCode = paperShortCode || `OLY-${String(paperId).slice(-4)}`;
+      const totalQ = Array.isArray(paperQuestions) && paperQuestions.length > 0 ? paperQuestions.length : 10;
+      const totalM = Number(paperTotalMarks) || (Array.isArray(paperQuestions) && paperQuestions.length > 0 ? paperQuestions.reduce((a, b) => a + (Number(b.marks) || 1), 0) : 60);
+
       const payload = {
         id: paperId,
+        exam_code: generatedCode,
         title: paperTitle,
-        short_code: paperShortCode || `${paperSubjectCode} - Mock`,
+        short_code: generatedCode,
         series_title: `${paperClass} - All India ${paperSubjectCode} Mock Test Series`,
         subject_code: (paperSubjectCode || 'IMO').toUpperCase(),
         subject_name: paperSubjectCode === 'IDLO' ? 'IDLO (Digital Literacy)' : paperSubjectCode === 'IHO' ? 'IHO (Hindi)' : `${paperSubjectCode} Olympiad`,
+        subject: paperSubjectCode || 'IMO',
         class_name: paperClass,
+        class: paperClass,
+        grade: paperClass,
         paper_category: paperCategory || 'mock_test',
+        category: paperCategory || 'mock_test',
+        exam_type: (paperCategory || 'mock_test').includes('practice') ? 'practice' : 'mock',
         exam_year: paperYear || '2026',
         duration_minutes: Number(paperDuration) || 60,
-        total_marks: Number(paperTotalMarks) || 60,
+        total_questions: totalQ,
+        total_marks: totalM,
         cutoff_marks: Number(paperCutoffMarks) || 42,
+        passing_percentage: 40,
         status: 'published',
+        is_published: true,
         header_color: '#809926',
         accent_color: '#809926',
         sections: paperSections.length > 0 ? paperSections : ['Subject Section 1', 'Achievers Section'],
-        questions: paperQuestions
+        questions: paperQuestions,
+        created_at: editingPaper?.created_at || new Date().toISOString()
       };
 
       if (editingPaper) {
@@ -763,7 +777,7 @@ export const SuperAdminPackagesManager = () => {
         await apiClient.post('/exam-papers', payload).catch(() => null);
       }
 
-      // Direct Sync across all localStorage keys
+      // Direct Sync across all 4 localStorage keys
       try {
         const dbKey = 'olympiadhub_db_exam_papers';
         const existingDb = JSON.parse(localStorage.getItem(dbKey) || '[]');
@@ -785,11 +799,21 @@ export const SuperAdminPackagesManager = () => {
           ? existingGen.map(p => String(p.id) === String(editingPaper.id) ? { ...p, ...payload } : p)
           : [payload, ...existingGen.filter(p => String(p.id) !== String(payload.id))];
         localStorage.setItem(genKey, JSON.stringify(updatedGen));
+
+        const examsKey = 'olympiadhub_db_exams';
+        const existingExams = JSON.parse(localStorage.getItem(examsKey) || '[]');
+        const updatedExams = editingPaper
+          ? existingExams.map(p => String(p.id) === String(editingPaper.id) ? { ...p, ...payload } : p)
+          : [payload, ...existingExams.filter(p => String(p.id) !== String(payload.id))];
+        localStorage.setItem(examsKey, JSON.stringify(updatedExams));
       } catch (err) {}
 
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: payload }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: payload }));
         window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exam_papers', data: payload } }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams', data: payload } }));
+        window.dispatchEvent(new Event('storage'));
       }
 
       // Immediately update local state so cards appear right away

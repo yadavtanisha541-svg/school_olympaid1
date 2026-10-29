@@ -25,6 +25,7 @@ export const AvailableExamsPage = ({ onStartExam }) => {
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(''); // '' (All) | 'free_trial' | 'practice' | 'mock' | 'paid'
+  const [selectedClassFilter, setSelectedClassFilter] = useState('All');
 
   // Full-Screen Instructions Page State (No modals!)
   const [selectedExamForInstructions, setSelectedExamForInstructions] = useState(null);
@@ -36,17 +37,34 @@ export const AvailableExamsPage = ({ onStartExam }) => {
       const res = await apiClient.get('/exams', { exam_type: activeTab });
       let list = (res && res.success && Array.isArray(res.data)) ? [...res.data] : [];
 
-      // Multi-store local fallback
+      // Multi-store local fallback & consolidation
       const addUniqueExam = (item) => {
-        if (!item || (!item.id && !item.exam_code)) return;
+        if (!item || (!item.id && !item.exam_code && !item.short_code)) return;
+        if (item.status === 'draft') return; // Do not show drafts to students
+
         const idStr = item.id ? String(item.id) : '';
         const codeStr = item.exam_code ? String(item.exam_code) : '';
-        const exists = list.some(e => 
+        const existsIdx = list.findIndex(e => 
           (idStr && String(e.id) === idStr) ||
           (codeStr && e.exam_code && String(e.exam_code) === codeStr)
         );
-        if (!exists) {
-          list.unshift(item);
+
+        const normalized = {
+          ...item,
+          exam_code: item.exam_code || item.short_code || `OLY-${String(item.id).slice(-4)}`,
+          exam_type: item.exam_type || (item.paper_category?.includes('mock') ? 'mock' : item.paper_category === 'generator' ? 'practice' : 'mock'),
+          paper_category: item.paper_category || (item.exam_type === 'mock' ? 'mock_test' : 'practice_test'),
+          total_questions: Array.isArray(item.questions) && item.questions.length > 0 ? item.questions.length : (item.total_questions || 10),
+          total_marks: Number(item.total_marks) || (Array.isArray(item.questions) && item.questions.length > 0 ? item.questions.reduce((a, b) => a + (Number(b.marks) || 1), 0) : 60),
+          duration_minutes: Number(item.duration_minutes) || 60,
+          passing_percentage: Number(item.passing_percentage) || 40,
+          status: 'published'
+        };
+
+        if (existsIdx === -1) {
+          list.unshift(normalized);
+        } else {
+          list[existsIdx] = { ...list[existsIdx], ...normalized };
         }
       };
 
@@ -80,6 +98,16 @@ export const AvailableExamsPage = ({ onStartExam }) => {
         });
       }
 
+      if (selectedClassFilter && selectedClassFilter !== 'All') {
+        const selNum = (selectedClassFilter.match(/\d+/) || [])[0];
+        list = list.filter(e => {
+          const eCls = String(e.class_name || e.class || e.grade || '').toLowerCase();
+          if (!eCls || eCls === 'all') return true;
+          const eNum = (eCls.match(/\d+/) || [])[0];
+          return (selNum && eNum && selNum === eNum) || eCls.includes(selectedClassFilter.toLowerCase());
+        });
+      }
+
       setExams(list);
     } catch (err) {
       console.error(err);
@@ -90,7 +118,7 @@ export const AvailableExamsPage = ({ onStartExam }) => {
 
   useEffect(() => {
     fetchExams();
-  }, [activeTab]);
+  }, [activeTab, selectedClassFilter]);
 
   useEffect(() => {
     let timer = null;
@@ -98,16 +126,20 @@ export const AvailableExamsPage = ({ onStartExam }) => {
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
         fetchExams();
-      }, 500);
+      }, 300);
     };
     window.addEventListener('olympiadhub-exams-updated', handleUpdate);
     window.addEventListener('olympiadhub-admin-papers-updated', handleUpdate);
+    window.addEventListener('olympiadhub-data-updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
     return () => {
       if (timer) clearTimeout(timer);
       window.removeEventListener('olympiadhub-exams-updated', handleUpdate);
       window.removeEventListener('olympiadhub-admin-papers-updated', handleUpdate);
+      window.removeEventListener('olympiadhub-data-updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
     };
-  }, [activeTab]);
+  }, [activeTab, selectedClassFilter]);
 
   const handleLaunchClick = (exam) => {
     setSelectedExamForInstructions(exam);
@@ -321,28 +353,44 @@ export const AvailableExamsPage = ({ onStartExam }) => {
         </p>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/80 shadow-xs max-w-xl">
-        {[
-          { id: '', label: 'All Exams' },
-          { id: 'mock', label: 'Mock Olympiads' },
-          { id: 'practice', label: 'Practice Tests' },
-          { id: 'free_trial', label: 'Free Trial' }
-        ].map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
-                isActive ? 'bg-indigo-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
+      {/* Filter Bar with Tabs and Class Selector */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/80 shadow-xs max-w-xl">
+          {[
+            { id: '', label: 'All Exams' },
+            { id: 'mock', label: 'Mock Olympiads' },
+            { id: 'practice', label: 'Practice Tests' },
+            { id: 'free_trial', label: 'Free Trial' }
+          ].map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
+                  isActive ? 'bg-indigo-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-2xl border border-slate-200/80 shadow-xs">
+          <span className="text-xs font-bold text-slate-500">Class:</span>
+          <select
+            value={selectedClassFilter}
+            onChange={(e) => setSelectedClassFilter(e.target.value)}
+            className="text-xs font-black text-slate-800 bg-transparent border-0 outline-none cursor-pointer pr-1"
+          >
+            <option value="All">All Classes</option>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => (
+              <option key={num} value={`Class ${num}`}>Class {num}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Exams Grid */}
