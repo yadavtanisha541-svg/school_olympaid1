@@ -1141,14 +1141,8 @@ export const SuperAdminPackagesManager = () => {
     }
   };
 
-  // Delete Exam Paper
-  // Delete Exam Paper
+  // Delete Exam Paper (Direct delete without alert popup)
   const handleDeletePaper = async (id, title) => {
-    const paperToDelete = examPapers.find(p => String(p.id) === String(id));
-    const paperName = title || paperToDelete?.title || 'this Mock Test Paper';
-    if (!window.confirm(`Kya aap "${paperName}" ko delete karna chahte hain?`)) {
-      return;
-    }
     try {
       await apiClient.delete(`/exam-papers/${id}`).catch(() => null);
       try {
@@ -1183,7 +1177,7 @@ export const SuperAdminPackagesManager = () => {
     }
   };
 
-  // Delete all mock tests inside a series cover
+  // Delete all mock tests inside a series cover (Direct delete without alert popup)
   const handleDeleteAllPapersInCover = async (cover) => {
     if (!cover || !cover.papers || cover.papers.length === 0) {
       showToast(`No mock tests found in ${cover?.code || 'this series'} to delete.`, 'info');
@@ -1191,9 +1185,6 @@ export const SuperAdminPackagesManager = () => {
     }
 
     const count = cover.papers.length;
-    const confirmMsg = `Kya aap "${cover.seriesTitle}" ke sabhi ${count} mock test papers ko delete karna chahte hain?`;
-    if (!window.confirm(confirmMsg)) return;
-
     const paperIds = cover.papers.map(p => String(p.id));
 
     try {
