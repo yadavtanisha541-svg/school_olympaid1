@@ -39,6 +39,7 @@ import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfM
 import { isSubjectPurchased, savePurchasedSubject, lockSubject, getPurchasedTests, getTestPricing } from '../../utils/purchaseUtils';
 
 const CLASS_OPTIONS = [
+  'All Classes',
   'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 
   'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 
   'Class 11', 'Class 12'
@@ -135,10 +136,11 @@ export const StudentMyContentPage = ({
   const fetchMyContentData = async () => {
     try {
       setLoading(true);
-      const [papersRes, resultsRes, pkgsRes] = await Promise.all([
+      const [papersRes, resultsRes, pkgsRes, examsRes] = await Promise.all([
         apiClient.get('/exam-papers').catch(() => ({ success: false })),
         apiClient.get('/results', { scope: 'all' }).catch(() => ({ success: false })),
-        apiClient.get('/packages').catch(() => ({ success: false }))
+        apiClient.get('/packages').catch(() => ({ success: false })),
+        apiClient.get('/exams').catch(() => ({ success: false }))
       ]);
 
       // Filter out deleted test papers
@@ -153,6 +155,31 @@ export const StudentMyContentPage = ({
         allPapers = papersRes.data.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code))));
       }
 
+      if (examsRes && examsRes.success && Array.isArray(examsRes.data)) {
+        examsRes.data.forEach((p) => {
+          if (!delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code)))) {
+            const pId = String(p.id);
+            if (!allPapers.some(x => String(x.id) === pId || (x.exam_code && p.exam_code && x.exam_code === p.exam_code))) {
+              allPapers.push({
+                ...p,
+                id: p.id,
+                title: p.title,
+                short_code: p.exam_code || p.short_code || `${p.subject_code || 'OLY'} - Mock`,
+                subject_code: (p.subject_code || p.subject_name || p.subject || '').toUpperCase(),
+                class_name: p.class_name || p.class || 'Class 6',
+                category: p.paper_category || p.category || (p.exam_type === 'mock' ? 'mock_test' : 'practice_test'),
+                paper_category: p.paper_category || p.category || 'mock_test',
+                duration_minutes: p.duration_minutes || 60,
+                total_marks: p.total_marks || 60,
+                cutoff_marks: p.cutoff_marks || 42,
+                status: p.status || 'published',
+                questions: p.questions || []
+              });
+            }
+          }
+        });
+      }
+
       // Include all Mock Tests & Admin-published papers from database and local storage
       const adminPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
       const mockDbPapers = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
@@ -165,13 +192,13 @@ export const StudentMyContentPage = ({
           if (!lp || (!lp.id && !lp.exam_code)) return;
           const pId = String(lp.id || lp.exam_code);
           if (delSet.has(String(lp.id)) || (lp.exam_code && delSet.has(String(lp.exam_code))) || delSet.has(pId)) return;
-          if (!allPapers.some(p => String(p.id) === pId || (p.title === lp.title && (p.class_name || p.class) === (lp.class_name || lp.class)))) {
+          if (!allPapers.some(p => String(p.id) === pId || (p.exam_code && lp.exam_code && p.exam_code === lp.exam_code) || (p.title === lp.title && (p.class_name || p.class) === (lp.class_name || lp.class)))) {
             allPapers.push({
               ...lp,
               id: lp.id || pId,
               title: lp.title,
-              short_code: lp.shortCode || lp.short_code || `${lp.subject_code || 'OLY'} - Mock`,
-              subject_code: (lp.subject_code || lp.subject || '').toUpperCase(),
+              short_code: lp.shortCode || lp.short_code || lp.exam_code || `${lp.subject_code || 'OLY'} - Mock`,
+              subject_code: (lp.subject_code || lp.subject_name || lp.subject || '').toUpperCase(),
               class_name: lp.class_name || lp.class || 'Class 6',
               category: lp.paper_category || lp.category || (lp.exam_type === 'mock' ? 'mock_test' : 'practice_test'),
               paper_category: lp.paper_category || lp.category || 'mock_test',
@@ -448,7 +475,7 @@ export const StudentMyContentPage = ({
     }
   ], [studentClass]);
 
-  const getSubjectPapers = (subCode, altCode) => {
+  const getSubjectPapers = (subCode, altCode, targetClass = null) => {
     let deletedIds = [];
     try {
       deletedIds = JSON.parse(localStorage.getItem('olympiadhub_deleted_ids') || '[]');
@@ -459,39 +486,91 @@ export const StudentMyContentPage = ({
     try {
       deletedCovers = JSON.parse(localStorage.getItem('olympiadhub_deleted_covers') || '[]');
     } catch (e) {}
-    const sCode = (subCode || '').toUpperCase();
-    const aCode = (altCode || '').toUpperCase();
+
+    const sCode = (subCode || '').toUpperCase().trim();
+    const aCode = (altCode || '').toUpperCase().trim();
+
+    // Universal mapping for subject aliases
+    const SUB_MAP = {
+      IMO: ['IMO', 'IEOM', 'MATH', 'MATHEMATICS', 'NMO'],
+      ISO: ['ISO', 'IEOS', 'NSO', 'SCIENCE'],
+      IDLO: ['IDLO', 'IEOD', 'ICSO', 'CYBER', 'COMPUTER', 'DIGITAL', 'NCO'],
+      IEO: ['IEO', 'IEOE', 'ENGLISH'],
+      IGKO: ['IGKO', 'IEOG', 'GK', 'GENERAL KNOWLEDGE', 'GENERAL', 'KNOWLEDGE'],
+      IHO: ['IHO', 'IEOH', 'HINDI']
+    };
+
+    let targetKey = sCode;
+    if (['IMO', 'IEOM', 'MATH', 'MATHEMATICS', 'NMO'].includes(sCode)) targetKey = 'IMO';
+    else if (['ISO', 'IEOS', 'NSO', 'SCIENCE'].includes(sCode)) targetKey = 'ISO';
+    else if (['IDLO', 'IEOD', 'ICSO', 'CYBER', 'COMPUTER', 'DIGITAL'].includes(sCode)) targetKey = 'IDLO';
+    else if (['IEO', 'IEOE', 'ENGLISH'].includes(sCode)) targetKey = 'IEO';
+    else if (['IGKO', 'IEOG', 'GK', 'GENERAL KNOWLEDGE', 'GENERAL', 'KNOWLEDGE'].includes(sCode)) targetKey = 'IGKO';
+    else if (['IHO', 'IEOH', 'HINDI'].includes(sCode)) targetKey = 'IHO';
+
+    const aliases = SUB_MAP[targetKey] || [sCode, aCode].filter(Boolean);
+
+    const activeClass = targetClass !== null ? targetClass : studentClass;
+    const sCls = (activeClass || '').toLowerCase().trim();
+
+    const matching = examPapers.filter((p) => {
+      if (!p) return false;
+      const pId = String(p.id);
+      const pExamCode = p.exam_code ? String(p.exam_code) : '';
+      if (delSet.has(pId) || (pExamCode && delSet.has(pExamCode))) return false;
+
+      const pSub = (p.subject_code || p.subject_name || p.subject || '').toUpperCase().trim();
+      const pTitle = (p.title || '').toUpperCase().trim();
+      const pCode = (p.exam_code || p.short_code || '').toUpperCase().trim();
+
+      // Check subject match across code, name, and title
+      const codeMatches = aliases.some(alias => {
+        if (!alias) return false;
+        return pSub === alias ||
+               pSub.includes(alias) ||
+               alias.includes(pSub) ||
+               pTitle.includes(alias) ||
+               pCode.includes(alias);
+      });
+
+      if (!codeMatches) return false;
+
+      // Check class match
+      const pCls = (p.class_name || p.class || p.grade || '').toLowerCase().trim();
+      if (!sCls || sCls === 'all' || sCls === 'all classes' || sCls === 'all class') {
+        return true;
+      }
+
+      const matchP = pCls.match(/\d+/);
+      const matchS = sCls.match(/\d+/);
+      if (matchP && matchS) {
+        return matchP[0] === matchS[0];
+      }
+
+      return !pCls || pCls === 'all' || pCls === 'all classes' || pCls.includes(sCls) || sCls.includes(pCls);
+    });
+
+    // Check if this subject/class was in deletedCovers
     const coverKey1 = `${sCode}_${studentClass}`;
     const coverKey2 = `${aCode}_${studentClass}`;
-    if (deletedCovers.includes(sCode) || deletedCovers.includes(aCode) || deletedCovers.includes(coverKey1) || deletedCovers.includes(coverKey2)) {
+    const isMarkedDeleted = deletedCovers.includes(sCode) || deletedCovers.includes(aCode) || deletedCovers.includes(coverKey1) || deletedCovers.includes(coverKey2);
+
+    if (isMarkedDeleted) {
+      if (matching.length > 0) {
+        // If there are real active papers published in Super Admin, auto-unblock and clean deletedCovers!
+        try {
+          const cleaned = deletedCovers.filter(c => c !== sCode && c !== aCode && c !== coverKey1 && c !== coverKey2);
+          localStorage.setItem('olympiadhub_deleted_covers', JSON.stringify(cleaned));
+        } catch (e) {}
+        return matching;
+      }
       return [];
     }
 
-    const matching = examPapers.filter((p) => {
-      if (delSet.has(String(p.id)) || (p.exam_code && delSet.has(String(p.exam_code)))) return false;
-      const pSub = (p.subject_code || p.subject || '').toUpperCase();
-      const isMath = (sCode === 'IMO' || sCode === 'IEOM') && ['IMO', 'IEOM', 'MATH', 'MATHEMATICS'].includes(pSub);
-      const isScience = (sCode === 'ISO' || sCode === 'IEOS') && ['ISO', 'IEOS', 'NSO', 'SCIENCE'].includes(pSub);
-      const isDigital = (sCode === 'IDLO' || sCode === 'IEOD') && ['IDLO', 'IEOD', 'ICSO', 'CYBER', 'COMPUTER'].includes(pSub);
-      const isEnglish = (sCode === 'IEO' || sCode === 'IEOE') && ['IEO', 'IEOE', 'ENGLISH'].includes(pSub);
-      const isGk = (sCode === 'IGKO' || sCode === 'IEOG') && ['IGKO', 'IEOG', 'GK', 'GENERAL KNOWLEDGE'].includes(pSub);
-      const isHindi = (sCode === 'IHO' || sCode === 'IEOH') && ['IHO', 'IEOH', 'HINDI'].includes(pSub);
-      const codeMatches = pSub === sCode || pSub === aCode || isMath || isScience || isDigital || isEnglish || isGk || isHindi;
-      
-      const pCls = (p.class_name || p.class || '').toLowerCase();
-      const sCls = (studentClass || '').toLowerCase();
-      const matchP = pCls.match(/\d+/);
-      const matchS = sCls.match(/\d+/);
-      const classMatches = (matchP && matchS) ? matchP[0] === matchS[0] : (pCls === sCls || !pCls || pCls === 'all');
-
-      return codeMatches && classMatches;
-    });
-
-    // Return ONLY real test papers configured in Super Admin — no phantom/dummy fallbacks
     return matching;
   };
 
-  // Filter covers according to selected subject and only show active non-deleted covers that have mock tests
+  // Filter covers according to selected subject and only show active non-deleted covers
   const visibleCovers = useMemo(() => {
     let deletedCovers = [];
     try {
@@ -501,12 +580,14 @@ export const StudentMyContentPage = ({
     let list = ALL_SUBJECT_COVERS.filter(s => {
       const coverKey = `${s.code}_${studentClass}`;
       const altKey = `${s.altCode}_${studentClass}`;
-      if (deletedCovers.includes(s.code) || deletedCovers.includes(s.altCode) || deletedCovers.includes(coverKey) || deletedCovers.includes(altKey)) {
-        return false;
+      const isExplicitlyDeleted = deletedCovers.includes(s.code) || deletedCovers.includes(s.altCode) || deletedCovers.includes(coverKey) || deletedCovers.includes(altKey);
+
+      // Only hide if explicitly deleted AND there are no active papers published for this subject
+      if (isExplicitlyDeleted) {
+        const allPapers = getSubjectPapers(s.code, s.altCode, 'All Classes');
+        if (allPapers.length === 0) return false;
       }
-      // If super admin has deleted all papers of this cover, or no tests exist, do not show cover in student panel
-      const papers = getSubjectPapers(s.code, s.altCode);
-      return papers.length > 0;
+      return true;
     });
 
     if (selectedSubject && selectedSubject !== 'ALL') {
@@ -1237,55 +1318,91 @@ export const StudentMyContentPage = ({
                 </div>
               </div>
 
-              {!isSubUnlocked ? (
-                /* Locked Test Series Notice */
-                <div className="bg-white rounded-3xl p-8 sm:p-10 border-2 border-amber-300 shadow-sm text-center space-y-4 max-w-xl mx-auto my-8 animate-in fade-in">
-                  <div className="w-16 h-16 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto shadow-xs">
-                    <Lock className="w-8 h-8" />
+              {/* Unlock Banner when locked */}
+              {!isSubUnlocked && (
+                <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 rounded-3xl p-5 sm:p-6 border-2 border-amber-300 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 shadow-xs">
+                      <Lock className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                        🔒 {currentSub.title} Mock Series is Locked ({studentClass})
+                      </h3>
+                      <p className="text-xs text-slate-600 font-medium mt-0.5">
+                        Purchase the complete test series or quick unlock to attempt full CBT timed tests, auto-scoring, and solutions.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                      🔒 {currentSub.title} Mock Series is Locked
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1.5 max-w-md mx-auto leading-relaxed">
-                      Purchase the complete {studentClass} test series to unlock all 5 timed mock papers, CBT exam timer, instant scorecards, and step-by-step solutions.
-                    </p>
-                  </div>
-                  <div className="pt-2">
+                  <div className="flex items-center gap-2.5 flex-wrap shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        savePurchasedSubject(currentSub.code, studentClass);
+                        setPurchasedTests(getPurchasedTests());
+                      }}
+                      className="px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Zap className="w-4 h-4 text-amber-600" />
+                      <span>⚡ Quick Unlock (Free Preview)</span>
+                    </button>
                     <button
                       type="button"
                       onClick={() => setPurchasingSubject(currentSub)}
-                      className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-sm shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer inline-flex items-center gap-2"
+                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer inline-flex items-center gap-2"
                     >
                       <Lock className="w-4 h-4" />
-                      <span>Unlock &amp; Pay ₹{bankSettings.test_pack_price || 99} Now</span>
+                      <span>Unlock &amp; Pay ₹{bankSettings.test_pack_price || 99}</span>
                     </button>
                   </div>
                 </div>
-              ) : subjectPapers.length === 0 ? (
+              )}
+
+              {subjectPapers.length === 0 ? (
                 /* Empty state when no mock tests exist in this series */
-                <div className="bg-white rounded-3xl p-10 border border-slate-200 text-center space-y-4 max-w-md mx-auto my-6 shadow-sm">
-                  <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
-                    <FileText className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-black text-slate-800">
-                      No Mock Tests in {currentSub.title}
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-1">
-                      Currently there are no mock tests configured for {studentClass}. Tests published in Super Admin will show up here automatically.
-                    </p>
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => setOpenedMockSeries(null)}
-                      className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
-                    >
-                      &larr; Back to Series Covers
-                    </button>
-                  </div>
-                </div>
+                (() => {
+                  const allClassPapers = getSubjectPapers(currentSub.code, currentSub.altCode, 'All Classes');
+                  return (
+                    <div className="bg-white rounded-3xl p-10 border border-slate-200 text-center space-y-4 max-w-lg mx-auto my-6 shadow-sm">
+                      <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                        <FileText className="w-7 h-7" />
+                      </div>
+                      <div>
+                        <h3 className="text-base font-black text-slate-800">
+                          No Mock Tests for {studentClass} in {currentSub.title}
+                        </h3>
+                        {allClassPapers.length > 0 ? (
+                          <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                            We found <span className="font-bold text-indigo-600">{allClassPapers.length} mock tests</span> configured across other classes. Switch class to view them.
+                          </p>
+                        ) : (
+                          <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Currently there are no mock tests published for {currentSub.title}. Tests published by Super Admin will show up here automatically.
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-center gap-3 pt-1 flex-wrap">
+                        {allClassPapers.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setSelectedClass('All Classes')}
+                            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                          >
+                            <GraduationCap className="w-4 h-4" />
+                            <span>View All Classes Tests ({allClassPapers.length})</span>
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setOpenedMockSeries(null)}
+                          className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                        >
+                          &larr; Back to Series Covers
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()
               ) : (
                 /* Mock Tests Cards Grid (Colorful 2-3 Mix Pastel Theme) */
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -1358,10 +1475,20 @@ export const StudentMyContentPage = ({
                         <div className="pt-2 flex justify-end">
                           <button
                             type="button"
-                            onClick={() => setSelectedPaperForInstructions(paper)}
-                            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl ${currentSub.btnBg || 'bg-gradient-to-r from-purple-600 via-indigo-600 to-sky-500 text-white'} font-black text-xs sm:text-sm shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95`}
+                            onClick={() => {
+                              if (!isSubUnlocked) {
+                                setPurchasingSubject(currentSub);
+                              } else {
+                                setSelectedPaperForInstructions(paper);
+                              }
+                            }}
+                            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl ${
+                              !isSubUnlocked
+                                ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                                : (currentSub.btnBg || 'bg-gradient-to-r from-purple-600 via-indigo-600 to-sky-500 text-white')
+                            } font-black text-xs sm:text-sm shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95`}
                           >
-                            <span>Open Test</span>
+                            <span>{isSubUnlocked ? 'Open Test' : '🔒 Unlock to Start'}</span>
                             <ArrowRight className="w-4 h-4" />
                           </button>
                         </div>
@@ -1533,17 +1660,30 @@ export const StudentMyContentPage = ({
                           className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-98 transition-all"
                         >
                           <Check className="w-4 h-4 stroke-[3]" />
-                          <span>✓ UNLOCKED - Open Mock Tests &rarr;</span>
+                          <span>✓ UNLOCKED - Open Mock Tests ({getSubjectPapers(sub.code, sub.altCode).length}) &rarr;</span>
                         </button>
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleOpenPayment(sub, primaryPkg)}
-                          className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-98 transition-all cursor-pointer border border-emerald-600"
-                        >
-                          <Lock className="w-4 h-4" />
-                          <span>🔒 Unlock &amp; Buy Test Series (₹{parseFloat(effectivePrice).toFixed(2)})</span>
-                        </button>
+                        <div className="space-y-2">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenPayment(sub, primaryPkg)}
+                            className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-98 transition-all cursor-pointer border border-emerald-600"
+                          >
+                            <Lock className="w-4 h-4" />
+                            <span>🔒 Unlock &amp; Buy Test Series (₹{parseFloat(effectivePrice).toFixed(2)})</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOpenedMockSeries(sub.code);
+                              setSelectedSubject(sub.code);
+                            }}
+                            className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                          >
+                            <Eye className="w-4 h-4 text-indigo-600" />
+                            <span>View Mock Tests ({getSubjectPapers(sub.code, sub.altCode).length}) &rarr;</span>
+                          </button>
+                        </div>
                       )}
 
 

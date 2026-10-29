@@ -873,6 +873,25 @@ export const TestGeneratorAdminManager = () => {
       safeSavePaperToStorage('mock_db_exam_papers', completePaper);
       safeSavePaperToStorage('olympiadhub_db_exams', completePaper);
 
+      // Un-delete cover and un-delete ID if was deleted previously
+      try {
+        const covRaw = localStorage.getItem('olympiadhub_deleted_covers');
+        if (covRaw) {
+          let covList = JSON.parse(covRaw);
+          const sc = (completePaper.subject_code || completePaper.subject || '').toUpperCase();
+          covList = covList.filter(c => c !== sc && !c.startsWith(sc + '_'));
+          localStorage.setItem('olympiadhub_deleted_covers', JSON.stringify(covList));
+        }
+        const delRaw = localStorage.getItem('olympiadhub_deleted_ids');
+        if (delRaw) {
+          let delList = JSON.parse(delRaw);
+          const pId = String(completePaper.id);
+          const pCode = String(completePaper.exam_code || '');
+          delList = delList.filter(id => String(id) !== pId && String(id) !== pCode);
+          localStorage.setItem('olympiadhub_deleted_ids', JSON.stringify(delList));
+        }
+      } catch (e) {}
+
       // 3. API call to mockEngine
       try {
         await apiClient.post('/test-generator/admin-papers', completePaper);
@@ -882,6 +901,7 @@ export const TestGeneratorAdminManager = () => {
 
       // 4. Dispatch sync events
       try {
+        window.dispatchEvent(new CustomEvent('olympiadhub-covers-updated'));
         window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: completePaper }));
         window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: completePaper }));
         window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exam_papers', data: [completePaper] } }));

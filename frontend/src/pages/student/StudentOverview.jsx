@@ -54,6 +54,7 @@ import {
 import { isSubjectPurchased, getPurchasedTests } from '../../utils/purchaseUtils';
 
 const CLASS_OPTIONS = [
+  'All Classes',
   'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 
   'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 
   'Class 11', 'Class 12'
@@ -113,11 +114,12 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
   const fetchDashboard = async (showLoading = false) => {
     try {
       if (showLoading) setLoading(true);
-      const [dashRes, examsRes, certRes, papersRes] = await Promise.all([
+      const [dashRes, examsRes, certRes, papersRes, allExamsRes] = await Promise.all([
         apiClient.get('/analytics/student').catch(() => ({ success: false })),
         apiClient.get('/exams/available').catch(() => ({ success: false })),
         apiClient.get('/certificates/my').catch(() => ({ success: false })),
-        apiClient.get('/exam-papers').catch(() => ({ success: false }))
+        apiClient.get('/exam-papers').catch(() => ({ success: false })),
+        apiClient.get('/exams').catch(() => ({ success: false }))
       ]);
 
       if (dashRes.success && dashRes.data) {
@@ -126,6 +128,13 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
 
       // Merge local stores for exams
       let examsList = (examsRes && examsRes.success && Array.isArray(examsRes.data)) ? [...examsRes.data] : [];
+      if (allExamsRes && allExamsRes.success && Array.isArray(allExamsRes.data)) {
+        allExamsRes.data.forEach(e => {
+          if (!examsList.some(x => String(x.id) === String(e.id) || (x.exam_code && e.exam_code && x.exam_code === e.exam_code))) {
+            examsList.push(e);
+          }
+        });
+      }
       const addUniqueItem = (list, item) => {
         if (!item || (!item.id && !item.exam_code && !item.short_code)) return;
         if (item.status === 'draft') return; // Never show drafts to students
@@ -191,6 +200,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       let papersList = (papersRes && papersRes.success && Array.isArray(papersRes.data))
         ? papersRes.data.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code))))
         : [];
+      if (allExamsRes && allExamsRes.success && Array.isArray(allExamsRes.data)) {
+        allExamsRes.data.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code)))).forEach(p => addUniqueItem(papersList, p));
+      }
       try {
         const genPapers = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
         if (Array.isArray(genPapers)) genPapers.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code)))).forEach(p => addUniqueItem(papersList, p));

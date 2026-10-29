@@ -503,7 +503,27 @@ export const ExamManagementPage = () => {
         const updatedDb = [savedExam, ...dbPapers.filter(p => String(p.id) !== String(savedExam.id))];
         localStorage.setItem('olympiadhub_db_exam_papers', JSON.stringify(updatedDb));
 
+        // Un-delete cover and un-delete paper ID if previously marked deleted
+        try {
+          const covRaw = localStorage.getItem('olympiadhub_deleted_covers');
+          if (covRaw) {
+            let covList = JSON.parse(covRaw);
+            const sc = (savedExam.subject_code || '').toUpperCase();
+            covList = covList.filter(c => c !== sc && !c.startsWith(sc + '_'));
+            localStorage.setItem('olympiadhub_deleted_covers', JSON.stringify(covList));
+          }
+          const delRaw = localStorage.getItem('olympiadhub_deleted_ids');
+          if (delRaw) {
+            let delList = JSON.parse(delRaw);
+            const pId = String(savedExam.id);
+            const pCode = String(savedExam.exam_code || '');
+            delList = delList.filter(id => String(id) !== pId && String(id) !== pCode);
+            localStorage.setItem('olympiadhub_deleted_ids', JSON.stringify(delList));
+          }
+        } catch (e) {}
+
         // Dispatch sync events across UI
+        window.dispatchEvent(new CustomEvent('olympiadhub-covers-updated'));
         window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: savedExam }));
         window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: savedExam }));
         window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams', data: updatedExams } }));
@@ -529,7 +549,29 @@ export const ExamManagementPage = () => {
 
   const handleDeleteExam = async (id) => {
     try {
-      await apiClient.delete(`/exams/${id}`);
+      await apiClient.delete(`/exams/${id}`).catch(() => {});
+
+      try {
+        const delRaw = localStorage.getItem('olympiadhub_deleted_ids');
+        const delList = delRaw ? JSON.parse(delRaw) : [];
+        if (!delList.includes(String(id))) {
+          delList.push(String(id));
+          localStorage.setItem('olympiadhub_deleted_ids', JSON.stringify(delList));
+        }
+
+        ['olympiadhub_db_exams', 'admin_generator_papers', 'mock_db_exam_papers', 'olympiadhub_db_exam_papers'].forEach(k => {
+          const list = JSON.parse(localStorage.getItem(k) || '[]');
+          const filtered = list.filter(p => String(p.id) !== String(id) && (!p.exam_code || String(p.exam_code) !== String(id)));
+          localStorage.setItem(k, JSON.stringify(filtered));
+        });
+
+        window.dispatchEvent(new CustomEvent('olympiadhub-covers-updated'));
+        window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated'));
+        window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated'));
+        window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams' } }));
+        window.dispatchEvent(new Event('storage'));
+      } catch (e) {}
+
       setFeedback({ type: 'success', message: 'Exam deleted successfully.' });
       fetchExams();
     } catch (err) {

@@ -1116,7 +1116,7 @@ export const SuperAdminPackagesManager = () => {
         localStorage.setItem(examsKey, JSON.stringify(updatedExams));
       } catch (err) {}
 
-      // Un-delete cover if it was deleted previously
+      // Un-delete cover and un-delete ID if was deleted previously
       try {
         const covRaw = localStorage.getItem('olympiadhub_deleted_covers');
         if (covRaw) {
@@ -1124,6 +1124,14 @@ export const SuperAdminPackagesManager = () => {
           const sc = (payload.subject_code || '').toUpperCase();
           covList = covList.filter(c => c !== sc && !c.startsWith(sc + '_'));
           localStorage.setItem('olympiadhub_deleted_covers', JSON.stringify(covList));
+        }
+        const delRaw = localStorage.getItem('olympiadhub_deleted_ids');
+        if (delRaw) {
+          let delList = JSON.parse(delRaw);
+          const pId = String(payload.id);
+          const pCode = String(payload.exam_code || '');
+          delList = delList.filter(id => String(id) !== pId && String(id) !== pCode);
+          localStorage.setItem('olympiadhub_deleted_ids', JSON.stringify(delList));
         }
       } catch (e) {}
 
