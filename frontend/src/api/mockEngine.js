@@ -2239,7 +2239,13 @@ export const mockEngine = {
           class_name: body.class_name || body.class || currentUser.class_name || currentUser.class
         };
         sessionStorage.setItem('olympiadhub_user', JSON.stringify(updatedUser));
-        localStorage.setItem('olympiadhub_user', JSON.stringify(updatedUser));
+        if (updatedUser.role !== 'superadmin') {
+          localStorage.setItem('olympiadhub_user', JSON.stringify(updatedUser));
+        } else {
+          localStorage.removeItem('olympiadhub_user');
+          localStorage.removeItem('olympiadhub_token');
+          localStorage.removeItem('token');
+        }
 
         // Update in users table too
         try {
@@ -2261,9 +2267,32 @@ export const mockEngine = {
       }
 
       if (sub === 'me') {
-        const token = sessionStorage.getItem('olympiadhub_token') || localStorage.getItem('olympiadhub_token') || sessionStorage.getItem('token') || localStorage.getItem('token');
-        const savedUserRaw = sessionStorage.getItem('olympiadhub_user') || localStorage.getItem('olympiadhub_user');
-        if (!token || !savedUserRaw) {
+        const sessionToken = sessionStorage.getItem('olympiadhub_token') || sessionStorage.getItem('token');
+        const sessionUserRaw = sessionStorage.getItem('olympiadhub_user');
+
+        let savedUserRaw = sessionUserRaw;
+        // Only non-superadmin users may ever restore from localStorage
+        if (!savedUserRaw) {
+          const localUserRaw = localStorage.getItem('olympiadhub_user');
+          if (localUserRaw) {
+            try {
+              const parsed = JSON.parse(localUserRaw);
+              if (parsed?.role !== 'superadmin') {
+                savedUserRaw = localUserRaw;
+              } else {
+                localStorage.removeItem('olympiadhub_user');
+                localStorage.removeItem('olympiadhub_token');
+                localStorage.removeItem('token');
+              }
+            } catch {}
+          }
+        }
+
+        const effectiveToken = sessionUserRaw 
+          ? sessionToken 
+          : (sessionToken || localStorage.getItem('olympiadhub_token') || localStorage.getItem('token'));
+
+        if (!effectiveToken || !savedUserRaw) {
           return { success: false, message: 'Unauthenticated' };
         }
         let user = null;
@@ -2275,8 +2304,8 @@ export const mockEngine = {
         if (!user || !user.role) {
           return { success: false, message: 'Unauthenticated' };
         }
-        // Super Admin sessions MUST be in sessionStorage. If tab was closed, admin is logged out!
-        if (user.role === 'superadmin' && !sessionStorage.getItem('olympiadhub_user')) {
+        // Super Admin sessions MUST strictly be in active sessionStorage!
+        if (user.role === 'superadmin' && !sessionUserRaw) {
           localStorage.removeItem('olympiadhub_user');
           localStorage.removeItem('olympiadhub_token');
           return { success: false, message: 'Admin session closed' };

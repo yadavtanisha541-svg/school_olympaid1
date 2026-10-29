@@ -5,6 +5,19 @@ const API_BASE = '/api';
 
 export const apiClient = {
   getToken() {
+    const sessionUser = sessionStorage.getItem('olympiadhub_user');
+    const localUser = localStorage.getItem('olympiadhub_user');
+    let isSuperAdmin = false;
+    try {
+      if (sessionUser && JSON.parse(sessionUser)?.role === 'superadmin') isSuperAdmin = true;
+      if (localUser && JSON.parse(localUser)?.role === 'superadmin') isSuperAdmin = true;
+    } catch (e) {}
+
+    if (isSuperAdmin) {
+      // Superadmin token MUST strictly come from active sessionStorage!
+      return sessionStorage.getItem('olympiadhub_token') || sessionStorage.getItem('token') || null;
+    }
+
     return sessionStorage.getItem('olympiadhub_token') || 
            sessionStorage.getItem('token') || 
            localStorage.getItem('olympiadhub_token') || 

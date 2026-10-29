@@ -90,9 +90,23 @@ const parseRouteFromUrl = () => {
       if (saved) savedState = JSON.parse(saved);
     } catch {}
 
-    // When opening the website link directly with no hash (e.g. root link),
+    // When opening the website link directly (e.g. root link or home):
     // ALWAYS open the clean Public Home Page. Admin panel must never open automatically.
-    if (!rawHash) {
+    if (!rawHash || rawHash === 'home' || rawHash === '/') {
+      try {
+        const sessionUser = sessionStorage.getItem('olympiadhub_user');
+        if (sessionUser && JSON.parse(sessionUser)?.role === 'superadmin') {
+          sessionStorage.removeItem('olympiadhub_user');
+          sessionStorage.removeItem('olympiadhub_token');
+        }
+        const localUser = localStorage.getItem('olympiadhub_user');
+        if (localUser && JSON.parse(localUser)?.role === 'superadmin') {
+          localStorage.removeItem('olympiadhub_user');
+          localStorage.removeItem('olympiadhub_token');
+          localStorage.removeItem('token');
+        }
+      } catch (e) {}
+
       return {
         viewMode: 'public',
         activePublicPage: 'home',
@@ -108,10 +122,20 @@ const parseRouteFromUrl = () => {
     const params = new URLSearchParams(queryString || '');
 
     if (routePath.startsWith('dashboard') || routePath.startsWith('superadmin')) {
-      const savedUser = localStorage.getItem('olympiadhub_user') || sessionStorage.getItem('olympiadhub_user');
-      const token = localStorage.getItem('olympiadhub_token') || sessionStorage.getItem('olympiadhub_token') || localStorage.getItem('token') || sessionStorage.getItem('token');
-      // If NOT logged in, require login! Never auto-open admin panel!
-      if (!savedUser || !token) {
+      // Admin dashboard access strictly requires ACTIVE session in sessionStorage!
+      const sessionUserStr = sessionStorage.getItem('olympiadhub_user');
+      const sessionToken = sessionStorage.getItem('olympiadhub_token') || sessionStorage.getItem('token');
+      
+      let isValidSession = false;
+      try {
+        if (sessionUserStr && sessionToken) {
+          const u = JSON.parse(sessionUserStr);
+          if (u?.role) isValidSession = true;
+        }
+      } catch {}
+
+      // If NOT an active session (e.g. website was closed or opened freshly), require login!
+      if (!isValidSession) {
         return {
           viewMode: 'login',
           activePublicPage: 'home',
