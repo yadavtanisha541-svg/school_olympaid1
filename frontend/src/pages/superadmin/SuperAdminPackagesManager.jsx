@@ -1142,7 +1142,13 @@ export const SuperAdminPackagesManager = () => {
   };
 
   // Delete Exam Paper
-  const handleDeletePaper = async (id) => {
+  // Delete Exam Paper
+  const handleDeletePaper = async (id, title) => {
+    const paperToDelete = examPapers.find(p => String(p.id) === String(id));
+    const paperName = title || paperToDelete?.title || 'this Mock Test Paper';
+    if (!window.confirm(`Kya aap "${paperName}" ko delete karna chahte hain?`)) {
+      return;
+    }
     try {
       await apiClient.delete(`/exam-papers/${id}`).catch(() => null);
       try {
@@ -1157,10 +1163,16 @@ export const SuperAdminPackagesManager = () => {
         const genKey = 'admin_generator_papers';
         const existingGen = JSON.parse(localStorage.getItem(genKey) || '[]');
         localStorage.setItem(genKey, JSON.stringify(existingGen.filter(p => String(p.id) !== String(id))));
+
+        const dbExamsKey = 'olympiadhub_db_exams';
+        const existingDbExams = JSON.parse(localStorage.getItem(dbExamsKey) || '[]');
+        localStorage.setItem(dbExamsKey, JSON.stringify(existingDbExams.filter(p => String(p.id) !== String(id) && String(p.exam_code) !== String(id))));
       } catch (e) {}
 
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedId: id } }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated'));
+        window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
       }
 
       setExamPapers(prev => prev.filter(p => String(p.id) !== String(id)));
@@ -1168,6 +1180,53 @@ export const SuperAdminPackagesManager = () => {
     } catch (err) {
       console.warn('Delete error:', err);
       showToast('Failed to delete paper.', 'error');
+    }
+  };
+
+  // Delete all mock tests inside a series cover
+  const handleDeleteAllPapersInCover = async (cover) => {
+    if (!cover || !cover.papers || cover.papers.length === 0) {
+      showToast(`No mock tests found in ${cover?.code || 'this series'} to delete.`, 'info');
+      return;
+    }
+
+    const count = cover.papers.length;
+    const confirmMsg = `Kya aap "${cover.seriesTitle}" ke sabhi ${count} mock test papers ko delete karna chahte hain?`;
+    if (!window.confirm(confirmMsg)) return;
+
+    const paperIds = cover.papers.map(p => String(p.id));
+
+    try {
+      await Promise.all(paperIds.map(id => apiClient.delete(`/exam-papers/${id}`).catch(() => null)));
+      try {
+        const dbKey = 'olympiadhub_db_exam_papers';
+        const existingDb = JSON.parse(localStorage.getItem(dbKey) || '[]');
+        localStorage.setItem(dbKey, JSON.stringify(existingDb.filter(p => !paperIds.includes(String(p.id)))));
+
+        const mockKey = 'mock_db_exam_papers';
+        const existingMock = JSON.parse(localStorage.getItem(mockKey) || '[]');
+        localStorage.setItem(mockKey, JSON.stringify(existingMock.filter(p => !paperIds.includes(String(p.id)))));
+
+        const genKey = 'admin_generator_papers';
+        const existingGen = JSON.parse(localStorage.getItem(genKey) || '[]');
+        localStorage.setItem(genKey, JSON.stringify(existingGen.filter(p => !paperIds.includes(String(p.id)))));
+
+        const dbExamsKey = 'olympiadhub_db_exams';
+        const existingDbExams = JSON.parse(localStorage.getItem(dbExamsKey) || '[]');
+        localStorage.setItem(dbExamsKey, JSON.stringify(existingDbExams.filter(p => !paperIds.includes(String(p.id)) && !paperIds.includes(String(p.exam_code)))));
+      } catch (e) {}
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedIds: paperIds } }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated'));
+        window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+      }
+
+      setExamPapers(prev => prev.filter(p => !paperIds.includes(String(p.id))));
+      showToast(`✓ All ${count} mock tests from ${cover.code} deleted successfully.`, 'info');
+    } catch (err) {
+      console.warn('Delete all error:', err);
+      showToast('Failed to delete papers.', 'error');
     }
   };
 
@@ -3293,9 +3352,24 @@ export const SuperAdminPackagesManager = () => {
                             <Icon className="w-4 h-4 text-white" />
                             <span>{cover.code} Olympiad Series</span>
                           </div>
-                          <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded bg-white/20">
-                            {cover.className}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            {cover.totalPapers > 0 && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteAllPapersInCover(cover);
+                                }}
+                                className="p-1 rounded-md bg-white/20 hover:bg-rose-600 text-white transition-all"
+                                title={`Delete all ${cover.totalPapers} mock tests in ${cover.code}`}
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                            <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded bg-white/20">
+                              {cover.className}
+                            </span>
+                          </div>
                         </div>
 
                         {/* Card Body */}
@@ -3321,21 +3395,55 @@ export const SuperAdminPackagesManager = () => {
                             </div>
                           </div>
 
-                          {/* Quick Preview of Tests inside */}
+                          {/* Quick Preview of Tests inside with direct delete */}
                           <div className="space-y-1.5 pt-1">
-                            <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
-                              Mock Tests in this Cover:
-                            </span>
-                            {cover.papers.slice(0, 3).map((p, pIdx) => (
-                              <div key={pIdx} className="flex items-center gap-1.5 text-xs text-slate-700 truncate">
-                                <FileCheck2 className="w-3.5 h-3.5 text-[#859900] shrink-0" />
-                                <span className="truncate font-semibold">{p.title}</span>
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
+                                Mock Tests in this Cover:
+                              </span>
+                              {cover.totalPapers > 0 && (
+                                <span className="text-[10px] text-slate-400 font-bold">
+                                  {cover.totalPapers} Total
+                                </span>
+                              )}
+                            </div>
+
+                            {cover.papers.slice(0, 4).map((p, pIdx) => (
+                              <div
+                                key={pIdx}
+                                className="flex items-center justify-between gap-1.5 text-xs text-slate-700 py-1 px-1.5 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all group/item"
+                              >
+                                <div className="flex items-center gap-1.5 truncate min-w-0">
+                                  <FileCheck2 className="w-3.5 h-3.5 text-[#859900] shrink-0" />
+                                  <span className="truncate font-semibold text-slate-800" title={p.title}>
+                                    {p.title}
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeletePaper(p.id, p.title);
+                                  }}
+                                  className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors shrink-0"
+                                  title={`Delete "${p.title}"`}
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
                               </div>
                             ))}
-                            {cover.papers.length > 3 && (
-                              <span className="text-[11px] font-bold text-slate-400 block">
-                                + {cover.papers.length - 3} more mock tests
-                              </span>
+
+                            {cover.papers.length > 4 && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedSubjectCover(cover.code);
+                                }}
+                                className="text-[11px] font-bold text-[#859900] hover:underline block text-left pt-0.5 cursor-pointer"
+                              >
+                                + {cover.papers.length - 4} more mock tests (Manage All) &rarr;
+                              </button>
                             )}
                             {cover.papers.length === 0 && (
                               <span className="text-xs italic text-slate-400">No mock tests configured yet.</span>
@@ -3351,16 +3459,33 @@ export const SuperAdminPackagesManager = () => {
                           <ChevronRight className="w-4 h-4" />
                         </span>
 
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenCreatePaper(cover.code, cover.className);
-                          }}
-                          className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#859900] hover:text-white border border-slate-200 text-slate-700 text-xs font-bold transition-all shadow-2xs"
-                        >
-                          + Add Test
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          {cover.totalPapers > 0 && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteAllPapersInCover(cover);
+                              }}
+                              className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-rose-50 hover:text-rose-600 border border-slate-200 text-slate-500 text-xs font-bold transition-all shadow-2xs flex items-center gap-1 cursor-pointer"
+                              title={`Delete all ${cover.totalPapers} mock tests in this cover`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span className="hidden sm:inline">Delete</span>
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenCreatePaper(cover.code, cover.className);
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#859900] hover:text-white border border-slate-200 text-slate-700 text-xs font-bold transition-all shadow-2xs cursor-pointer"
+                          >
+                            + Add Test
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );
@@ -3389,6 +3514,22 @@ export const SuperAdminPackagesManager = () => {
                 </div>
 
                 <div className="flex items-center gap-2.5">
+                  {activeSubjectPapers.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteAllPapersInCover({
+                        code: selectedSubjectCover,
+                        seriesTitle: `${packageClassFilter} - All India ${selectedSubjectCover} Mock Test Series`,
+                        papers: activeSubjectPapers
+                      })}
+                      className="px-3.5 py-2 rounded-xl bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-300 text-slate-600 hover:text-rose-600 font-bold text-xs shadow-2xs active:scale-95 cursor-pointer flex items-center gap-1.5 transition-all"
+                      title={`Delete all ${activeSubjectPapers.length} mock tests in this series`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Delete All ({activeSubjectPapers.length})</span>
+                    </button>
+                  )}
+
                   <button
                     type="button"
                     onClick={() => handleAddMockTestToSeries(selectedSubjectCover, packageClassFilter, activeSubjectPapers.length)}
