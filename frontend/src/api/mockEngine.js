@@ -1348,57 +1348,6 @@ const initialStore = {
         ]
     },
     {
-        "id": 12,
-        "title": "Class 10 IMO Official Free Sample Paper",
-        "exam_code": "SMP-MAT-6B590",
-        "exam_type": "sample_paper",
-        "paper_category": "mock_test",
-        "category": "mock_test",
-        "class_id": 10,
-        "class_name": "Class 10",
-        "class": "Class 10",
-        "subject_code": "IMO",
-        "subject_name": "Mathematics",
-        "duration_minutes": 10,
-        "total_marks": 1,
-        "total_questions": 1,
-        "passing_percentage": 40,
-        "status": "published",
-        "questions": [
-            {
-                "id": 15,
-                "class_id": 10,
-                "class_name": "Class 10",
-                "class": "Class 10",
-                "subject_id": 1,
-                "subject_code": "IMO",
-                "subject_name": "Mathematics",
-                "subject": "Mathematics",
-                "question_text": "who is father of maths",
-                "q": "who is father of maths",
-                "options": [
-                    "albert einstein",
-                    "aryabhatt",
-                    "sunny deol",
-                    "chunni lal"
-                ],
-                "option_a": "albert einstein",
-                "option_b": "aryabhatt",
-                "option_c": "sunny deol",
-                "option_d": "chunni lal",
-                "correct_option": "B",
-                "correct": 1,
-                "difficulty": "medium",
-                "marks": 1,
-                "negative_marks": 0.25,
-                "explanation": "",
-                "status": "active",
-                "author_name": "Super Administrator",
-                "created_at": "2026-10-05 13:52:33"
-            }
-        ]
-    },
-    {
         "id": 13,
         "title": "Class 6 IMO Previous Year Question Paper (2024)",
         "exam_code": "PYP-MAT-0AD10",
@@ -2040,15 +1989,15 @@ function getDb(table) {
       return parsed;
     }
     if (table === 'exams') {
-      let delSet = new Set();
+      let delSet = new Set(['SMP-MAT-6B590', '12']);
       try {
         const delArr = JSON.parse(localStorage.getItem('olympiadhub_deleted_ids') || '[]');
-        delSet = new Set(delArr.map(String));
+        delArr.forEach(d => delSet.add(String(d)));
       } catch (e) {}
 
       // Strictly filter out any deleted exam by id or exam_code
       if (Array.isArray(parsed)) {
-        parsed = parsed.filter(e => !delSet.has(String(e.id)) && (!e.exam_code || !delSet.has(String(e.exam_code))));
+        parsed = parsed.filter(e => !delSet.has(String(e.id)) && (!e.exam_code || !delSet.has(String(e.exam_code))) && !(e.title && (e.title.includes('Class 10 IMO Official Free Sample Paper') || e.title.includes('Class 5 IMO Mock Test Paper'))));
       }
 
       const examsSeeded = localStorage.getItem('olympiadhub_exams_seeded_v1');
@@ -2063,13 +2012,13 @@ function getDb(table) {
       return parsed || [];
     }
     if (table === 'exam_papers') {
-      let delSet = new Set();
+      let delSet = new Set(['SMP-MAT-6B590', '12']);
       try {
         const delArr = JSON.parse(localStorage.getItem('olympiadhub_deleted_ids') || '[]');
-        delSet = new Set(delArr.map(String));
+        delArr.forEach(d => delSet.add(String(d)));
       } catch (e) {}
       if (Array.isArray(parsed)) {
-        parsed = parsed.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code))) && (!p.short_code || !delSet.has(String(p.short_code))));
+        parsed = parsed.filter(p => !delSet.has(String(p.id)) && (!p.exam_code || !delSet.has(String(p.exam_code))) && (!p.short_code || !delSet.has(String(p.short_code))) && !(p.title && (p.title.includes('Class 10 IMO Official Free Sample Paper') || p.title.includes('Class 5 IMO Mock Test Paper'))));
       }
       return parsed || [];
     }
@@ -2095,6 +2044,8 @@ export function registerDeletedId(id, code) {
     }
 
     const delSet = new Set(list.map(String));
+    delSet.add('SMP-MAT-6B590');
+    delSet.add('12');
     const cleanArr = (arr) => {
       if (!Array.isArray(arr)) return [];
       return arr.filter(item => {
@@ -2102,6 +2053,7 @@ export function registerDeletedId(id, code) {
         if (item.id && delSet.has(String(item.id))) return false;
         if (item.exam_code && delSet.has(String(item.exam_code))) return false;
         if (item.short_code && delSet.has(String(item.short_code))) return false;
+        if (item.title && (item.title.includes('Class 10 IMO Official Free Sample Paper') || item.title.includes('Class 5 IMO Mock Test Paper'))) return false;
         return true;
       });
     };
