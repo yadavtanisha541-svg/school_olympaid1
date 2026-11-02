@@ -339,7 +339,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           ].map((sub) => {
                             const SubIcon = sub.icon;
                             const isSubActive = currentTab === sub.id;
-                            const isUnlocked = isSubjectPurchased(sub.key, user?.class || user?.grade || 'Class 6', purchasedTests);
+                            const isUnlocked = isSubjectPurchased(sub.key, user?.class_name || user?.class || user?.grade || 'Class 6', purchasedTests);
 
                             return (
                               <button

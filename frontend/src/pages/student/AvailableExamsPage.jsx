@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { apiClient } from '../../api/client';
 import {
   BookOpen,
@@ -16,7 +16,9 @@ import {
   HelpCircle,
   FileText,
   Sparkles,
-  User
+  User,
+  Search,
+  Filter
 } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
@@ -24,8 +26,10 @@ import { Badge } from '../../components/Badge';
 export const AvailableExamsPage = ({ onStartExam }) => {
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(''); // '' (All) | 'free_trial' | 'practice' | 'mock' | 'paid'
+  const [activeTab, setActiveTab] = useState(''); // '' (All) | 'free_trial' | 'practice' | 'mock'
   const [selectedClassFilter, setSelectedClassFilter] = useState('All');
+  const [selectedSubjectFilter, setSelectedSubjectFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Full-Screen Instructions Page State (No modals!)
   const [selectedExamForInstructions, setSelectedExamForInstructions] = useState(null);
@@ -88,25 +92,13 @@ export const AvailableExamsPage = ({ onStartExam }) => {
         if (Array.isArray(mockPapers)) mockPapers.forEach(addUniqueExam);
       } catch (e) {}
 
-      if (activeTab && activeTab !== 'all') {
-        list = list.filter(e => {
-          const t = (e.exam_type || e.paper_category || e.category || 'mock').toLowerCase();
-          const title = (e.title || e.name || '').toLowerCase();
-          return t === activeTab.toLowerCase() ||
-                 (activeTab === 'practice' && (t.includes('practice') || t.includes('generator') || title.includes('practice'))) ||
-                 (activeTab === 'mock' && (t.includes('mock') || title.includes('mock') || !t.includes('practice')));
-        });
-      }
-
-      if (selectedClassFilter && selectedClassFilter !== 'All') {
-        const selNum = (selectedClassFilter.match(/\d+/) || [])[0];
-        list = list.filter(e => {
-          const eCls = String(e.class_name || e.class || e.grade || '').toLowerCase();
-          if (!eCls || eCls === 'all') return true;
-          const eNum = (eCls.match(/\d+/) || [])[0];
-          return (selNum && eNum && selNum === eNum) || eCls.includes(selectedClassFilter.toLowerCase());
-        });
-      }
+      // Filter out deleted IDs
+      let deletedIds = [];
+      try {
+        deletedIds = JSON.parse(localStorage.getItem('olympiadhub_deleted_ids') || '[]');
+      } catch (e) {}
+      const delSet = new Set((deletedIds || []).map(String));
+      list = list.filter(e => !delSet.has(String(e.id)) && (!e.exam_code || !delSet.has(String(e.exam_code))));
 
       setExams(list);
     } catch (err) {
@@ -118,7 +110,7 @@ export const AvailableExamsPage = ({ onStartExam }) => {
 
   useEffect(() => {
     fetchExams();
-  }, [activeTab, selectedClassFilter]);
+  }, [activeTab]);
 
   useEffect(() => {
     let timer = null;
@@ -139,7 +131,65 @@ export const AvailableExamsPage = ({ onStartExam }) => {
       window.removeEventListener('olympiadhub-data-updated', handleUpdate);
       window.removeEventListener('storage', handleUpdate);
     };
-  }, [activeTab, selectedClassFilter]);
+  }, [activeTab]);
+
+  // Extract dynamic subject options from all published exams
+  const subjectOptions = useMemo(() => {
+    const set = new Set();
+    exams.forEach(e => {
+      const s = (e.subject_name || e.subject || e.subject_code || '').trim();
+      if (s) set.add(s);
+    });
+    return Array.from(set).sort();
+  }, [exams]);
+
+  // Client-side filtering across class, subject, search, and exam type
+  const filteredExams = useMemo(() => {
+    return exams.filter(e => {
+      // 1. Tab filter
+      if (activeTab && activeTab !== 'all') {
+        const t = (e.exam_type || e.paper_category || e.category || 'mock').toLowerCase();
+        const title = (e.title || e.name || '').toLowerCase();
+        const tabMatch = t === activeTab.toLowerCase() ||
+               (activeTab === 'practice' && (t.includes('practice') || t.includes('generator') || title.includes('practice'))) ||
+               (activeTab === 'mock' && (t.includes('mock') || title.includes('mock') || !t.includes('practice')));
+        if (!tabMatch) return false;
+      }
+
+      // 2. Class filter
+      if (selectedClassFilter && selectedClassFilter !== 'All') {
+        const selNum = (selectedClassFilter.match(/\d+/) || [])[0];
+        const eCls = String(e.class_name || e.class || e.grade || '').toLowerCase();
+        if (eCls && eCls !== 'all' && eCls !== 'all classes') {
+          const eNum = (eCls.match(/\d+/) || [])[0];
+          const classMatch = (selNum && eNum && selNum === eNum) || eCls.includes(selectedClassFilter.toLowerCase());
+          if (!classMatch) return false;
+        }
+      }
+
+      // 3. Subject filter
+      if (selectedSubjectFilter && selectedSubjectFilter !== 'All') {
+        const sTarget = selectedSubjectFilter.toLowerCase();
+        const eSub = String(e.subject_name || e.subject || e.subject_code || '').toLowerCase();
+        const eTitle = String(e.title || '').toLowerCase();
+        if (!eSub.includes(sTarget) && !eTitle.includes(sTarget) && !sTarget.includes(eSub)) {
+          return false;
+        }
+      }
+
+      // 4. Search query
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const matchTitle = (e.title || '').toLowerCase().includes(q);
+        const matchCode = (e.exam_code || '').toLowerCase().includes(q);
+        const matchSub = (e.subject_name || e.subject || e.subject_code || '').toLowerCase().includes(q);
+        const matchClass = (e.class_name || e.class || '').toLowerCase().includes(q);
+        if (!matchTitle && !matchCode && !matchSub && !matchClass) return false;
+      }
+
+      return true;
+    });
+  }, [exams, activeTab, selectedClassFilter, selectedSubjectFilter, searchQuery]);
 
   const handleLaunchClick = (exam) => {
     setSelectedExamForInstructions(exam);
@@ -353,43 +403,83 @@ export const AvailableExamsPage = ({ onStartExam }) => {
         </p>
       </div>
 
-      {/* Filter Bar with Tabs and Class Selector */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/80 shadow-xs max-w-xl">
-          {[
-            { id: '', label: 'All Exams' },
-            { id: 'mock', label: 'Mock Olympiads' },
-            { id: 'practice', label: 'Practice Tests' },
-            { id: 'free_trial', label: 'Free Trial' }
-          ].map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
-                  isActive ? 'bg-indigo-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-50'
-                }`}
+      {/* Filter Bar with Tabs, Class Selector, Subject Filter & Search */}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/80 shadow-xs max-w-xl flex-wrap">
+            {[
+              { id: '', label: 'All Exams' },
+              { id: 'mock', label: 'Mock Olympiads' },
+              { id: 'practice', label: 'Practice Tests' },
+              { id: 'free_trial', label: 'Free Trial' }
+            ].map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`py-2 px-3 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
+                    isActive ? 'bg-indigo-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Subject Filter */}
+            <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-2xl border border-slate-200/80 shadow-xs">
+              <span className="text-xs font-bold text-slate-500">Subject:</span>
+              <select
+                value={selectedSubjectFilter}
+                onChange={(e) => setSelectedSubjectFilter(e.target.value)}
+                className="text-xs font-bold text-slate-800 bg-transparent border-0 outline-none cursor-pointer pr-1"
               >
-                {tab.label}
-              </button>
-            );
-          })}
+                <option value="All">All Subjects</option>
+                {subjectOptions.map(sub => (
+                  <option key={sub} value={sub}>{sub}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Class Filter */}
+            <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-2xl border border-slate-200/80 shadow-xs">
+              <span className="text-xs font-bold text-slate-500">Class:</span>
+              <select
+                value={selectedClassFilter}
+                onChange={(e) => setSelectedClassFilter(e.target.value)}
+                className="text-xs font-black text-slate-800 bg-transparent border-0 outline-none cursor-pointer pr-1"
+              >
+                <option value="All">All Classes</option>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => (
+                  <option key={num} value={`Class ${num}`}>Class {num}</option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-2xl border border-slate-200/80 shadow-xs">
-          <span className="text-xs font-bold text-slate-500">Class:</span>
-          <select
-            value={selectedClassFilter}
-            onChange={(e) => setSelectedClassFilter(e.target.value)}
-            className="text-xs font-black text-slate-800 bg-transparent border-0 outline-none cursor-pointer pr-1"
-          >
-            <option value="All">All Classes</option>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => (
-              <option key={num} value={`Class ${num}`}>Class {num}</option>
-            ))}
-          </select>
+        {/* Search Bar */}
+        <div className="relative w-full max-w-md">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search exam title, subject, code or class..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200/80 rounded-2xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 font-bold"
+            >
+              ✕
+            </button>
+          )}
         </div>
       </div>
 
@@ -397,18 +487,19 @@ export const AvailableExamsPage = ({ onStartExam }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
           [1, 2, 3].map((i) => <div key={i} className="h-56 bg-slate-200 rounded-3xl animate-pulse" />)
-        ) : exams.length === 0 ? (
+        ) : filteredExams.length === 0 ? (
           <div className="col-span-full bg-white rounded-3xl border border-slate-200 p-12 text-center text-slate-400 text-xs">
             <BookOpen className="w-12 h-12 mx-auto mb-2 text-slate-300" />
-            <p className="text-sm font-semibold text-slate-600">No examinations available in this category</p>
-            <p className="mt-1">Check back later or switch category filters above.</p>
+            <p className="text-sm font-semibold text-slate-600">No examinations found</p>
+            <p className="mt-1">Try changing your search term, subject or class filter.</p>
           </div>
         ) : (
-          exams.map((exam) => {
+          filteredExams.map((exam) => {
             const hasActiveAttempt = !!exam.active_attempt_id;
             const attemptCount = parseInt(exam.user_attempt_count || 0);
             const limit = parseInt(exam.attempt_limit || 1);
             const isLimitReached = attemptCount >= limit && !hasActiveAttempt;
+            const subjectLabel = exam.subject_name || exam.subject || exam.subject_code || '';
 
             return (
               <div
@@ -424,6 +515,11 @@ export const AvailableExamsPage = ({ onStartExam }) => {
                       {exam.class_name && (
                         <span className="text-[10px] font-bold text-[#065f46] bg-[#ecfdf5] px-2 py-0.5 rounded-full border border-[#a7f3d0]">
                           {exam.class_name}
+                        </span>
+                      )}
+                      {subjectLabel && (
+                        <span className="text-[10px] font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full border border-violet-200">
+                          {subjectLabel}
                         </span>
                       )}
                     </div>

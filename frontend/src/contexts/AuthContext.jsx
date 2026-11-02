@@ -102,9 +102,6 @@ export const AuthProvider = ({ children }) => {
         if (elapsed > ADMIN_INACTIVITY_LIMIT_MS) {
           console.warn('Super Admin session timed out due to inactivity.');
           logout();
-          if (typeof window !== 'undefined') {
-            alert('Aapka Super Admin session inactivity (idle) ki wajah se logout ho gaya hai. Kripya punah login karein.');
-          }
         }
       } catch (e) {}
     };

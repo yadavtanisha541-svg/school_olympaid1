@@ -1,6 +1,14 @@
 // src/utils/purchaseUtils.js
 // Universal utility to manage Olympiad subject purchases, mock test unlocks & dashboard visibility
 
+export const normalizeClassNumber = (cls) => {
+  if (!cls) return null;
+  const str = String(cls).trim().toLowerCase();
+  if (str === 'all' || str === 'all classes' || str === 'all class') return null;
+  const match = str.match(/\d+/);
+  return match ? match[0] : null;
+};
+
 export const SUBJECT_ALIAS_MAP = {
   imo: ['imo', 'ieom', 'math', 'maths', 'mathematics'],
   ieom: ['imo', 'ieom', 'math', 'maths', 'mathematics'],
@@ -16,13 +24,22 @@ export const SUBJECT_ALIAS_MAP = {
   ieoh: ['iho', 'ieoh', 'hindi']
 };
 
-// Reset legacy/cached purchases so subjects start locked by default as requested
+// Reset and sanitize legacy / unscoped purchases so subjects are strictly scoped to their specific class
 if (typeof window !== 'undefined') {
   try {
-    const lockResetDone = localStorage.getItem('olympiadhub_lock_reset_v4');
-    if (!lockResetDone) {
-      localStorage.removeItem('olympiadhub_purchased_tests');
-      localStorage.setItem('olympiadhub_lock_reset_v4', 'true');
+    const lockResetKey = 'olympiadhub_lock_reset_v5';
+    if (!localStorage.getItem(lockResetKey)) {
+      const existing = JSON.parse(localStorage.getItem('olympiadhub_purchased_tests') || '[]');
+      if (Array.isArray(existing)) {
+        // Keep ONLY items that have an explicit class number (e.g. class_6_imo)
+        const cleaned = existing.filter(item => {
+          const s = String(item).toLowerCase().trim();
+          if (s === 'all' || s === 'all_mock_tests' || s === 'all_practice_tests') return false;
+          return /\d+/.test(s);
+        });
+        localStorage.setItem('olympiadhub_purchased_tests', JSON.stringify(cleaned));
+      }
+      localStorage.setItem(lockResetKey, 'true');
     }
   } catch (e) {}
 }
@@ -39,23 +56,32 @@ export const lockSubject = (subCodeOrKey, studentClass = null) => {
   try {
     const list = getPurchasedTests();
     const rawKey = String(subCodeOrKey).toLowerCase().trim();
-    const rawClass = studentClass ? String(studentClass).toLowerCase().trim() : '';
+    const classNum = normalizeClassNumber(studentClass);
     const aliases = SUBJECT_ALIAS_MAP[rawKey] || [rawKey];
 
     const updated = list.filter(item => {
       const s = String(item).toLowerCase().trim();
-      for (const alias of aliases) {
-        if (s === alias) return false;
-        if (rawClass && (s === `${rawClass}_${alias}` || s === `${rawClass} ${alias}`)) return false;
-        const parts = s.split(/[_\s-]+/);
-        if (parts.includes(alias)) return false;
+      const itemClassNum = normalizeClassNumber(s);
+
+      // Check if this item relates to this subject
+      const matchesSubject = aliases.some(alias => s === alias || s.includes(alias));
+      if (!matchesSubject) return true; // keep unrelated subjects
+
+      // If classNum is specified, only remove items belonging to THIS class (or un-scoped)
+      if (classNum) {
+        if (!itemClassNum || itemClassNum === classNum) {
+          return false; // remove it
+        }
+        return true; // keep it for other classes
       }
-      return true;
+
+      // If no classNum specified, remove all matches for this subject
+      return false;
     });
 
     localStorage.setItem('olympiadhub_purchased_tests', JSON.stringify(updated));
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('olympiadhub-package-purchased', { detail: { locked: true, subject: subCodeOrKey } }));
+      window.dispatchEvent(new CustomEvent('olympiadhub-package-purchased', { detail: { locked: true, subject: subCodeOrKey, studentClass } }));
       window.dispatchEvent(new Event('storage'));
     }
     return updated;
@@ -80,29 +106,35 @@ export const isSubjectPurchased = (subCodeOrKey, studentClass = null, purchasedL
   if (!Array.isArray(list) || list.length === 0) return false;
 
   const rawKey = String(subCodeOrKey).toLowerCase().trim();
-  const rawClass = studentClass ? String(studentClass).toLowerCase().trim() : '';
-
-  // Universal unlock flag
-  if (list.some(k => {
-    const s = String(k).toLowerCase().trim();
-    return s === 'all' || s === 'all_mock_tests' || s === 'all_practice_tests';
-  })) {
-    return true;
-  }
-
+  const classNum = normalizeClassNumber(studentClass);
   const aliases = SUBJECT_ALIAS_MAP[rawKey] || [rawKey];
 
-  return list.some(item => {
-    const s = String(item).toLowerCase().trim();
-    for (const alias of aliases) {
-      if (s === alias) return true;
-      if (rawClass && (s === `${rawClass}_${alias}` || s === `${rawClass} ${alias}`)) return true;
-      if (rawClass && s === `${rawClass}_all`) return true;
-      const parts = s.split(/[_\s-]+/);
-      if (parts.includes(alias)) return true;
-    }
-    return false;
-  });
+  if (classNum) {
+    // STRICT CLASS CHECK:
+    // Only return true if the purchased list contains an entry specifically matching THIS class number and subject!
+    return list.some(item => {
+      const s = String(item).toLowerCase().trim();
+      const itemClassNum = normalizeClassNumber(s);
+
+      // Must explicitly match the target class number!
+      // If item is for Class 6, a Class 7 student CANNOT match it!
+      if (!itemClassNum || itemClassNum !== classNum) {
+        return false;
+      }
+
+      // Same class number: check if any subject alias is present in the item
+      return aliases.some(alias => {
+        return s === `class_${classNum}_${alias}` ||
+               s === `class ${classNum}_${alias}` ||
+               s === `${classNum}_${alias}` ||
+               s === `${alias}_${classNum}` ||
+               s.includes(alias);
+      });
+    });
+  }
+
+  // If no class number provided, return false (purchases must be tied to a class)
+  return false;
 };
 
 export const DEFAULT_TEST_PRICING = {
@@ -173,13 +205,16 @@ export const savePurchasedSubject = (subCode, altCode, studentClass, orderDetail
   const current = getPurchasedTests();
   const rawSub = String(subCode).toLowerCase().trim();
   const rawAlt = altCode ? String(altCode).toLowerCase().trim() : '';
-  const rawClass = studentClass ? String(studentClass).toLowerCase().trim() : '';
+  const classNum = normalizeClassNumber(studentClass) || '6';
 
-  const newKeys = [rawSub];
-  if (rawAlt) newKeys.push(rawAlt);
-  if (rawClass) {
-    newKeys.push(`${rawClass}_${rawSub}`);
-    if (rawAlt) newKeys.push(`${rawClass}_${rawAlt}`);
+  // Strictly store class-scoped keys so that ONLY this specific class is unlocked!
+  const newKeys = [
+    `class_${classNum}_${rawSub}`,
+    `class ${classNum}_${rawSub}`
+  ];
+  if (rawAlt) {
+    newKeys.push(`class_${classNum}_${rawAlt}`);
+    newKeys.push(`class ${classNum}_${rawAlt}`);
   }
 
   const updated = Array.from(new Set([...current, ...newKeys]));
@@ -192,7 +227,7 @@ export const savePurchasedSubject = (subCode, altCode, studentClass, orderDetail
 
   const orderPayload = {
     order_id: orderDetails.order_id || `ORD-MOCK-${Date.now().toString().slice(-6)}`,
-    grade: studentClass || 'All Classes',
+    grade: `Class ${classNum}`,
     subject: subCode,
     subject_name: orderDetails.subject_name || subCode,
     amount: orderDetails.amount || defaultAmount,

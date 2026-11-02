@@ -39,7 +39,6 @@ import { DownloadPaperPdfModal } from '../../components/common/DownloadPaperPdfM
 import { isSubjectPurchased, savePurchasedSubject, lockSubject, getPurchasedTests, getTestPricing } from '../../utils/purchaseUtils';
 
 const CLASS_OPTIONS = [
-  'All Classes',
   'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 
   'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 
   'Class 11', 'Class 12'
@@ -52,9 +51,21 @@ export const StudentMyContentPage = ({
 }) => {
   const { user } = useAuth();
   const [selectedClass, setSelectedClass] = useState(() => {
-    return user?.class || user?.grade || 'Class 6';
+    const uCls = user?.class_name || user?.class || user?.grade;
+    if (uCls && uCls !== 'All Classes' && uCls !== 'All') return uCls;
+    return 'Class 6';
   });
-  const studentClass = selectedClass;
+
+  useEffect(() => {
+    const uCls = user?.class_name || user?.class || user?.grade;
+    if (uCls && uCls !== 'All Classes' && uCls !== 'All') {
+      setSelectedClass(uCls);
+    }
+  }, [user]);
+
+  const studentClass = (selectedClass && selectedClass !== 'All Classes' && selectedClass !== 'All')
+    ? selectedClass
+    : (user?.class_name || user?.class || user?.grade || 'Class 6');
 
   const [examPapers, setExamPapers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -388,7 +399,7 @@ export const StudentMyContentPage = ({
     }
   }, [activeSubjectCode]);
 
-  const ALL_SUBJECT_COVERS = useMemo(() => [
+  const BASE_SUBJECT_COVERS = useMemo(() => [
     {
       code: 'IMO',
       altCode: 'IEOM',
@@ -474,6 +485,37 @@ export const StudentMyContentPage = ({
       seriesTitle: `${studentClass}-All India IEOH Mock Test Series`
     }
   ], [studentClass]);
+
+  // Dynamically include any extra subjects published from Super Admin
+  const ALL_SUBJECT_COVERS = useMemo(() => {
+    const defaultCodes = new Set(['IMO', 'IEOM', 'ISO', 'IEOS', 'IDLO', 'IEOD', 'IEO', 'IEOE', 'IGKO', 'IEOG', 'IHO', 'IEOH']);
+    const extraMap = new Map();
+
+    (examPapers || []).forEach(p => {
+      const rawCode = (p.subject_code || p.subject || '').toUpperCase().trim();
+      const rawName = (p.subject_name || p.subject || p.title || 'Subject').trim();
+      if (!rawCode || defaultCodes.has(rawCode)) return;
+
+      if (!extraMap.has(rawCode)) {
+        extraMap.set(rawCode, {
+          code: rawCode,
+          altCode: rawCode,
+          title: `${rawCode} (${rawName})`,
+          subtitle: rawName,
+          description: `Olympiad preparation and mock test series for ${rawName}.`,
+          icon: BookOpen,
+          cardBg: 'bg-gradient-to-br from-indigo-200/95 via-blue-200/85 to-violet-200/85 border-2 border-indigo-400/90 hover:border-indigo-500 shadow-sm',
+          iconBg: 'bg-gradient-to-tr from-indigo-500 via-blue-500 to-violet-500 text-white shadow-indigo-300 shadow-md',
+          tagBg: 'bg-indigo-300/90 text-indigo-900 border border-indigo-400',
+          countBg: 'bg-blue-300/90 text-blue-950 border border-blue-400',
+          btnBg: 'bg-gradient-to-r from-indigo-600 via-blue-600 to-violet-600 hover:from-indigo-700 hover:via-blue-700 hover:to-violet-700 text-white shadow-sm border border-indigo-600',
+          seriesTitle: `${studentClass}-All India ${rawCode} Mock Test Series`
+        });
+      }
+    });
+
+    return [...BASE_SUBJECT_COVERS, ...Array.from(extraMap.values())];
+  }, [BASE_SUBJECT_COVERS, examPapers, studentClass]);
 
   const getSubjectPapers = (subCode, altCode, targetClass = null) => {
     let deletedIds = [];
@@ -1385,11 +1427,14 @@ export const StudentMyContentPage = ({
                         {allClassPapers.length > 0 && (
                           <button
                             type="button"
-                            onClick={() => setSelectedClass('All Classes')}
+                            onClick={() => {
+                              const targetClass = allClassPapers[0]?.class_name || allClassPapers[0]?.class || 'Class 6';
+                              setSelectedClass(targetClass);
+                            }}
                             className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5"
                           >
                             <GraduationCap className="w-4 h-4" />
-                            <span>View All Classes Tests ({allClassPapers.length})</span>
+                            <span>Switch to {allClassPapers[0]?.class_name || 'Class'} ({allClassPapers.length} tests)</span>
                           </button>
                         )}
                         <button
@@ -1476,19 +1521,14 @@ export const StudentMyContentPage = ({
                           <button
                             type="button"
                             onClick={() => {
-                              if (!isSubUnlocked) {
-                                setPurchasingSubject(currentSub);
-                              } else {
-                                setSelectedPaperForInstructions(paper);
-                              }
+                              setSelectedPaperForInstructions(paper);
                             }}
                             className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl ${
-                              !isSubUnlocked
-                                ? 'bg-amber-600 hover:bg-amber-700 text-white'
-                                : (currentSub.btnBg || 'bg-gradient-to-r from-purple-600 via-indigo-600 to-sky-500 text-white')
+                              currentSub.btnBg || 'bg-gradient-to-r from-purple-600 via-indigo-600 to-sky-500 text-white'
                             } font-black text-xs sm:text-sm shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95`}
                           >
-                            <span>{isSubUnlocked ? 'Open Test' : '🔒 Unlock to Start'}</span>
+                            <Play className="w-4 h-4 fill-white" />
+                            <span>Start Test</span>
                             <ArrowRight className="w-4 h-4" />
                           </button>
                         </div>
@@ -1771,14 +1811,28 @@ export const StudentMyContentPage = ({
                         <ArrowRight className="w-4 h-4" />
                       </button>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={() => handleOpenPayment(sub, primaryPkg)}
-                        className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-98 transition-all cursor-pointer border border-emerald-600"
-                      >
-                        <Lock className="w-4 h-4" />
-                        <span>Unlock &amp; Buy Test Series (₹{effectivePrice})</span>
-                      </button>
+                      <div className="space-y-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpenedMockSeries(sub.code);
+                            setSelectedSubject(sub.code);
+                          }}
+                          className={`w-full py-3 rounded-xl ${sub.btnBg || 'bg-indigo-600 text-white'} font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs active:scale-98 transition-all cursor-pointer`}
+                        >
+                          <Play className="w-4 h-4 fill-white" />
+                          <span>Start Mock Test ({getSubjectPapers(sub.code, sub.altCode).length} Papers)</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenPayment(sub, primaryPkg)}
+                          className="w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-2 active:scale-98 transition-all cursor-pointer border border-slate-200"
+                        >
+                          <Lock className="w-3.5 h-3.5 text-amber-600" />
+                          <span>Unlock Pro Pack (₹{effectivePrice})</span>
+                        </button>
+                      </div>
                     )}
 
                     <div className="flex items-center justify-between gap-1.5 flex-wrap">

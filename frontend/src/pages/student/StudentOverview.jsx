@@ -63,8 +63,18 @@ const CLASS_OPTIONS = [
 export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, activeSubjectTab }) => {
   const { user } = useAuth();
   const [selectedClass, setSelectedClass] = useState(() => {
-    return user?.class || user?.grade || 'Class 6';
+    const uCls = user?.class_name || user?.class || user?.grade;
+    if (uCls && uCls !== 'All Classes' && uCls !== 'All') return uCls;
+    return 'Class 6';
   });
+
+  useEffect(() => {
+    const uCls = user?.class_name || user?.class || user?.grade;
+    if (uCls && uCls !== 'All Classes' && uCls !== 'All') {
+      setSelectedClass(uCls);
+    }
+  }, [user]);
+
   const [purchasedTests, setPurchasedTests] = useState(() => getPurchasedTests());
   const [data, setData] = useState(null);
   const [availableExams, setAvailableExams] = useState([]);
@@ -80,6 +90,11 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(() => new Date());
+
+  // Dashboard Live Published Tests Filters
+  const [dashboardSubjectFilter, setDashboardSubjectFilter] = useState('ALL');
+  const [dashboardExamTypeFilter, setDashboardExamTypeFilter] = useState('ALL');
+  const [dashboardSearchQuery, setDashboardSearchQuery] = useState('');
 
   useEffect(() => {
     const handleSync = () => {
@@ -534,9 +549,9 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
     });
   }, [allStudentResults, user]);
 
-  const studentClass = user?.class || user?.grade || 'Class 6';
+  const studentClass = selectedClass || user?.class || user?.grade || 'Class 6';
 
-  const ALL_SUBJECT_COVERS = useMemo(() => [
+  const BASE_SUBJECT_COVERS = useMemo(() => [
     {
       code: 'IMO',
       altCode: 'IEOM',
@@ -599,12 +614,39 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
     }
   ], [studentClass]);
 
+  // Dynamically include any additional subjects created in Super Admin
+  const ALL_SUBJECT_COVERS = useMemo(() => {
+    const defaultCodes = new Set(['IMO', 'IEOM', 'ISO', 'IEOS', 'IDLO', 'IEOD', 'IEO', 'IEOE', 'IGKO', 'IEOG', 'IHO', 'IEOH']);
+    const extraMap = new Map();
+
+    (examPapers || []).forEach(p => {
+      const rawCode = (p.subject_code || p.subject || '').toUpperCase().trim();
+      const rawName = (p.subject_name || p.subject || p.title || 'Subject').trim();
+      if (!rawCode || defaultCodes.has(rawCode)) return;
+
+      if (!extraMap.has(rawCode)) {
+        extraMap.set(rawCode, {
+          code: rawCode,
+          altCode: rawCode,
+          title: `${rawCode} (${rawName})`,
+          subtitle: rawName,
+          icon: BookOpen,
+          color: '#6366f1',
+          iconBg: 'bg-indigo-50 border-indigo-200 text-indigo-600',
+          seriesTitle: `${studentClass}-All India ${rawCode} Mock Test Series`
+        });
+      }
+    });
+
+    return [...BASE_SUBJECT_COVERS, ...Array.from(extraMap.values())];
+  }, [BASE_SUBJECT_COVERS, examPapers, studentClass]);
+
   const getSubjectPapers = (subCode, altCode) => {
-    const sCode = (subCode || '').toUpperCase();
-    const aCode = (altCode || '').toUpperCase();
+    const sCode = (subCode || '').toUpperCase().trim();
+    const aCode = (altCode || '').toUpperCase().trim();
 
     const subMap = {
-      IMO: ['IMO', 'IEOM', 'MATH', 'MATHEMATICS'],
+      IMO: ['IMO', 'IEOM', 'MATH', 'MATHEMATICS', 'NMO'],
       ISO: ['ISO', 'IEOS', 'SCIENCE', 'NSO'],
       IDLO: ['IDLO', 'IEOD', 'DIGITAL', 'COMPUTER', 'ICSO', 'CYBER', 'AI', 'TECH'],
       IEO: ['IEO', 'IEOE', 'ENGLISH', 'ENG'],
@@ -614,12 +656,12 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
     const aliases = [...(subMap[sCode] || [sCode]), aCode].filter(Boolean).map(x => x.toUpperCase());
 
     const matching = examPapers.filter((p) => {
-      const pSub = (p.subject_code || p.subject || '').toUpperCase();
+      const pSub = (p.subject_code || p.subject_name || p.subject || '').toUpperCase();
       const pTitle = (p.title || p.name || '').toUpperCase();
       const pCode = (p.exam_code || p.short_code || '').toUpperCase();
 
       const codeMatches = aliases.some(alias => 
-        pSub.includes(alias) || pTitle.includes(alias) || pCode.includes(alias)
+        pSub.includes(alias) || pTitle.includes(alias) || pCode.includes(alias) || alias.includes(pSub)
       );
 
       const pClass = String(p.class_name || p.class || p.grade || '').toLowerCase();
@@ -627,7 +669,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       const pClassNum = (pClass.match(/\d+/) || [])[0];
       const sClassNum = (sClass.match(/\d+/) || [])[0];
 
-      const classMatches = !pClass || pClass === 'all' || (pClassNum && sClassNum && pClassNum === sClassNum) || pClass.includes(sClass);
+      const classMatches = !pClass || pClass === 'all' || sClass === 'all classes' || sClass === 'all' || !sClassNum || (pClassNum && sClassNum && pClassNum === sClassNum) || pClass.includes(sClass);
       return codeMatches && classMatches;
     });
 
@@ -643,6 +685,96 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
 
     return result;
   };
+
+  // Consolidate all tests published by Super Admin & Teachers
+  const allPublishedTests = useMemo(() => {
+    const combined = [...availableExams, ...examPapers];
+    const seen = new Set();
+    const unique = [];
+
+    let deletedIds = [];
+    try {
+      deletedIds = JSON.parse(localStorage.getItem('olympiadhub_deleted_ids') || '[]');
+    } catch (e) {}
+    const delSet = new Set((deletedIds || []).map(String));
+
+    combined.forEach(p => {
+      if (!p) return;
+      if (p.status === 'draft') return;
+      const idKey = String(p.id || p.exam_code || p.title);
+      if (delSet.has(String(p.id)) || (p.exam_code && delSet.has(String(p.exam_code)))) return;
+      if (seen.has(idKey)) return;
+      seen.add(idKey);
+
+      unique.push({
+        ...p,
+        id: p.id || idKey,
+        title: p.title || p.name || 'Olympiad Test',
+        class_name: p.class_name || p.class || p.grade || 'Class 6',
+        subject_name: p.subject_name || p.subject || p.subject_code || 'General',
+        subject_code: (p.subject_code || 'OLY').toUpperCase(),
+        duration_minutes: Number(p.duration_minutes) || 60,
+        total_questions: Array.isArray(p.questions) && p.questions.length > 0 ? p.questions.length : (Number(p.total_questions) || 10),
+        total_marks: Number(p.total_marks) || (Array.isArray(p.questions) && p.questions.length > 0 ? p.questions.reduce((a, b) => a + (Number(b.marks) || 1), 0) : 60),
+        exam_type: p.exam_type || (p.paper_category?.includes('mock') ? 'mock' : 'practice')
+      });
+    });
+
+    return unique;
+  }, [availableExams, examPapers]);
+
+  // Extract all dynamic subjects from published tests
+  const dynamicSubjectList = useMemo(() => {
+    const subs = new Set();
+    allPublishedTests.forEach(p => {
+      const s = p.subject_name || p.subject || p.subject_code;
+      if (s && s.trim()) subs.add(s.trim());
+    });
+    return Array.from(subs).sort();
+  }, [allPublishedTests]);
+
+  // Filtered live tests for the dashboard
+  const filteredDashboardTests = useMemo(() => {
+    return allPublishedTests.filter(test => {
+      // 1. Class filter
+      if (selectedClass && selectedClass !== 'All Classes' && selectedClass !== 'All') {
+        const targetNum = (selectedClass.match(/\d+/) || [])[0];
+        const testClass = String(test.class_name || test.class || '').toLowerCase();
+        if (testClass && testClass !== 'all' && testClass !== 'all classes') {
+          const testNum = (testClass.match(/\d+/) || [])[0];
+          if (targetNum && testNum && targetNum !== testNum) return false;
+        }
+      }
+
+      // 2. Subject filter
+      if (dashboardSubjectFilter && dashboardSubjectFilter !== 'ALL') {
+        const sTarget = dashboardSubjectFilter.toLowerCase();
+        const testSub = String(test.subject_name || test.subject || test.subject_code || '').toLowerCase();
+        const testTitle = String(test.title || '').toLowerCase();
+        if (!testSub.includes(sTarget) && !testTitle.includes(sTarget) && !sTarget.includes(testSub)) {
+          return false;
+        }
+      }
+
+      // 3. Exam Type filter
+      if (dashboardExamTypeFilter && dashboardExamTypeFilter !== 'ALL') {
+        const t = (test.exam_type || test.paper_category || '').toLowerCase();
+        if (dashboardExamTypeFilter === 'mock' && !t.includes('mock')) return false;
+        if (dashboardExamTypeFilter === 'practice' && !t.includes('practice') && !t.includes('generator')) return false;
+      }
+
+      // 4. Search query
+      if (dashboardSearchQuery.trim()) {
+        const q = dashboardSearchQuery.toLowerCase().trim();
+        const matchTitle = (test.title || '').toLowerCase().includes(q);
+        const matchCode = (test.exam_code || test.short_code || '').toLowerCase().includes(q);
+        const matchSub = (test.subject_name || test.subject || '').toLowerCase().includes(q);
+        if (!matchTitle && !matchCode && !matchSub) return false;
+      }
+
+      return true;
+    });
+  }, [allPublishedTests, selectedClass, dashboardSubjectFilter, dashboardExamTypeFilter, dashboardSearchQuery]);
 
   // Time of day greeting
   const hour = currentTime.getHours();
@@ -931,6 +1063,222 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
       </div>
 
       {/* ========================================================================= */}
+      {/* 1.5. SECTION: LIVE PUBLISHED OLYMPIAD TESTS & EXAMINATIONS (SUPER ADMIN)   */}
+      {/* ========================================================================= */}
+      <div className="space-y-4 pt-2">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+              <Award className="w-6 h-6 text-indigo-600" />
+              <span>Live Olympiad Tests &amp; Examinations</span>
+              <span className="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">
+                {filteredDashboardTests.length} Available
+              </span>
+            </h2>
+            <p className="text-xs text-slate-500 font-semibold mt-0.5">
+              Attempt all live competitive Olympiads and practice papers published by faculty &amp; administration.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* View Full Portal Button */}
+            <button
+              type="button"
+              onClick={() => onNavigateTab && onNavigateTab('available_exams')}
+              className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            >
+              <span>View All Exams Portal</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Filters Bar: Search, Subject Dropdown, Class Dropdown & Type Tabs */}
+        <div className="bg-white rounded-3xl p-4 border border-slate-200/90 shadow-2xs space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1 min-w-[200px] max-w-md">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search test title, subject, or code..."
+                value={dashboardSearchQuery}
+                onChange={(e) => setDashboardSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+              {dashboardSearchQuery && (
+                <button
+                  onClick={() => setDashboardSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 font-bold"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {/* Subject Filter */}
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-xs font-bold text-slate-500">Subject:</span>
+                <select
+                  value={dashboardSubjectFilter}
+                  onChange={(e) => setDashboardSubjectFilter(e.target.value)}
+                  className="text-xs font-bold text-slate-800 bg-transparent focus:outline-none cursor-pointer"
+                >
+                  <option value="ALL">All Subjects</option>
+                  {dynamicSubjectList.map(sub => (
+                    <option key={sub} value={sub}>{sub}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Class Filter */}
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200">
+                <GraduationCap className="w-4 h-4 text-indigo-600 shrink-0" />
+                <span className="text-xs font-bold text-slate-500">Class:</span>
+                <select
+                  value={selectedClass}
+                  onChange={(e) => setSelectedClass(e.target.value)}
+                  className="text-xs font-black text-slate-800 bg-transparent focus:outline-none cursor-pointer"
+                >
+                  {CLASS_OPTIONS.map((cls) => (
+                    <option key={cls} value={cls}>{cls}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Exam Type Tabs */}
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                {[
+                  { id: 'ALL', label: 'All' },
+                  { id: 'mock', label: 'Mock' },
+                  { id: 'practice', label: 'Practice' }
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setDashboardExamTypeFilter(tab.id)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      dashboardExamTypeFilter === tab.id
+                        ? 'bg-white text-indigo-700 shadow-2xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Grid of Published Tests */}
+        {filteredDashboardTests.length === 0 ? (
+          <div className="bg-white rounded-3xl p-8 border border-slate-200 text-center space-y-3 shadow-2xs">
+            <BookOpen className="w-10 h-10 text-slate-300 mx-auto" />
+            <h4 className="text-sm font-bold text-slate-800">
+              No examination tests match your filter
+            </h4>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              No papers found for {selectedClass} in {dashboardSubjectFilter === 'ALL' ? 'all subjects' : dashboardSubjectFilter}.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedClass('All Classes');
+                setDashboardSubjectFilter('ALL');
+                setDashboardExamTypeFilter('ALL');
+                setDashboardSearchQuery('');
+              }}
+              className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-1.5"
+            >
+              <span>Show All Tests ({allPublishedTests.length})</span>
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredDashboardTests.map((test) => {
+              const subLabel = test.subject_name || test.subject || test.subject_code || 'Olympiad';
+              const isMock = (test.exam_type || test.paper_category || '').toLowerCase().includes('mock');
+
+              return (
+                <div
+                  key={test.id}
+                  className="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-2xs hover:shadow-md hover:border-indigo-300 transition-all flex flex-col justify-between group"
+                >
+                  <div className="space-y-3">
+                    {/* Top Badges */}
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-wider ${
+                          isMock
+                            ? 'text-indigo-700 bg-indigo-50 border-indigo-200'
+                            : 'text-purple-700 bg-purple-50 border-purple-200'
+                        }`}>
+                          {isMock ? 'Mock Test' : 'Practice Test'}
+                        </span>
+                        {test.class_name && (
+                          <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                            {test.class_name}
+                          </span>
+                        )}
+                        <span className="text-[10px] font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full border border-violet-200">
+                          {subLabel}
+                        </span>
+                      </div>
+
+                      <span className="text-[11px] font-mono font-bold text-slate-400">
+                        {test.exam_code || test.short_code}
+                      </span>
+                    </div>
+
+                    {/* Title */}
+                    <div>
+                      <h3 className="font-bold text-slate-900 text-base leading-snug group-hover:text-indigo-600 transition-colors line-clamp-2">
+                        {test.title}
+                      </h3>
+                      {test.author_name && !['Super Admin', 'Super Administrator'].includes(test.author_name) && (
+                        <p className="text-[11px] text-slate-500 font-medium mt-1">
+                          Faculty: {test.author_name}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* 3 Metric Stats */}
+                    <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-center text-xs">
+                      <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
+                        <span className="text-[9px] font-bold text-slate-400 block uppercase">Questions</span>
+                        <span className="font-bold text-slate-800">{test.total_questions || 10}</span>
+                      </div>
+                      <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
+                        <span className="text-[9px] font-bold text-slate-400 block uppercase">Duration</span>
+                        <span className="font-bold text-slate-800">{test.duration_minutes || 60}m</span>
+                      </div>
+                      <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
+                        <span className="text-[9px] font-bold text-slate-400 block uppercase">Marks</span>
+                        <span className="font-bold text-indigo-600">{test.total_marks || 60}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom Action Button */}
+                  <div className="pt-4 mt-3 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedPaperForInstructions(test)}
+                      className="w-full py-2.5 px-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:to-pink-700 text-white rounded-xl text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                    >
+                      <Play className="w-3.5 h-3.5 fill-white" />
+                      <span>Start Examination Now →</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ========================================================================= */}
       {/* 2. SECTION: OLYMPIAD SUBJECTS (SHOWS ONLY PURCHASED SUBJECTS)             */}
       {/* ========================================================================= */}
       {(() => {
@@ -997,8 +1345,12 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
           }
         ];
 
+        const activeEnrolledClass = (selectedClass && selectedClass !== 'All Classes' && selectedClass !== 'All')
+          ? selectedClass
+          : (user?.class_name || user?.class || user?.grade || 'Class 6');
+
         const purchasedDashboardSubjects = ALL_DASHBOARD_SUBJECTS.filter(sub =>
-          isSubjectPurchased(sub.key, selectedClass, purchasedTests)
+          isSubjectPurchased(sub.key, activeEnrolledClass, purchasedTests)
         );
 
         return (
@@ -1015,8 +1367,8 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                 </h2>
                 <p className="text-xs text-slate-500 font-semibold mt-0.5">
                   {purchasedDashboardSubjects.length > 0
-                    ? 'Only your purchased Olympiad test series are shown below. Click to start mock tests.'
-                    : 'Unlock any subject below to access full mock test series and CBT exams.'}
+                    ? `Only your purchased Olympiad test series for ${activeEnrolledClass} are shown below. Click to start mock tests.`
+                    : `Unlock any subject below to access full mock test series and CBT exams for ${activeEnrolledClass}.`}
                 </p>
               </div>
 
@@ -1037,12 +1389,12 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                   <GraduationCap className="w-4 h-4 text-indigo-600 shrink-0" />
                   <span className="text-xs font-bold text-slate-500">Class:</span>
                   <select
-                    value={selectedClass}
+                    value={activeEnrolledClass}
                     onChange={(e) => setSelectedClass(e.target.value)}
                     aria-label="Select Class"
                     className="text-xs font-black text-slate-800 bg-transparent focus:outline-none cursor-pointer pr-1"
                   >
-                    {CLASS_OPTIONS.map((cls) => (
+                    {CLASS_OPTIONS.filter(cls => cls !== 'All Classes').map((cls) => (
                       <option key={cls} value={cls}>
                         {cls}
                       </option>
@@ -1130,7 +1482,7 @@ export const StudentOverview = ({ onNavigateTab, onStartExam, onViewResult, acti
                         No Mock Test Series Unlocked Yet
                       </h4>
                       <p className="text-xs text-slate-600 font-medium mt-0.5">
-                        Select any Olympiad subject below to unlock the complete 5 mock tests package for Class {selectedClass}!
+                        Select any Olympiad subject below to unlock the complete 5 mock tests package for {activeEnrolledClass}!
                       </p>
                     </div>
                   </div>

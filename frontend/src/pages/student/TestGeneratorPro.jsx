@@ -445,20 +445,27 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
         const pClass = (pClassRaw || p.title || '').toLowerCase().trim();
         const selGrade = (selectedGrade || '').toLowerCase().trim();
 
-        const pMatch = (pClassRaw || '').match(/\d+/) || pClass.match(/class\s*(\d+)/i) || pClass.match(/grade\s*(\d+)/i) || pClass.match(/\d+/);
-        const selMatch = selGrade.match(/\d+/);
+        if (selGrade && selGrade !== 'all' && selGrade !== 'all classes') {
+          const pMatch = (pClassRaw || '').match(/\d+/) || pClass.match(/class\s*(\d+)/i) || pClass.match(/grade\s*(\d+)/i) || pClass.match(/\d+/);
+          const selMatch = selGrade.match(/\d+/);
 
-        if (pMatch && selMatch) {
-          const pNum = pMatch[1] || pMatch[0];
-          const selNum = selMatch[0];
-          if (pNum !== selNum) return false;
-        } else if (pClass && selGrade) {
-          if (!pClass.includes(selGrade) && !selGrade.includes(pClass)) return false;
+          if (pMatch && selMatch) {
+            const pNum = pMatch[1] || pMatch[0];
+            const selNum = selMatch[0];
+            if (pNum !== selNum) return false;
+          } else if (pClass && selGrade) {
+            if (!pClass.includes(selGrade) && !selGrade.includes(pClass)) return false;
+          }
         }
 
         // 2. Subject match
         const subCode = (p.subject_code || p.subject || p.subject_name || '').toLowerCase().trim();
         const currentSub = (selectedSubject || '').toLowerCase().trim();
+
+        if (!currentSub || currentSub === 'all' || currentSub === 'all subjects') {
+          return true;
+        }
+
         const subMap = {
           math: ['imo', 'ieom', 'math', 'mathematics', 'mathematic', 'maths', 'nmo'],
           science: ['iso', 'ieos', 'science', 'nso'],
@@ -469,7 +476,7 @@ export const TestGeneratorPro = ({ onNavigateTab, onExitToDashboard }) => {
           reasoning: ['lro', 'iro', 'isso', 'reasoning', 'social studies', 'aptitude', 'logical']
         };
         const validCodes = subMap[currentSub] || [currentSub];
-        return validCodes.some((code) => subCode.includes(code) || pTitle.includes(code));
+        return validCodes.some((code) => subCode === code || subCode.includes(code) || code.includes(subCode) || pTitle.includes(code));
       })
       .sort((a, b) => {
         const qA = Array.isArray(a.questions) ? a.questions.length : 0;
