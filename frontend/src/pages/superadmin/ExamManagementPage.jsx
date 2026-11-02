@@ -178,13 +178,23 @@ export const ExamManagementPage = () => {
     try {
       setLoading(true);
       const res = await apiClient.get('/exams', { search, exam_type: filterType });
-      let combinedExams = (res && res.success && Array.isArray(res.data)) ? [...res.data] : [];
+
+      let deletedIds = [];
+      try {
+        deletedIds = JSON.parse(localStorage.getItem('olympiadhub_deleted_ids') || '[]');
+      } catch (e) {}
+      const delSet = new Set((deletedIds || []).map(String));
+
+      let combinedExams = (res && res.success && Array.isArray(res.data))
+        ? res.data.filter(e => e && !delSet.has(String(e.id)) && (!e.exam_code || !delSet.has(String(e.exam_code))))
+        : [];
 
       // Multi-source local storage fallback to ensure zero loss across reloads
       const addUniqueExam = (item) => {
         if (!item || (!item.id && !item.exam_code)) return;
         const idStr = item.id ? String(item.id) : '';
         const codeStr = item.exam_code ? String(item.exam_code) : '';
+        if (delSet.has(idStr) || (codeStr && delSet.has(codeStr))) return;
         const exists = combinedExams.some(e => 
           (idStr && String(e.id) === idStr) ||
           (codeStr && e.exam_code && String(e.exam_code) === codeStr)
@@ -549,30 +559,47 @@ export const ExamManagementPage = () => {
 
   const handleDeleteExam = async (id) => {
     try {
+      const item = exams.find(e => String(e.id) === String(id));
+      const examCode = item?.exam_code;
+      const shortCode = item?.short_code;
+
       await apiClient.delete(`/exams/${id}`).catch(() => {});
+      await apiClient.delete(`/exam-papers/${id}`).catch(() => {});
+      if (examCode) {
+        await apiClient.delete(`/exams/${examCode}`).catch(() => {});
+        await apiClient.delete(`/exam-papers/${examCode}`).catch(() => {});
+      }
 
       try {
         const delRaw = localStorage.getItem('olympiadhub_deleted_ids');
         const delList = delRaw ? JSON.parse(delRaw) : [];
-        if (!delList.includes(String(id))) {
-          delList.push(String(id));
-          localStorage.setItem('olympiadhub_deleted_ids', JSON.stringify(delList));
-        }
+        [String(id), examCode, shortCode].forEach(v => {
+          if (v && !delList.includes(String(v))) delList.push(String(v));
+        });
+        localStorage.setItem('olympiadhub_deleted_ids', JSON.stringify(delList));
 
-        ['olympiadhub_db_exams', 'admin_generator_papers', 'mock_db_exam_papers', 'olympiadhub_db_exam_papers'].forEach(k => {
+        const isMatch = (p) => {
+          if (!p) return false;
+          if (String(p.id) === String(id)) return true;
+          if (examCode && (String(p.exam_code) === String(examCode) || String(p.id) === String(examCode))) return true;
+          if (shortCode && String(p.short_code) === String(shortCode)) return true;
+          return false;
+        };
+
+        ['olympiadhub_db_exams', 'admin_generator_papers', 'mock_db_exam_papers', 'olympiadhub_db_exam_papers', 'olympiadhub_exams', 'olympiadhub_exam_papers'].forEach(k => {
           const list = JSON.parse(localStorage.getItem(k) || '[]');
-          const filtered = list.filter(p => String(p.id) !== String(id) && (!p.exam_code || String(p.exam_code) !== String(id)));
-          localStorage.setItem(k, JSON.stringify(filtered));
+          localStorage.setItem(k, JSON.stringify(list.filter(p => !isMatch(p))));
         });
 
         window.dispatchEvent(new CustomEvent('olympiadhub-covers-updated'));
-        window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated'));
-        window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated'));
+        window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: { deletedId: id } }));
+        window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedId: id } }));
         window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams' } }));
         window.dispatchEvent(new Event('storage'));
       } catch (e) {}
 
       setFeedback({ type: 'success', message: 'Exam deleted successfully.' });
+      setExams(prev => prev.filter(e => String(e.id) !== String(id) && (!examCode || String(e.exam_code) !== String(examCode))));
       fetchExams();
     } catch (err) {
       alert(err.message);

@@ -554,10 +554,17 @@ export const TestGeneratorAdminManager = () => {
     try {
       let combined = [];
 
+      let deletedIds = [];
+      try {
+        deletedIds = JSON.parse(localStorage.getItem('olympiadhub_deleted_ids') || '[]');
+      } catch (e) {}
+      const delSet = new Set((deletedIds || []).map(String));
+
       const addPaperUnique = (p) => {
         if (!p || (!p.id && !p.exam_code)) return;
         const idStr = p.id ? String(p.id) : '';
         const codeStr = p.exam_code ? String(p.exam_code) : '';
+        if (delSet.has(idStr) || (codeStr && delSet.has(codeStr))) return;
         const exists = combined.some((cp) => 
           (idStr && String(cp.id) === idStr) ||
           (codeStr && cp.exam_code && String(cp.exam_code) === codeStr)
@@ -929,26 +936,50 @@ export const TestGeneratorAdminManager = () => {
 
   // Delete Paper directly
   const handleDeletePaper = async (paperId) => {
-    setPapers((prev) => prev.filter((p) => p.id !== paperId));
+    const item = papers.find(p => String(p.id) === String(paperId));
+    const examCode = item?.exam_code;
+    const shortCode = item?.short_code;
+
+    setPapers((prev) => prev.filter((p) => String(p.id) !== String(paperId) && (!examCode || String(p.exam_code) !== String(examCode))));
 
     try {
-      await apiClient.delete(`/test-generator/admin-papers/${paperId}`);
+      await apiClient.delete(`/test-generator/admin-papers/${paperId}`).catch(() => null);
+      await apiClient.delete(`/exam-papers/${paperId}`).catch(() => null);
+      await apiClient.delete(`/exams/${paperId}`).catch(() => null);
+      if (examCode) {
+        await apiClient.delete(`/exams/${examCode}`).catch(() => null);
+        await apiClient.delete(`/exam-papers/${examCode}`).catch(() => null);
+      }
     } catch (e) {
       console.warn('Delete error', e);
     }
 
     try {
-      const local = JSON.parse(localStorage.getItem('admin_generator_papers') || '[]');
-      const updated = local.filter((p) => p.id !== paperId);
-      localStorage.setItem('admin_generator_papers', JSON.stringify(updated));
-    } catch (e) {}
+      const delRaw = localStorage.getItem('olympiadhub_deleted_ids');
+      const delList = delRaw ? JSON.parse(delRaw) : [];
+      [String(paperId), examCode, shortCode].forEach(v => {
+        if (v && !delList.includes(String(v))) delList.push(String(v));
+      });
+      localStorage.setItem('olympiadhub_deleted_ids', JSON.stringify(delList));
 
-    try {
-      const mockDb = JSON.parse(localStorage.getItem('mock_db_exam_papers') || '[]');
-      localStorage.setItem('mock_db_exam_papers', JSON.stringify(mockDb.filter((p) => p.id !== paperId)));
+      const isMatch = (p) => {
+        if (!p) return false;
+        if (String(p.id) === String(paperId)) return true;
+        if (examCode && (String(p.exam_code) === String(examCode) || String(p.id) === String(examCode))) return true;
+        if (shortCode && String(p.short_code) === String(shortCode)) return true;
+        return false;
+      };
+
+      ['admin_generator_papers', 'mock_db_exam_papers', 'olympiadhub_db_exam_papers', 'olympiadhub_db_exams'].forEach(k => {
+        const arr = JSON.parse(localStorage.getItem(k) || '[]');
+        localStorage.setItem(k, JSON.stringify(arr.filter(p => !isMatch(p))));
+      });
     } catch (e) {}
 
     window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: { deletedId: paperId } }));
+    window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: { deletedId: paperId } }));
+    window.dispatchEvent(new CustomEvent('olympiadhub-data-updated'));
+    window.dispatchEvent(new Event('storage'));
     fetchPapers();
   };
 
