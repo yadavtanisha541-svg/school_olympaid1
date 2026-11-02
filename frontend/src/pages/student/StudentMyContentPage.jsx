@@ -1703,27 +1703,14 @@ export const StudentMyContentPage = ({
                           <span>✓ UNLOCKED - Open Mock Tests ({getSubjectPapers(sub.code, sub.altCode).length}) &rarr;</span>
                         </button>
                       ) : (
-                        <div className="space-y-2">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenPayment(sub, primaryPkg)}
-                            className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-98 transition-all cursor-pointer border border-emerald-600"
-                          >
-                            <Lock className="w-4 h-4" />
-                            <span>🔒 Unlock &amp; Buy Test Series (₹{parseFloat(effectivePrice).toFixed(2)})</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setOpenedMockSeries(sub.code);
-                              setSelectedSubject(sub.code);
-                            }}
-                            className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                          >
-                            <Eye className="w-4 h-4 text-indigo-600" />
-                            <span>View Mock Tests ({getSubjectPapers(sub.code, sub.altCode).length}) &rarr;</span>
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenPayment(sub, primaryPkg)}
+                          className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-98 transition-all cursor-pointer border border-emerald-600"
+                        >
+                          <Lock className="w-4 h-4" />
+                          <span>🔒 Unlock &amp; Buy Test Series (₹{parseFloat(effectivePrice).toFixed(2)})</span>
+                        </button>
                       )}
 
 
