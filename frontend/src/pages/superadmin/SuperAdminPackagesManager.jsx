@@ -3437,26 +3437,17 @@ export const SuperAdminPackagesManager = () => {
           {!selectedSubjectCover ? (
             <div className="space-y-6">
               {subjectCoversDirectory.length === 0 ? (
-                <div className="bg-white rounded-3xl p-10 border border-slate-200 text-center space-y-4 max-w-md mx-auto my-6 shadow-sm">
-                  <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                <div className="bg-white rounded-3xl p-10 border border-slate-200 text-center space-y-3 max-w-md mx-auto my-6 shadow-sm">
+                  <div className="w-14 h-14 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center mx-auto">
                     <Award className="w-7 h-7" />
                   </div>
                   <div>
                     <h3 className="text-base font-black text-slate-800">
-                      All Exam Covers are Deleted / Hidden
+                      No Exam Covers Available
                     </h3>
                     <p className="text-xs text-slate-500 mt-1">
-                      No active exam covers are visible for {packageClassFilter}.
+                      No active exam covers found for {packageClassFilter}.
                     </p>
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      onClick={handleRestoreCovers}
-                      className="px-4 py-2 rounded-xl bg-[#859900] hover:bg-[#728400] text-white font-black text-xs transition-colors cursor-pointer"
-                    >
-                      Restore All Exam Covers
-                    </button>
                   </div>
                 </div>
               ) : (
