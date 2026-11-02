@@ -225,7 +225,7 @@ export const StudentMyContentPage = ({
 
       setExamPapers(allPapers);
 
-      // Packages
+      // Packages - strictly 1 package per subject
       let allPkgs = [];
       if (pkgsRes && pkgsRes.success && Array.isArray(pkgsRes.data)) {
         allPkgs = [...pkgsRes.data];
@@ -238,7 +238,19 @@ export const StudentMyContentPage = ({
           }
         });
       }
-      setPackagesList(allPkgs);
+      // Deduplicate packages so only 1 unique package per subject is retained
+      const seenSubs = new Set();
+      const uniquePkgs = [];
+      for (const p of allPkgs) {
+        const normSub = normalizeCode(p.subject_code || p.subject || '');
+        const pCls = p.class_name || 'All';
+        const key = `${normSub}_${pCls}`;
+        if (!seenSubs.has(key)) {
+          seenSubs.add(key);
+          uniquePkgs.push(p);
+        }
+      }
+      setPackagesList(uniquePkgs);
 
       if (resultsRes && resultsRes.success && Array.isArray(resultsRes.data)) {
         const filtered = resultsRes.data.filter(
@@ -486,21 +498,26 @@ export const StudentMyContentPage = ({
     }
   ], [studentClass]);
 
-  // Dynamically include any extra subjects published from Super Admin
+  // Dynamically include any extra subjects published from Super Admin (deduplicating all core subject aliases)
   const ALL_SUBJECT_COVERS = useMemo(() => {
-    const defaultCodes = new Set(['IMO', 'IEOM', 'ISO', 'IEOS', 'IDLO', 'IEOD', 'IEO', 'IEOE', 'IGKO', 'IEOG', 'IHO', 'IEOH']);
+    const defaultCodes = new Set(['IMO', 'IEOM', 'ISO', 'IEOS', 'IDLO', 'IEOD', 'IEO', 'IEOE', 'IGKO', 'IEOG', 'IHO', 'IEOH', 'ICSO', 'NSO', 'GK', 'MATH', 'MATHEMATICS', 'SCIENCE', 'ENGLISH', 'HINDI']);
     const extraMap = new Map();
 
     (examPapers || []).forEach(p => {
       const rawCode = (p.subject_code || p.subject || '').toUpperCase().trim();
       const rawName = (p.subject_name || p.subject || p.title || 'Subject').trim();
-      if (!rawCode || defaultCodes.has(rawCode)) return;
+      if (!rawCode) return;
 
-      if (!extraMap.has(rawCode)) {
-        extraMap.set(rawCode, {
-          code: rawCode,
-          altCode: rawCode,
-          title: `${rawCode} (${rawName})`,
+      const norm = normalizeCode(rawCode);
+      // If normalized to one of the 6 core subjects, do NOT add as duplicate cover
+      if (['IMO', 'ISO', 'IDLO', 'IEO', 'IGKO', 'IHO'].includes(norm)) return;
+      if (defaultCodes.has(rawCode) || defaultCodes.has(norm)) return;
+
+      if (!extraMap.has(norm)) {
+        extraMap.set(norm, {
+          code: norm,
+          altCode: norm,
+          title: `${norm} (${rawName})`,
           subtitle: rawName,
           description: `Olympiad preparation and mock test series for ${rawName}.`,
           icon: BookOpen,
@@ -509,7 +526,7 @@ export const StudentMyContentPage = ({
           tagBg: 'bg-indigo-300/90 text-indigo-900 border border-indigo-400',
           countBg: 'bg-blue-300/90 text-blue-950 border border-blue-400',
           btnBg: 'bg-gradient-to-r from-indigo-600 via-blue-600 to-violet-600 hover:from-indigo-700 hover:via-blue-700 hover:to-violet-700 text-white shadow-sm border border-indigo-600',
-          seriesTitle: `${studentClass}-All India ${rawCode} Mock Test Series`
+          seriesTitle: `${studentClass}-All India ${norm} Mock Test Series`
         });
       }
     });
@@ -633,10 +650,26 @@ export const StudentMyContentPage = ({
     });
 
     if (selectedSubject && selectedSubject !== 'ALL') {
-      const match = list.filter(s => s.code === selectedSubject || s.altCode === selectedSubject);
-      if (match.length > 0) return match;
+      const normSelected = normalizeCode(selectedSubject);
+      const match = list.filter(s => {
+        const sNorm = normalizeCode(s.code);
+        const altNorm = normalizeCode(s.altCode);
+        return sNorm === normSelected || altNorm === normSelected || s.code === selectedSubject || s.altCode === selectedSubject;
+      });
+      if (match.length > 0) return [match[0]];
     }
-    return list;
+
+    // Deduplicate covers so every subject has strictly 1 package card
+    const seenCodes = new Set();
+    const dedupedCovers = [];
+    for (const c of list) {
+      const normCode = normalizeCode(c.code);
+      if (!seenCodes.has(normCode)) {
+        seenCodes.add(normCode);
+        dedupedCovers.push(c);
+      }
+    }
+    return dedupedCovers;
   }, [selectedSubject, ALL_SUBJECT_COVERS, examPapers, studentClass]);
 
   // Default subject study packages (Image 1 style) for all 6 subjects
@@ -682,7 +715,25 @@ export const StudentMyContentPage = ({
         id: 'def_pkg_idlo',
         title: `Olympiads Level-2 Champs Package - ICSO ${studentClass}`,
         class_name: studentClass,
-        subject_code: 'ICSO',
+        subject_code: 'IDLO',
+        subject_name: 'International Cyber Olympiad',
+        price: Number(bankSettings.mock_test_price) || 99,
+        original_price: Number(bankSettings.original_price) || 299,
+        header_color: '#4895d9',
+        points: [
+          '10 ICSO Computer & Cyber Olympiad Mock Papers',
+          'Computational Thinking & Logic Building',
+          'Previous 5 Years Solved Cyber Papers',
+          'Instant Scoring & Rank Benchmark'
+        ]
+      }
+    ],
+    ICSO: [
+      {
+        id: 'def_pkg_idlo',
+        title: `Olympiads Level-2 Champs Package - ICSO ${studentClass}`,
+        class_name: studentClass,
+        subject_code: 'IDLO',
         subject_name: 'International Cyber Olympiad',
         price: Number(bankSettings.mock_test_price) || 99,
         original_price: Number(bankSettings.original_price) || 299,
@@ -768,18 +819,26 @@ export const StudentMyContentPage = ({
     });
 
     if (matched.length > 0) {
-      return matched.map(p => ({
+      // Exactly 1 package per subject
+      const p = matched[0];
+      return [{
         ...p,
+        class_name: studentClass,
         price: mockPrice,
         original_price: origPrice
-      }));
+      }];
     }
 
-    return (DEFAULT_SUBJECT_PACKAGES[norm] || []).map(p => ({
-      ...p,
-      price: mockPrice,
-      original_price: origPrice
-    }));
+    const defaultPkg = (DEFAULT_SUBJECT_PACKAGES[norm] || DEFAULT_SUBJECT_PACKAGES['IMO'] || [])[0];
+    if (defaultPkg) {
+      return [{
+        ...defaultPkg,
+        class_name: studentClass,
+        price: mockPrice,
+        original_price: origPrice
+      }];
+    }
+    return [];
   };
 
   // Dedicated Step 2: Payment & QR Checkout Screen for Mock Test Series
@@ -1603,8 +1662,11 @@ export const StudentMyContentPage = ({
               };
               const SubIcon = sub.icon;
 
-              // Decide whether to render the Package Card (Image 1) or Cover Card (Image 2)
-              const renderAsPackage = viewMode === 'packages' || (viewMode === 'smart' && !isUnlocked);
+              // Render unified Study Package Card (Image 1 style) for every subject
+              const renderAsPackage = true;
+              const pkgTitle = primaryPkg.title
+                ? primaryPkg.title.replace(/Class\s*\d+/gi, studentClass)
+                : `Olympiads Level-2 Champs Package - ${sub.code} ${studentClass}`;
 
               if (renderAsPackage) {
                 /* ================================================================= */
@@ -1621,13 +1683,13 @@ export const StudentMyContentPage = ({
                         className="text-white text-center py-2.5 px-3 rounded-t-xl -mt-5 -mx-5 font-black text-xs sm:text-sm shadow-xs mb-3 truncate"
                         style={{ backgroundColor: primaryPkg.header_color || '#4895d9' }}
                       >
-                        {primaryPkg.title}
+                        {pkgTitle}
                       </div>
 
                       {/* Class & Features Badges */}
                       <div className="flex items-center justify-between gap-2 mb-3">
                         <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px]">
-                          {primaryPkg.class_name || studentClass} &bull; {primaryPkg.subject_code || sub.code}
+                          {studentClass} &bull; {primaryPkg.subject_code || sub.code}
                         </span>
                         <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px]">
                           {(primaryPkg.points || []).length} Key Features

@@ -3070,6 +3070,13 @@ export const mockEngine = {
           });
           if (classSpecific.length > 0) {
             filtered = classSpecific;
+          } else {
+            // Adapt default packages to requested class
+            filtered = filtered.map(p => ({
+              ...p,
+              class_name: classFilter,
+              title: p.title ? p.title.replace(/Class\s*\d+/gi, classFilter) : p.title
+            }));
           }
         }
         if (subjectFilter && subjectFilter !== 'ALL' && subjectFilter !== 'All') {
@@ -3093,6 +3100,26 @@ export const mockEngine = {
             return false;
           });
         }
+
+        // Strictly 1 package per subject code
+        const seenSubjectCodes = new Set();
+        const singlePkgPerSubject = [];
+        for (const pkg of filtered) {
+          const rawSub = String(pkg.subject_code || pkg.subject || 'ALL').toUpperCase().trim();
+          let canonicalSub = rawSub;
+          if (['IMO', 'IEOM', 'MATH', 'MATHEMATICS'].includes(rawSub)) canonicalSub = 'IMO';
+          else if (['ISO', 'IEOS', 'NSO', 'SCIENCE'].includes(rawSub)) canonicalSub = 'ISO';
+          else if (['IDLO', 'IEOD', 'ICSO', 'CYBER', 'DIGITAL'].includes(rawSub)) canonicalSub = 'IDLO';
+          else if (['IEO', 'IEOE', 'ENGLISH'].includes(rawSub)) canonicalSub = 'IEO';
+          else if (['IGKO', 'IEOG', 'GK', 'GENERAL KNOWLEDGE'].includes(rawSub)) canonicalSub = 'IGKO';
+          else if (['IHO', 'IEOH', 'HINDI'].includes(rawSub)) canonicalSub = 'IHO';
+
+          if (!seenSubjectCodes.has(canonicalSub)) {
+            seenSubjectCodes.add(canonicalSub);
+            singlePkgPerSubject.push(pkg);
+          }
+        }
+        filtered = singlePkgPerSubject;
 
         const mappedPackages = filtered.map(pkg => ({
           ...pkg,
