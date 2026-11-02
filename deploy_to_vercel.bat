@@ -1,21 +1,27 @@
 @echo off
 title OlympiadHub Vercel Deployer
+color 0b
 echo ========================================================
-echo  Deploying Latest Changes to Live Vercel...
+echo   OLYMPIADHUB - Deploying All Changes to Vercel
 echo ========================================================
 echo.
 cd /d "C:\Users\HP\.gemini\antigravity\scratch\olympiadhub"
-set PATH=C:\Users\HP\.gemini\antigravity\scratch\mingit\cmd;%PATH%
+set PATH=C:\Users\HP\.gemini\antigravity\scratch\nodejs;C:\Users\HP\.gemini\antigravity\scratch\mingit\cmd;%PATH%
 
-echo [1/2] Checking & Pushing changes to GitHub repository...
+echo [1/2] Checking unpushed commits...
+git log origin/main..HEAD --oneline
+
+echo.
+echo [2/2] Pushing latest changes to GitHub (triggers Vercel auto-deploy)...
+echo.
 git push origin main
 
 if %errorlevel% neq 0 (
     echo.
     echo --------------------------------------------------------
-    echo [WARNING] Internet se connect nahi ho pa raha hai!
-    echo Kripya apna Wi-Fi / Mobile Hotspot check karke connect karein.
-    echo Internet aate hi yeh command automatically push kar degi.
+    echo [NOTE] Agar GitHub Login ya Token maang raha hai:
+    echo 1. Browser me GitHub login window khulegi - 'Sign in with your browser' par click karein.
+    echo 2. Ya GitHub Settings -> Developer Settings -> Personal access tokens (classic) se token daalein.
     echo --------------------------------------------------------
     echo.
     pause
@@ -24,10 +30,12 @@ if %errorlevel% neq 0 (
 
 echo.
 echo ========================================================
-echo [SUCCESS] Changes GitHub par successfully push ho gaye!
-echo Vercel automatically live website update kar raha hai:
+echo   [SUCCESS] Sare changes GitHub par push ho chuke hain!
+echo   Vercel automatically website ko update kar raha hai.
 echo.
 echo   LIVE URL: https://school-olympaid1.vercel.app
 echo ========================================================
+echo.
+echo 1-2 minute me Vercel par live changes dikhne lagenge.
 echo.
 pause
