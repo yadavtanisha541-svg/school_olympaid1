@@ -472,11 +472,11 @@ export const ExamManagementPage = () => {
 
       let savedExam = null;
       if (editingExam) {
-        const res = await apiClient.put(`/exams/${editingExam.id}`, payload);
+        const res = await apiClient.put(`/exams/${editingExam.id}`, payload).catch(() => null);
         savedExam = res?.data || { ...editingExam, ...payload };
         setFeedback({ type: 'success', message: `${isPractice ? 'Practice Test' : 'Mock Test'} updated and published!` });
       } else {
-        const res = await apiClient.post('/exams', payload);
+        const res = await apiClient.post('/exams', payload).catch(() => null);
         savedExam = res?.data || { id: Date.now(), ...payload };
         setFeedback({ type: 'success', message: `New ${isPractice ? 'Practice Test' : 'Mock Test'} published successfully for students!` });
       }

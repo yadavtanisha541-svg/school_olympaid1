@@ -4732,7 +4732,25 @@ export const mockEngine = {
           const epList = JSON.parse(localStorage.getItem('olympiadhub_db_exam_papers') || '[]');
           localStorage.setItem('olympiadhub_db_exam_papers', JSON.stringify([newExam, ...epList.filter(p => String(p.id) !== String(newExam.id))]));
 
+          const exList = JSON.parse(localStorage.getItem('olympiadhub_db_exams') || '[]');
+          localStorage.setItem('olympiadhub_db_exams', JSON.stringify([newExam, ...exList.filter(p => String(p.id) !== String(newExam.id))]));
+
+          // Un-delete cover if subject was previously deleted
+          try {
+            const covRaw = localStorage.getItem('olympiadhub_deleted_covers');
+            if (covRaw) {
+              let covList = JSON.parse(covRaw);
+              const sc = (newExam.subject_code || newExam.subject || '').toUpperCase();
+              covList = covList.filter(c => {
+                const cu = String(c).toUpperCase();
+                return cu !== sc && !cu.startsWith(sc + '_') && !cu.includes(sc);
+              });
+              localStorage.setItem('olympiadhub_deleted_covers', JSON.stringify(covList));
+            }
+          } catch (_) {}
+
           if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('olympiadhub-covers-updated'));
             window.dispatchEvent(new CustomEvent('olympiadhub-exams-updated', { detail: newExam }));
             window.dispatchEvent(new CustomEvent('olympiadhub-admin-papers-updated', { detail: newExam }));
             window.dispatchEvent(new CustomEvent('olympiadhub-data-updated', { detail: { table: 'exams', data: exams } }));

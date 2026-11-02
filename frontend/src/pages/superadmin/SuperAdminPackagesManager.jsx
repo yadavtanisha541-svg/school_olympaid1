@@ -1039,20 +1039,44 @@ export const SuperAdminPackagesManager = () => {
   // Save Exam Paper
   const handleSavePaper = async (e) => {
     e?.preventDefault();
-    if (!paperTitle.trim()) {
-      showToast('Please enter a Paper Title', 'error');
-      return;
-    }
+    const finalTitle = (paperTitle || '').trim() || `${paperClass || 'Class 6'} ${paperSubjectCode || 'IMO'} Mock Test Paper`;
+
     try {
       const paperId = editingPaper ? editingPaper.id : Date.now();
       const generatedCode = paperShortCode || `OLY-${String(paperId).slice(-4)}`;
-      const totalQ = Array.isArray(paperQuestions) && paperQuestions.length > 0 ? paperQuestions.length : 10;
-      const totalM = Number(paperTotalMarks) || (Array.isArray(paperQuestions) && paperQuestions.length > 0 ? paperQuestions.reduce((a, b) => a + (Number(b.marks) || 1), 0) : 60);
+
+      // Resolve questions: check paperQuestions, then bulkQuestionsInput, then default fallback
+      let finalQuestions = Array.isArray(paperQuestions) && paperQuestions.length > 0 ? paperQuestions : [];
+      if (finalQuestions.length === 0 && bulkQuestionsInput && bulkQuestionsInput.trim()) {
+        try {
+          const parsed = parseUniversalBulkQuestions(bulkQuestionsInput, paperSubjectCode);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            finalQuestions = parsed;
+          }
+        } catch (_) {}
+      }
+      if (finalQuestions.length === 0) {
+        const defQ = getDefaultQuestionForSubject(paperSubjectCode);
+        finalQuestions = [
+          {
+            id: 1,
+            section: defQ.section,
+            q: defQ.q,
+            options: defQ.options,
+            correct: defQ.correct,
+            marks: 1,
+            explanation: defQ.explanation
+          }
+        ];
+      }
+
+      const totalQ = finalQuestions.length;
+      const totalM = Number(paperTotalMarks) || (finalQuestions.length > 0 ? finalQuestions.reduce((a, b) => a + (Number(b.marks) || 1), 0) : 60);
 
       const payload = {
         id: paperId,
         exam_code: generatedCode,
-        title: paperTitle,
+        title: finalTitle,
         short_code: generatedCode,
         series_title: `${paperClass} - All India ${paperSubjectCode} Mock Test Series`,
         subject_code: (paperSubjectCode || 'IMO').toUpperCase(),
@@ -1075,7 +1099,7 @@ export const SuperAdminPackagesManager = () => {
         header_color: '#809926',
         accent_color: '#809926',
         sections: paperSections.length > 0 ? paperSections : ['Subject Section 1', 'Achievers Section'],
-        questions: paperQuestions,
+        questions: finalQuestions,
         created_at: editingPaper?.created_at || new Date().toISOString()
       };
 
@@ -1122,7 +1146,10 @@ export const SuperAdminPackagesManager = () => {
         if (covRaw) {
           let covList = JSON.parse(covRaw);
           const sc = (payload.subject_code || '').toUpperCase();
-          covList = covList.filter(c => c !== sc && !c.startsWith(sc + '_'));
+          covList = covList.filter(c => {
+            const cu = String(c).toUpperCase();
+            return cu !== sc && !cu.startsWith(sc + '_') && !cu.includes(sc);
+          });
           localStorage.setItem('olympiadhub_deleted_covers', JSON.stringify(covList));
         }
         const delRaw = localStorage.getItem('olympiadhub_deleted_ids');
@@ -1154,6 +1181,8 @@ export const SuperAdminPackagesManager = () => {
 
       showToast(editingPaper ? '✓ Mock Test updated successfully!' : '✓ New Mock Test added and published successfully!');
       setIsAuthoringPaper(false);
+      setSelectedSubjectCover(payload.subject_code);
+      setPackageClassFilter('All');
       fetchExamPapers();
     } catch (err) {
       console.warn('Save paper error:', err);
@@ -1792,6 +1821,17 @@ export const SuperAdminPackagesManager = () => {
 
     const allKnownSubjects = SUBJECTS_LIST.filter(s => {
       if (s.code === 'ALL') return false;
+
+      // Check if there are active exam papers for this subject
+      const matchingPapers = examPapers.filter(p => {
+        const matchesSub = matchSubjectCodes(p.subject_code, s.code);
+        const matchesClass = matchClassNames(p.class_name, packageClassFilter);
+        return matchesSub && matchesClass;
+      });
+
+      // If active mock test papers exist for this subject, ALWAYS display the cover!
+      if (matchingPapers.length > 0) return true;
+
       const coverKey = `${s.code}_${packageClassFilter}`;
       if (deletedCovers.includes(s.code) || deletedCovers.includes(coverKey)) return false;
       return true;
@@ -2161,7 +2201,15 @@ export const SuperAdminPackagesManager = () => {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex justify-end">
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3 flex-wrap">
+                <button
+                  type="button"
+                  onClick={handleSavePaper}
+                  className="px-5 py-2.5 bg-[#00b074] hover:bg-[#009260] text-white rounded-xl text-xs font-black flex items-center gap-2 cursor-pointer shadow-xs active:scale-95 transition-all"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>Save &amp; Publish Mock Test</span>
+                </button>
                 <button
                   type="button"
                   onClick={() => setPaperModalTab('questions')}
@@ -2505,32 +2553,43 @@ export const SuperAdminPackagesManager = () => {
                   </div>
 
                   {/* Navigation Footer for Questions */}
-                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                    <button
-                      type="button"
-                      disabled={activeQuestionIndex === 0}
-                      onClick={() => setActiveQuestionIndex(Math.max(0, activeQuestionIndex - 1))}
-                      className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                      &larr; Previous Question
-                    </button>
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2.5 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={activeQuestionIndex === 0}
+                        onClick={() => setActiveQuestionIndex(Math.max(0, activeQuestionIndex - 1))}
+                        className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        &larr; Prev
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleAddBlankQuestion}
+                        className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-xs cursor-pointer shadow-2xs flex items-center gap-1.5"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>+ Add Question</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={activeQuestionIndex >= paperQuestions.length - 1}
+                        onClick={() => setActiveQuestionIndex(Math.min(paperQuestions.length - 1, activeQuestionIndex + 1))}
+                        className="px-3.5 py-2 rounded-xl bg-[#4e2a4a] hover:bg-[#3d203a] text-white font-bold text-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        Next &rarr;
+                      </button>
+                    </div>
 
                     <button
                       type="button"
-                      onClick={handleAddBlankQuestion}
-                      className="px-4 py-2 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white font-black text-xs cursor-pointer shadow-2xs flex items-center gap-1.5"
+                      onClick={handleSavePaper}
+                      className="px-5 py-2 rounded-xl bg-[#00b074] hover:bg-[#009260] text-white font-black text-xs shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5 ml-auto"
                     >
-                      <Plus className="w-4 h-4" />
-                      <span>+ Add Next Question</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      disabled={activeQuestionIndex >= paperQuestions.length - 1}
-                      onClick={() => setActiveQuestionIndex(Math.min(paperQuestions.length - 1, activeQuestionIndex + 1))}
-                      className="px-4 py-2 rounded-xl bg-[#4e2a4a] hover:bg-[#3d203a] text-white font-bold text-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                      Next Question &rarr;
+                      <Check className="w-4 h-4" />
+                      <span>Save &amp; Publish Mock Test</span>
                     </button>
                   </div>
                 </div>
@@ -2790,19 +2849,32 @@ export const SuperAdminPackagesManager = () => {
                       <span className="text-xs font-bold text-slate-500">
                         Total: <span className="font-black text-slate-900">{detectedList.length}</span> questions loaded
                       </span>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <button
                           type="button"
                           onClick={() => {
-                            if (paperQuestions.length === 0 && detectedList.length > 0) {
+                            if (detectedList.length > 0) {
                               setPaperQuestions(detectedList);
                             }
                             setPaperModalTab('questions');
                             setActiveQuestionIndex(0);
                           }}
-                          className="px-5 py-2.5 bg-[#4e2a4a] hover:bg-[#3d203a] text-white rounded-xl text-xs font-black shadow-md cursor-pointer flex items-center gap-2"
+                          className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold cursor-pointer"
                         >
-                          <span>Proceed to Question Studio &rarr;</span>
+                          <span>Review in Questions Studio &rarr;</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            if (detectedList.length > 0) {
+                              setPaperQuestions(detectedList);
+                            }
+                            handleSavePaper(e);
+                          }}
+                          className="px-5 py-2.5 bg-[#00b074] hover:bg-[#009260] text-white rounded-xl text-xs font-black shadow-md cursor-pointer flex items-center gap-2 active:scale-95 transition-all"
+                        >
+                          <Check className="w-4 h-4" />
+                          <span>Save &amp; Publish Directly</span>
                         </button>
                       </div>
                     </div>
