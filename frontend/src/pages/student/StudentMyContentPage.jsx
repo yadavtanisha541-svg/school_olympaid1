@@ -1402,52 +1402,28 @@ export const StudentMyContentPage = ({
 
               {subjectPapers.length === 0 ? (
                 /* Empty state when no mock tests exist in this series */
-                (() => {
-                  const allClassPapers = getSubjectPapers(currentSub.code, currentSub.altCode, 'All Classes');
-                  return (
-                    <div className="bg-white rounded-3xl p-10 border border-slate-200 text-center space-y-4 max-w-lg mx-auto my-6 shadow-sm">
-                      <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
-                        <FileText className="w-7 h-7" />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-black text-slate-800">
-                          No Mock Tests for {studentClass} in {currentSub.title}
-                        </h3>
-                        {allClassPapers.length > 0 ? (
-                          <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                            We found <span className="font-bold text-indigo-600">{allClassPapers.length} mock tests</span> configured across other classes. Switch class to view them.
-                          </p>
-                        ) : (
-                          <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                            Currently there are no mock tests published for {currentSub.title}. Tests published by Super Admin will show up here automatically.
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center justify-center gap-3 pt-1 flex-wrap">
-                        {allClassPapers.length > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const targetClass = allClassPapers[0]?.class_name || allClassPapers[0]?.class || 'Class 6';
-                              setSelectedClass(targetClass);
-                            }}
-                            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5"
-                          >
-                            <GraduationCap className="w-4 h-4" />
-                            <span>Switch to {allClassPapers[0]?.class_name || 'Class'} ({allClassPapers.length} tests)</span>
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => setOpenedMockSeries(null)}
-                          className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
-                        >
-                          &larr; Back to Series Covers
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })()
+                <div className="bg-white rounded-3xl p-10 border border-slate-200 text-center space-y-4 max-w-lg mx-auto my-6 shadow-sm">
+                  <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                    <FileText className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-slate-800">
+                      No Mock Tests Available for {studentClass} in {currentSub.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                      Currently there are no mock tests published for this series. Published mock tests will appear here automatically.
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center gap-3 pt-1 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => setOpenedMockSeries(null)}
+                      className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                    >
+                      &larr; Back to Series Covers
+                    </button>
+                  </div>
+                </div>
               ) : (
                 /* Mock Tests Cards Grid (Colorful 2-3 Mix Pastel Theme) */
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
