@@ -1602,39 +1602,6 @@ export const StudentMyContentPage = ({
             </div>
           </div>
 
-          {/* Subject Switcher Tabs - Strictly 1 subject package shown at a time */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            {[
-              { code: 'IMO', label: 'IEOM (Maths)', icon: Calculator },
-              { code: 'ISO', label: 'IEOS (Science)', icon: Rocket },
-              { code: 'IGKO', label: 'IEOG (GK)', icon: Globe },
-              { code: 'IEO', label: 'IEOE (English)', icon: BookOpen },
-              { code: 'IDLO', label: 'IEOD (Cyber)', icon: Laptop },
-              { code: 'IHO', label: 'IEOH (Hindi)', icon: Languages },
-            ].map((tab) => {
-              const TabIcon = tab.icon;
-              const isSelected = normalizeCode(selectedSubject) === tab.code;
-              return (
-                <button
-                  key={tab.code}
-                  type="button"
-                  onClick={() => {
-                    setSelectedSubject(tab.code);
-                    if (onNavigateTab) onNavigateTab(`content_${tab.code.toLowerCase()}`);
-                  }}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
-                    isSelected
-                      ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-300'
-                      : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  <TabIcon className="w-3.5 h-3.5" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
           {/* Single Subject Package Card Container */}
           {visibleCovers.length === 0 ? (
             <div className="bg-white rounded-3xl p-12 border border-slate-200 text-center space-y-4 max-w-lg mx-auto shadow-sm my-6">
