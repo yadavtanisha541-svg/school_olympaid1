@@ -189,9 +189,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                 onSelectTab('overview');
                 if (onClose) onClose();
               }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer ${
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-colors cursor-pointer outline-none focus:outline-none focus:ring-0 ${
                 currentTab === 'overview'
-                  ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                  ? 'bg-slate-800 text-white font-bold border border-slate-700'
                   : 'text-slate-300 hover:bg-[#1a264e] hover:text-white font-semibold'
               }`}
             >
@@ -225,9 +225,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         onSelectTab(item.id);
                         if (onClose) onClose();
                       }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer text-left ${
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-colors cursor-pointer text-left outline-none focus:outline-none focus:ring-0 ${
                         isActive
-                          ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                          ? 'bg-slate-800 text-white font-bold border border-slate-700'
                           : 'text-slate-300 font-semibold hover:bg-[#1a264e] hover:text-white'
                       }`}
                     >
@@ -261,9 +261,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                       onSelectTab(item.id);
                       if (onClose) onClose();
                     }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all duration-150 cursor-pointer text-left ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-colors cursor-pointer text-left outline-none focus:outline-none focus:ring-0 ${
                       isActive
-                        ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                        ? 'bg-slate-800 text-white font-bold border border-slate-700'
                         : 'text-slate-300 font-semibold hover:bg-[#1a264e] hover:text-white'
                     }`}
                   >
@@ -330,14 +330,14 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                                   onSelectTab(sub.id);
                                   if (onClose) onClose();
                                 }}
-                                className={`w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
+                                className={`w-full flex items-center justify-between gap-2 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap outline-none focus:outline-none focus:ring-0 ${
                                   isSubActive
-                                    ? 'bg-slate-800 text-white font-bold border border-slate-700'
-                                    : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                                    ? 'text-white font-bold border-l-2 border-indigo-400 pl-2.5 bg-transparent shadow-none'
+                                    : 'text-slate-300 hover:text-white font-medium pl-3 border-l-2 border-transparent bg-transparent shadow-none'
                                 }`}
                               >
                                 <div className="flex items-center gap-2 min-w-0">
-                                  <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-white' : 'text-slate-400'}`} />
+                                  <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-indigo-400' : 'text-slate-400'}`} />
                                   <span className="truncate">{sub.label}</span>
                                 </div>
 
@@ -362,9 +362,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         onSelectTab('practice_tests');
                         if (onClose) onClose();
                       }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-colors cursor-pointer outline-none focus:outline-none focus:ring-0 ${
                         currentTab === 'practice_tests' || currentTab === 'test_generator'
-                          ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                          ? 'bg-slate-800 text-white font-bold border border-slate-700'
                           : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                       }`}
                     >
@@ -381,9 +381,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         onSelectTab('prog_rsdp');
                         if (onClose) onClose();
                       }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-colors cursor-pointer outline-none focus:outline-none focus:ring-0 ${
                         currentTab.startsWith('prog_')
-                          ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                          ? 'bg-slate-800 text-white font-bold border border-slate-700'
                           : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                       }`}
                     >
@@ -407,7 +407,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                       <button
                         type="button"
                         onClick={() => toggleStudentAccordion('performance')}
-                        className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-slate-200 hover:bg-[#1a264e] hover:text-white cursor-pointer transition-colors"
+                        className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-slate-200 hover:bg-[#1a264e] hover:text-white cursor-pointer transition-colors outline-none focus:outline-none focus:ring-0"
                       >
                         <div className="flex items-center gap-2.5">
                           <BarChart3 className="w-5 h-5 text-slate-400 shrink-0" />
@@ -430,13 +430,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                                 onSelectTab('performance');
                                 if (onClose) onClose();
                               }}
-                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
+                              className={`w-full flex items-center gap-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap outline-none focus:outline-none focus:ring-0 ${
                                 currentTab === 'performance'
-                                  ? 'bg-slate-800 text-white font-bold border border-slate-700'
-                                  : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                                  ? 'text-white font-bold border-l-2 border-indigo-400 pl-2.5 bg-transparent shadow-none'
+                                  : 'text-slate-300 hover:text-white font-medium pl-3 border-l-2 border-transparent bg-transparent shadow-none'
                               }`}
                             >
-                              <BarChart3 className="w-4 h-4 text-slate-400 shrink-0" />
+                              <BarChart3 className={`w-4 h-4 shrink-0 ${currentTab === 'performance' ? 'text-indigo-400' : 'text-slate-400'}`} />
                               <span className="truncate">Statistics &amp; Reports</span>
                             </button>
                           )}
@@ -447,13 +447,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                                 onSelectTab('analysis');
                                 if (onClose) onClose();
                               }}
-                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
+                              className={`w-full flex items-center gap-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap outline-none focus:outline-none focus:ring-0 ${
                                 currentTab === 'analysis' || currentTab === 'exam_solutions'
-                                  ? 'bg-slate-800 text-white font-bold border border-slate-700'
-                                  : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                                  ? 'text-white font-bold border-l-2 border-indigo-400 pl-2.5 bg-transparent shadow-none'
+                                  : 'text-slate-300 hover:text-white font-medium pl-3 border-l-2 border-transparent bg-transparent shadow-none'
                               }`}
                             >
-                              <TrendingUp className="w-4 h-4 text-slate-400 shrink-0" />
+                              <TrendingUp className={`w-4 h-4 shrink-0 ${currentTab === 'analysis' || currentTab === 'exam_solutions' ? 'text-indigo-400' : 'text-slate-400'}`} />
                               <span className="truncate">Analysis &amp; Solutions</span>
                             </button>
                           )}
@@ -464,13 +464,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                                 onSelectTab('exam_history');
                                 if (onClose) onClose();
                               }}
-                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
+                              className={`w-full flex items-center gap-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap outline-none focus:outline-none focus:ring-0 ${
                                 currentTab === 'exam_history'
-                                  ? 'bg-slate-800 text-white font-bold border border-slate-700'
-                                  : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                                  ? 'text-white font-bold border-l-2 border-indigo-400 pl-2.5 bg-transparent shadow-none'
+                                  : 'text-slate-300 hover:text-white font-medium pl-3 border-l-2 border-transparent bg-transparent shadow-none'
                               }`}
                             >
-                              <FileCheck2 className="w-4 h-4 text-slate-400 shrink-0" />
+                              <FileCheck2 className={`w-4 h-4 shrink-0 ${currentTab === 'exam_history' ? 'text-indigo-400' : 'text-slate-400'}`} />
                               <span className="truncate">Exam History</span>
                             </button>
                           )}
@@ -487,9 +487,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                         onSelectTab('my_revision');
                         if (onClose) onClose();
                       }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-all cursor-pointer ${
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[15px] transition-colors cursor-pointer outline-none focus:outline-none focus:ring-0 ${
                         currentTab === 'my_revision'
-                          ? 'bg-slate-800 text-white font-bold shadow-sm border border-slate-700'
+                          ? 'bg-slate-800 text-white font-bold border border-slate-700'
                           : 'text-slate-200 font-semibold hover:bg-[#1a264e] hover:text-white'
                       }`}
                     >
@@ -512,7 +512,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   <button
                     type="button"
                     onClick={() => toggleStudentAccordion('account')}
-                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-slate-200 hover:bg-[#1a264e] hover:text-white cursor-pointer transition-colors"
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-slate-200 hover:bg-[#1a264e] hover:text-white cursor-pointer transition-colors outline-none focus:outline-none focus:ring-0"
                   >
                     <div className="flex items-center gap-2.5">
                       <User className="w-5 h-5 text-slate-400 shrink-0" />
@@ -535,13 +535,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                             onSelectTab('profile');
                             if (onClose) onClose();
                           }}
-                          className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
+                          className={`w-full flex items-center gap-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap outline-none focus:outline-none focus:ring-0 ${
                             currentTab === 'profile'
-                              ? 'bg-slate-800 text-white font-bold border border-slate-700'
-                              : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                              ? 'text-white font-bold border-l-2 border-indigo-400 pl-2.5 bg-transparent shadow-none'
+                              : 'text-slate-300 hover:text-white font-medium pl-3 border-l-2 border-transparent bg-transparent shadow-none'
                           }`}
                         >
-                          <User className="w-4 h-4 text-slate-400 shrink-0" />
+                          <User className={`w-4 h-4 shrink-0 ${currentTab === 'profile' ? 'text-indigo-400' : 'text-slate-400'}`} />
                           <span className="truncate">My Profile</span>
                         </button>
                       )}
@@ -551,13 +551,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('my_orders');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
+                        className={`w-full flex items-center gap-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap outline-none focus:outline-none focus:ring-0 ${
                           currentTab === 'my_orders'
-                            ? 'bg-slate-800 text-white font-bold border border-slate-700'
-                            : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                            ? 'text-white font-bold border-l-2 border-indigo-400 pl-2.5 bg-transparent shadow-none'
+                            : 'text-slate-300 hover:text-white font-medium pl-3 border-l-2 border-transparent bg-transparent shadow-none'
                         }`}
                       >
-                        <CreditCard className="w-4 h-4 text-slate-400 shrink-0" />
+                        <CreditCard className={`w-4 h-4 shrink-0 ${currentTab === 'my_orders' ? 'text-indigo-400' : 'text-slate-400'}`} />
                         <span className="truncate">My Orders</span>
                       </button>
                       <button
@@ -566,13 +566,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('my_wallet');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
+                        className={`w-full flex items-center gap-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap outline-none focus:outline-none focus:ring-0 ${
                           currentTab === 'my_wallet'
-                            ? 'bg-slate-800 text-white font-bold border border-slate-700'
-                            : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                            ? 'text-white font-bold border-l-2 border-indigo-400 pl-2.5 bg-transparent shadow-none'
+                            : 'text-slate-300 hover:text-white font-medium pl-3 border-l-2 border-transparent bg-transparent shadow-none'
                         }`}
                       >
-                        <Wallet className="w-4 h-4 text-slate-400 shrink-0" />
+                        <Wallet className={`w-4 h-4 shrink-0 ${currentTab === 'my_wallet' ? 'text-indigo-400' : 'text-slate-400'}`} />
                         <span className="truncate">My Wallet</span>
                       </button>
                     </div>
@@ -621,13 +621,13 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                               onSelectTab(sub.id);
                               if (onClose) onClose();
                             }}
-                            className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                            className={`w-full flex items-center gap-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap outline-none focus:outline-none focus:ring-0 ${
                               isSubActive
-                                ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
-                                : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
+                                ? 'text-white font-bold border-l-2 border-indigo-400 pl-2.5 bg-transparent shadow-none'
+                                : 'text-slate-300 hover:text-white font-medium pl-3 border-l-2 border-transparent bg-transparent shadow-none'
                             }`}
                           >
-                            <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-white' : 'text-slate-400'}`} />
+                            <SubIcon className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-indigo-400' : 'text-slate-400'}`} />
                             <span className="truncate">{sub.label}</span>
                           </button>
                         );
