@@ -650,15 +650,14 @@ export const StudentMyContentPage = ({
     });
 
     // Strictly show ONLY 1 subject package card at a time for the currently active subject
-    const activeSubCode = selectedSubject || 'IMO';
-    const normSelected = normalizeCode(activeSubCode);
-    const match = list.filter(s => {
+    const activeSubCode = normalizeCode(selectedSubject) || 'IMO';
+    const targetCover = ALL_SUBJECT_COVERS.find(s => {
       const sNorm = normalizeCode(s.code);
       const altNorm = normalizeCode(s.altCode);
-      return sNorm === normSelected || altNorm === normSelected || s.code === activeSubCode || s.altCode === activeSubCode;
-    });
-    if (match.length > 0) return [match[0]];
-    return list.slice(0, 1);
+      return sNorm === activeSubCode || altNorm === activeSubCode || s.code === activeSubCode || s.altCode === activeSubCode;
+    }) || ALL_SUBJECT_COVERS[0];
+
+    return [targetCover];
   }, [selectedSubject, ALL_SUBJECT_COVERS, examPapers, studentClass]);
 
   // Default subject study packages (Image 1 style) for all 6 subjects
@@ -702,15 +701,15 @@ export const StudentMyContentPage = ({
     IDLO: [
       {
         id: 'def_pkg_idlo',
-        title: `Olympiads Level-2 Champs Package - ICSO ${studentClass}`,
+        title: `Olympiads Level-2 Champs Package - IDLO ${studentClass}`,
         class_name: studentClass,
         subject_code: 'IDLO',
-        subject_name: 'International Cyber Olympiad',
+        subject_name: 'International Digital Literacy & Cyber Olympiad',
         price: Number(bankSettings.mock_test_price) || 99,
         original_price: Number(bankSettings.original_price) || 299,
         header_color: '#4895d9',
         points: [
-          '10 ICSO Computer & Cyber Olympiad Mock Papers',
+          '10 Complete Digital Literacy & Cyber Mock Papers',
           'Computational Thinking & Logic Building',
           'Previous 5 Years Solved Cyber Papers',
           'Instant Scoring & Rank Benchmark'
@@ -1618,7 +1617,7 @@ export const StudentMyContentPage = ({
               </div>
             </div>
           ) : (
-            <div className="w-full max-w-[480px] mx-auto">
+            <div className="w-full max-w-[420px] sm:max-w-[440px]">
               {visibleCovers.map((sub) => {
               const isUnlocked = isSubjectPurchased(sub.code, studentClass, purchasedTests);
               const subjectPkgs = getPackagesForSubject(sub.code);
