@@ -291,40 +291,21 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                   {/* Mock Test Accordion Header */}
                   {hasPermission('access_mock_tests') && (
                     <div>
-                      <div className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold transition-colors ${
-                        currentTab === 'my_content' || currentTab.startsWith('content_')
-                          ? 'bg-slate-800 text-white shadow-sm border border-slate-700'
-                          : 'text-slate-200 hover:bg-[#1a264e] hover:text-white'
-                      }`}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            onSelectTab('my_content');
-                            if (!studentAccordions.content) {
-                              toggleStudentAccordion('content');
-                            }
-                            if (onClose) onClose();
-                          }}
-                          className="flex-1 flex items-center gap-2.5 text-left cursor-pointer"
-                        >
+                      <button
+                        type="button"
+                        onClick={() => toggleStudentAccordion('content')}
+                        className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[15px] font-bold text-slate-200 hover:bg-[#1a264e] hover:text-white cursor-pointer transition-colors"
+                      >
+                        <div className="flex items-center gap-2.5">
                           <BookOpen className="w-5 h-5 text-slate-300 shrink-0" />
                           <span>Mock Test</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleStudentAccordion('content');
-                          }}
-                          className="p-1 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white cursor-pointer transition-colors"
-                        >
-                          {studentAccordions.content ? (
-                            <ChevronUp className="w-4.5 h-4.5" />
-                          ) : (
-                            <ChevronDown className="w-4.5 h-4.5" />
-                          )}
-                        </button>
-                      </div>
+                        </div>
+                        {studentAccordions.content ? (
+                          <ChevronUp className="w-4.5 h-4.5 text-slate-400" />
+                        ) : (
+                          <ChevronDown className="w-4.5 h-4.5 text-slate-400" />
+                        )}
+                      </button>
 
                       {/* Clean Sub-items for all 6 core Olympiad subjects */}
                       {studentAccordions.content && (
@@ -338,7 +319,7 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                             { id: 'content_iho', key: 'iho', label: 'IEOH (Hindi)', icon: Languages }
                           ].map((sub) => {
                             const SubIcon = sub.icon;
-                            const isSubActive = currentTab === sub.id;
+                            const isSubActive = currentTab === sub.id || (currentTab === 'my_content' && sub.id === 'content_imo');
                             const isUnlocked = isSubjectPurchased(sub.key, user?.class_name || user?.class || user?.grade || 'Class 6', purchasedTests);
 
                             return (
@@ -349,9 +330,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                                   onSelectTab(sub.id);
                                   if (onClose) onClose();
                                 }}
-                                className={`w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                                className={`w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
                                   isSubActive
-                                    ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
+                                    ? 'bg-slate-800 text-white font-bold border border-slate-700'
                                     : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                                 }`}
                               >
@@ -449,9 +430,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                                 onSelectTab('performance');
                                 if (onClose) onClose();
                               }}
-                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
                                 currentTab === 'performance'
-                                  ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
+                                  ? 'bg-slate-800 text-white font-bold border border-slate-700'
                                   : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                               }`}
                             >
@@ -466,9 +447,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                                 onSelectTab('analysis');
                                 if (onClose) onClose();
                               }}
-                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
                                 currentTab === 'analysis' || currentTab === 'exam_solutions'
-                                  ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
+                                  ? 'bg-slate-800 text-white font-bold border border-slate-700'
                                   : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                               }`}
                             >
@@ -483,9 +464,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                                 onSelectTab('exam_history');
                                 if (onClose) onClose();
                               }}
-                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
                                 currentTab === 'exam_history'
-                                  ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
+                                  ? 'bg-slate-800 text-white font-bold border border-slate-700'
                                   : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                               }`}
                             >
@@ -554,9 +535,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                             onSelectTab('profile');
                             if (onClose) onClose();
                           }}
-                          className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                          className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
                             currentTab === 'profile'
-                              ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
+                              ? 'bg-slate-800 text-white font-bold border border-slate-700'
                               : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                           }`}
                         >
@@ -570,9 +551,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('my_orders');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
                           currentTab === 'my_orders'
-                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
+                            ? 'bg-slate-800 text-white font-bold border border-slate-700'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
@@ -585,9 +566,9 @@ export const Sidebar = ({ currentTab, onSelectTab, isOpen, onClose, onGoToPublic
                           onSelectTab('my_wallet');
                           if (onClose) onClose();
                         }}
-                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-all cursor-pointer whitespace-nowrap ${
+                        className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] text-left transition-colors cursor-pointer whitespace-nowrap ${
                           currentTab === 'my_wallet'
-                            ? 'bg-slate-800 text-white font-bold border border-slate-700 shadow-2xs'
+                            ? 'bg-slate-800 text-white font-bold border border-slate-700'
                             : 'text-slate-300 hover:bg-[#19244a] hover:text-white font-medium'
                         }`}
                       >
