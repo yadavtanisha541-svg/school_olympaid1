@@ -104,7 +104,7 @@ export const StudentMyContentPage = ({
 
   // Helper to normalize subject codes and aliases
   const normalizeCode = (raw) => {
-    if (!raw) return 'ALL';
+    if (!raw) return 'IMO';
     const s = String(raw).replace('content_', '').toUpperCase().trim();
     if (s === 'IMO' || s === 'IEOM' || s === 'MATH' || s === 'MATHEMATICS') return 'IMO';
     if (s === 'ISO' || s === 'IEOS' || s === 'NSO' || s === 'SCIENCE') return 'ISO';
@@ -112,8 +112,8 @@ export const StudentMyContentPage = ({
     if (s === 'IEO' || s === 'IEOE' || s === 'ENGLISH') return 'IEO';
     if (s === 'IGKO' || s === 'IEOG' || s === 'GK' || s === 'GENERAL KNOWLEDGE') return 'IGKO';
     if (s === 'IHO' || s === 'IEOH' || s === 'HINDI') return 'IHO';
-    if (s === 'MY_CONTENT' || s === 'ALL') return 'ALL';
-    return s;
+    if (s === 'MY_CONTENT' || s === 'ALL') return 'IMO';
+    return s || 'IMO';
   };
 
   const cleanMockTitle = (title) => {
@@ -127,12 +127,12 @@ export const StudentMyContentPage = ({
       .trim();
   };
 
-  // Active selected subject filter: 'ALL' or 'IGKO', 'IMO', 'ISO', etc.
+  // Active selected subject filter: Always a specific subject (defaults to 'IMO', never 'ALL' so exactly 1 package shows)
   const [selectedSubject, setSelectedSubject] = useState(() => {
     if (activeSubjectCode) {
       return normalizeCode(activeSubjectCode);
     }
-    return 'ALL';
+    return 'IMO';
   });
 
   // Level 2: Which subject's mock tests are open (null = showing covers/packages, 'IMO' = showing mock tests)
@@ -649,27 +649,16 @@ export const StudentMyContentPage = ({
       return true;
     });
 
-    if (selectedSubject && selectedSubject !== 'ALL') {
-      const normSelected = normalizeCode(selectedSubject);
-      const match = list.filter(s => {
-        const sNorm = normalizeCode(s.code);
-        const altNorm = normalizeCode(s.altCode);
-        return sNorm === normSelected || altNorm === normSelected || s.code === selectedSubject || s.altCode === selectedSubject;
-      });
-      if (match.length > 0) return [match[0]];
-    }
-
-    // Deduplicate covers so every subject has strictly 1 package card
-    const seenCodes = new Set();
-    const dedupedCovers = [];
-    for (const c of list) {
-      const normCode = normalizeCode(c.code);
-      if (!seenCodes.has(normCode)) {
-        seenCodes.add(normCode);
-        dedupedCovers.push(c);
-      }
-    }
-    return dedupedCovers;
+    // Strictly show ONLY 1 subject package card at a time for the currently active subject
+    const activeSubCode = selectedSubject || 'IMO';
+    const normSelected = normalizeCode(activeSubCode);
+    const match = list.filter(s => {
+      const sNorm = normalizeCode(s.code);
+      const altNorm = normalizeCode(s.altCode);
+      return sNorm === normSelected || altNorm === normSelected || s.code === activeSubCode || s.altCode === activeSubCode;
+    });
+    if (match.length > 0) return [match[0]];
+    return list.slice(0, 1);
   }, [selectedSubject, ALL_SUBJECT_COVERS, examPapers, studentClass]);
 
   // Default subject study packages (Image 1 style) for all 6 subjects
@@ -1586,15 +1575,11 @@ export const StudentMyContentPage = ({
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
                 <BookOpen className="w-6 h-6 text-indigo-600" />
                 <span>
-                  {selectedSubject !== 'ALL'
-                    ? `${selectedSubject} Mock Test Series`
-                    : 'Olympiad Mock Test Series'}
+                  {selectedSubject} Mock Test Package
                 </span>
               </h2>
               <p className="text-xs text-slate-500 font-semibold mt-1">
-                {selectedSubject !== 'ALL'
-                  ? `Click "Unlock & Buy Test Series" below to unlock and start mock tests for ${selectedSubject}.`
-                  : 'Select any Olympiad subject below to view official mock tests, papers & practice.'}
+                {`Official Level-2 Champs Study & Examination Package for ${selectedSubject} (${studentClass}).`}
               </p>
             </div>
 
@@ -1617,9 +1602,40 @@ export const StudentMyContentPage = ({
             </div>
           </div>
 
+          {/* Subject Switcher Tabs - Strictly 1 subject package shown at a time */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {[
+              { code: 'IMO', label: 'IEOM (Maths)', icon: Calculator },
+              { code: 'ISO', label: 'IEOS (Science)', icon: Rocket },
+              { code: 'IGKO', label: 'IEOG (GK)', icon: Globe },
+              { code: 'IEO', label: 'IEOE (English)', icon: BookOpen },
+              { code: 'IDLO', label: 'IEOD (Cyber)', icon: Laptop },
+              { code: 'IHO', label: 'IEOH (Hindi)', icon: Languages },
+            ].map((tab) => {
+              const TabIcon = tab.icon;
+              const isSelected = normalizeCode(selectedSubject) === tab.code;
+              return (
+                <button
+                  key={tab.code}
+                  type="button"
+                  onClick={() => {
+                    setSelectedSubject(tab.code);
+                    if (onNavigateTab) onNavigateTab(`content_${tab.code.toLowerCase()}`);
+                  }}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
+                    isSelected
+                      ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-300'
+                      : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  <TabIcon className="w-3.5 h-3.5" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
 
-
-          {/* Grid of Cards or Empty State */}
+          {/* Single Subject Package Card Container */}
           {visibleCovers.length === 0 ? (
             <div className="bg-white rounded-3xl p-12 border border-slate-200 text-center space-y-4 max-w-lg mx-auto shadow-sm my-6">
               <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -1630,16 +1646,12 @@ export const StudentMyContentPage = ({
                   No Mock Test Series Available
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed mt-1">
-                  Currently, there are no active mock test series configured for {selectedSubject !== 'ALL' ? selectedSubject : studentClass}. Once published by the administrator, they will appear here automatically.
+                  Currently, there are no active mock test series configured for {selectedSubject}. Once published by the administrator, they will appear here automatically.
                 </p>
               </div>
             </div>
           ) : (
-            <div className={`grid gap-6 w-full ${
-              visibleCovers.length === 1
-                ? 'grid-cols-1 max-w-[480px]'
-                : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-            }`}>
+            <div className="w-full max-w-[480px] mx-auto">
               {visibleCovers.map((sub) => {
               const isUnlocked = isSubjectPurchased(sub.code, studentClass, purchasedTests);
               const subjectPkgs = getPackagesForSubject(sub.code);
